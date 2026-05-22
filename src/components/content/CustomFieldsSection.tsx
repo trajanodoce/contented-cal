@@ -1,0 +1,160 @@
+import React from 'react';
+import type { CustomFieldDefinition, SelectOption } from '../../lib/database.types';
+
+interface Props {
+  fields: CustomFieldDefinition[];
+  values: Record<string, unknown>;
+  onChange: (id: string, value: unknown) => void;
+  compact?: boolean;
+}
+
+export function CustomFieldsSection({ fields, values, onChange, compact = false }: Props) {
+  if (fields.length === 0) return null;
+
+  return (
+    <div className={compact ? 'space-y-3' : 'space-y-4'}>
+      {fields.map(field => (
+        <div key={field.id}>
+          <label className={`block font-medium text-gray-700 mb-1.5 ${compact ? 'text-xs' : 'text-sm'}`}>
+            {field.name}
+            {field.required && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+          <CustomFieldInput field={field} value={values[field.id]} onChange={v => onChange(field.id, v)} compact={compact} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface InputProps {
+  field: CustomFieldDefinition;
+  value: unknown;
+  onChange: (v: unknown) => void;
+  compact?: boolean;
+}
+
+function CustomFieldInput({ field, value, onChange, compact }: InputProps) {
+  const cls = `w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
+  const options = (field.options as unknown as SelectOption[]) ?? [];
+
+  switch (field.field_type) {
+    case 'text':
+    case 'url':
+      return (
+        <input
+          type={field.field_type === 'url' ? 'url' : 'text'}
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value)}
+          className={cls}
+          placeholder={field.field_type === 'url' ? 'https://' : ''}
+        />
+      );
+
+    case 'long_text':
+      return (
+        <textarea
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value)}
+          rows={3}
+          className={`${cls} resize-none`}
+        />
+      );
+
+    case 'number':
+      return (
+        <input
+          type="number"
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value === '' ? null : Number(e.target.value))}
+          className={cls}
+        />
+      );
+
+    case 'date':
+      return (
+        <input
+          type="date"
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value || null)}
+          className={cls}
+        />
+      );
+
+    case 'checkbox':
+      return (
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={!!value}
+            onChange={e => onChange(e.target.checked)}
+            className="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-400"
+          />
+          <span className="text-sm text-gray-600">Enabled</span>
+        </label>
+      );
+
+    case 'single_select':
+      return (
+        <select
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value || null)}
+          className={`${cls} bg-white`}
+        >
+          <option value="">Select...</option>
+          {options.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      );
+
+    case 'multi_select': {
+      const selected = (value as string[]) ?? [];
+      return (
+        <div className="flex flex-wrap gap-1.5">
+          {options.map(opt => {
+            const active = selected.includes(opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  const next = active
+                    ? selected.filter(v => v !== opt.value)
+                    : [...selected, opt.value];
+                  onChange(next);
+                }}
+                className={`px-2.5 py-1 text-xs rounded-full border transition-colors
+                  ${active
+                    ? 'bg-brand-600 text-white border-brand-600'
+                    : 'text-gray-600 border-gray-300 hover:border-gray-400'}`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+
+    default:
+      return (
+        <input
+          type="text"
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value)}
+          className={cls}
+        />
+      );
+  }
+}
+
+export function renderCustomFieldValue(field: CustomFieldDefinition, value: unknown): string {
+  if (value === null || value === undefined || value === '') return '—';
+  const options = (field.options as unknown as SelectOption[]) ?? [];
+  switch (field.field_type) {
+    case 'checkbox': return value ? 'Yes' : 'No';
+    case 'single_select': return options.find(o => o.value === value)?.label ?? String(value);
+    case 'multi_select': return (value as string[]).map(v => options.find(o => o.value === v)?.label ?? v).join(', ');
+    default: return String(value);
+  }
+}

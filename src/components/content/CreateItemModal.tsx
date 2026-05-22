@@ -1,0 +1,532 @@
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { useWorkspaceData } from '../../hooks/useWorkspaceData';
+import type { ContentType, Profile, BoardColumn } from '../../lib/database.types';
+import {
+  X,
+  ChevronDown,
+  Calendar,
+  Check,
+  User,
+  Loader2,
+} from 'lucide-react';
+
+interface CreateItemModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Priority options
+const priorityOptions = [
+  { value: 'low', label: 'Low', color: '#9ca3af' },
+  { value: 'medium', label: 'Medium', color: '#fbbf24' },
+  { value: 'high', label: 'High', color: '#f97316' },
+  { value: 'urgent', label: 'Urgent', color: '#ef4444' },
+] as const;
+
+// Default field visibility - all fields visible by default
+interface DefaultWorkflow {
+  fields?: Record<string, boolean>;
+  columns?: string[];
+}
+
+function getFieldVisibility(contentType: ContentType | null): Record<string, boolean> {
+  const defaultVisibility = {
+    channel: true,
+    priority: true,
+    publishDate: true,
+    dueDate: true,
+    tags: true,
+    description: true,
+  };
+
+  if (!contentType?.default_workflow) return defaultVisibility;
+
+  const workflow = contentType.default_workflow as DefaultWorkflow;
+  return { ...defaultVisibility, ...workflow.fields };
+}
+
+function getAllowedStatuses(contentType: ContentType | null, allColumns: BoardColumn[]): BoardColumn[] {
+  if (!contentType?.default_workflow) return allColumns;
+
+  const workflow = contentType.default_workflow as DefaultWorkflow;
+  if (!workflow.columns || workflow.columns.length === 0) return allColumns;
+
+  return allColumns.filter(col => workflow.columns?.includes(col.id));
+}
+
+// Simple custom select component
+interface SelectOption {
+  value: string;
+  label: string;
+  color?: string;
+}
+
+function CustomSelect({
+  options,
+  value,
+  onChange,
+  placeholder,
+}: {
+  options: SelectOption[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const selectedOption = options.find((o) => o.value === value);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between min-h-[42px]"
+      >
+        <div className="flex items-center gap-2">
+          {selectedOption?.color && (
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: selectedOption.color }}
+            />
+          )}
+          <span className={selectedOption ? '' : 'text-slate-400'}>
+            {selectedOption?.label || placeholder || 'Select...'}
+          </span>
+        </div>
+        <ChevronDown className="w-4 h-4 text-slate-400" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
+                option.value === value ? 'bg-blue-50 text-blue-900' : 'text-slate-700'
+              }`}
+            >
+              {option.color && (
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: option.color }}
+                />
+              )}
+              {option.label}
+              {option.value === value && <Check className="w-4 h-4 ml-auto" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Multi-select for assignees
+function AssigneeMultiSelect({
+  members,
+  value,
+  onChange,
+}: {
+  members: Profile[];
+  value: string[];
+  onChange: (value: string[]) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedMembers = members.filter((m) => value.includes(m.id));
+
+  const toggleMember = (memberId: string) => {
+    if (value.includes(memberId)) {
+      onChange(value.filter((id) => id !== memberId));
+    } else {
+      onChange([...value, memberId]);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between min-h-[42px]"
+      >
+        <div className="flex items-center gap-2 flex-wrap">
+          {selectedMembers.length === 0 ? (
+            <span className="text-slate-400">Select assignees...</span>
+          ) : selectedMembers.length === 1 ? (
+            <>
+              {selectedMembers[0].avatar_url ? (
+                <img
+                  src={selectedMembers[0].avatar_url}
+                  alt={selectedMembers[0].full_name || selectedMembers[0].email}
+                  className="w-6 h-6 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+                  <User className="w-3 h-3 text-slate-500" />
+                </div>
+              )}
+              <span className="text-slate-700">
+                {selectedMembers[0].full_name || selectedMembers[0].email}
+              </span>
+            </>
+          ) : (
+            <span className="text-slate-700">{selectedMembers.length} members</span>
+          )}
+        </div>
+        <ChevronDown className="w-4 h-4 text-slate-400" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+          {members.length === 0 ? (
+            <div className="px-3 py-2 text-sm text-slate-500">No members found</div>
+          ) : (
+            members.map((member) => {
+              const isSelected = value.includes(member.id);
+              return (
+                <button
+                  key={member.id}
+                  type="button"
+                  onClick={() => toggleMember(member.id)}
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-3 ${
+                    isSelected ? 'bg-blue-50' : ''
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded border flex items-center justify-center ${
+                      isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'
+                    }`}
+                  >
+                    {isSelected && <Check className="w-3 h-3 text-white" />}
+                  </div>
+                  {member.avatar_url ? (
+                    <img
+                      src={member.avatar_url}
+                      alt={member.full_name || member.email}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
+                      <User className="w-3 h-3 text-slate-500" />
+                    </div>
+                  )}
+                  <span className={isSelected ? 'text-blue-900' : 'text-slate-700'}>
+                    {member.full_name || member.email}
+                  </span>
+                </button>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Main modal component
+export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
+  const { user } = useAuth();
+  const { currentWorkspace } = useWorkspace();
+  const { contentTypes, boardColumns, members } = useWorkspaceData(
+    currentWorkspace?.id || null
+  );
+
+  const [title, setTitle] = useState('');
+  const [contentTypeId, setContentTypeId] = useState('');
+  const [statusId, setStatusId] = useState('');
+  const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
+  const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('medium');
+  const [channel, setChannel] = useState('');
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Set default status to first board column (Backlog)
+  useEffect(() => {
+    if (boardColumns.length > 0 && !statusId) {
+      const firstColumn = boardColumns.sort((a, b) => a.position - b.position)[0];
+      setStatusId(firstColumn.id);
+    }
+  }, [boardColumns, statusId]);
+
+  // Get selected content type
+  const selectedContentType = contentTypes.find(ct => ct.id === contentTypeId);
+
+  // Get field visibility based on selected content type
+  const fieldVisibility = getFieldVisibility(selectedContentType);
+
+  // Prepare select options
+  const contentTypeOptions = contentTypes.map((ct) => ({
+    value: ct.id,
+    label: ct.name,
+    color: ct.color,
+  }));
+
+  // Filter status options based on content type workflow
+  const allowedStatuses = getAllowedStatuses(selectedContentType, boardColumns);
+  const statusOptions = allowedStatuses
+    .sort((a, b) => a.position - b.position)
+    .map((bc) => ({
+      value: bc.id,
+      label: bc.name,
+      color: bc.color,
+    }));
+
+  if (!isOpen) return null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+
+    if (!currentWorkspace) {
+      toast.error('No workspace selected');
+      return;
+    }
+
+    if (!user) {
+      toast.error('You must be logged in');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from('content_items').insert({
+        workspace_id: currentWorkspace.id,
+        title: title.trim(),
+        content_type_id: contentTypeId || null,
+        status: statusId || null,
+        assignee_ids: assigneeIds,
+        due_date: dueDate || null,
+        priority: priority as 'low' | 'medium' | 'high' | 'urgent',
+        channel: channel.trim(),
+        description: description.trim(),
+        created_by: user.id,
+        tags: [],
+        custom_fields: {},
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Content item created!');
+      onClose();
+      resetForm();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to create content item');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  function resetForm() {
+    setTitle('');
+    setContentTypeId('');
+    setAssigneeIds([]);
+    setDueDate('');
+    setPriority('medium');
+    setChannel('');
+    setDescription('');
+    // Keep status as default
+  }
+
+  function handleClose() {
+    onClose();
+    resetForm();
+  }
+
+  const modal = (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+          <h2 className="font-semibold text-slate-900">Create Content Item</h2>
+          <button onClick={handleClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Title <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter content title..."
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              autoFocus
+              required
+            />
+          </div>
+
+          {/* Content Type & Status */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Content Type</label>
+              <CustomSelect
+                options={contentTypeOptions}
+                value={contentTypeId}
+                onChange={(value) => {
+                  setContentTypeId(value);
+                  // Reset status to first allowed when type changes
+                  const newType = contentTypes.find(ct => ct.id === value);
+                  const newAllowedStatuses = getAllowedStatuses(newType || null, boardColumns);
+                  if (newAllowedStatuses.length > 0) {
+                    setStatusId(newAllowedStatuses.sort((a, b) => a.position - b.position)[1]?.id || newAllowedStatuses[0]?.id);
+                  }
+                }}
+                placeholder="Select type..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
+              <CustomSelect
+                options={statusOptions}
+                value={statusId}
+                onChange={setStatusId}
+                placeholder="Select status..."
+              />
+            </div>
+          </div>
+
+          {/* Assignees */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">Assignees</label>
+            <AssigneeMultiSelect members={members} value={assigneeIds} onChange={setAssigneeIds} />
+          </div>
+
+          {/* Due Date & Priority */}
+          <div className="grid grid-cols-2 gap-4">
+            {fieldVisibility.dueDate && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Due Date</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            {fieldVisibility.priority && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Priority</label>
+                <CustomSelect
+                  options={priorityOptions.map((p) => ({ value: p.value, label: p.label, color: p.color }))}
+                  value={priority}
+                  onChange={setPriority}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Channel */}
+          {fieldVisibility.channel && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Channel</label>
+              <input
+                type="text"
+                value={channel}
+                onChange={(e) => setChannel(e.target.value)}
+                placeholder="e.g., Email, Social Media, Blog..."
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          )}
+
+          {/* Description */}
+          {fieldVisibility.description && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Add any additional details..."
+                rows={4}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              />
+            </div>
+          )}
+        </form>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
+          <button
+            type="button"
+            onClick={handleClose}
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !title.trim()}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              'Create'
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return createPortal(modal, document.body);
+}

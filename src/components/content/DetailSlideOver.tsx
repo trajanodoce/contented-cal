@@ -1,0 +1,658 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  X, Calendar, MessageSquare,
+  Activity, Plus, Loader2, Edit2, Check, Hash, Zap, ExternalLink
+} from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { useApp } from '../../contexts/AppContext';
+import type { ContentItem, Comment, ActivityLog, Subtask, ContentType, BoardColumn } from '../../lib/database.types';
+import { formatDate, formatDateFull } from '../../lib/utils';
+import { CustomFieldsSection } from './CustomFieldsSection';
+import { isOrdinalItem, ORDINAL_COLOR, getOrdinalProfile, getPlatformFromChannel, PLATFORM_META } from '../../lib/ordinal';
+import { useOrdinalPost } from '../../hooks/useOrdinalPost';
+import { ExternalLinksSection } from './ExternalLinks';
+import { AiAssistant } from './AiAssistant';
+
+interface Props {
+  item: ContentItem;
+  onClose: () => void;
+  onUpdated: () => void;
+  addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+const CHANNELS = ['Blog', 'LinkedIn', 'Twitter/X', 'Instagram', 'Facebook', 'YouTube', 'Email', 'Website', 'Other'];
+const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
+
+// Default field visibility - all fields visible by default
+interface DefaultWorkflow {
+  fields?: Record<string, boolean>;
+  columns?: string[];
+}
+
+function getFieldVisibility(contentType: ContentType | null): Record<string, boolean> {
+  const defaultVisibility = {
+    channel: true,
+    priority: true,
+    publishDate: true,
+    dueDate: true,
+    tags: true,
+    description: true,
+  };
+
+  if (!contentType?.default_workflow) return defaultVisibility;
+
+  const workflow = contentType.default_workflow as DefaultWorkflow;
+  return { ...defaultVisibility, ...workflow.fields };
+}
+
+function getAllowedStatuses(contentType: ContentType | null, allColumns: BoardColumn[]): BoardColumn[] {
+  if (!contentType?.default_workflow) return allColumns;
+
+  const workflow = contentType.default_workflow as DefaultWorkflow;
+  if (!workflow.columns || workflow.columns.length === 0) return allColumns;
+
+  return allColumns.filter(col => workflow.columns?.includes(col.id));
+}
+
+export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
+  const { contentTypes, boardColumns, user, customFieldDefs, projects } = useApp();
+  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'activity'>('details');
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [activity, setActivity] = useState<ActivityLog[]>([]);
+  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [newSubtask, setNewSubtask] = useState('');
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<Partial<ContentItem>>({});
+  const [savingField, setSavingField] = useState<string | null>(null);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [description, setDescription] = useState(item.description);
+
+  const contentType = contentTypes.find(ct => ct.id === item.content_type_id);
+
+  // Check if this is an Ordinal item
+  const isOrdinal = isOrdinalItem(item);
+  const ordinalProfile = isOrdinal ? getOrdinalProfile(item) : null;
+  const { ordinalLink, loading: ordinalLinkLoading } = useOrdinalPost(item.id);
+
+  // Get field visibility based on content type
+  const fieldVisibility = useMemo(() => getFieldVisibility(contentType || null), [contentType]);
+
+  // Get allowed statuses based on content type workflow
+  const allowedStatuses = useMemo(() => getAllowedStatuses(contentType || null, boardColumns), [contentType, boardColumns]);
+
+  const activeCustomFields = useMemo(
+    () => customFieldDefs.filter(f => f.content_type_id === item.content_type_id || (!f.content_type_id && !item.content_type_id)),
+    [customFieldDefs, item.content_type_id]
+  );
+
+  const customFieldValues = useMemo(
+    () => (item.custom_fields as Record<string, unknown>) ?? {},
+    [item.custom_fields]
+  );
+
+  async function updateCustomField(fieldId: string, value: unknown) {
+    const updated = { ...customFieldValues, [fieldId]: value };
+    await updateField('custom_fields', updated);
+  }
+
+  const loadComments = useCallback(async () => {
+    const { data } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('content_item_id', item.id)
+      .order('created_at');
+    if (data) setComments(data);
+  }, [item.id]);
+
+  const loadActivity = useCallback(async () => {
+    const { data } = await supabase
+      .from('activity_log')
+      .select('*')
+      .eq('content_item_id', item.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (data) setActivity(data);
+  }, [item.id]);
+
+  const loadSubtasks = useCallback(async () => {
+    const { data } = await supabase
+      .from('subtasks')
+      .select('*')
+      .eq('content_item_id', item.id)
+      .order('position');
+    if (data) setSubtasks(data);
+  }, [item.id]);
+
+  useEffect(() => {
+    loadComments();
+    loadActivity();
+    loadSubtasks();
+  }, [loadComments, loadActivity, loadSubtasks]);
+
+  async function updateField(field: string, value: unknown) {
+    setSavingField(field);
+    try {
+      const { error } = await supabase
+        .from('content_items')
+        .update({ [field]: value } as Record<string, unknown>)
+        .eq('id', item.id);
+      if (error) throw error;
+
+      await supabase.from('activity_log').insert({
+        content_item_id: item.id,
+        user_id: user?.id,
+        action: `Updated ${field}`,
+        metadata: { field, value },
+      });
+
+      onUpdated();
+      addToast('Updated');
+    } catch (err: unknown) {
+      addToast((err as Error).message, 'error');
+    } finally {
+      setSavingField(null);
+      setEditingField(null);
+    }
+  }
+
+  async function saveDescription() {
+    await updateField('description', description);
+    setEditingDescription(false);
+  }
+
+  async function addComment() {
+    if (!commentText.trim() || !user) return;
+    const { error } = await supabase.from('comments').insert({
+      content_item_id: item.id,
+      user_id: user.id,
+      body: commentText.trim(),
+    });
+    if (error) { addToast(error.message, 'error'); return; }
+    setCommentText('');
+    loadComments();
+    addToast('Comment added');
+  }
+
+  async function addSubtask() {
+    if (!newSubtask.trim()) return;
+    const { error } = await supabase.from('subtasks').insert({
+      content_item_id: item.id,
+      title: newSubtask.trim(),
+      position: subtasks.length,
+    });
+    if (error) { addToast(error.message, 'error'); return; }
+    setNewSubtask('');
+    loadSubtasks();
+  }
+
+  async function toggleSubtask(subtask: Subtask) {
+    await supabase.from('subtasks').update({ completed: !subtask.completed }).eq('id', subtask.id);
+    loadSubtasks();
+  }
+
+  const completedSubtasks = subtasks.filter(s => s.completed).length;
+
+  return (
+    <div className="fixed inset-0 z-40 flex justify-end" onClick={onClose}>
+      <div
+        className="w-full max-w-2xl bg-white h-full flex flex-col shadow-2xl border-l border-gray-200"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Ordinal Banner */}
+        {isOrdinal && (
+          <div className="px-6 py-3 border-b" style={{ backgroundColor: `${ORDINAL_COLOR}08`, borderColor: `${ORDINAL_COLOR}20` }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-6 h-6 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: `${ORDINAL_COLOR}15` }}
+                >
+                  <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">This post is managed in Ordinal</p>
+                  <p className="text-xs text-gray-500">To edit, open it in Ordinal</p>
+                </div>
+              </div>
+              {ordinalLink?.post_url && (
+                <a
+                  href={ordinalLink.post_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+                  style={{
+                    color: ORDINAL_COLOR,
+                    borderColor: `${ORDINAL_COLOR}40`,
+                    backgroundColor: `${ORDINAL_COLOR}08`,
+                  }}
+                >
+                  <span>Open in Ordinal</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Header */}
+        <div className="flex items-start gap-3 px-6 py-4 border-b border-gray-100">
+          <div className="flex-1 min-w-0">
+            {isOrdinal ? (
+              // Read-only title for Ordinal items
+              <div className="flex items-start gap-2">
+                <div
+                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{ backgroundColor: `${ORDINAL_COLOR}15` }}
+                >
+                  <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
+                  {/* Ordinal Profile */}
+                  {ordinalProfile && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span
+                        className="inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold"
+                        style={{
+                          backgroundColor: PLATFORM_META[ordinalProfile.platform]?.bgColor ?? '#F5F5F5',
+                          color: PLATFORM_META[ordinalProfile.platform]?.color ?? '#666',
+                        }}
+                      >
+                        {PLATFORM_META[ordinalProfile.platform]?.icon?.charAt(0) ?? '●'}
+                      </span>
+                      <span className="text-xs text-gray-500">{ordinalProfile.handle}</span>
+                      <span className="text-gray-300">•</span>
+                      <span className="text-xs text-gray-400">{ordinalProfile.name}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                {editingField === 'title' ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      autoFocus
+                      value={editValues.title ?? item.title}
+                      onChange={e => setEditValues({ ...editValues, title: e.target.value })}
+                      className="flex-1 text-lg font-semibold text-gray-900 border-b-2 border-brand-400 outline-none bg-transparent"
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') updateField('title', editValues.title ?? item.title);
+                        if (e.key === 'Escape') setEditingField(null);
+                      }}
+                    />
+                    <button onClick={() => updateField('title', editValues.title ?? item.title)}>
+                      {savingField === 'title' ? <Loader2 className="w-4 h-4 animate-spin text-brand-500" /> : <Check className="w-4 h-4 text-green-500" />}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    className="text-left group"
+                    onClick={() => { setEditingField('title'); setEditValues({ title: item.title }); }}
+                  >
+                    <h2 className="text-lg font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">{item.title}</h2>
+                  </button>
+                )}
+              </>
+            )}
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {contentType && (
+                <span className="flex items-center gap-1 text-xs text-gray-500">
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contentType.color }} />
+                  {contentType.name}
+                </span>
+              )}
+              <span className="text-gray-300">•</span>
+              <span className="text-xs text-gray-400">Created {formatDateFull(item.created_at)}</span>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors shrink-0 mt-1">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-gray-100 px-6">
+          {(['details', 'comments', 'activity'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-3 px-1 mr-5 text-sm font-medium border-b-2 transition-colors capitalize
+                ${activeTab === tab ? 'border-brand-400 text-brand-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+            >
+              {tab}
+              {tab === 'comments' && comments.length > 0 && (
+                <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex-1 overflow-y-auto">
+          {activeTab === 'details' && (
+            <div className="p-6 space-y-6">
+              {/* Key fields grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Status */}
+                <div>
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</label>
+                  <select
+                    value={item.status ?? ''}
+                    onChange={e => updateField('status', e.target.value || null)}
+                    className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                  >
+                    <option value="">None</option>
+                    {allowedStatuses.map(col => (
+                      <option key={col.id} value={col.id}>{col.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Priority */}
+                {fieldVisibility.priority && (
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Priority</label>
+                    <select
+                      value={item.priority}
+                      onChange={e => updateField('priority', e.target.value)}
+                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                    >
+                      {PRIORITIES.map(p => (
+                        <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Due date */}
+                {fieldVisibility.dueDate && (
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> Due date
+                    </label>
+                    <input
+                      type="date"
+                      value={item.due_date ?? ''}
+                      onChange={e => updateField('due_date', e.target.value || null)}
+                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                    />
+                  </div>
+                )}
+
+                {/* Publish date */}
+                {fieldVisibility.publishDate && (
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> Publish date
+                    </label>
+                    <input
+                      type="date"
+                      value={item.publish_date ?? ''}
+                      onChange={e => updateField('publish_date', e.target.value || null)}
+                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                    />
+                  </div>
+                )}
+
+                {/* Channel */}
+                {fieldVisibility.channel && (
+                  <div>
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Channel</label>
+                    <select
+                      value={item.channel ?? ''}
+                      onChange={e => updateField('channel', e.target.value)}
+                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                    >
+                      <option value="">None</option>
+                      {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                )}
+
+                {/* Content type */}
+                <div>
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Content type</label>
+                  <select
+                    value={item.content_type_id ?? ''}
+                    onChange={e => updateField('content_type_id', e.target.value || null)}
+                    className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                  >
+                    <option value="">None</option>
+                    {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
+                  </select>
+                </div>
+
+                {/* Project */}
+                {projects.length > 0 && (
+                  <div className="col-span-2">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Project</label>
+                    <select
+                      value={item.project_id ?? ''}
+                      onChange={e => updateField('project_id', e.target.value || null)}
+                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                    >
+                      <option value="">No project</option>
+                      {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Tags */}
+              {fieldVisibility.tags && item.tags && item.tags.length > 0 && (
+                <div>
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1 mb-2">
+                    <Hash className="w-3 h-3" /> Tags
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {item.tags.map(tag => (
+                      <span key={tag} className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {fieldVisibility.description && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</label>
+                    {!editingDescription && (
+                      <button
+                        onClick={() => setEditingDescription(true)}
+                        className="text-xs text-brand-500 hover:text-brand-500 flex items-center gap-1"
+                      >
+                        <Edit2 className="w-3 h-3" /> Edit
+                      </button>
+                    )}
+                  </div>
+                  {editingDescription ? (
+                    <div>
+                      <textarea
+                        autoFocus
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        rows={6}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none font-mono"
+                      />
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={saveDescription}
+                          className="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 flex items-center gap-1"
+                        >
+                          {savingField === 'description' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                          Save
+                        </button>
+                        <button
+                          onClick={() => { setEditingDescription(false); setDescription(item.description); }}
+                          className="px-3 py-1.5 text-gray-600 text-xs border border-gray-200 rounded-lg hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="text-sm text-gray-700 whitespace-pre-wrap min-h-[60px] p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => setEditingDescription(true)}
+                    >
+                      {item.description || <span className="text-gray-400 italic">Click to add description...</span>}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Custom fields */}
+              {activeCustomFields.length > 0 && (
+                <div>
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3 block">Custom fields</label>
+                  <CustomFieldsSection
+                    fields={activeCustomFields}
+                    values={customFieldValues}
+                    onChange={updateCustomField}
+                    compact
+                  />
+                </div>
+              )}
+
+              {/* External links */}
+              <div className="border-t border-gray-100 pt-5">
+                <ExternalLinksSection contentItemId={item.id} addToast={addToast} />
+              </div>
+
+              {/* Subtasks */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Subtasks {subtasks.length > 0 && `(${completedSubtasks}/${subtasks.length})`}
+                  </label>
+                </div>
+                {subtasks.length > 0 && (
+                  <div className="mb-2">
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-green-500 rounded-full transition-all"
+                        style={{ width: `${subtasks.length ? (completedSubtasks / subtasks.length) * 100 : 0}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="space-y-1.5 mb-3">
+                  {subtasks.map(st => (
+                    <div key={st.id} className="flex items-center gap-2.5 py-1">
+                      <button
+                        onClick={() => toggleSubtask(st)}
+                        className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors shrink-0
+                          ${st.completed ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-gray-400'}`}
+                      >
+                        {st.completed && <Check className="w-2.5 h-2.5 text-white" />}
+                      </button>
+                      <span className={`text-sm flex-1 ${st.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                        {st.title}
+                      </span>
+                      {st.due_date && (
+                        <span className="text-xs text-gray-400">{formatDate(st.due_date)}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={newSubtask}
+                    onChange={e => setNewSubtask(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && addSubtask()}
+                    placeholder="Add subtask..."
+                    className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  />
+                  <button
+                    onClick={addSubtask}
+                    disabled={!newSubtask.trim()}
+                    className="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* AI Assistant */}
+              <AiAssistant
+                item={item}
+                addToast={addToast}
+                onInsertToDescription={(text) => {
+                  setDescription(prev => prev ? `${prev}\n\n${text}` : text);
+                  setEditingDescription(true);
+                }}
+              />
+            </div>
+          )}
+
+          {activeTab === 'comments' && (
+            <div className="p-6 space-y-4">
+              {comments.length === 0 && (
+                <div className="text-center py-8 text-gray-400">
+                  <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                  <p className="text-sm">No comments yet</p>
+                </div>
+              )}
+              {comments.map(comment => (
+                <div key={comment.id} className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-mint-200 text-brand-600 flex items-center justify-center text-xs font-medium shrink-0">
+                    {comment.user_id.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xs font-medium text-gray-700">{comment.user_id.slice(0, 8)}</span>
+                      <span className="text-xs text-gray-400">{formatDateFull(comment.created_at)}</span>
+                    </div>
+                    <p className="text-sm text-gray-700 mt-0.5 whitespace-pre-wrap">{comment.body}</p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="pt-2 border-t border-gray-100">
+                <textarea
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  placeholder="Add a comment..."
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+                />
+                <button
+                  onClick={addComment}
+                  disabled={!commentText.trim()}
+                  className="mt-2 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors"
+                >
+                  Post comment
+                </button>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'activity' && (
+            <div className="p-6 space-y-3">
+              {activity.length === 0 && (
+                <div className="text-center py-8 text-gray-400">
+                  <Activity className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                  <p className="text-sm">No activity yet</p>
+                </div>
+              )}
+              {activity.map(log => (
+                <div key={log.id} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <Activity className="w-3 h-3 text-gray-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-700">{log.action}</p>
+                    <p className="text-xs text-gray-400">{formatDateFull(log.created_at)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
