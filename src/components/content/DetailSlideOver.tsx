@@ -299,106 +299,120 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         )}
 
         {/* Header */}
-        <div className="flex items-start gap-3 px-6 py-4 border-b border-slate-100">
-          <div className="flex-1 min-w-0">
-            {isOrdinalPost ? (
-              // Read-only title for Ordinal items
-              <div className="flex items-start gap-2">
-                <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{ backgroundColor: `${ORDINAL_COLOR}15` }}
-                >
-                  <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
-                  {/* Ordinal Profile */}
-                  {ordinalProfile && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <span
-                        className="inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold"
-                        style={{
-                          backgroundColor: PLATFORM_META[ordinalProfile.platform]?.bgColor ?? '#F5F5F5',
-                          color: PLATFORM_META[ordinalProfile.platform]?.color ?? '#666',
-                        }}
-                      >
-                        {PLATFORM_META[ordinalProfile.platform]?.icon?.charAt(0) ?? '●'}
-                      </span>
-                      <span className="text-xs text-slate-500">{ordinalProfile.handle}</span>
-                      <span className="text-slate-300">•</span>
-                      <span className="text-xs text-slate-400">{ordinalProfile.name}</span>
-                    </div>
+        {(() => {
+          const titleColor = contentType?.color ?? '#64748b';
+          return (
+            <div className="border-b border-slate-200">
+              {/* Action buttons row */}
+              <div className="flex items-center justify-between px-6 pt-3 pb-0">
+                <div className="flex items-center gap-2">
+                  {contentType && (
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: titleColor }} />
+                      {contentType.name}
+                    </span>
                   )}
+                  <span className="text-slate-300">•</span>
+                  <span className="text-xs text-slate-400">Created {formatDateFull(item.created_at)}</span>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => {
+                      const url = `${window.location.origin}${window.location.pathname}?item=${item.id}`;
+                      navigator.clipboard.writeText(url).then(() => addToast('Link copied to clipboard'));
+                    }}
+                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    title="Copy link"
+                  >
+                    <Link2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className={`p-1.5 rounded-full transition-all ${
+                      showSavedCheck
+                        ? 'bg-green-100 text-green-600'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {showSavedCheck ? (
+                      <Check className="w-5 h-5 animate-[scaleIn_0.3s_ease-out]" />
+                    ) : (
+                      <X className="w-5 h-5" />
+                    )}
+                  </button>
                 </div>
               </div>
-            ) : isReadOnly ? (
-              <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
-            ) : (
-              <>
-                {editingField === 'title' ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      autoFocus
-                      value={editValues.title ?? item.title}
-                      onChange={e => setEditValues({ ...editValues, title: e.target.value })}
-                      className="flex-1 text-lg font-semibold text-slate-900 border-b-2 border-brand-400 outline-none bg-transparent"
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') updateField('title', editValues.title ?? item.title);
-                        if (e.key === 'Escape') setEditingField(null);
-                      }}
-                    />
-                    <button onClick={() => updateField('title', editValues.title ?? item.title)}>
-                      {savingField === 'title' ? <Loader2 className="w-4 h-4 animate-spin text-brand-500" /> : <Check className="w-4 h-4 text-green-500" />}
-                    </button>
+
+              {/* Title wrapper with content type color */}
+              <div
+                className="mx-5 my-3 px-4 py-3 rounded-lg border-l-[3px]"
+                style={{
+                  backgroundColor: `${titleColor}0A`,
+                  borderLeftColor: titleColor,
+                }}
+              >
+                {isOrdinalPost ? (
+                  <div className="flex items-start gap-2">
+                    <div
+                      className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                      style={{ backgroundColor: `${ORDINAL_COLOR}15` }}
+                    >
+                      <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-xl font-bold text-slate-900">{item.title}</h2>
+                      {ordinalProfile && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <span
+                            className="inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold"
+                            style={{
+                              backgroundColor: PLATFORM_META[ordinalProfile.platform]?.bgColor ?? '#F5F5F5',
+                              color: PLATFORM_META[ordinalProfile.platform]?.color ?? '#666',
+                            }}
+                          >
+                            {PLATFORM_META[ordinalProfile.platform]?.icon?.charAt(0) ?? '●'}
+                          </span>
+                          <span className="text-xs text-slate-500">{ordinalProfile.handle}</span>
+                          <span className="text-slate-300">•</span>
+                          <span className="text-xs text-slate-400">{ordinalProfile.name}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                ) : isReadOnly ? (
+                  <h2 className="text-xl font-bold text-slate-900">{item.title}</h2>
                 ) : (
-                  <button
-                    className="text-left group"
-                    onClick={() => { setEditingField('title'); setEditValues({ title: item.title }); }}
-                  >
-                    <h2 className="text-lg font-semibold text-slate-900 group-hover:text-brand-600 transition-colors">{item.title}</h2>
-                  </button>
+                  <>
+                    {editingField === 'title' ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          autoFocus
+                          value={editValues.title ?? item.title}
+                          onChange={e => setEditValues({ ...editValues, title: e.target.value })}
+                          className="flex-1 text-xl font-bold text-slate-900 border-b-2 border-brand-400 outline-none bg-transparent"
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') updateField('title', editValues.title ?? item.title);
+                            if (e.key === 'Escape') setEditingField(null);
+                          }}
+                        />
+                        <button onClick={() => updateField('title', editValues.title ?? item.title)}>
+                          {savingField === 'title' ? <Loader2 className="w-4 h-4 animate-spin text-brand-500" /> : <Check className="w-4 h-4 text-green-500" />}
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        className="text-left group w-full"
+                        onClick={() => { setEditingField('title'); setEditValues({ title: item.title }); }}
+                      >
+                        <h2 className="text-xl font-bold text-slate-900 group-hover:text-brand-600 transition-colors">{item.title}</h2>
+                      </button>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
-              {contentType && (
-                <span className="flex items-center gap-1 text-xs text-slate-500">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contentType.color ?? undefined }} />
-                  {contentType.name}
-                </span>
-              )}
-              <span className="text-slate-300">•</span>
-              <span className="text-xs text-slate-400">Created {formatDateFull(item.created_at)}</span>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-1 shrink-0 mt-1">
-            <button
-              onClick={() => {
-                const url = `${window.location.origin}${window.location.pathname}?item=${item.id}`;
-                navigator.clipboard.writeText(url).then(() => addToast('Link copied to clipboard'));
-              }}
-              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-              title="Copy link"
-            >
-              <Link2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={handleClose}
-              className={`p-1.5 rounded-full transition-all ${
-                showSavedCheck
-                  ? 'bg-green-100 text-green-600'
-                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {showSavedCheck ? (
-                <Check className="w-5 h-5 animate-[scaleIn_0.3s_ease-out]" />
-              ) : (
-                <X className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* Tabs */}
         <div className="flex border-b border-slate-100 px-6">
