@@ -80,6 +80,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const [description, setDescription] = useState(item.description);
   const [granolaPickerOpen, setGranolaPickerOpen] = useState(false);
   const [granolaRefreshKey, setGranolaRefreshKey] = useState(0);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [showSavedCheck, setShowSavedCheck] = useState(false);
 
   const contentType = contentTypes.find(ct => ct.id === item.content_type_id);
 
@@ -149,6 +151,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
       });
 
       onUpdated();
+      setHasChanges(true);
       addToast('Updated');
     } catch (err: unknown) {
       addToast((err as Error).message, 'error');
@@ -176,6 +179,19 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     addToast('Comment added');
   }
 
+  // Close with green check animation if changes were made
+  function handleClose() {
+    if (hasChanges) {
+      setShowSavedCheck(true);
+      setTimeout(() => {
+        setShowSavedCheck(false);
+        onClose();
+      }, 800);
+    } else {
+      onClose();
+    }
+  }
+
   // Member profiles for subtasks section
   const memberProfiles = useMemo(
     () => members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null })),
@@ -183,9 +199,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   );
 
   return (
-    <div className="fixed inset-0 z-40 flex justify-end" onClick={onClose}>
+    <div className="fixed inset-0 z-40 flex justify-end" onClick={handleClose}>
       <div
-        className="w-full max-w-2xl bg-white h-full flex flex-col shadow-2xl border-l border-slate-200"
+        className="w-full max-w-2xl bg-white h-full flex flex-col shadow-2xl border-l-2 border-slate-300"
         onClick={e => e.stopPropagation()}
       >
         {/* Ordinal Banner */}
@@ -366,8 +382,19 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             >
               <Link2 className="w-4 h-4" />
             </button>
-            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors">
-              <X className="w-5 h-5" />
+            <button
+              onClick={handleClose}
+              className={`p-1.5 rounded-full transition-all ${
+                showSavedCheck
+                  ? 'bg-green-100 text-green-600'
+                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {showSavedCheck ? (
+                <Check className="w-5 h-5 animate-[scaleIn_0.3s_ease-out]" />
+              ) : (
+                <X className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -704,6 +731,31 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Sticky footer */}
+        <div className="flex-shrink-0 px-6 py-4 border-t-2 border-slate-200 bg-white">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-400">
+              {hasChanges ? 'All changes saved' : 'No unsaved changes'}
+            </span>
+            <button
+              onClick={handleClose}
+              className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1.5"
+            >
+              {showSavedCheck ? (
+                <>
+                  <Check className="w-4 h-4 animate-[scaleIn_0.3s_ease-out]" />
+                  Saved
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  Done
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
