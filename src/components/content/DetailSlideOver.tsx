@@ -201,7 +201,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={handleClose}>
       <div
-        className="w-full max-w-2xl bg-white h-full flex flex-col shadow-2xl border-l-2 border-slate-300"
+        className="w-full max-w-2xl bg-white h-full flex flex-col border-l-2 border-blue-200"
+        style={{ boxShadow: '-8px 0 30px -5px rgba(59, 130, 246, 0.15), -2px 0 10px -2px rgba(59, 130, 246, 0.08)' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Ordinal Banner */}
@@ -420,7 +421,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           {activeTab === 'details' && (
             <div className="p-5 space-y-4">
               {/* Key fields card */}
-              <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
+              <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
               <div className="grid grid-cols-2 gap-4">
                 {/* Status */}
                 <div>
@@ -551,7 +552,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               </div>
 
               {/* Linked Assets */}
-              <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
+              <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>
 
@@ -570,7 +571,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Description */}
               {fieldVisibility.description && (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
+                <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Description</label>
                     {!editingDescription && !isReadOnly && (
@@ -620,7 +621,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Custom fields */}
               {activeCustomFields.length > 0 && (
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
+                <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
                   <label className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3 block">Custom fields</label>
                   <CustomFieldsSection
                     fields={activeCustomFields}
@@ -734,7 +735,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         </div>
 
         {/* Sticky footer */}
-        <div className="flex-shrink-0 px-6 py-4 border-t-2 border-slate-200 bg-white">
+        <div className="flex-shrink-0 px-6 py-4 border-t-2 border-blue-100 bg-white">
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-400">
               {hasChanges ? 'All changes saved' : 'No unsaved changes'}

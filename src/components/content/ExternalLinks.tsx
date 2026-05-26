@@ -41,9 +41,9 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:border-gray-300 transition-all">
+    <div className="group bg-white border border-slate-300 rounded-xl overflow-hidden hover:shadow-md hover:border-slate-400 transition-all">
       {/* Thumbnail */}
-      <div className="w-full h-28 bg-gray-50 flex items-center justify-center overflow-hidden relative">
+      <div className="w-full h-28 bg-slate-50 flex items-center justify-center overflow-hidden relative">
         {link.thumbnail_url && !imgError ? (
           <img
             src={link.thumbnail_url}
@@ -52,7 +52,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="flex flex-col items-center gap-2 text-gray-300">
+          <div className="flex flex-col items-center gap-2 text-slate-300">
             <Image className="w-8 h-8" />
             <span className="text-xs">No preview</span>
           </div>
@@ -60,7 +60,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
         {!readOnly && (
           <button
             onClick={onDelete}
-            className="absolute top-2 right-2 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+            className="absolute top-2 right-2 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -70,11 +70,11 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
       {/* Content */}
       <div className="p-3">
         <PlatformBadge platform={link.platform as ExternalLinkPlatform} />
-        <p className="mt-1.5 text-sm font-medium text-gray-800 line-clamp-2 leading-snug">
+        <p className="mt-1.5 text-sm font-medium text-slate-800 line-clamp-2 leading-snug">
           {link.title || 'Untitled'}
         </p>
         {(link.metadata as Record<string, string>)?.description && (
-          <p className="mt-0.5 text-xs text-gray-400 line-clamp-2">
+          <p className="mt-0.5 text-xs text-slate-400 line-clamp-2">
             {(link.metadata as Record<string, string>).description}
           </p>
         )}
@@ -194,7 +194,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
+        <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
           <Link2 className="w-3.5 h-3.5" />
           Linked Assets {links.length > 0 && `(${links.length})`}
         </label>
@@ -220,7 +220,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
               if (e.key === 'Escape') { setAdding(false); setUrl(''); }
             }}
             placeholder="https://www.figma.com/..."
-            className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+            className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
           />
           <button
             onClick={handleAddLink}
@@ -232,7 +232,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
           </button>
           <button
             onClick={() => { setAdding(false); setUrl(''); }}
-            className="px-2 py-1.5 text-gray-400 hover:text-gray-600 text-xs border border-gray-200 rounded-lg transition-colors"
+            className="px-2 py-1.5 text-slate-400 hover:text-slate-600 text-xs border border-slate-200 rounded-lg transition-colors"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -241,13 +241,13 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
 
       {loading ? (
         <div className="flex items-center justify-center py-6">
-          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+          <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
         </div>
       ) : links.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-6 text-center border border-dashed border-gray-200 rounded-xl">
-          <Link2 className="w-7 h-7 text-gray-300 mb-2" />
-          <p className="text-xs text-gray-400">No linked assets yet</p>
-          <p className="text-xs text-gray-400 mt-0.5">Paste a Figma, Canva, Miro, or any URL to attach it</p>
+        <div className="flex flex-col items-center justify-center py-6 text-center border border-dashed border-slate-200 rounded-xl">
+          <Link2 className="w-7 h-7 text-slate-300 mb-2" />
+          <p className="text-xs text-slate-400">No linked assets yet</p>
+          <p className="text-xs text-slate-400 mt-0.5">Paste a Figma, Canva, Miro, or any URL to attach it</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
@@ -295,7 +295,7 @@ export function LinkPlatformIcons({ contentItemId }: { contentItemId: string }) 
         );
       })}
       {platforms.length > 3 && (
-        <span className="text-[9px] text-gray-400 font-medium">+{platforms.length - 3}</span>
+        <span className="text-[9px] text-slate-400 font-medium">+{platforms.length - 3}</span>
       )}
     </div>
   );

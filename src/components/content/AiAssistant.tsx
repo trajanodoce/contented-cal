@@ -96,7 +96,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       onClick={copy}
       title="Copy to clipboard"
-      className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+      className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 transition-colors"
     >
       {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
       {copied ? 'Copied' : 'Copy'}
@@ -116,8 +116,8 @@ function InsertModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCancel}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
-        <h3 className="text-sm font-semibold text-gray-900 mb-1">Insert into description</h3>
-        <p className="text-xs text-gray-500 mb-4">The description already has content. How should this be added?</p>
+        <h3 className="text-sm font-semibold text-slate-900 mb-1">Insert into description</h3>
+        <p className="text-xs text-slate-500 mb-4">The description already has content. How should this be added?</p>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => onChoice('replace')}
@@ -128,13 +128,13 @@ function InsertModal({
           </button>
           <button
             onClick={() => onChoice('append')}
-            className="w-full px-4 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
           >
             Append to description
           </button>
           <button
             onClick={onCancel}
-            className="w-full px-4 py-2 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+            className="w-full px-4 py-2 text-xs text-slate-500 hover:text-slate-700 transition-colors"
           >
             Cancel
           </button>
@@ -160,14 +160,14 @@ function ResponseCard({
   const timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-b border-gray-100">
+    <div className="bg-white border border-slate-300 rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-100">
         <div className="flex items-center gap-1.5">
-          <span className="text-gray-500">{actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}</span>
-          <span className="text-xs font-medium text-gray-700">{actionMeta?.label ?? interaction.action}</span>
+          <span className="text-slate-500">{actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}</span>
+          <span className="text-xs font-medium text-slate-700">{actionMeta?.label ?? interaction.action}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400 flex items-center gap-1">
+          <span className="text-xs text-slate-400 flex items-center gap-1">
             <Clock className="w-3 h-3" />{timeLabel}
           </span>
           <CopyButton text={interaction.response ?? ''} />
@@ -182,7 +182,7 @@ function ResponseCard({
         </div>
       </div>
       <div className="px-3 py-2.5">
-        <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{interaction.response}</p>
+        <p className="text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">{interaction.response}</p>
       </div>
     </div>
   );
@@ -320,24 +320,24 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
 
   return (
     <>
-      <div className="border border-gray-200 rounded-xl overflow-hidden">
+      <div className="border border-slate-300 rounded-xl overflow-hidden">
         {/* Header toggle */}
         <button
           onClick={() => setOpen(o => !o)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-white hover:bg-gray-50 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-slate-50 to-white hover:bg-slate-50 transition-colors"
         >
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#2F8889' }}>
               <Sparkles className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="text-sm font-semibold text-gray-800">AI Assistant</span>
-            <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">Bolt.new Writer</span>
+            <span className="text-sm font-semibold text-slate-800">AI Assistant</span>
+            <span className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">Bolt.new Writer</span>
           </div>
-          {open ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+          {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </button>
 
         {open && (
-          <div className="border-t border-gray-100">
+          <div className="border-t border-slate-100">
             {hasIntegration === false ? (
               <NotConnectedState />
             ) : (
@@ -350,21 +350,21 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
 
                 {/* Primary actions — large buttons */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">Quick actions</p>
+                  <p className="text-xs font-medium text-slate-500 mb-2">Quick actions</p>
                   <div className="space-y-2">
                     {primaryActions.map(action => (
                       <button
                         key={action.id}
                         onClick={() => runAction(action.id)}
                         disabled={loading !== null}
-                        className="w-full flex items-center gap-3 p-3 text-left border border-gray-200 rounded-lg transition-all group disabled:opacity-50 hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5"
+                        className="w-full flex items-center gap-3 p-3 text-left border border-slate-200 rounded-lg transition-all group disabled:opacity-50 hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 group-hover:bg-[#2F8889]/10 flex items-center justify-center text-gray-500 group-hover:text-[#2F8889] transition-colors shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-[#2F8889]/10 flex items-center justify-center text-slate-500 group-hover:text-[#2F8889] transition-colors shrink-0">
                           {action.icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-800 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{action.description}</p>
+                          <p className="text-sm font-medium text-slate-800 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{action.description}</p>
                         </div>
                         {loading === action.id && (
                           <Loader2 className="w-4 h-4 animate-spin shrink-0" style={{ color: AI_ACCENT }} />
@@ -383,13 +383,13 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                           key={action.id}
                           onClick={() => runAction(action.id)}
                           disabled={loading !== null}
-                          className="flex items-center gap-2 p-2.5 text-left border border-gray-200 rounded-lg hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5 transition-all group disabled:opacity-50"
+                          className="flex items-center gap-2 p-2.5 text-left border border-slate-200 rounded-lg hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5 transition-all group disabled:opacity-50"
                         >
-                          <span className="text-gray-400 group-hover:text-[#2F8889] transition-colors shrink-0">
+                          <span className="text-slate-400 group-hover:text-[#2F8889] transition-colors shrink-0">
                             {action.icon}
                           </span>
                           <div className="min-w-0">
-                            <p className="text-xs font-medium text-gray-700 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
+                            <p className="text-xs font-medium text-slate-700 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
                           </div>
                           {loading === action.id && (
                             <Loader2 className="w-3.5 h-3.5 animate-spin ml-auto shrink-0" style={{ color: AI_ACCENT }} />
@@ -405,7 +405,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                   <div>
                     <button
                       onClick={() => setShowMoreActions(v => !v)}
-                      className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                      className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 transition-colors"
                     >
                       <MoreHorizontal className="w-3.5 h-3.5" />
                       {showMoreActions ? 'Less' : 'More actions'}
@@ -417,12 +417,12 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                             key={action.id}
                             onClick={() => runAction(action.id)}
                             disabled={loading !== null}
-                            className="flex items-center gap-2 p-2 text-left border border-gray-100 rounded-lg hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5 transition-all group disabled:opacity-50"
+                            className="flex items-center gap-2 p-2 text-left border border-slate-100 rounded-lg hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5 transition-all group disabled:opacity-50"
                           >
-                            <span className="text-gray-400 group-hover:text-[#2F8889] transition-colors shrink-0">
+                            <span className="text-slate-400 group-hover:text-[#2F8889] transition-colors shrink-0">
                               {action.icon}
                             </span>
-                            <p className="text-xs text-gray-600 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
+                            <p className="text-xs text-slate-600 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
                             {loading === action.id && (
                               <Loader2 className="w-3 h-3 animate-spin ml-auto shrink-0" style={{ color: AI_ACCENT }} />
                             )}
@@ -435,7 +435,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
 
                 {/* Custom prompt */}
                 <div>
-                  <p className="text-xs font-medium text-gray-500 mb-2">Ask Claude anything</p>
+                  <p className="text-xs font-medium text-slate-500 mb-2">Ask Claude anything</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -443,7 +443,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                       onChange={e => setCustomPrompt(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && customPrompt.trim() && runAction('custom', customPrompt)}
                       placeholder="Ask anything about this content..."
-                      className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2F8889]"
+                      className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2F8889]"
                       disabled={loading !== null}
                     />
                     <button
@@ -459,11 +459,11 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                 {/* History */}
                 {loadingHistory ? (
                   <div className="flex items-center justify-center py-4">
-                    <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                   </div>
                 ) : history.length > 0 ? (
                   <div>
-                    <p className="text-xs font-medium text-gray-500 mb-2">Recent responses</p>
+                    <p className="text-xs font-medium text-slate-500 mb-2">Recent responses</p>
                     <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                       {history.map(int => (
                         <ResponseCard
@@ -478,8 +478,8 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center py-4 text-center">
-                    <Zap className="w-6 h-6 text-gray-300 mb-1.5" />
-                    <p className="text-xs text-gray-400">Run an action to get AI-generated content</p>
+                    <Zap className="w-6 h-6 text-slate-300 mb-1.5" />
+                    <p className="text-xs text-slate-400">Run an action to get AI-generated content</p>
                   </div>
                 )}
               </div>
@@ -507,8 +507,8 @@ function NotConnectedState() {
       <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ background: 'linear-gradient(to bottom right, #e0f2f1, #b2dfdb)' }}>
         <Sparkles className="w-5 h-5" style={{ color: AI_ACCENT }} />
       </div>
-      <p className="text-sm font-medium text-gray-800 mb-1">AI Assistant not connected</p>
-      <p className="text-xs text-gray-500 mb-3">Connect Claude AI in Settings → Integrations to use the AI assistant.</p>
+      <p className="text-sm font-medium text-slate-800 mb-1">AI Assistant not connected</p>
+      <p className="text-xs text-slate-500 mb-3">Connect Claude AI in Settings → Integrations to use the AI assistant.</p>
       <a
         href="#settings"
         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-xs rounded-lg transition-colors font-medium" style={{ backgroundColor: AI_ACCENT }}
