@@ -197,15 +197,15 @@ export function MyWorkPage() {
 
       {/* My Content Items */}
       {sortedItems.length > 0 && (
-            <section>
-              <div className="flex items-center gap-2 mb-4">
+            <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
                 <h2 className="text-lg font-semibold text-slate-900">My Content Items</h2>
                 <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
                   {sortedItems.length}
                 </span>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+              <div className="overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
@@ -334,8 +334,8 @@ export function MyWorkPage() {
 
           {/* My Subtasks */}
           {subtasks.length > 0 && (
-            <section>
-              <div className="flex items-center gap-2 mb-4">
+            <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
                 <ListChecks className="w-5 h-5 text-slate-400" />
                 <h2 className="text-lg font-semibold text-slate-900">My Subtasks</h2>
                 <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
@@ -343,7 +343,7 @@ export function MyWorkPage() {
                 </span>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100">
                 {subtasks.map((subtask) => {
                   const isOverdue =
                     subtask.due_date &&
