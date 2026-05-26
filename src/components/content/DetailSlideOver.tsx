@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   X, Calendar, MessageSquare,
-  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink
+  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
@@ -10,7 +10,7 @@ import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json,
 import { formatDateFull } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import { SubtasksSection } from './SubtasksSection';
-import { isOrdinalItem, ORDINAL_COLOR, DRAFT_COLOR, getOrdinalProfile, PLATFORM_META } from '../../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
 import { useOrdinalPost } from '../../hooks/useOrdinalPost';
 import { ExternalLinksSection } from './ExternalLinks';
 import { GranolaNoteSection } from './GranolaNoteSection';
@@ -67,7 +67,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const { contentTypes, boardColumns, user, customFieldDefs, projects, members } = useApp();
   const { userRole } = useWorkspace();
   const isOrdinalPost = isOrdinalItem(item);
-  const isReadOnly = userRole === 'viewer' || isOrdinalPost;
+  const isLinearIssue = isLinearItem(item);
+  const isReadOnly = userRole === 'viewer' || isOrdinalPost || isLinearIssue;
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'activity'>('details');
   const [comments, setComments] = useState<CommentWithProfile[]>([]);
   const [activity, setActivity] = useState<ActivityLog[]>([]);
@@ -84,6 +85,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
   const ordinalProfile = isOrdinalPost ? getOrdinalProfile(item) : null;
   const { ordinalLink } = useOrdinalPost(item.id);
+  const linearInfo = isLinearIssue ? getLinearIssueInfo(item) : null;
 
   // Get field visibility based on content type
   const fieldVisibility = useMemo(() => getFieldVisibility(contentType || null), [contentType]);
@@ -230,6 +232,55 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           </div>
         )}
 
+        {/* Linear Banner */}
+        {isLinearIssue && linearInfo && (
+          <div className="px-6 py-3 border-b" style={{ backgroundColor: `${LINEAR_COLOR}08`, borderColor: `${LINEAR_COLOR}20` }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs"
+                  style={{ backgroundColor: `${LINEAR_COLOR}15`, color: LINEAR_COLOR }}
+                >
+                  L
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">This issue is managed in Linear</p>
+                  <p className="text-xs text-gray-500">
+                    {linearInfo.identifier} · {linearInfo.team}
+                    {linearInfo.project ? ` · ${linearInfo.project}` : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {linearInfo.status && (
+                  <span
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
+                    style={{ backgroundColor: `${LINEAR_COLOR}15`, color: LINEAR_COLOR }}
+                  >
+                    {linearInfo.status}
+                  </span>
+                )}
+                {linearInfo.url && (
+                  <a
+                    href={linearInfo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+                    style={{
+                      color: LINEAR_COLOR,
+                      borderColor: `${LINEAR_COLOR}40`,
+                      backgroundColor: `${LINEAR_COLOR}08`,
+                    }}
+                  >
+                    <span>Open in Linear</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-start gap-3 px-6 py-4 border-b border-gray-100">
           <div className="flex-1 min-w-0">
@@ -304,9 +355,21 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               <span className="text-xs text-gray-400">Created {formatDateFull(item.created_at)}</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors shrink-0 mt-1">
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1 shrink-0 mt-1">
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}${window.location.pathname}?item=${item.id}`;
+                navigator.clipboard.writeText(url).then(() => addToast('Link copied to clipboard'));
+              }}
+              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+              title="Copy link"
+            >
+              <Link2 className="w-4 h-4" />
+            </button>
+            <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}

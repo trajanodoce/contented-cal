@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -72,9 +72,10 @@ export function AppLayout() {
   const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const { selectedItemId } = useSelectedItem();
+  const { selectedItemId, setSelectedItemId } = useSelectedItem();
   const canCreate = userRole === 'admin' || userRole === 'editor';
   const canAccessSettings = userRole === 'admin';
+  const urlSyncRef = useRef(false);
 
   // Track view changes and save to persistence
   useEffect(() => {
@@ -84,6 +85,37 @@ export function AppLayout() {
       setLastUsedView(view);
     }
   }, [location.pathname, setLastUsedView]);
+
+  // URL ↔ selected item sync: read ?item= on mount/navigation
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const itemId = params.get('item');
+    if (itemId && itemId !== selectedItemId) {
+      urlSyncRef.current = true;
+      setSelectedItemId(itemId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
+
+  // URL ↔ selected item sync: write ?item= when selection changes
+  useEffect(() => {
+    if (urlSyncRef.current) {
+      urlSyncRef.current = false;
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const currentParam = params.get('item');
+
+    if (selectedItemId && currentParam !== selectedItemId) {
+      params.set('item', selectedItemId);
+      window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+    } else if (!selectedItemId && currentParam) {
+      params.delete('item');
+      const search = params.toString();
+      window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedItemId]);
 
   // Handle view transitions
   const handleNavigation = useCallback(() => {
