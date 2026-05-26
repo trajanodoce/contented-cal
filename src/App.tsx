@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -20,19 +21,29 @@ import { LoginPage } from './pages/LoginPage';
 import { CreateWorkspacePage } from './pages/CreateWorkspacePage';
 import { Loader2 } from 'lucide-react';
 
-// Layout and pages
+// Layout (always loaded)
 import { AppLayout } from './layouts/AppLayout';
-import { HomePage } from './pages/HomePage';
-import { ListPage } from './pages/ListPage';
-import { BoardPage } from './pages/BoardPage';
-import { CalendarPage } from './pages/CalendarPage';
-import { ProjectsPage } from './pages/ProjectsPage';
-import { ProjectDetailPage } from './pages/ProjectDetailPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { IntakeQueuePage } from './pages/IntakeQueuePage';
-import { IntakeFormPage } from './pages/IntakeFormPage';
-import { MyWorkPage } from './pages/MyWorkPage';
-import { AuthCallback } from './components/auth/AuthCallback';
+
+// Lazy-loaded pages
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const ListPage = lazy(() => import('./pages/ListPage').then(m => ({ default: m.ListPage })));
+const BoardPage = lazy(() => import('./pages/BoardPage').then(m => ({ default: m.BoardPage })));
+const CalendarPage = lazy(() => import('./pages/CalendarPage').then(m => ({ default: m.CalendarPage })));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
+const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const IntakeQueuePage = lazy(() => import('./pages/IntakeQueuePage').then(m => ({ default: m.IntakeQueuePage })));
+const IntakeFormPage = lazy(() => import('./pages/IntakeFormPage').then(m => ({ default: m.IntakeFormPage })));
+const MyWorkPage = lazy(() => import('./pages/MyWorkPage').then(m => ({ default: m.MyWorkPage })));
+const AuthCallback = lazy(() => import('./components/auth/AuthCallback').then(m => ({ default: m.AuthCallback })));
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center h-full py-20">
+      <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+    </div>
+  );
+}
 
 function LoginRoute() {
   const { user, loading } = useAuth();
@@ -127,18 +138,18 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/create-workspace" element={<CreateWorkspaceRoute />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/intake/:slug" element={<IntakeFormPage />} />
+      <Route path="/auth/callback" element={<Suspense fallback={<PageLoader />}><AuthCallback /></Suspense>} />
+      <Route path="/intake/:slug" element={<Suspense fallback={<PageLoader />}><IntakeFormPage /></Suspense>} />
       <Route element={<ProtectedLayout />}>
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/list" element={<ListPage />} />
-        <Route path="/my-work" element={<MyWorkPage />} />
-        <Route path="/board" element={<BoardPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/projects" element={<ProjectsPage />} />
-        <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
-        <Route path="/intake-queue" element={<IntakeQueuePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/home" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
+        <Route path="/list" element={<Suspense fallback={<PageLoader />}><ListPage /></Suspense>} />
+        <Route path="/my-work" element={<Suspense fallback={<PageLoader />}><MyWorkPage /></Suspense>} />
+        <Route path="/board" element={<Suspense fallback={<PageLoader />}><BoardPage /></Suspense>} />
+        <Route path="/calendar" element={<Suspense fallback={<PageLoader />}><CalendarPage /></Suspense>} />
+        <Route path="/projects" element={<Suspense fallback={<PageLoader />}><ProjectsPage /></Suspense>} />
+        <Route path="/projects/:projectId" element={<Suspense fallback={<PageLoader />}><ProjectDetailPage /></Suspense>} />
+        <Route path="/intake-queue" element={<Suspense fallback={<PageLoader />}><IntakeQueuePage /></Suspense>} />
+        <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
         <Route path="/" element={<LastViewRedirect />} />
       </Route>
     </Routes>
