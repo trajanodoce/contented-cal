@@ -262,8 +262,9 @@ export function PersonalTasksSection({ workspaceId }: Props) {
   if (loading) return null;
 
   return (
-    <section>
-      <div className="flex items-center justify-between mb-4">
+    <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <Briefcase className="w-5 h-5 text-slate-400" />
           <h2 className="text-lg font-semibold text-slate-900">Personal Tasks</h2>
@@ -276,41 +277,74 @@ export function PersonalTasksSection({ workspaceId }: Props) {
         <AddTaskForm workspaceId={workspaceId} onAdded={fetchTasks} />
       </div>
 
-      {activeTasks.length === 0 && completedTasks.length === 0 ? (
-        <div className="bg-white border border-dashed border-slate-200 rounded-lg py-8 text-center">
-          <Briefcase className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-          <p className="text-sm text-slate-400">
-            Track your role tasks, meetings, and to-dos here
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {/* Active tasks by category */}
-          {sortedCategories.map((catKey) => {
-            const catMeta = TASK_CATEGORIES[catKey] || TASK_CATEGORIES.general;
-            const CatIcon = catMeta.icon;
-            const catTasks = grouped[catKey];
-            const isCollapsed = collapsedCategories.has(catKey);
+      {/* Body */}
+      <div className="p-5">
+        {activeTasks.length === 0 && completedTasks.length === 0 ? (
+          <div className="border border-dashed border-slate-200 rounded-lg py-8 text-center">
+            <Briefcase className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+            <p className="text-sm text-slate-400">
+              Track your role tasks, meetings, and to-dos here
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Active tasks by category */}
+            {sortedCategories.map((catKey) => {
+              const catMeta = TASK_CATEGORIES[catKey] || TASK_CATEGORIES.general;
+              const CatIcon = catMeta.icon;
+              const catTasks = grouped[catKey];
+              const isCollapsed = collapsedCategories.has(catKey);
 
-            return (
-              <div key={catKey} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => toggleCategory(catKey)}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
-                >
-                  {isCollapsed ? (
-                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                  ) : (
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              return (
+                <div key={catKey} className="border border-slate-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => toggleCategory(catKey)}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
+                  >
+                    {isCollapsed ? (
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                    <CatIcon className="w-4 h-4" style={{ color: catMeta.color }} />
+                    <span className="text-sm font-medium text-slate-700">{catMeta.label}</span>
+                    <span className="text-xs text-slate-400 ml-auto">{catTasks.length}</span>
+                  </button>
+
+                  {!isCollapsed && (
+                    <div className="divide-y divide-slate-50 border-t border-slate-100">
+                      {catTasks.map((task) => (
+                        <TaskRow
+                          key={task.id}
+                          task={task}
+                          isEditing={editingTaskId === task.id}
+                          onStartEdit={() => setEditingTaskId(task.id)}
+                          onStopEdit={() => setEditingTaskId(null)}
+                          onUpdate={async (updates) => updateTask(task.id, updates)}
+                          onToggle={() => toggleComplete(task)}
+                          onDelete={() => deleteTask(task.id)}
+                        />
+                      ))}
+                    </div>
                   )}
-                  <CatIcon className="w-4 h-4" style={{ color: catMeta.color }} />
-                  <span className="text-sm font-medium text-slate-700">{catMeta.label}</span>
-                  <span className="text-xs text-slate-400 ml-auto">{catTasks.length}</span>
+                </div>
+              );
+            })}
+
+            {/* Completed tasks toggle */}
+            {completedTasks.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setShowCompleted(!showCompleted)}
+                  className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors mb-2"
+                >
+                  {showCompleted ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                  {completedTasks.length} completed task{completedTasks.length !== 1 ? 's' : ''}
                 </button>
 
-                {!isCollapsed && (
-                  <div className="divide-y divide-slate-50 border-t border-slate-100">
-                    {catTasks.map((task) => (
+                {showCompleted && (
+                  <div className="border border-slate-200 rounded-lg divide-y divide-slate-50 opacity-60">
+                    {completedTasks.map((task) => (
                       <TaskRow
                         key={task.id}
                         task={task}
@@ -325,40 +359,10 @@ export function PersonalTasksSection({ workspaceId }: Props) {
                   </div>
                 )}
               </div>
-            );
-          })}
-
-          {/* Completed tasks toggle */}
-          {completedTasks.length > 0 && (
-            <div>
-              <button
-                onClick={() => setShowCompleted(!showCompleted)}
-                className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors mb-2"
-              >
-                {showCompleted ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                {completedTasks.length} completed task{completedTasks.length !== 1 ? 's' : ''}
-              </button>
-
-              {showCompleted && (
-                <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-50 opacity-60">
-                  {completedTasks.map((task) => (
-                    <TaskRow
-                      key={task.id}
-                      task={task}
-                      isEditing={editingTaskId === task.id}
-                      onStartEdit={() => setEditingTaskId(task.id)}
-                      onStopEdit={() => setEditingTaskId(null)}
-                      onUpdate={async (updates) => updateTask(task.id, updates)}
-                      onToggle={() => toggleComplete(task)}
-                      onDelete={() => deleteTask(task.id)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
@@ -387,6 +391,7 @@ function TaskRow({
   const [editPriority, setEditPriority] = useState(task.priority || 'medium');
   const [editDueDate, setEditDueDate] = useState(task.due_date || '');
   const [saving, setSaving] = useState(false);
+  const [showSavedCheck, setShowSavedCheck] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
 
   // Reset edit fields only when entering edit mode (not on every task object change)
@@ -396,6 +401,7 @@ function TaskRow({
       setEditCategory(task.category || 'general');
       setEditPriority(task.priority || 'medium');
       setEditDueDate(task.due_date || '');
+      setShowSavedCheck(false);
       setTimeout(() => titleRef.current?.focus(), 50);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -410,11 +416,11 @@ function TaskRow({
     );
   };
 
-  const saveChanges = async () => {
-    if (!editTitle.trim()) return;
+  const saveChanges = async (andClose = true): Promise<boolean> => {
+    if (!editTitle.trim()) return false;
     if (!hasChanges()) {
-      onStopEdit();
-      return;
+      if (andClose) onStopEdit();
+      return true;
     }
     setSaving(true);
     const ok = await onUpdate({
@@ -424,16 +430,21 @@ function TaskRow({
       due_date: editDueDate || null,
     });
     setSaving(false);
-    if (ok) {
-      onStopEdit();
-      toast.success('Task updated');
-    }
+    if (!ok) return false;
+    if (andClose) onStopEdit();
+    return true;
   };
 
-  const handleClose = () => {
-    // Auto-save on X if there are changes
+  const handleClose = async () => {
     if (hasChanges() && editTitle.trim()) {
-      saveChanges();
+      const ok = await saveChanges(false);
+      if (ok) {
+        setShowSavedCheck(true);
+        setTimeout(() => {
+          setShowSavedCheck(false);
+          onStopEdit();
+        }, 900);
+      }
     } else {
       onStopEdit();
     }
@@ -448,8 +459,8 @@ function TaskRow({
   if (isEditing) {
     return (
       <div className="px-4 py-3 bg-blue-50/50 border-l-2 border-blue-400">
-        {/* Row 1: Title + X */}
-        <div className="flex items-center gap-2 mb-2">
+        {/* Row 1: Title + close/saved indicator */}
+        <div className="flex items-center gap-2 mb-3">
           <input
             ref={titleRef}
             type="text"
@@ -464,15 +475,23 @@ function TaskRow({
           />
           <button
             onClick={handleClose}
-            className="p-1 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
+            className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
+              showSavedCheck
+                ? 'bg-green-100 text-green-600'
+                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+            }`}
             title="Close (auto-saves)"
           >
-            <X className="w-4 h-4" />
+            {showSavedCheck ? (
+              <Check className="w-4 h-4 animate-[scaleIn_0.3s_ease-out]" />
+            ) : (
+              <X className="w-4 h-4" />
+            )}
           </button>
         </div>
 
-        {/* Row 2: Fields + Save */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Row 2: Fields */}
+        <div className="flex items-center gap-2 flex-wrap mb-3">
           <select
             value={editCategory}
             onChange={(e) => setEditCategory(e.target.value)}
@@ -497,12 +516,26 @@ function TaskRow({
             onChange={(e) => setEditDueDate(e.target.value)}
             className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
           />
+        </div>
+
+        {/* Row 3: Save button at bottom */}
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-blue-100">
           <button
-            onClick={saveChanges}
+            onClick={() => saveChanges()}
             disabled={!editTitle.trim() || saving}
-            className="ml-auto px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
           >
-            {saving ? 'Saving...' : 'Save'}
+            {saving ? (
+              <span className="flex items-center gap-1.5">
+                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5">
+                <Check className="w-4 h-4" />
+                Save Changes
+              </span>
+            )}
           </button>
         </div>
       </div>

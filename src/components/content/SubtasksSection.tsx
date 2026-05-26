@@ -268,7 +268,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   };
 
   return (
-    <div>
+    <div className="border border-gray-200 rounded-xl p-4">
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-sm font-medium text-gray-700">Subtasks</span>
