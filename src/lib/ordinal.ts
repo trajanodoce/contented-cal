@@ -6,7 +6,7 @@ export const ORDINAL_COLOR = '#7E61FF';
 // Check if an item is from Ordinal (synced)
 export function isOrdinalItem(item: ContentItem): boolean {
   const customFields = (item.custom_fields as Record<string, unknown>) ?? {};
-  return customFields._source === 'ordinal' || item.tags?.includes('ordinal-sync');
+  return customFields._source === 'ordinal' || (item.tags?.includes('ordinal-sync') ?? false);
 }
 
 // Get the source of an item
@@ -97,6 +97,9 @@ export function getPlatformFromChannel(channel: string | null): string | null {
   if (channel.includes('TikTok')) return 'TikTok';
   return null;
 }
+
+// Draft styling constants — Ordinal posts are always treated as drafts in the calendar
+export const DRAFT_COLOR = '#D97706'; // amber-600
 
 // Source filter options
 export const SOURCE_FILTER_OPTIONS = [

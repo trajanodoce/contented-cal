@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import type { ActivityLog } from '../lib/database.types';
+import type { ActivityLog, Json } from '../lib/database.types';
 
 interface UseActivityLogOptions {
   contentItemId: string | null;
@@ -86,7 +86,7 @@ export function useActivityLog({ contentItemId }: UseActivityLogOptions): UseAct
       content_item_id: contentItemId,
       user_id: user?.id || null,
       action,
-      metadata: metadata || {},
+      metadata: (metadata || {}) as Json,
     });
 
     if (error) {

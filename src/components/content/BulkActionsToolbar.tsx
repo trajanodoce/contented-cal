@@ -167,7 +167,7 @@ export function BulkActionsToolbar({
                     {member.avatar_url ? (
                       <img
                         src={member.avatar_url}
-                        alt={member.full_name || member.email}
+                        alt={member.full_name ?? member.email ?? undefined}
                         className="w-6 h-6 rounded-full object-cover"
                       />
                     ) : (
@@ -198,7 +198,7 @@ export function BulkActionsToolbar({
             <div className="absolute bottom-full mb-1 left-0 bg-white border border-slate-200 rounded-lg shadow-xl min-w-[180px]">
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select status</p>
-                {boardColumns
+                {[...boardColumns]
                   .sort((a, b) => a.position - b.position)
                   .map((column) => (
                     <button
@@ -208,7 +208,7 @@ export function BulkActionsToolbar({
                     >
                       <span
                         className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: column.color }}
+                        style={{ backgroundColor: column.color ?? undefined }}
                       />
                       <span className="text-slate-700">{column.name}</span>
                     </button>

@@ -1,0 +1,415 @@
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'sonner';
+import type { PersonalTask } from '../../lib/database.types';
+import { parseLocalDate, formatDate } from '../../lib/utils';
+import { isPast, isToday } from 'date-fns';
+import {
+  Plus,
+  Check,
+  Square,
+  Trash2,
+  AlertCircle,
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  Briefcase,
+  Users,
+  Lightbulb,
+  Palette,
+  ClipboardCheck,
+  Search,
+  FolderOpen,
+  X,
+} from 'lucide-react';
+
+// ── Category definitions ─────────────────────────────────────────────────────
+
+export const TASK_CATEGORIES: Record<string, { label: string; icon: typeof Briefcase; color: string }> = {
+  meetings:  { label: 'Meetings',   icon: Users,          color: '#6366f1' },
+  admin:     { label: 'Admin',      icon: Briefcase,      color: '#64748b' },
+  strategy:  { label: 'Strategy',   icon: Lightbulb,      color: '#f59e0b' },
+  creative:  { label: 'Creative',   icon: Palette,        color: '#ec4899' },
+  reviews:   { label: 'Reviews',    icon: ClipboardCheck, color: '#10b981' },
+  research:  { label: 'Research',   icon: Search,         color: '#3b82f6' },
+  general:   { label: 'General',    icon: FolderOpen,     color: '#94a3b8' },
+};
+
+const priorityColors: Record<string, string> = {
+  urgent: '#ef4444',
+  high: '#f97316',
+  medium: '#fbbf24',
+  low: '#94a3b8',
+};
+
+const priorityLabels: Record<string, string> = {
+  urgent: 'Urgent',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+};
+
+// ── Inline add form ──────────────────────────────────────────────────────────
+
+function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: () => void }) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('general');
+  const [priority, setPriority] = useState('medium');
+  const [dueDate, setDueDate] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim() || !user) return;
+    setSaving(true);
+    const { error } = await supabase.from('personal_tasks').insert({
+      user_id: user.id,
+      workspace_id: workspaceId,
+      title: title.trim(),
+      category,
+      priority,
+      due_date: dueDate || null,
+    });
+    setSaving(false);
+    if (error) {
+      toast.error('Failed to add task');
+      return;
+    }
+    toast.success('Task added');
+    setTitle('');
+    setCategory('general');
+    setPriority('medium');
+    setDueDate('');
+    setOpen(false);
+    onAdded();
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+      >
+        <Plus className="w-4 h-4" />
+        Add Task
+      </button>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="What do you need to do?"
+          className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none"
+          autoFocus
+        />
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none"
+        >
+          {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
+            <option key={key} value={key}>{cat.label}</option>
+          ))}
+        </select>
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none"
+        >
+          {Object.entries(priorityLabels).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
+          ))}
+        </select>
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none"
+        />
+        <button
+          type="submit"
+          disabled={!title.trim() || saving}
+          className="ml-auto px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+        >
+          {saving ? 'Adding...' : 'Add'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// ── Main section ─────────────────────────────────────────────────────────────
+
+interface Props {
+  workspaceId: string;
+}
+
+export function PersonalTasksSection({ workspaceId }: Props) {
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<PersonalTask[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showCompleted, setShowCompleted] = useState(false);
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+
+  const fetchTasks = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data } = await supabase
+      .from('personal_tasks')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('workspace_id', workspaceId)
+      .order('completed', { ascending: true })
+      .order('due_date', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: false });
+    setTasks((data as PersonalTask[]) || []);
+    setLoading(false);
+  }, [user, workspaceId]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  const toggleComplete = async (task: PersonalTask) => {
+    const nowCompleted = !task.completed;
+    const { error } = await supabase
+      .from('personal_tasks')
+      .update({
+        completed: nowCompleted,
+        completed_at: nowCompleted ? new Date().toISOString() : null,
+      })
+      .eq('id', task.id);
+    if (error) {
+      toast.error('Failed to update task');
+      return;
+    }
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === task.id ? { ...t, completed: nowCompleted, completed_at: nowCompleted ? new Date().toISOString() : null } : t
+      )
+    );
+  };
+
+  const deleteTask = async (taskId: string) => {
+    const { error } = await supabase.from('personal_tasks').delete().eq('id', taskId);
+    if (error) {
+      toast.error('Failed to delete task');
+      return;
+    }
+    setTasks((prev) => prev.filter((t) => t.id !== taskId));
+  };
+
+  const toggleCategory = (cat: string) => {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
+
+  // Split tasks
+  const activeTasks = tasks.filter((t) => !t.completed);
+  const completedTasks = tasks.filter((t) => t.completed);
+
+  // Group active tasks by category
+  const grouped = activeTasks.reduce<Record<string, PersonalTask[]>>((acc, task) => {
+    const cat = task.category || 'general';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(task);
+    return acc;
+  }, {});
+
+  // Sort categories: those with tasks first, in order defined
+  const categoryOrder = Object.keys(TASK_CATEGORIES);
+  const sortedCategories = categoryOrder.filter((cat) => grouped[cat]?.length);
+
+  if (loading) return null;
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Briefcase className="w-5 h-5 text-slate-400" />
+          <h2 className="text-lg font-semibold text-slate-900">Personal Tasks</h2>
+          {activeTasks.length > 0 && (
+            <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+              {activeTasks.length}
+            </span>
+          )}
+        </div>
+        <AddTaskForm workspaceId={workspaceId} onAdded={fetchTasks} />
+      </div>
+
+      {activeTasks.length === 0 && completedTasks.length === 0 ? (
+        <div className="bg-white border border-dashed border-slate-200 rounded-lg py-8 text-center">
+          <Briefcase className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+          <p className="text-sm text-slate-400">
+            Track your role tasks, meetings, and to-dos here
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Active tasks by category */}
+          {sortedCategories.map((catKey) => {
+            const catMeta = TASK_CATEGORIES[catKey] || TASK_CATEGORIES.general;
+            const CatIcon = catMeta.icon;
+            const catTasks = grouped[catKey];
+            const isCollapsed = collapsedCategories.has(catKey);
+
+            return (
+              <div key={catKey} className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => toggleCategory(catKey)}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
+                >
+                  {isCollapsed ? (
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  ) : (
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  )}
+                  <CatIcon className="w-4 h-4" style={{ color: catMeta.color }} />
+                  <span className="text-sm font-medium text-slate-700">{catMeta.label}</span>
+                  <span className="text-xs text-slate-400 ml-auto">{catTasks.length}</span>
+                </button>
+
+                {!isCollapsed && (
+                  <div className="divide-y divide-slate-50 border-t border-slate-100">
+                    {catTasks.map((task) => (
+                      <TaskRow
+                        key={task.id}
+                        task={task}
+                        onToggle={() => toggleComplete(task)}
+                        onDelete={() => deleteTask(task.id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Completed tasks toggle */}
+          {completedTasks.length > 0 && (
+            <div>
+              <button
+                onClick={() => setShowCompleted(!showCompleted)}
+                className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors mb-2"
+              >
+                {showCompleted ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                {completedTasks.length} completed task{completedTasks.length !== 1 ? 's' : ''}
+              </button>
+
+              {showCompleted && (
+                <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-50 opacity-60">
+                  {completedTasks.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      onToggle={() => toggleComplete(task)}
+                      onDelete={() => deleteTask(task.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ── Task row ─────────────────────────────────────────────────────────────────
+
+function TaskRow({
+  task,
+  onToggle,
+  onDelete,
+}: {
+  task: PersonalTask;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  const isOverdue =
+    !task.completed &&
+    task.due_date &&
+    isPast(parseLocalDate(task.due_date)) &&
+    !isToday(parseLocalDate(task.due_date));
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
+      {/* Checkbox */}
+      <button
+        onClick={onToggle}
+        className={`flex-shrink-0 transition-colors ${
+          task.completed
+            ? 'text-green-500 hover:text-green-600'
+            : 'text-slate-300 hover:text-blue-500'
+        }`}
+      >
+        {task.completed ? <Check className="w-4.5 h-4.5" /> : <Square className="w-4.5 h-4.5" />}
+      </button>
+
+      {/* Title */}
+      <span
+        className={`text-sm flex-1 ${
+          task.completed ? 'line-through text-slate-400' : 'text-slate-900'
+        }`}
+      >
+        {task.title}
+      </span>
+
+      {/* Priority dot */}
+      {!task.completed && task.priority !== 'medium' && (
+        <span
+          className="w-2 h-2 rounded-full flex-shrink-0"
+          style={{ backgroundColor: priorityColors[task.priority] }}
+          title={priorityLabels[task.priority]}
+        />
+      )}
+
+      {/* Due date */}
+      {task.due_date && !task.completed && (
+        <span
+          className={`flex items-center gap-1 text-xs flex-shrink-0 ${
+            isOverdue ? 'text-red-600 font-medium' : 'text-slate-500'
+          }`}
+        >
+          {isOverdue && <AlertCircle className="w-3 h-3" />}
+          <Calendar className="w-3 h-3" />
+          {formatDate(task.due_date)}
+        </span>
+      )}
+
+      {/* Delete */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all flex-shrink-0"
+        title="Delete task"
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  );
+}

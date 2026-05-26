@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, X, ChevronDown, Check, User } from 'lucide-react';
 import type { ContentType, BoardColumn, Profile } from '../lib/database.types';
 
@@ -9,6 +9,8 @@ export interface FilterState {
   assignees: string[];
   priorities: string[];
   channels: string[];
+  projects: string[];
+  linkedPlatforms: string[];
 }
 
 export const DEFAULT_FILTERS: FilterState = {
@@ -18,6 +20,8 @@ export const DEFAULT_FILTERS: FilterState = {
   assignees: [],
   priorities: [],
   channels: [],
+  projects: [],
+  linkedPlatforms: [],
 };
 
 interface FilterBarProps {
@@ -26,6 +30,8 @@ interface FilterBarProps {
   boardColumns: BoardColumn[];
   members: Profile[];
   channels: string[];
+  projects?: Array<{ id: string; label: string }>;
+  linkCounts?: Map<string, { count: number; platforms: string[] }>;
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   totalCount: number;
@@ -39,12 +45,26 @@ const priorityOptions = [
   { value: 'urgent', label: 'Urgent', color: '#ef4444' },
 ] as const;
 
+const linkPlatformOptions = [
+  { id: '_any', label: 'Any linked asset' },
+  { id: 'figma', label: 'Figma' },
+  { id: 'canva', label: 'Canva' },
+  { id: 'miro', label: 'Miro' },
+  { id: 'ordinal', label: 'Ordinal' },
+  { id: 'google_docs', label: 'Google Docs' },
+  { id: 'google_drive', label: 'Google Drive' },
+  { id: 'notion', label: 'Notion' },
+  { id: 'linear', label: 'Linear' },
+] as const;
+
 export function FilterBar({
   workspaceId,
   contentTypes,
   boardColumns,
   members,
   channels,
+  projects,
+  linkCounts,
   filters,
   onFiltersChange,
   totalCount,
@@ -77,7 +97,9 @@ export function FilterBar({
     filters.statuses.length > 0 ||
     filters.assignees.length > 0 ||
     filters.priorities.length > 0 ||
-    filters.channels.length > 0;
+    filters.channels.length > 0 ||
+    filters.projects?.length > 0 ||
+    filters.linkedPlatforms?.length > 0;
 
   const clearFilters = () => {
     setSearchValue('');
@@ -91,6 +113,8 @@ export function FilterBar({
     assignees: filters.assignees.length,
     priorities: filters.priorities.length,
     channels: filters.channels.length,
+    projects: filters.projects?.length || 0,
+    links: filters.linkedPlatforms?.length || 0,
   }), [filters]);
 
   return (
@@ -122,7 +146,7 @@ export function FilterBar({
         <FilterDropdown
           label="Type"
           count={activeFilterCounts.types}
-          options={contentTypes.map((ct) => ({ id: ct.id, label: ct.name, color: ct.color }))}
+          options={contentTypes.map((ct) => ({ id: ct.id, label: ct.name, color: ct.color ?? undefined }))}
           selectedIds={filters.contentTypes}
           onToggle={(id) => {
             const newSet = filters.contentTypes.includes(id)
@@ -136,7 +160,7 @@ export function FilterBar({
         <FilterDropdown
           label="Status"
           count={activeFilterCounts.statuses}
-          options={boardColumns.map((bc) => ({ id: bc.id, label: bc.name, color: bc.color }))}
+          options={boardColumns.map((bc) => ({ id: bc.id, label: bc.name, color: bc.color ?? undefined }))}
           selectedIds={filters.statuses}
           onToggle={(id) => {
             const newSet = filters.statuses.includes(id)
@@ -186,6 +210,40 @@ export function FilterBar({
                 ? filters.channels.filter((c) => c !== id)
                 : [...filters.channels, id];
               onFiltersChange({ ...filters, channels: newSet });
+            }}
+          />
+        )}
+
+        {/* Project filter */}
+        {projects && projects.length > 0 && (
+          <FilterDropdown
+            label="Project"
+            count={activeFilterCounts.projects}
+            options={projects}
+            selectedIds={filters.projects || []}
+            onToggle={(id) => {
+              const current = filters.projects || [];
+              const newSet = current.includes(id)
+                ? current.filter((p) => p !== id)
+                : [...current, id];
+              onFiltersChange({ ...filters, projects: newSet });
+            }}
+          />
+        )}
+
+        {/* Has Links filter */}
+        {linkCounts && linkCounts.size > 0 && (
+          <FilterDropdown
+            label="Links"
+            count={activeFilterCounts.links}
+            options={linkPlatformOptions.map((p) => ({ id: p.id, label: p.label }))}
+            selectedIds={filters.linkedPlatforms || []}
+            onToggle={(id) => {
+              const current = filters.linkedPlatforms || [];
+              const newSet = current.includes(id)
+                ? current.filter((p) => p !== id)
+                : [...current, id];
+              onFiltersChange({ ...filters, linkedPlatforms: newSet });
             }}
           />
         )}
@@ -247,7 +305,18 @@ function FilterDropdown({
 
   // Determine display text
   const displayText = useMemo(() => {
-    if (count === 0) return `All ${label}s`;
+    if (count === 0) {
+      const plural: Record<string, string> = {
+        Type: 'Types',
+        Status: 'Statuses',
+        Assignee: 'Assignees',
+        Priority: 'Priorities',
+        Channel: 'Channels',
+        Project: 'Projects',
+        Links: 'Links',
+      };
+      return `All ${plural[label] || label + 's'}`;
+    }
     if (count === 1) {
       const option = options.find((o) => o.id === selectedIds[0]);
       return option?.label || label;
@@ -371,18 +440,20 @@ export function useFilters(workspaceId: string | null) {
 }
 
 // Apply filters to items
-export function applyFilters(
-  items: Array<{
+export function applyFilters<T extends {
     id: string;
     title: string;
     content_type_id: string | null;
     status: string | null;
     assignee_ids: string[] | null;
-    priority: string;
+    priority: string | null;
     channel: string | null;
-  }>,
-  filters: FilterState
-): typeof items {
+    project_id?: string | null;
+  }>(
+  items: T[],
+  filters: FilterState,
+  linkCounts?: Map<string, { count: number; platforms: string[] }>
+): T[] {
   return items.filter((item) => {
     // Search filter
     if (filters.search && !item.title.toLowerCase().includes(filters.search.toLowerCase())) {
@@ -407,13 +478,31 @@ export function applyFilters(
     }
 
     // Priority filter
-    if (filters.priorities.length > 0 && !filters.priorities.includes(item.priority)) {
+    if (filters.priorities.length > 0 && !filters.priorities.includes(item.priority ?? '')) {
+      return false;
+    }
+
+    // Project filter
+    if (filters.projects && filters.projects.length > 0 && !filters.projects.includes(item.project_id || '')) {
       return false;
     }
 
     // Channel filter
-    if (filters.channels.length > 1 && !filters.channels.includes(item.channel || '')) {
+    if (filters.channels.length > 0 && !filters.channels.includes(item.channel || '')) {
       return false;
+    }
+
+    // Linked platforms filter
+    if (filters.linkedPlatforms && filters.linkedPlatforms.length > 0 && linkCounts) {
+      const itemLinks = linkCounts.get(item.id);
+      if (!itemLinks || itemLinks.count === 0) return false;
+
+      // If "_any" is selected, just check that item has links (already done above)
+      const specificPlatforms = filters.linkedPlatforms.filter((p) => p !== '_any');
+      if (specificPlatforms.length > 0) {
+        const hasMatchingPlatform = specificPlatforms.some((p) => itemLinks.platforms.includes(p));
+        if (!hasMatchingPlatform) return false;
+      }
     }
 
     return true;

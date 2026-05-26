@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Link2, Plus, Trash2, ExternalLink as ExternalLinkIcon, Loader2, X, Image } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Link2, Plus, ExternalLink as ExternalLinkIcon, Loader2, X, Image } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import type { ExternalLink, ExternalLinkPlatform } from '../../lib/database.types';
@@ -7,6 +7,7 @@ import type { ExternalLink, ExternalLinkPlatform } from '../../lib/database.type
 interface Props {
   contentItemId: string;
   addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+  readOnly?: boolean;
 }
 
 // Platform metadata for display
@@ -19,6 +20,7 @@ const PLATFORM_META: Record<ExternalLinkPlatform, { label: string; bgColor: stri
   google_drive: { label: 'Google Drive', bgColor: '#F0FDF4', textColor: '#15803D', icon: 'G' },
   notion:       { label: 'Notion',       bgColor: '#F9FAFB', textColor: '#374151', icon: 'N' },
   linear:       { label: 'Linear',       bgColor: '#EFF6FF', textColor: '#1D4ED8', icon: 'L' },
+  granola:      { label: 'Granola',      bgColor: '#345A11', textColor: '#FFFFFF', icon: '🎙️' },
   other:        { label: 'Link',         bgColor: '#F9FAFB', textColor: '#4B5563', icon: '↗' },
 };
 
@@ -35,7 +37,7 @@ function PlatformBadge({ platform }: { platform: ExternalLinkPlatform }) {
   );
 }
 
-function LinkCard({ link, onDelete }: { link: ExternalLink; onDelete: () => void }) {
+function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; onDelete: () => void; readOnly?: boolean }) {
   const [imgError, setImgError] = useState(false);
 
   return (
@@ -55,12 +57,14 @@ function LinkCard({ link, onDelete }: { link: ExternalLink; onDelete: () => void
             <span className="text-xs">No preview</span>
           </div>
         )}
-        <button
-          onClick={onDelete}
-          className="absolute top-2 right-2 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+        {!readOnly && (
+          <button
+            onClick={onDelete}
+            className="absolute top-2 right-2 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Content */}
@@ -89,7 +93,7 @@ function LinkCard({ link, onDelete }: { link: ExternalLink; onDelete: () => void
   );
 }
 
-export function ExternalLinksSection({ contentItemId, addToast }: Props) {
+export function ExternalLinksSection({ contentItemId, addToast, readOnly = false }: Props) {
   const { user } = useApp();
   const [links, setLinks] = useState<ExternalLink[]>([]);
   const [loading, setLoading] = useState(true);
@@ -192,9 +196,9 @@ export function ExternalLinksSection({ contentItemId, addToast }: Props) {
       <div className="flex items-center justify-between mb-3">
         <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1.5">
           <Link2 className="w-3.5 h-3.5" />
-          External links {links.length > 0 && `(${links.length})`}
+          Linked Assets {links.length > 0 && `(${links.length})`}
         </label>
-        {!adding && (
+        {!adding && !readOnly && (
           <button
             onClick={() => setAdding(true)}
             className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
@@ -248,7 +252,7 @@ export function ExternalLinksSection({ contentItemId, addToast }: Props) {
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {links.map(link => (
-            <LinkCard key={link.id} link={link} onDelete={() => handleDelete(link.id)} />
+            <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link.id)} />
           ))}
         </div>
       )}

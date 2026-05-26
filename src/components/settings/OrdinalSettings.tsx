@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import { Zap, ExternalLink, RefreshCw, Link2, Unlink, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Zap, RefreshCw, Link2, Unlink, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 import { useOrdinalUser } from '../../hooks/useOrdinalUser';
-import { OrdinalBadge, PlatformIcon, OrdinalProfileChip }  from '../ordinal/OrdinalBadge';
-import { ORDINAL_COLOR, isOrdinalItem, getOrdinalProfile, PLATFORM_META } from '../../lib/ordinal';
-import type { ContentItem } from '../../lib/database.types';
+import { PlatformIcon }  from '../ordinal/OrdinalBadge';
+import { ORDINAL_COLOR, isOrdinalItem, getOrdinalProfile } from '../../lib/ordinal';
 import { toast }  from 'sonner';
 
 export function OrdinalSettings() {
-  const { workspace, user, contentItems } = useApp();
+  const { workspace, contentItems } = useApp();
   const {
     connections,
     syncStatus,
     loading,
-    error,
+    error: _error,
     refetchSyncStatus,
     connect,
     disconnect,

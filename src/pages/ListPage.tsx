@@ -1,15 +1,22 @@
 import { useState, useMemo, useCallback, useRef, useEffect }  from 'react';
-import { format, isPast, isToday, isTomorrow } from 'date-fns';
+import { isPast, isToday, isTomorrow } from 'date-fns';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
+// UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
+import { parseLocalDate, formatDate } from '../lib/utils';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
+import { CreateItemModal } from '../components/content/CreateItemModal';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
+import { isOrdinalItem, ORDINAL_COLOR } from '../lib/ordinal';
+import { useGranolaItemIds } from '../hooks/useGranolaNotes';
+import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
+import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
 import {
   CheckSquare,
   Square,
@@ -22,6 +29,9 @@ import {
   ChevronDown,
   Check,
   User,
+  ListChecks,
+  Link2,
+  Mic,
 } from 'lucide-react';
 
 type SortField =
@@ -67,17 +77,17 @@ function getAssignees(assigneeIds: string[], members: Profile[]): Profile[] {
 }
 
 // Helper to format due date with status
-function formatDueDate(date: string | null): { text: string; isOverdue: boolean; isSoon: boolean } {
+function formatDueDateWithStatus(date: string | null): { text: string; isOverdue: boolean; isSoon: boolean } {
   if (!date) return { text: '-', isOverdue: false, isSoon: false };
 
-  const dueDate = new Date(date);
-  const isOverdue = isPast(dueDate) && !isToday(dueDate);
-  const isSoon = isToday(dueDate) || isTomorrow(dueDate);
+  const dueDate = parseLocalDate(date);
+  const overdue = isPast(dueDate) && !isToday(dueDate);
+  const soon = isToday(dueDate) || isTomorrow(dueDate);
 
   return {
-    text: format(dueDate, 'MMM d, yyyy'),
-    isOverdue,
-    isSoon,
+    text: formatDate(date),
+    isOverdue: overdue,
+    isSoon: soon,
   };
 }
 
@@ -90,8 +100,9 @@ const priorityConfig = {
 };
 
 export function ListPage() {
-  const { currentWorkspace } = useWorkspace();
-  const { filters, setFilters, isLoaded, hasActiveFilters } = useFilters();
+  const { currentWorkspace, userRole } = useWorkspace();
+  const canEdit = userRole === 'admin' || userRole === 'editor';
+  const { filters, setFilters, isLoaded } = useFilters();
   const { items: rawItems, loading, error, refetch } = useContentItems({
     workspaceId: currentWorkspace?.id || null,
   });
@@ -104,7 +115,11 @@ export function ListPage() {
 
   const [sort, setSort] = useState<SortState>({ field: 'due_date', direction: 'asc' });
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { setSelectedItemId } = useSelectedItem();
+  const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
+  const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id || null);
+  const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
   const [channels, setChannels] = useState<string[]>([]);
 
   // Extract unique channels from items
@@ -118,8 +133,8 @@ export function ListPage() {
   // Apply filters to items
   const items = useMemo(() => {
     if (!isLoaded) return rawItems;
-    return applyFilters(rawItems, filters);
-  }, [rawItems, filters, isLoaded]);
+    return applyFilters(rawItems, filters, linkCounts);
+  }, [rawItems, filters, isLoaded, linkCounts]);
 
   // Sort items
   const sortedItems = useMemo(() => {
@@ -153,8 +168,8 @@ export function ListPage() {
           break;
         }
         case 'due_date': {
-          const aDate = a.due_date ? new Date(a.due_date).getTime() : Infinity;
-          const bDate = b.due_date ? new Date(b.due_date).getTime() : Infinity;
+          const aDate = a.due_date ? parseLocalDate(a.due_date).getTime() : Infinity;
+          const bDate = b.due_date ? parseLocalDate(b.due_date).getTime() : Infinity;
           comparison = aDate - bDate;
           break;
         }
@@ -250,7 +265,7 @@ export function ListPage() {
               Get started by creating your first content item. You can organize it by type, assign it to team members, and track its progress.
             </p>
             <button
-              onClick={() => console.log('Create first item')}
+              onClick={() => setIsModalOpen(true)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -258,6 +273,7 @@ export function ListPage() {
             </button>
           </div>
         </div>
+        <CreateItemModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
     );
   }
@@ -271,6 +287,7 @@ export function ListPage() {
         boardColumns={boardColumns}
         members={members}
         channels={channels}
+        linkCounts={linkCounts}
         filters={filters}
         onFiltersChange={setFilters}
         totalCount={rawItems.length}
@@ -327,8 +344,10 @@ export function ListPage() {
                 const contentType = getContentType(item.content_type_id, contentTypes);
                 const status = getBoardColumn(item.status, boardColumns);
                 const assignees = getAssignees(item.assignee_ids || [], members);
-                const dueDate = formatDueDate(item.due_date);
-                const priority = priorityConfig[item.priority] || priorityConfig.medium;
+                const dueDate = formatDueDateWithStatus(item.due_date);
+                const priority = priorityConfig[(item.priority ?? 'medium') as keyof typeof priorityConfig] || priorityConfig.medium;
+
+                const isOrdinal = isOrdinalItem(item);
 
                 return (
                   <tr
@@ -337,6 +356,7 @@ export function ListPage() {
                     className={`hover:bg-slate-50 cursor-pointer transition-colors ${
                       isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''
                     }`}
+                    style={isOrdinal && !isSelected ? { backgroundColor: `${ORDINAL_COLOR}0A` } : {}}
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button
@@ -351,48 +371,106 @@ export function ListPage() {
                       </button>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-medium text-slate-900">{item.title}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-slate-900">{item.title}</span>
+                        {granolaItemIds.has(item.id) && (
+                          <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#345A11' }} title="Has meeting notes" />
+                        )}
+                        {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
+                          <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                            <ListChecks className="w-3.5 h-3.5" />
+                            <span>{subtaskCounts.get(item.id)!.completed}/{subtaskCounts.get(item.id)!.total}</span>
+                          </span>
+                        )}
+                        {linkCounts.get(item.id) && linkCounts.get(item.id)!.count > 0 && (
+                          <span
+                            className="inline-flex items-center gap-0.5 text-xs text-slate-400"
+                            title={`${linkCounts.get(item.id)!.count} linked asset${linkCounts.get(item.id)!.count !== 1 ? 's' : ''}`}
+                          >
+                            <Link2 className="w-3.5 h-3.5" />
+                            {linkCounts.get(item.id)!.count > 1 && <span>{linkCounts.get(item.id)!.count}</span>}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       {contentType && (
                         <div className="flex items-center gap-2">
                           <span
                             className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: contentType.color }}
+                            style={{ backgroundColor: contentType.color ?? undefined }}
                           />
                           <span className="text-sm text-slate-600">{contentType.name}</span>
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <InlineStatusEdit
-                        statusId={item.status}
-                        boardColumns={boardColumns}
-                        contentItemId={item.id}
-                        onUpdate={handleItemUpdated}
-                      />
+                      {canEdit ? (
+                        <InlineStatusEdit
+                          statusId={item.status}
+                          boardColumns={boardColumns}
+                          contentItemId={item.id}
+                          onUpdate={handleItemUpdated}
+                        />
+                      ) : (
+                        status && (
+                          <span
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                            style={{ backgroundColor: `${status.color ?? '#94a3b8'}20`, color: status.color ?? undefined }}
+                          >
+                            {status.name}
+                          </span>
+                        )
+                      )}
                     </td>
                     <td className="px-4 py-3">
-                      <InlineAssigneeEdit
-                        assigneeIds={item.assignee_ids || []}
-                        members={members}
-                        contentItemId={item.id}
-                        onUpdate={handleItemUpdated}
-                      />
+                      {canEdit ? (
+                        <InlineAssigneeEdit
+                          assigneeIds={item.assignee_ids || []}
+                          members={members}
+                          contentItemId={item.id}
+                          onUpdate={handleItemUpdated}
+                        />
+                      ) : (
+                        <div className="flex -space-x-2">
+                          {assignees.length === 0 ? (
+                            <span className="text-slate-400 text-sm">-</span>
+                          ) : (
+                            assignees.slice(0, 3).map((a) => (
+                              <div key={a.id} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs text-slate-600 overflow-hidden">
+                                {a.avatar_url ? <img src={a.avatar_url} alt="" className="w-full h-full object-cover" /> : (a.full_name?.[0] || a.email?.[0] || '?').toUpperCase()}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
-                      <InlineDueDateEdit
-                        dueDate={item.due_date}
-                        contentItemId={item.id}
-                        onUpdate={handleItemUpdated}
-                      />
+                      {canEdit ? (
+                        <InlineDueDateEdit
+                          dueDate={item.due_date}
+                          contentItemId={item.id}
+                          onUpdate={handleItemUpdated}
+                        />
+                      ) : (
+                        <span className={`text-sm ${dueDate.isOverdue ? 'text-red-600 font-medium' : dueDate.isSoon ? 'text-amber-600' : 'text-slate-600'}`}>
+                          {dueDate.text}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
-                      <InlinePriorityEdit
-                        priority={item.priority}
-                        contentItemId={item.id}
-                        onUpdate={handleItemUpdated}
-                      />
+                      {canEdit ? (
+                        <InlinePriorityEdit
+                          priority={item.priority}
+                          contentItemId={item.id}
+                          onUpdate={handleItemUpdated}
+                        />
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          <span className={`w-2.5 h-2.5 rounded-full ${priority.dotColor}`} />
+                          <span className="text-sm text-slate-700">{priority.label}</span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm text-slate-600">{item.channel || '-'}</span>
@@ -471,8 +549,8 @@ function InlineStatusEdit({
         }}
         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium hover:opacity-80 transition-opacity"
         style={{
-          backgroundColor: currentColumn ? `${currentColumn.color}20` : '#f1f5f9',
-          color: currentColumn?.color || '#64748b',
+          backgroundColor: currentColumn?.color ? `${currentColumn.color}20` : '#f1f5f9',
+          color: currentColumn?.color ?? '#64748b',
         }}
       >
         {currentColumn?.name || 'None'}
@@ -481,7 +559,7 @@ function InlineStatusEdit({
 
       {isOpen && (
         <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg min-w-[150px]">
-          {boardColumns
+          {[...boardColumns]
             .sort((a, b) => a.position - b.position)
             .map((column) => (
               <button
@@ -496,7 +574,7 @@ function InlineStatusEdit({
               >
                 <span
                   className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: column.color }}
+                  style={{ backgroundColor: column.color ?? undefined }}
                 />
                 <span className={column.id === statusId ? 'text-blue-900 font-medium' : 'text-slate-700'}>
                   {column.name}
@@ -516,7 +594,7 @@ function InlinePriorityEdit({
   contentItemId,
   onUpdate,
 }: {
-  priority: string;
+  priority: string | null;
   contentItemId: string;
   onUpdate: () => void;
 }) {
@@ -540,7 +618,7 @@ function InlinePriorityEdit({
 
     const { error } = await supabase
       .from('content_items')
-      .update({ priority: newPriority })
+      .update({ priority: newPriority as 'low' | 'medium' | 'high' | 'urgent' })
       .eq('id', contentItemId);
 
     if (error) {
@@ -678,12 +756,12 @@ function InlineAssigneeEdit({
             {selectedMembers[0].avatar_url ? (
               <img
                 src={selectedMembers[0].avatar_url}
-                alt={selectedMembers[0].full_name || selectedMembers[0].email}
+                alt={selectedMembers[0].full_name ?? selectedMembers[0].email ?? undefined}
                 className="w-8 h-8 rounded-full object-cover border-2 border-white"
               />
             ) : (
               <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-medium text-slate-600">
-                {(selectedMembers[0].full_name?.[1] || selectedMembers[0].email[1] || '?').toUpperCase()}
+                {(selectedMembers[0].full_name?.[0] || selectedMembers[0].email?.[0] || '?').toUpperCase()}
               </div>
             )}
           </>
@@ -698,11 +776,11 @@ function InlineAssigneeEdit({
                 {assignee.avatar_url ? (
                   <img
                     src={assignee.avatar_url}
-                    alt={assignee.full_name || assignee.email}
+                    alt={assignee.full_name ?? assignee.email ?? undefined}
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
-                  (assignee.full_name?.[1] || assignee.email[1] || '?').toUpperCase()
+                  (assignee.full_name?.[0] || assignee.email?.[0] || '?').toUpperCase()
                 )}
               </div>
             ))}
@@ -740,7 +818,7 @@ function InlineAssigneeEdit({
                 {member.avatar_url ? (
                   <img
                     src={member.avatar_url}
-                    alt={member.full_name || member.email}
+                    alt={member.full_name ?? member.email ?? undefined}
                     className="w-6 h-6 rounded-full object-cover"
                   />
                 ) : (
@@ -749,7 +827,7 @@ function InlineAssigneeEdit({
                   </div>
                 )}
                 <span className={isSelected ? 'text-blue-900' : 'text-slate-700'}>
-                  {member.full_name || member.email}
+                  {member.full_name || member.email || 'Unknown'}
                 </span>
               </button>
             );
@@ -774,7 +852,7 @@ function InlineDueDateEdit({
   const [tempDate, setTempDate] = useState(dueDate || '');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const formatted = formatDueDate(dueDate);
+  const formatted = formatDueDateWithStatus(dueDate);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

@@ -22,11 +22,16 @@ import { Loader2 } from 'lucide-react';
 
 // Layout and pages
 import { AppLayout } from './layouts/AppLayout';
+import { HomePage } from './pages/HomePage';
 import { ListPage } from './pages/ListPage';
 import { BoardPage } from './pages/BoardPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { IntakeQueuePage } from './pages/IntakeQueuePage';
+import { IntakeFormPage } from './pages/IntakeFormPage';
+import { MyWorkPage } from './pages/MyWorkPage';
 import { AuthCallback } from './components/auth/AuthCallback';
 
 function LoginRoute() {
@@ -123,11 +128,16 @@ function AppRoutes() {
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/create-workspace" element={<CreateWorkspaceRoute />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/intake/:slug" element={<IntakeFormPage />} />
       <Route element={<ProtectedLayout />}>
+        <Route path="/home" element={<HomePage />} />
         <Route path="/list" element={<ListPage />} />
+        <Route path="/my-work" element={<MyWorkPage />} />
         <Route path="/board" element={<BoardPage />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+        <Route path="/intake-queue" element={<IntakeQueuePage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/" element={<LastViewRedirect />} />
       </Route>

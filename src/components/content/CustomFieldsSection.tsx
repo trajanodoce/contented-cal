@@ -1,14 +1,14 @@
-import React from 'react';
-import type { CustomFieldDefinition, SelectOption } from '../../lib/database.types';
+import type { CustomFieldDefinition, SelectOption, Profile } from '../../lib/database.types';
 
 interface Props {
   fields: CustomFieldDefinition[];
   values: Record<string, unknown>;
   onChange: (id: string, value: unknown) => void;
   compact?: boolean;
+  members?: Profile[];
 }
 
-export function CustomFieldsSection({ fields, values, onChange, compact = false }: Props) {
+export function CustomFieldsSection({ fields, values, onChange, compact = false, members = [] }: Props) {
   if (fields.length === 0) return null;
 
   return (
@@ -19,7 +19,7 @@ export function CustomFieldsSection({ fields, values, onChange, compact = false 
             {field.name}
             {field.required && <span className="text-red-500 ml-0.5">*</span>}
           </label>
-          <CustomFieldInput field={field} value={values[field.id]} onChange={v => onChange(field.id, v)} compact={compact} />
+          <CustomFieldInput field={field} value={values[field.id]} onChange={v => onChange(field.id, v)} compact={compact} members={members} />
         </div>
       ))}
     </div>
@@ -31,11 +31,17 @@ interface InputProps {
   value: unknown;
   onChange: (v: unknown) => void;
   compact?: boolean;
+  members?: Profile[];
 }
 
-function CustomFieldInput({ field, value, onChange, compact }: InputProps) {
+function CustomFieldInput({ field, value, onChange, compact, members = [] }: InputProps) {
   const cls = `w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
-  const options = (field.options as unknown as SelectOption[]) ?? [];
+  const rawOpts = field.options;
+  const options: SelectOption[] = Array.isArray(rawOpts)
+    ? rawOpts
+    : typeof rawOpts === 'string'
+      ? (() => { try { const p = JSON.parse(rawOpts); return Array.isArray(p) ? p : []; } catch { return []; } })()
+      : [];
 
   switch (field.field_type) {
     case 'text':
@@ -136,6 +142,21 @@ function CustomFieldInput({ field, value, onChange, compact }: InputProps) {
       );
     }
 
+    case 'user': {
+      return (
+        <select
+          value={(value as string) ?? ''}
+          onChange={e => onChange(e.target.value || null)}
+          className={`${cls} bg-white`}
+        >
+          <option value="">Select team member...</option>
+          {members.map(m => (
+            <option key={m.id} value={m.id}>{m.full_name || m.email}</option>
+          ))}
+        </select>
+      );
+    }
+
     default:
       return (
         <input
@@ -148,13 +169,22 @@ function CustomFieldInput({ field, value, onChange, compact }: InputProps) {
   }
 }
 
-export function renderCustomFieldValue(field: CustomFieldDefinition, value: unknown): string {
+export function renderCustomFieldValue(field: CustomFieldDefinition, value: unknown, members?: Profile[]): string {
   if (value === null || value === undefined || value === '') return '—';
-  const options = (field.options as unknown as SelectOption[]) ?? [];
+  const rawOpts = field.options;
+  const options: SelectOption[] = Array.isArray(rawOpts)
+    ? rawOpts
+    : typeof rawOpts === 'string'
+      ? (() => { try { const p = JSON.parse(rawOpts); return Array.isArray(p) ? p : []; } catch { return []; } })()
+      : [];
   switch (field.field_type) {
     case 'checkbox': return value ? 'Yes' : 'No';
     case 'single_select': return options.find(o => o.value === value)?.label ?? String(value);
     case 'multi_select': return (value as string[]).map(v => options.find(o => o.value === v)?.label ?? v).join(', ');
+    case 'user': {
+      const member = members?.find(m => m.id === value);
+      return member?.full_name || member?.email || String(value);
+    }
     default: return String(value);
   }
 }

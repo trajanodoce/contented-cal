@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import type { ContentType, BoardColumn } from '../../lib/database.types';
+import { useApp } from '../../contexts/AppContext';
+import type { ContentType, BoardColumn, CustomFieldDefinition, CustomFieldType, SelectOption, Json } from '../../lib/database.types';
 import {
   Plus,
   Trash2,
@@ -9,13 +10,24 @@ import {
   ChevronUp,
   Save,
   Eye,
-  EyeOff,
   Layout,
-  Columns,
   FileText,
   Settings,
   AlertTriangle,
+  X,
 } from 'lucide-react';
+
+const FIELD_TYPES: { value: CustomFieldType; label: string }[] = [
+  { value: 'text', label: 'Text' },
+  { value: 'long_text', label: 'Long Text' },
+  { value: 'number', label: 'Number' },
+  { value: 'date', label: 'Date' },
+  { value: 'single_select', label: 'Single Select' },
+  { value: 'multi_select', label: 'Multi Select' },
+  { value: 'url', label: 'URL' },
+  { value: 'checkbox', label: 'Checkbox' },
+  { value: 'user', label: 'Team Member' },
+];
 
 const COLOR_PALETTE = [
   '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#10b981',
@@ -58,6 +70,7 @@ interface ContentTypeEditorProps {
 }
 
 export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
+  const { refreshWorkspaceData } = useApp();
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,8 +125,8 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
     const workflow = (type.default_workflow as DefaultWorkflow) || {};
     setFormData({
       name: type.name,
-      icon: type.icon,
-      color: type.color,
+      icon: type.icon ?? 'FileText',
+      color: type.color ?? COLOR_PALETTE[0],
       defaultWorkflow: {
         fields: {
           channel: true,
@@ -157,8 +170,8 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
     // Ensure all columns are selected if none specified
     const workflowToSave: DefaultWorkflow = {
       fields: formData.defaultWorkflow.fields,
-      columns: formData.defaultWorkflow.columns?.length > 0
-        ? formData.defaultWorkflow.columns
+      columns: (formData.defaultWorkflow.columns?.length ?? 0) > 0
+        ? formData.defaultWorkflow.columns!
         : boardColumns.map(c => c.id),
     };
 
@@ -170,7 +183,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
           name: formData.name.trim(),
           icon: formData.icon,
           color: formData.color,
-          default_workflow: workflowToSave,
+          default_workflow: workflowToSave as unknown as Json,
         })
         .eq('id', expandedType);
 
@@ -180,6 +193,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
         toast.success('Content type updated');
         setExpandedType(null);
         fetchData();
+        refreshWorkspaceData();
       }
     } else if (showCreateModal) {
       // Create new
@@ -190,7 +204,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
           name: formData.name.trim(),
           icon: formData.icon,
           color: formData.color,
-          default_workflow: workflowToSave,
+          default_workflow: workflowToSave as unknown as Json,
         });
 
       if (error) {
@@ -199,6 +213,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
         toast.success('Content type created');
         setShowCreateModal(false);
         fetchData();
+        refreshWorkspaceData();
       }
     }
 
@@ -213,6 +228,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
       toast.success('Content type deleted');
       setShowDeleteConfirm(null);
       fetchData();
+      refreshWorkspaceData();
     }
   };
 
@@ -222,8 +238,8 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
       defaultWorkflow: {
         ...prev.defaultWorkflow,
         fields: {
-          ...prev.defaultWorkflow.fields,
-          [fieldKey]: !prev.defaultWorkflow.fields[fieldKey as keyof typeof prev.defaultWorkflow.fields],
+          ...(prev.defaultWorkflow.fields ?? {}),
+          [fieldKey]: !(prev.defaultWorkflow.fields ?? {})[fieldKey as keyof typeof prev.defaultWorkflow.fields],
         },
       },
     }));
@@ -305,11 +321,11 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                 <div className="flex items-center gap-3">
                   <span
                     className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: type.color }}
+                    style={{ backgroundColor: type.color ?? undefined }}
                   />
                   <span className="font-medium text-slate-900">{type.name}</span>
                   <span className="text-xs text-slate-500 px-2 py-0.5 bg-slate-200 rounded-full">
-                    {type.icon}
+                    {type.icon ?? 'FileText'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -401,14 +417,14 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                           <button
                             onClick={() => toggleField(field.key)}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                              formData.defaultWorkflow.fields[field.key]
+                              formData.defaultWorkflow.fields?.[field.key]
                                 ? 'bg-blue-600'
                                 : 'bg-slate-300'
                             }`}
                           >
                             <span
                               className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                formData.defaultWorkflow.fields[field.key]
+                                formData.defaultWorkflow.fields?.[field.key]
                                   ? 'translate-x-6'
                                   : 'translate-x-1'
                               }`}
@@ -430,7 +446,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                     </p>
                     <div className="space-y-2">
                       {boardColumns.map((column) => {
-                        const isSelected = formData.defaultWorkflow.columns.includes(column.id);
+                        const isSelected = (formData.defaultWorkflow.columns ?? []).includes(column.id);
                         return (
                           <label
                             key={column.id}
@@ -446,19 +462,28 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                             />
                             <span
                               className="w-3 h-3 rounded-full"
-                              style={{ backgroundColor: column.color }}
+                              style={{ backgroundColor: column.color ?? undefined }}
                             />
                             <span className="text-sm font-medium text-slate-900">{column.name}</span>
                           </label>
                         );
                       })}
                     </div>
-                    {formData.defaultWorkflow.columns.length === 0 && (
+                    {(formData.defaultWorkflow.columns?.length ?? 0) === 0 && (
                       <p className="text-xs text-amber-600 mt-2">
                         No columns selected. All columns will be available for this content type.
                       </p>
                     )}
                   </div>
+
+                  {/* Custom Fields Section */}
+                  {expandedType && (
+                    <CustomFieldsManager
+                      workspaceId={workspaceId!}
+                      contentTypeId={expandedType}
+                      refreshWorkspaceData={refreshWorkspaceData}
+                    />
+                  )}
 
                   {/* Action Buttons */}
                   <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
@@ -580,6 +605,201 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
             </div>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+// Inline custom field definition manager for a content type
+function CustomFieldsManager({
+  workspaceId,
+  contentTypeId,
+  refreshWorkspaceData,
+}: {
+  workspaceId: string;
+  contentTypeId: string;
+  refreshWorkspaceData: () => Promise<void>;
+}) {
+  const { customFieldDefs } = useApp();
+  const typeFields = customFieldDefs
+    .filter(f => f.content_type_id === contentTypeId)
+    .sort((a, b) => a.position - b.position);
+
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newType, setNewType] = useState<CustomFieldType>('text');
+  const [newRequired, setNewRequired] = useState(false);
+  const [newOptions, setNewOptions] = useState<SelectOption[]>([]);
+  const [optionInput, setOptionInput] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const needsOptions = newType === 'single_select' || newType === 'multi_select';
+
+  const addOption = () => {
+    if (!optionInput.trim()) return;
+    const val = optionInput.toLowerCase().replace(/\s+/g, '_');
+    setNewOptions(prev => [...prev, { value: val, label: optionInput.trim() }]);
+    setOptionInput('');
+  };
+
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    setSaving(true);
+    const { error } = await supabase.from('custom_field_definitions').insert({
+      workspace_id: workspaceId,
+      content_type_id: contentTypeId,
+      name: newName.trim(),
+      field_type: newType,
+      options: (needsOptions ? newOptions : []) as unknown as Json,
+      required: newRequired,
+      position: typeFields.length,
+    });
+    setSaving(false);
+    if (error) {
+      toast.error('Failed to add field: ' + error.message);
+      return;
+    }
+    toast.success('Custom field added');
+    setAdding(false);
+    setNewName('');
+    setNewType('text');
+    setNewRequired(false);
+    setNewOptions([]);
+    refreshWorkspaceData();
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from('custom_field_definitions').delete().eq('id', id);
+    if (error) {
+      toast.error('Failed to delete field: ' + error.message);
+      return;
+    }
+    toast.success('Custom field deleted');
+    refreshWorkspaceData();
+  };
+
+  return (
+    <div className="mb-6">
+      <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-3">
+        <Settings className="w-4 h-4" />
+        Custom Fields
+      </h4>
+      <p className="text-xs text-slate-500 mb-3">
+        Add custom fields specific to this content type
+      </p>
+
+      {typeFields.length === 0 && !adding && (
+        <p className="text-xs text-slate-400 mb-3">No custom fields defined yet.</p>
+      )}
+
+      {typeFields.length > 0 && (
+        <div className="space-y-2 mb-3">
+          {typeFields.map(field => (
+            <div key={field.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+              <div>
+                <span className="text-sm font-medium text-slate-900">{field.name}</span>
+                <span className="text-xs text-slate-500 ml-2">
+                  {FIELD_TYPES.find(ft => ft.value === field.field_type)?.label || field.field_type}
+                </span>
+                {field.required && <span className="text-xs text-red-500 ml-1">*</span>}
+              </div>
+              <button
+                onClick={() => handleDelete(field.id)}
+                className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {adding ? (
+        <div className="border border-blue-200 rounded-lg p-4 bg-blue-50/30 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Field Name</label>
+              <input
+                type="text"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g., Word Count"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Type</label>
+              <select
+                value={newType}
+                onChange={e => {
+                  setNewType(e.target.value as CustomFieldType);
+                  setNewOptions([]);
+                }}
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                {FIELD_TYPES.map(ft => (
+                  <option key={ft.value} value={ft.value}>{ft.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {needsOptions && (
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Options</label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {newOptions.map((opt, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-slate-200 rounded-full">
+                    {opt.label}
+                    <button onClick={() => setNewOptions(prev => prev.filter((_, j) => j !== i))} className="hover:text-red-600">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={optionInput}
+                  onChange={e => setOptionInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addOption(); } }}
+                  className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Option label"
+                />
+                <button onClick={addOption} className="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 rounded-lg">Add</button>
+              </div>
+            </div>
+          )}
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={newRequired} onChange={e => setNewRequired(e.target.checked)} className="w-4 h-4 rounded" />
+            <span className="text-sm text-slate-700">Required field</span>
+          </label>
+
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={() => setAdding(false)}
+              className="px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAdd}
+              disabled={saving || !newName.trim() || (needsOptions && newOptions.length === 0)}
+              className="px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+            >
+              {saving ? 'Adding...' : 'Add Field'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          onClick={() => setAdding(true)}
+          className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          Add Custom Field
+        </button>
       )}
     </div>
   );

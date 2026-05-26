@@ -25,21 +25,16 @@ export function AuthCallback() {
           throw new Error(`OAuth error: ${errorCode} - ${errorDesc || 'Unknown error'}`);
         }
 
-        console.log('[AuthCallback] Setting up auth state listener...');
+        // Set up auth state listener
 
         let timeoutId: ReturnType<typeof setTimeout>;
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-          console.log('[AuthCallback] Auth state changed:', event, 'Session:', !!session);
-
           if (event === 'SIGNED_IN' && session) {
             clearTimeout(timeoutId);
             subscription.unsubscribe();
 
-            // CRITICAL: Wait for AuthContext to update its user state
-            // This prevents the race condition where ProtectedLayout sees user as null
-            console.log('[AuthCallback] Waiting for AuthContext to update...');
-
+            // Wait for AuthContext to update its user state before navigating
             setTimeout(() => {
               toast.success('Signed in successfully!');
 
@@ -53,7 +48,6 @@ export function AuthCallback() {
                 ? returnTo
                 : '/list';
 
-              console.log('[AuthCallback] Redirecting to:', redirectTo);
               navigate(redirectTo, { replace: true });
             }, 1000); // 1 second delay to ensure AuthContext has updated
           }
@@ -61,13 +55,13 @@ export function AuthCallback() {
 
         // Set a timeout in case the auth state change never fires
         timeoutId = setTimeout(() => {
-          console.log('[AuthCallback] Auth state listener timed out');
+          // Auth state listener timed out — try one final session check
           subscription.unsubscribe();
 
           // One last check for session
           supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
-              console.log('[AuthCallback] Found session on timeout check, redirecting...');
+              // Found session on timeout check
               toast.success('Signed in successfully!');
 
               const returnTo = localStorage.getItem('authReturnTo');

@@ -1,8 +1,26 @@
 import { format, isToday, isTomorrow, isPast, parseISO } from 'date-fns';
 
+/**
+ * Parse a date string as a LOCAL date.
+ * date-fns v4 parseISO treats date-only strings (yyyy-MM-dd) as UTC midnight,
+ * which shifts to the previous day in timezones behind UTC (all US timezones).
+ * This helper splits the string and constructs a local Date instead.
+ * For full ISO timestamps (with T), it falls back to parseISO.
+ */
+export function parseLocalDate(dateStr: string): Date {
+  const datePart = dateStr.split('T')[0];
+  // If it's a date-only string, construct local date
+  if (datePart === dateStr || dateStr.endsWith('T00:00:00') || dateStr.endsWith('T00:00:00.000')) {
+    const [y, m, d] = datePart.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  // Full timestamp — use parseISO
+  return parseISO(dateStr);
+}
+
 export function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—';
-  const d = parseISO(dateStr);
+  const d = parseLocalDate(dateStr);
   if (isToday(d)) return 'Today';
   if (isTomorrow(d)) return 'Tomorrow';
   return format(d, 'MMM d');
@@ -10,12 +28,12 @@ export function formatDate(dateStr: string | null | undefined): string {
 
 export function formatDateFull(dateStr: string | null | undefined): string {
   if (!dateStr) return '—';
-  return format(parseISO(dateStr), 'MMM d, yyyy');
+  return format(parseLocalDate(dateStr), 'MMM d, yyyy');
 }
 
 export function isOverdue(dateStr: string | null | undefined): boolean {
   if (!dateStr) return false;
-  const d = parseISO(dateStr);
+  const d = parseLocalDate(dateStr);
   return isPast(d) && !isToday(d);
 }
 

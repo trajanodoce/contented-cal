@@ -73,7 +73,7 @@ interface FormBuilderProps {
 }
 
 export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
-  const { workspace, contentTypes, refreshIntakeForms } = useApp();
+  const { refreshIntakeForms } = useApp();
   const dragId = useRef<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 
@@ -262,7 +262,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
               <div>
                 <label className="block text-xs text-gray-500 mb-1">Description</label>
                 <textarea
-                  value={description}
+                  value={description ?? ''}
                   onChange={e => setDescription(e.target.value)}
                   rows={2}
                   className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
@@ -482,7 +482,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
                   </div>
                   {ct && (
                     <span className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ct.color }} />
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ct.color ?? undefined }} />
                       {ct.name}
                     </span>
                   )}

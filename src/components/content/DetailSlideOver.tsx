@@ -1,16 +1,20 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   X, Calendar, MessageSquare,
-  Activity, Plus, Loader2, Edit2, Check, Hash, Zap, ExternalLink
+  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
-import type { ContentItem, Comment, ActivityLog, Subtask, ContentType, BoardColumn } from '../../lib/database.types';
-import { formatDate, formatDateFull } from '../../lib/utils';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json, Profile } from '../../lib/database.types';
+import { formatDateFull } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
-import { isOrdinalItem, ORDINAL_COLOR, getOrdinalProfile, getPlatformFromChannel, PLATFORM_META } from '../../lib/ordinal';
+import { SubtasksSection } from './SubtasksSection';
+import { isOrdinalItem, ORDINAL_COLOR, DRAFT_COLOR, getOrdinalProfile, PLATFORM_META } from '../../lib/ordinal';
 import { useOrdinalPost } from '../../hooks/useOrdinalPost';
 import { ExternalLinksSection } from './ExternalLinks';
+import { GranolaNoteSection } from './GranolaNoteSection';
+import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
 
 interface Props {
@@ -18,6 +22,11 @@ interface Props {
   onClose: () => void;
   onUpdated: () => void;
   addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+}
+
+// Comment enriched with author profile via FK join
+interface CommentWithProfile extends Comment {
+  profiles: Pick<Profile, 'id' | 'full_name' | 'email' | 'avatar_url'> | null;
 }
 
 const CHANNELS = ['Blog', 'LinkedIn', 'Twitter/X', 'Instagram', 'Facebook', 'YouTube', 'Email', 'Website', 'Other'];
@@ -55,25 +64,26 @@ function getAllowedStatuses(contentType: ContentType | null, allColumns: BoardCo
 }
 
 export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
-  const { contentTypes, boardColumns, user, customFieldDefs, projects } = useApp();
+  const { contentTypes, boardColumns, user, customFieldDefs, projects, members } = useApp();
+  const { userRole } = useWorkspace();
+  const isOrdinalPost = isOrdinalItem(item);
+  const isReadOnly = userRole === 'viewer' || isOrdinalPost;
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'activity'>('details');
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentWithProfile[]>([]);
   const [activity, setActivity] = useState<ActivityLog[]>([]);
-  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [commentText, setCommentText] = useState('');
-  const [newSubtask, setNewSubtask] = useState('');
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<Partial<ContentItem>>({});
   const [savingField, setSavingField] = useState<string | null>(null);
   const [editingDescription, setEditingDescription] = useState(false);
   const [description, setDescription] = useState(item.description);
+  const [granolaPickerOpen, setGranolaPickerOpen] = useState(false);
+  const [granolaRefreshKey, setGranolaRefreshKey] = useState(0);
 
   const contentType = contentTypes.find(ct => ct.id === item.content_type_id);
 
-  // Check if this is an Ordinal item
-  const isOrdinal = isOrdinalItem(item);
-  const ordinalProfile = isOrdinal ? getOrdinalProfile(item) : null;
-  const { ordinalLink, loading: ordinalLinkLoading } = useOrdinalPost(item.id);
+  const ordinalProfile = isOrdinalPost ? getOrdinalProfile(item) : null;
+  const { ordinalLink } = useOrdinalPost(item.id);
 
   // Get field visibility based on content type
   const fieldVisibility = useMemo(() => getFieldVisibility(contentType || null), [contentType]);
@@ -99,10 +109,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const loadComments = useCallback(async () => {
     const { data } = await supabase
       .from('comments')
-      .select('*')
+      .select('*, profiles:user_id(id, full_name, email, avatar_url)')
       .eq('content_item_id', item.id)
       .order('created_at');
-    if (data) setComments(data);
+    if (data) setComments(data as unknown as CommentWithProfile[]);
   }, [item.id]);
 
   const loadActivity = useCallback(async () => {
@@ -115,20 +125,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     if (data) setActivity(data);
   }, [item.id]);
 
-  const loadSubtasks = useCallback(async () => {
-    const { data } = await supabase
-      .from('subtasks')
-      .select('*')
-      .eq('content_item_id', item.id)
-      .order('position');
-    if (data) setSubtasks(data);
-  }, [item.id]);
-
   useEffect(() => {
     loadComments();
     loadActivity();
-    loadSubtasks();
-  }, [loadComments, loadActivity, loadSubtasks]);
+  }, [loadComments, loadActivity]);
 
   async function updateField(field: string, value: unknown) {
     setSavingField(field);
@@ -143,7 +143,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         content_item_id: item.id,
         user_id: user?.id,
         action: `Updated ${field}`,
-        metadata: { field, value },
+        metadata: { field, value } as Json,
       });
 
       onUpdated();
@@ -174,24 +174,11 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     addToast('Comment added');
   }
 
-  async function addSubtask() {
-    if (!newSubtask.trim()) return;
-    const { error } = await supabase.from('subtasks').insert({
-      content_item_id: item.id,
-      title: newSubtask.trim(),
-      position: subtasks.length,
-    });
-    if (error) { addToast(error.message, 'error'); return; }
-    setNewSubtask('');
-    loadSubtasks();
-  }
-
-  async function toggleSubtask(subtask: Subtask) {
-    await supabase.from('subtasks').update({ completed: !subtask.completed }).eq('id', subtask.id);
-    loadSubtasks();
-  }
-
-  const completedSubtasks = subtasks.filter(s => s.completed).length;
+  // Member profiles for subtasks section
+  const memberProfiles = useMemo(
+    () => members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null })),
+    [members]
+  );
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={onClose}>
@@ -200,7 +187,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         onClick={e => e.stopPropagation()}
       >
         {/* Ordinal Banner */}
-        {isOrdinal && (
+        {isOrdinalPost && (
           <div className="px-6 py-3 border-b" style={{ backgroundColor: `${ORDINAL_COLOR}08`, borderColor: `${ORDINAL_COLOR}20` }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -215,22 +202,30 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <p className="text-xs text-gray-500">To edit, open it in Ordinal</p>
                 </div>
               </div>
-              {ordinalLink?.post_url && (
-                <a
-                  href={ordinalLink.post_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                  style={{
-                    color: ORDINAL_COLOR,
-                    borderColor: `${ORDINAL_COLOR}40`,
-                    backgroundColor: `${ORDINAL_COLOR}08`,
-                  }}
+              <div className="flex items-center gap-2">
+                <span
+                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide"
+                  style={{ backgroundColor: `${DRAFT_COLOR}15`, color: DRAFT_COLOR }}
                 >
-                  <span>Open in Ordinal</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
+                  Draft
+                </span>
+                {ordinalLink?.post_url && (
+                  <a
+                    href={ordinalLink.post_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+                    style={{
+                      color: ORDINAL_COLOR,
+                      borderColor: `${ORDINAL_COLOR}40`,
+                      backgroundColor: `${ORDINAL_COLOR}08`,
+                    }}
+                  >
+                    <span>Open in Ordinal</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -238,7 +233,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         {/* Header */}
         <div className="flex items-start gap-3 px-6 py-4 border-b border-gray-100">
           <div className="flex-1 min-w-0">
-            {isOrdinal ? (
+            {isOrdinalPost ? (
               // Read-only title for Ordinal items
               <div className="flex items-start gap-2">
                 <div
@@ -268,6 +263,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   )}
                 </div>
               </div>
+            ) : isReadOnly ? (
+              <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
             ) : (
               <>
                 {editingField === 'title' ? (
@@ -299,7 +296,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {contentType && (
                 <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contentType.color }} />
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contentType.color ?? undefined }} />
                   {contentType.name}
                 </span>
               )}
@@ -340,7 +337,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <select
                     value={item.status ?? ''}
                     onChange={e => updateField('status', e.target.value || null)}
-                    className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                    disabled={isReadOnly}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {allowedStatuses.map(col => (
@@ -354,9 +352,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Priority</label>
                     <select
-                      value={item.priority}
+                      value={item.priority ?? undefined}
                       onChange={e => updateField('priority', e.target.value)}
-                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                      disabled={isReadOnly}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       {PRIORITIES.map(p => (
                         <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -375,7 +374,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       type="date"
                       value={item.due_date ?? ''}
                       onChange={e => updateField('due_date', e.target.value || null)}
-                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                      disabled={isReadOnly}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -390,7 +390,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       type="date"
                       value={item.publish_date ?? ''}
                       onChange={e => updateField('publish_date', e.target.value || null)}
-                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                      disabled={isReadOnly}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -402,7 +403,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     <select
                       value={item.channel ?? ''}
                       onChange={e => updateField('channel', e.target.value)}
-                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                      disabled={isReadOnly}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">None</option>
                       {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -416,7 +418,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <select
                     value={item.content_type_id ?? ''}
                     onChange={e => updateField('content_type_id', e.target.value || null)}
-                    className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                    disabled={isReadOnly}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
@@ -430,7 +433,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     <select
                       value={item.project_id ?? ''}
                       onChange={e => updateField('project_id', e.target.value || null)}
-                      className="mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white"
+                      disabled={isReadOnly}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">No project</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
@@ -453,12 +457,30 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 </div>
               )}
 
+              {/* Linked Assets */}
+              <div className="border-t border-gray-100 pt-5">
+                <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
+              </div>
+
+              {/* Granola Meeting Notes */}
+              <GranolaNoteSection
+                key={granolaRefreshKey}
+                contentItemId={item.id}
+                onLinkNote={() => setGranolaPickerOpen(true)}
+              />
+              <GranolaNotePickerModal
+                isOpen={granolaPickerOpen}
+                onClose={() => setGranolaPickerOpen(false)}
+                contentItemId={item.id}
+                onLinked={() => setGranolaRefreshKey((k) => k + 1)}
+              />
+
               {/* Description */}
               {fieldVisibility.description && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</label>
-                    {!editingDescription && (
+                    {!editingDescription && !isReadOnly && (
                       <button
                         onClick={() => setEditingDescription(true)}
                         className="text-xs text-brand-500 hover:text-brand-500 flex items-center gap-1"
@@ -471,7 +493,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     <div>
                       <textarea
                         autoFocus
-                        value={description}
+                        value={description ?? ''}
                         onChange={e => setDescription(e.target.value)}
                         rows={6}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none font-mono"
@@ -494,10 +516,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     </div>
                   ) : (
                     <div
-                      className="text-sm text-gray-700 whitespace-pre-wrap min-h-[60px] p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                      onClick={() => setEditingDescription(true)}
+                      className={`text-sm text-gray-700 whitespace-pre-wrap min-h-[60px] p-3 bg-gray-50 rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-gray-100'}`}
+                      onClick={() => !isReadOnly && setEditingDescription(true)}
                     >
-                      {item.description || <span className="text-gray-400 italic">Click to add description...</span>}
+                      {item.description || <span className="text-gray-400 italic">{isReadOnly ? 'No description' : 'Click to add description...'}</span>}
                     </div>
                   )}
                 </div>
@@ -512,76 +534,29 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     values={customFieldValues}
                     onChange={updateCustomField}
                     compact
+                    members={members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null }))}
                   />
                 </div>
               )}
 
-              {/* External links */}
-              <div className="border-t border-gray-100 pt-5">
-                <ExternalLinksSection contentItemId={item.id} addToast={addToast} />
-              </div>
-
               {/* Subtasks */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                    Subtasks {subtasks.length > 0 && `(${completedSubtasks}/${subtasks.length})`}
-                  </label>
-                </div>
-                {subtasks.length > 0 && (
-                  <div className="mb-2">
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 rounded-full transition-all"
-                        style={{ width: `${subtasks.length ? (completedSubtasks / subtasks.length) * 100 : 0}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-                <div className="space-y-1.5 mb-3">
-                  {subtasks.map(st => (
-                    <div key={st.id} className="flex items-center gap-2.5 py-1">
-                      <button
-                        onClick={() => toggleSubtask(st)}
-                        className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors shrink-0
-                          ${st.completed ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-gray-400'}`}
-                      >
-                        {st.completed && <Check className="w-2.5 h-2.5 text-white" />}
-                      </button>
-                      <span className={`text-sm flex-1 ${st.completed ? 'line-through text-gray-400' : 'text-gray-700'}`}>
-                        {st.title}
-                      </span>
-                      {st.due_date && (
-                        <span className="text-xs text-gray-400">{formatDate(st.due_date)}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={newSubtask}
-                    onChange={e => setNewSubtask(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && addSubtask()}
-                    placeholder="Add subtask..."
-                    className="flex-1 px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
-                  />
-                  <button
-                    onClick={addSubtask}
-                    disabled={!newSubtask.trim()}
-                    className="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
+              <SubtasksSection
+                contentItemId={item.id}
+                userId={user?.id ?? null}
+                members={memberProfiles}
+                addToast={addToast}
+              />
 
               {/* AI Assistant */}
               <AiAssistant
                 item={item}
                 addToast={addToast}
-                onInsertToDescription={(text) => {
-                  setDescription(prev => prev ? `${prev}\n\n${text}` : text);
+                onInsertToDescription={(text, mode) => {
+                  if (mode === 'replace') {
+                    setDescription(text);
+                  } else {
+                    setDescription(prev => prev ? `${prev}\n\n---\n\n${text}` : text);
+                  }
                   setEditingDescription(true);
                 }}
               />
@@ -596,20 +571,32 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <p className="text-sm">No comments yet</p>
                 </div>
               )}
-              {comments.map(comment => (
-                <div key={comment.id} className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-mint-200 text-brand-600 flex items-center justify-center text-xs font-medium shrink-0">
-                    {comment.user_id.slice(0, 2).toUpperCase()}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-xs font-medium text-gray-700">{comment.user_id.slice(0, 8)}</span>
-                      <span className="text-xs text-gray-400">{formatDateFull(comment.created_at)}</span>
+              {comments.map(comment => {
+                const authorName = comment.profiles?.full_name || comment.profiles?.email || 'Unknown';
+                const authorInitial = (authorName[0] || '?').toUpperCase();
+                return (
+                  <div key={comment.id} className="flex gap-3">
+                    {comment.profiles?.avatar_url ? (
+                      <img
+                        src={comment.profiles.avatar_url}
+                        alt={authorName}
+                        className="w-8 h-8 rounded-full object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium shrink-0">
+                        {authorInitial}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-medium text-gray-700">{authorName}</span>
+                        <span className="text-xs text-gray-400">{formatDateFull(comment.created_at)}</span>
+                      </div>
+                      <p className="text-sm text-gray-700 mt-0.5 whitespace-pre-wrap">{comment.body}</p>
                     </div>
-                    <p className="text-sm text-gray-700 mt-0.5 whitespace-pre-wrap">{comment.body}</p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <div className="pt-2 border-t border-gray-100">
                 <textarea

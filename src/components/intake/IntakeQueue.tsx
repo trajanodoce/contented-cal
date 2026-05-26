@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Inbox, ChevronRight, ArrowRight, Loader2, RefreshCw, Check, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
@@ -14,7 +14,7 @@ interface SubmissionWithForm extends IntakeSubmission {
 }
 
 export function IntakeQueue({ addToast }: Props) {
-  const { workspace, user, intakeForms, boardColumns, contentTypes, refreshContentItems } = useApp();
+  const { workspace, user, intakeForms, boardColumns, refreshContentItems } = useApp();
   const [submissions, setSubmissions] = useState<SubmissionWithForm[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<SubmissionWithForm | null>(null);

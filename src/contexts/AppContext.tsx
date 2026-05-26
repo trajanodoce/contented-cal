@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { useWorkspace } from './WorkspaceContext';
 import type {
   Workspace, WorkspaceMember, ContentType, BoardColumn,
   ContentItem, Project, CustomFieldDefinition, IntakeForm
@@ -33,6 +34,7 @@ interface AppContextValue {
 const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const { currentWorkspace: wsFromContext } = useWorkspace();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [workspace, setWorkspaceState] = useState<Workspace | null>(null);
@@ -67,6 +69,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Sync workspace from WorkspaceContext so AppContext stays in sync
+  useEffect(() => {
+    if (wsFromContext && wsFromContext.id !== workspace?.id) {
+      setWorkspaceState(wsFromContext);
+    }
+  }, [wsFromContext, workspace?.id]);
 
   const setWorkspace = useCallback((w: Workspace) => {
     setWorkspaceState(w);
@@ -117,7 +126,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       supabase.from('content_types').select('*').eq('workspace_id', workspace.id).order('name'),
       supabase.from('board_columns').select('*').eq('workspace_id', workspace.id).order('position'),
       supabase.from('projects').select('*').eq('workspace_id', workspace.id).order('created_at', { ascending: false }),
-      supabase.from('workspace_members').select('*').eq('workspace_id', workspace.id),
+      supabase.from('workspace_members').select('*, profiles:user_id(id, full_name, email, avatar_url)').eq('workspace_id', workspace.id),
       supabase.from('workspace_members').select('role').eq('workspace_id', workspace.id).eq('user_id', user.id).maybeSingle(),
       supabase.from('custom_field_definitions').select('*').eq('workspace_id', workspace.id).order('position'),
     ]);
@@ -129,12 +138,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (customFieldsRes.data) setCustomFieldDefs(customFieldsRes.data);
 
     if (membersRes.data) {
-      // Enrich with user metadata from auth.users via current session info
-      const enriched = membersRes.data.map(m => ({
+      // Enrich with profile data from the profiles join
+      const enriched = membersRes.data.map((m: any) => ({
         ...m,
-        email: m.user_id === user.id ? user.email : undefined,
-        full_name: m.user_id === user.id ? user.user_metadata?.full_name : undefined,
-        avatar_url: m.user_id === user.id ? user.user_metadata?.avatar_url : undefined,
+        email: m.profiles?.email ?? (m.user_id === user.id ? user.email : undefined),
+        full_name: m.profiles?.full_name ?? (m.user_id === user.id ? user.user_metadata?.full_name : undefined),
+        avatar_url: m.profiles?.avatar_url ?? (m.user_id === user.id ? user.user_metadata?.avatar_url : undefined),
+        profiles: undefined, // Remove nested profiles object
       }));
       setMembers(enriched);
     }

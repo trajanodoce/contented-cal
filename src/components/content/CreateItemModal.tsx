@@ -1,11 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { useApp } from '../../contexts/AppContext';
 import { useWorkspaceData } from '../../hooks/useWorkspaceData';
-import type { ContentType, Profile, BoardColumn } from '../../lib/database.types';
+import { CustomFieldsSection } from './CustomFieldsSection';
+import type { ContentType, Profile, BoardColumn, Json } from '../../lib/database.types';
 import {
   X,
   ChevronDown,
@@ -15,9 +17,18 @@ import {
   Loader2,
 } from 'lucide-react';
 
+export interface MeetingPrefill {
+  title: string;
+  description: string;
+  dueDate?: string;
+  granolaNoteId?: string;
+}
+
 interface CreateItemModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialDate?: string | null;
+  meetingPrefill?: MeetingPrefill | null;
 }
 
 // Priority options
@@ -63,7 +74,7 @@ function getAllowedStatuses(contentType: ContentType | null, allColumns: BoardCo
 interface SelectOption {
   value: string;
   label: string;
-  color?: string;
+  color?: string | undefined;
 }
 
 function CustomSelect({
@@ -191,7 +202,7 @@ function AssigneeMultiSelect({
               {selectedMembers[0].avatar_url ? (
                 <img
                   src={selectedMembers[0].avatar_url}
-                  alt={selectedMembers[0].full_name || selectedMembers[0].email}
+                  alt={selectedMembers[0].full_name ?? selectedMembers[0].email ?? undefined}
                   className="w-6 h-6 rounded-full object-cover"
                 />
               ) : (
@@ -236,7 +247,7 @@ function AssigneeMultiSelect({
                   {member.avatar_url ? (
                     <img
                       src={member.avatar_url}
-                      alt={member.full_name || member.email}
+                      alt={member.full_name ?? member.email ?? undefined}
                       className="w-6 h-6 rounded-full object-cover"
                     />
                   ) : (
@@ -258,27 +269,59 @@ function AssigneeMultiSelect({
 }
 
 // Main modal component
-export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
+export function CreateItemModal({ isOpen, onClose, initialDate, meetingPrefill }: CreateItemModalProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { contentTypes, boardColumns, members } = useWorkspaceData(
     currentWorkspace?.id || null
   );
+  const { customFieldDefs, projects } = useApp();
 
   const [title, setTitle] = useState('');
   const [contentTypeId, setContentTypeId] = useState('');
   const [statusId, setStatusId] = useState('');
   const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
-  const [dueDate, setDueDate] = useState('');
+  const [dueDate, setDueDate] = useState(initialDate || '');
   const [priority, setPriority] = useState('medium');
   const [channel, setChannel] = useState('');
   const [description, setDescription] = useState('');
+  const [projectId, setProjectId] = useState('');
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Custom fields for the selected content type
+  const activeCustomFields = useMemo(
+    () => customFieldDefs
+      .filter(f => f.content_type_id === contentTypeId || (!f.content_type_id && !contentTypeId))
+      .sort((a, b) => a.position - b.position),
+    [customFieldDefs, contentTypeId]
+  );
+
+  const memberProfiles = useMemo(
+    () => members.map(m => ({ id: m.id, email: m.email || '', full_name: m.full_name || m.email || '', avatar_url: m.avatar_url ?? null })),
+    [members]
+  );
+
+  // Pre-fill due date when opened from calendar date click
+  useEffect(() => {
+    if (isOpen && initialDate) {
+      setDueDate(initialDate);
+    }
+  }, [isOpen, initialDate]);
+
+  // Pre-fill from meeting note
+  useEffect(() => {
+    if (isOpen && meetingPrefill) {
+      setTitle(meetingPrefill.title);
+      setDescription(meetingPrefill.description);
+      if (meetingPrefill.dueDate) setDueDate(meetingPrefill.dueDate);
+    }
+  }, [isOpen, meetingPrefill]);
 
   // Set default status to first board column (Backlog)
   useEffect(() => {
     if (boardColumns.length > 0 && !statusId) {
-      const firstColumn = boardColumns.sort((a, b) => a.position - b.position)[0];
+      const firstColumn = [...boardColumns].sort((a, b) => a.position - b.position)[0];
       setStatusId(firstColumn.id);
     }
   }, [boardColumns, statusId]);
@@ -287,23 +330,23 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
   const selectedContentType = contentTypes.find(ct => ct.id === contentTypeId);
 
   // Get field visibility based on selected content type
-  const fieldVisibility = getFieldVisibility(selectedContentType);
+  const fieldVisibility = getFieldVisibility(selectedContentType ?? null);
 
   // Prepare select options
   const contentTypeOptions = contentTypes.map((ct) => ({
     value: ct.id,
     label: ct.name,
-    color: ct.color,
+    color: ct.color ?? undefined,
   }));
 
   // Filter status options based on content type workflow
-  const allowedStatuses = getAllowedStatuses(selectedContentType, boardColumns);
-  const statusOptions = allowedStatuses
+  const allowedStatuses = getAllowedStatuses(selectedContentType ?? null, boardColumns);
+  const statusOptions = [...allowedStatuses]
     .sort((a, b) => a.position - b.position)
     .map((bc) => ({
       value: bc.id,
       label: bc.name,
-      color: bc.color,
+      color: bc.color ?? undefined,
     }));
 
   if (!isOpen) return null;
@@ -326,10 +369,19 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
       return;
     }
 
+    // Validate required custom fields
+    const missingRequired = activeCustomFields.filter(f =>
+      f.required && (customFieldValues[f.id] === undefined || customFieldValues[f.id] === null || customFieldValues[f.id] === '')
+    );
+    if (missingRequired.length > 0) {
+      toast.error(`Required field: ${missingRequired[0].name}`);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from('content_items').insert({
+      const { data: newItem, error } = await supabase.from('content_items').insert({
         workspace_id: currentWorkspace.id,
         title: title.trim(),
         content_type_id: contentTypeId || null,
@@ -341,11 +393,36 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
         description: description.trim(),
         created_by: user.id,
         tags: [],
-        custom_fields: {},
-      });
+        project_id: projectId || null,
+        custom_fields: customFieldValues as Json,
+      }).select('id').single();
 
       if (error) {
         throw error;
+      }
+
+      // If created from a meeting note, link it automatically
+      if (meetingPrefill?.granolaNoteId && newItem) {
+        const session = await supabase.auth.getSession();
+        if (session.data.session) {
+          fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/granola-sync`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.data.session.access_token}`,
+                Apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+              },
+              body: JSON.stringify({
+                action: 'link',
+                workspace_id: currentWorkspace.id,
+                granola_note_id: meetingPrefill.granolaNoteId,
+                content_item_id: newItem.id,
+              }),
+            }
+          ).catch(() => {}); // Fire-and-forget — note link is best-effort
+        }
       }
 
       toast.success('Content item created!');
@@ -366,6 +443,8 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
     setPriority('medium');
     setChannel('');
     setDescription('');
+    setProjectId('');
+    setCustomFieldValues({});
     // Keep status as default
   }
 
@@ -412,11 +491,12 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
                 value={contentTypeId}
                 onChange={(value) => {
                   setContentTypeId(value);
+                  setCustomFieldValues({}); // Reset custom fields when type changes
                   // Reset status to first allowed when type changes
                   const newType = contentTypes.find(ct => ct.id === value);
                   const newAllowedStatuses = getAllowedStatuses(newType || null, boardColumns);
                   if (newAllowedStatuses.length > 0) {
-                    setStatusId(newAllowedStatuses.sort((a, b) => a.position - b.position)[1]?.id || newAllowedStatuses[0]?.id);
+                    setStatusId([...newAllowedStatuses].sort((a, b) => a.position - b.position)[1]?.id || newAllowedStatuses[0]?.id);
                   }
                 }}
                 placeholder="Select type..."
@@ -439,6 +519,19 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Assignees</label>
             <AssigneeMultiSelect members={members} value={assigneeIds} onChange={setAssigneeIds} />
           </div>
+
+          {/* Project */}
+          {projects.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Project</label>
+              <CustomSelect
+                options={projects.filter(p => p.status === 'active').map(p => ({ value: p.id, label: p.title }))}
+                value={projectId}
+                onChange={setProjectId}
+                placeholder="Select project..."
+              />
+            </div>
+          )}
 
           {/* Due Date & Priority */}
           <div className="grid grid-cols-2 gap-4">
@@ -493,6 +586,19 @@ export function CreateItemModal({ isOpen, onClose }: CreateItemModalProps) {
                 placeholder="Add any additional details..."
                 rows={4}
                 className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              />
+            </div>
+          )}
+
+          {/* Custom fields */}
+          {activeCustomFields.length > 0 && (
+            <div className="border-t border-slate-200 pt-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Custom fields</p>
+              <CustomFieldsSection
+                fields={activeCustomFields}
+                values={customFieldValues}
+                onChange={(id, value) => setCustomFieldValues(prev => ({ ...prev, [id]: value }))}
+                members={memberProfiles}
               />
             </div>
           )}

@@ -1,14 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { useToast } from '../hooks/useToast';
-import type { ContentType, BoardColumn } from '../lib/database.types';
+import type { BoardColumn } from '../lib/database.types';
 import { ContentTypeEditor } from '../components/settings/ContentTypesTab';
-import { OrdinalSettings }  from '../components/settings/OrdinalSettings';
+import { IntegrationsPage } from '../components/settings/IntegrationsPage';
+import { IntakeFormsList } from '../components/settings/IntakeFormBuilder';
+import { TeamTab } from '../components/settings/TeamTab';
+import { CustomFieldsTab } from '../components/settings/CustomFieldsTab';
 import {
-  Settings, FileText, Layout, Save, Trash2, Plus,
-  ChevronDown, ChevronUp, GripVertical, AlertTriangle, Zap,
+  Settings, FileText, Layout, Save, Trash2, Plus, Inbox, Users,
+  ChevronDown, ChevronUp, GripVertical, AlertTriangle, Zap, Upload, X, ImageIcon,
+  SlidersHorizontal,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -18,7 +22,7 @@ const COLOR_PALETTE = [
   '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#64748b', '#94a3b8',
 ];
 
-type Tab = 'general' | 'content-types' | 'board-columns' | 'integrations';
+type Tab = 'general' | 'team' | 'content-types' | 'custom-fields' | 'board-columns' | 'intake-forms' | 'integrations';
 
 export function SettingsPage() {
   const { currentWorkspace, userRole } = useWorkspace();
@@ -48,17 +52,23 @@ export function SettingsPage() {
       <div className="border-b border-slate-200 mb-6">
         <nav className="flex gap-1">
           <TabBtn active={activeTab === 'general'} onClick={() => setActiveTab('general')} icon={Settings} label="General" />
+          <TabBtn active={activeTab === 'team'} onClick={() => setActiveTab('team')} icon={Users} label="Team" />
           <TabBtn active={activeTab === 'content-types'} onClick={() => setActiveTab('content-types')} icon={FileText} label="Content Types" />
+          <TabBtn active={activeTab === 'custom-fields'} onClick={() => setActiveTab('custom-fields')} icon={SlidersHorizontal} label="Custom Fields" />
           <TabBtn active={activeTab === 'board-columns'} onClick={() => setActiveTab('board-columns')} icon={Layout} label="Board Columns" />
+          <TabBtn active={activeTab === 'intake-forms'} onClick={() => setActiveTab('intake-forms')} icon={Inbox} label="Intake Forms" />
           <TabBtn active={activeTab === 'integrations'} onClick={() => setActiveTab('integrations')} icon={Zap} label="Integrations" />
         </nav>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg p-6">
         {activeTab === 'general' && <GeneralTab workspace={currentWorkspace} />}
+        {activeTab === 'team' && <TeamTab />}
         {activeTab === 'content-types' && <ContentTypeEditor workspaceId={currentWorkspace?.id || null} />}
+        {activeTab === 'custom-fields' && <CustomFieldsTab workspaceId={currentWorkspace?.id || null} />}
         {activeTab === 'board-columns' && <BoardColumnsTab workspaceId={currentWorkspace?.id || null} />}
-        {activeTab === 'integrations' && <OrdinalSettings />}
+        {activeTab === 'intake-forms' && <IntakeFormsList addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}
+        {activeTab === 'integrations' && <IntegrationsPage addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}
       </div>
     </div>
   );
@@ -78,17 +88,114 @@ function TabBtn({ active, onClick, icon: Icon, label }: { active: boolean; onCli
   );
 }
 
-function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug: string } | null }) {
+function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug: string; logo_url?: string | null } | null }) {
+  const { refreshWorkspaces } = useWorkspace();
   const [name, setName] = useState(workspace?.name || '');
   const [slug, setSlug] = useState(workspace?.slug || '');
+  const [logoUrl, setLogoUrl] = useState(workspace?.logo_url || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (workspace) {
       setName(workspace.name);
       setSlug(workspace.slug);
+      setLogoUrl(workspace.logo_url || '');
     }
   }, [workspace]);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !workspace) return;
+
+    // Reset the input so the same file can be re-selected
+    e.target.value = '';
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be under 2MB');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const ext = file.name.split('.').pop() || 'png';
+      const path = `logos/${workspace.id}.${ext}`;
+
+      // Delete old logo if it exists (ignore errors for non-existent files)
+      try {
+        await supabase.storage.from('workspace-assets').remove([`logos/${workspace.id}.png`, `logos/${workspace.id}.jpg`, `logos/${workspace.id}.jpeg`, `logos/${workspace.id}.webp`]);
+      } catch {
+        // Non-critical — proceed with upload
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-assets')
+        .upload(path, file, { upsert: true });
+
+      if (uploadError) {
+        toast.error('Failed to upload logo: ' + uploadError.message);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('workspace-assets')
+        .getPublicUrl(path);
+
+      // Add cache-busting param so the browser fetches the new image
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      const { error: updateError } = await supabase
+        .from('workspaces')
+        .update({ logo_url: publicUrl })
+        .eq('id', workspace.id);
+
+      if (updateError) {
+        toast.error('Failed to save logo: ' + updateError.message);
+      } else {
+        setLogoUrl(publicUrl);
+        toast.success('Logo updated!');
+        await refreshWorkspaces();
+      }
+    } catch (err) {
+      toast.error('Logo upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!workspace) return;
+    setIsUploading(true);
+    try {
+      try {
+        await supabase.storage.from('workspace-assets').remove([`logos/${workspace.id}.png`, `logos/${workspace.id}.jpg`, `logos/${workspace.id}.jpeg`, `logos/${workspace.id}.webp`]);
+      } catch {
+        // Non-critical — proceed with DB update
+      }
+
+      const { error } = await supabase
+        .from('workspaces')
+        .update({ logo_url: null })
+        .eq('id', workspace.id);
+
+      if (error) {
+        toast.error('Failed to remove logo: ' + error.message);
+      } else {
+        setLogoUrl('');
+        toast.success('Logo removed');
+        await refreshWorkspaces();
+      }
+    } catch {
+      toast.error('Failed to remove logo. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!workspace) return;
@@ -113,11 +220,50 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
       toast.error('Failed to update workspace: ' + error.message);
     } else {
       toast.success('Workspace updated successfully');
+      await refreshWorkspaces();
     }
   };
 
   return (
     <div className="space-y-6 max-w-lg">
+      {/* Logo */}
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">Workspace Logo</label>
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 overflow-hidden shrink-0">
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" className="w-full h-full object-cover rounded-xl" />
+            ) : (
+              <ImageIcon className="w-6 h-6 text-slate-400" />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors">
+              <Upload className="w-4 h-4" />
+              {isUploading ? 'Uploading...' : logoUrl ? 'Change logo' : 'Upload logo'}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+                disabled={isUploading}
+              />
+            </label>
+            {logoUrl && (
+              <button
+                onClick={handleRemoveLogo}
+                disabled={isUploading}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Remove
+              </button>
+            )}
+          </div>
+        </div>
+        <p className="mt-1.5 text-xs text-slate-500">Square image recommended. Max 2MB.</p>
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Workspace Name</label>
         <input
@@ -155,275 +301,8 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
   );
 }
 
-function ContentTypesTab({ workspaceId }: { workspaceId: string | null }) {
-  const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingType, setEditingType] = useState<ContentType | null>(null);
-  const [formData, setFormData] = useState({ name: '', icon: 'FileText', color: COLOR_PALETTE[0] });
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-
-  const fetchContentTypes = useCallback(async () => {
-    if (!workspaceId) return;
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('content_types')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .order('name');
-    if (error) {
-      toast.error('Failed to load content types');
-    } else {
-      setContentTypes(data || []);
-    }
-    setLoading(false);
-  }, [workspaceId]);
-
-  useEffect(() => {
-    fetchContentTypes();
-  }, [fetchContentTypes]);
-
-  const handleSave = async () => {
-    if (!workspaceId || !formData.name.trim()) return;
-    setIsSaving(true);
-
-    if (editingType) {
-      const { error } = await supabase
-        .from('content_types')
-        .update({ name: formData.name.trim(), icon: formData.icon, color: formData.color })
-        .eq('id', editingType.id);
-      if (error) {
-        toast.error('Failed to update: ' + error.message);
-      } else {
-        toast.success('Content type updated');
-        setShowForm(false);
-        setEditingType(null);
-        fetchContentTypes();
-      }
-    } else {
-      const { error } = await supabase
-        .from('content_types')
-        .insert({ workspace_id: workspaceId, name: formData.name.trim(), icon: formData.icon, color: formData.color });
-      if (error) {
-        toast.error('Failed to create: ' + error.message);
-      } else {
-        toast.success('Content type created');
-        setShowForm(false);
-        setFormData({ name: '', icon: 'FileText', color: COLOR_PALETTE[0] });
-        fetchContentTypes();
-      }
-    }
-    setIsSaving(false);
-  };
-
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from('content_types').delete().eq('id', id);
-    if (error) {
-      toast.error('Failed to delete: ' + error.message);
-    } else {
-      toast.success('Content type deleted');
-      setShowDeleteConfirm(null);
-      fetchContentTypes();
-    }
-  };
-
-  const openEditForm = (type: ContentType) => {
-    setEditingType(type);
-    setFormData({ name: type.name, icon: type.icon, color: type.color });
-    setShowForm(true);
-  };
-
-  const openCreateForm = () => {
-    setEditingType(null);
-    setFormData({ name: '', icon: 'FileText', color: COLOR_PALETTE[0] });
-    setShowForm(true);
-  };
-
-  // Icon picker options (subset of lucide icons commonly used for content)
-  const iconOptions = ['FileText', 'Image', 'Video', 'Link', 'File', 'Book', 'Newspaper', 'MessageSquare', 'PenTool', 'Layout'];
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-slate-900">Content Types</h3>
-        <button
-          onClick={openCreateForm}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Content Type
-        </button>
-      </div>
-
-      {contentTypes.length === 1 ? (
-        <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500 mb-4">No custom content types yet</p>
-          <button
-            onClick={openCreateForm}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-          >
-            Create your first content type
-          </button>
-        </div>
-      ) : (
-        <div className="border border-slate-200 rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Color</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Icon</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {contentTypes.map((type) => (
-                <tr key={type.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3">
-                    <span
-                      className="w-4 h-4 rounded-full inline-block"
-                      style={{ backgroundColor: type.color }}
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-sm text-slate-900">{type.name}</td>
-                  <td className="px-4 py-3 text-sm text-slate-500">{type.icon}</td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => openEditForm(type)}
-                        className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded"
-                      >
-                        <Save className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setShowDeleteConfirm(type.id)}
-                        className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Create/Edit Modal */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowForm(false)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">
-              {editingType ? 'Edit Content Type' : 'Create Content Type'}
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Blog Post"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Icon</label>
-                <select
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {iconOptions.map((icon) => (
-                    <option key={icon} value={icon}>{icon}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Color</label>
-                <div className="flex flex-wrap gap-2">
-                  {COLOR_PALETTE.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setFormData({ ...formData, color })}
-                      className={`w-8 h-8 rounded-full border-2 transition-all ${
-                        formData.color === color ? 'border-slate-900 scale-110' : 'border-transparent hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving || !formData.name.trim()}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
-              >
-                {isSaving ? 'Saving...' : editingType ? 'Save Changes' : 'Create'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowDeleteConfirm(null)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">Delete Content Type?</h3>
-            </div>
-            <p className="text-slate-600 mb-4">
-              This action cannot be undone. Content items using this type will lose their type assignment.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
+  const { refreshWorkspaceData } = useApp();
   const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -470,6 +349,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
         setShowForm(false);
         setEditingColumn(null);
         fetchColumns();
+        refreshWorkspaceData();
       }
     } else {
       const maxPosition = columns.length > 0 ? Math.max(...columns.map((c) => c.position)) : -1;
@@ -488,6 +368,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
         setShowForm(false);
         setFormData({ name: '', color: COLOR_PALETTE[0], position: 1 });
         fetchColumns();
+        refreshWorkspaceData();
       }
     }
     setIsSaving(false);
@@ -506,6 +387,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
       toast.success('Board column deleted');
       setShowDeleteConfirm(null);
       fetchColumns();
+      refreshWorkspaceData();
     }
   };
 
@@ -523,6 +405,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
     );
     await Promise.all(updates);
     setColumns(newColumns);
+    refreshWorkspaceData();
   };
 
   // Drag and drop handlers
@@ -560,6 +443,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
     await Promise.all(updates);
     setColumns(newColumns);
     setDraggedItem(null);
+    refreshWorkspaceData();
   };
 
   if (loading) {
@@ -632,7 +516,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                   <td className="px-4 py-3">
                     <span
                       className="w-4 h-4 rounded-full inline-block"
-                      style={{ backgroundColor: column.color }}
+                      style={{ backgroundColor: column.color ?? undefined }}
                     />
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-900">{column.name}</td>
@@ -657,7 +541,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                       <button
                         onClick={() => {
                           setEditingColumn(column);
-                          setFormData({ name: column.name, color: column.color, position: column.position });
+                          setFormData({ name: column.name, color: column.color ?? COLOR_PALETTE[0], position: column.position });
                           setShowForm(true);
                         }}
                         className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded ml-2"

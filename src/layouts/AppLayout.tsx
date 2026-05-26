@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { useViewPersistence } from '../contexts/ViewPersistenceContext';
+import { useViewPersistence, type ViewType } from '../contexts/ViewPersistenceContext';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { CreateItemModal } from '../components/content/CreateItemModal';
 import { DetailSlideOver } from '../components/content/DetailSlideOver';
@@ -13,10 +13,13 @@ import {
   Columns,
   List,
   Folder,
+  Inbox,
   Settings,
   LogOut,
   ChevronDown,
   Plus,
+  CircleUser,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface NavItem {
@@ -26,15 +29,20 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { label: 'Home', icon: <LayoutDashboard className="w-5 h-5" />, path: '/home' },
   { label: 'Calendar', icon: <Calendar className="w-5 h-5" />, path: '/calendar' },
   { label: 'Board', icon: <Columns className="w-5 h-5" />, path: '/board' },
   { label: 'List', icon: <List className="w-5 h-5" />, path: '/list' },
+  { label: 'My Work', icon: <CircleUser className="w-5 h-5" />, path: '/my-work' },
   { label: 'Projects', icon: <Folder className="w-5 h-5" />, path: '/projects' },
+  { label: 'Intake Queue', icon: <Inbox className="w-5 h-5" />, path: '/intake-queue' },
 ];
 
 // Helper to get page title from current path
 function getPageTitle(pathname: string): string {
   switch (pathname) {
+    case '/home':
+      return 'Home';
     case '/list':
       return 'List View';
     case '/board':
@@ -43,9 +51,14 @@ function getPageTitle(pathname: string): string {
       return 'Calendar View';
     case '/projects':
       return 'Projects';
+    case '/intake-queue':
+      return 'Intake Queue';
+    case '/my-work':
+      return 'My Work';
     case '/settings':
       return 'Settings';
     default:
+      if (pathname.startsWith('/projects/')) return 'Project Detail';
       return 'Content Calendar';
   }
 }
@@ -54,17 +67,20 @@ export function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { currentWorkspace, switchWorkspace, workspaces } = useWorkspace();
+  const { currentWorkspace, switchWorkspace, workspaces, userRole } = useWorkspace();
   const { setLastUsedView } = useViewPersistence();
   const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const { selectedItemId } = useSelectedItem();
+  const canCreate = userRole === 'admin' || userRole === 'editor';
+  const canAccessSettings = userRole === 'admin';
 
   // Track view changes and save to persistence
   useEffect(() => {
     const path = location.pathname;
     const view = path.replace('/', '') as ViewType;
-    if (['list', 'board', 'calendar', 'projects', 'settings'].includes(view)) {
+    if (['home', 'list', 'board', 'calendar', 'projects', 'intake-queue', 'my-work', 'settings'].includes(view)) {
       setLastUsedView(view);
     }
   }, [location.pathname, setLastUsedView]);
@@ -92,9 +108,16 @@ export function AppLayout() {
         <div className="p-4 border-b border-slate-700">
           <button
             onClick={() => setShowWorkspacePicker(!showWorkspacePicker)}
-            className="w-full flex items-center justify-between text-white hover:bg-slate-700 rounded-lg px-3 py-2 transition-colors"
+            className="w-full flex items-center gap-2.5 text-white hover:bg-slate-700 rounded-lg px-3 py-2 transition-colors"
           >
-            <span className="font-medium truncate">{currentWorkspace?.name || 'Select Workspace'}</span>
+            {currentWorkspace?.logo_url ? (
+              <img src={currentWorkspace.logo_url} alt="" className="w-6 h-6 rounded shrink-0 object-cover" />
+            ) : (
+              <div className="w-6 h-6 rounded bg-slate-600 flex items-center justify-center shrink-0">
+                <span className="text-xs font-bold text-white">{currentWorkspace?.name?.charAt(0)?.toUpperCase() ?? 'W'}</span>
+              </div>
+            )}
+            <span className="font-medium truncate flex-1 text-left">{currentWorkspace?.name || 'Select Workspace'}</span>
             <ChevronDown
               className={`w-4 h-4 flex-shrink-0 transition-transform ${showWorkspacePicker ? 'rotate-180' : ''}`}
             />
@@ -110,13 +133,20 @@ export function AppLayout() {
                     switchWorkspace(ws);
                     setShowWorkspacePicker(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm ${
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm ${
                     currentWorkspace?.id === ws.id
                       ? 'text-white bg-slate-600'
                       : 'text-slate-300 hover:bg-slate-600 hover:text-white'
                   } transition-colors`}
                 >
-                  {ws.name}
+                  {ws.logo_url ? (
+                    <img src={ws.logo_url} alt="" className="w-5 h-5 rounded shrink-0 object-cover" />
+                  ) : (
+                    <div className="w-5 h-5 rounded bg-slate-500 flex items-center justify-center shrink-0">
+                      <span className="text-[10px] font-bold text-white">{ws.name?.charAt(0)?.toUpperCase()}</span>
+                    </div>
+                  )}
+                  <span className="truncate">{ws.name}</span>
                 </button>
               ))}
             </div>
@@ -144,23 +174,25 @@ export function AppLayout() {
           ))}
         </nav>
 
-        {/* Settings link (above user section) */}
-        <div className="px-3 pb-2">
-          <NavLink
-            to="/settings"
-            onClick={handleNavigation}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-slate-700 text-white border-l-2 border-blue-400'
-                  : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-              }`
-            }
-          >
-            <Settings className="w-5 h-5 text-slate-400" />
-            <span>Settings</span>
-          </NavLink>
-        </div>
+        {/* Settings link (above user section) — admin only */}
+        {canAccessSettings && (
+          <div className="px-3 pb-2">
+            <NavLink
+              to="/settings"
+              onClick={handleNavigation}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-slate-700 text-white border-l-2 border-blue-400'
+                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                }`
+              }
+            >
+              <Settings className="w-5 h-5 text-slate-400" />
+              <span>Settings</span>
+            </NavLink>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="mx-4 border-t border-slate-700" />
@@ -201,19 +233,23 @@ export function AppLayout() {
           <h1 className="text-lg font-semibold text-slate-900">
             {getPageTitle(location.pathname)}
           </h1>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            New Item
-          </button>
+          {canCreate && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              New Item
+            </button>
+          )}
 
           {/* Create Item Modal */}
-          <CreateItemModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-          />
+          {canCreate && (
+            <CreateItemModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            />
+          )}
         </header>
 
         {/* Page content with fade transition */}
@@ -228,15 +264,17 @@ export function AppLayout() {
         {/* Detail SlideOver Panel - Rendered at layout level */}
         <ItemDetailPanelWrapper />
 
-        {/* Floating Action Button - visible on all views */}
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 z-50"
-          aria-label="Create new item"
-          title="Create new item"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
+        {/* Floating Action Button - visible for editors and admins, hidden when detail panel is open */}
+        {canCreate && !selectedItemId && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 z-50"
+            aria-label="Create new item"
+            title="Create new item"
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+        )}
       </main>
     </div>
   );
@@ -246,7 +284,7 @@ export function AppLayout() {
 function ItemDetailPanelWrapper() {
   const { selectedItemId, selectedItem, setSelectedItem, closePanel } = useSelectedItem();
   const { currentWorkspace } = useWorkspace();
-  const [loading, setLoading] = useState(false);
+  const [_loading, setLoading] = useState(false);
 
   // Fetch item data when selectedItemId changes
   useEffect(() => {
@@ -273,8 +311,8 @@ function ItemDetailPanelWrapper() {
         } else if (data) {
           setSelectedItem(data);
         }
-      })
-      .finally(() => setLoading(false));
+        setLoading(false);
+      });
   }, [selectedItemId, currentWorkspace, selectedItem, setSelectedItem, closePanel]);
 
   if (!selectedItemId || !selectedItem) {
@@ -286,9 +324,17 @@ function ItemDetailPanelWrapper() {
       item={selectedItem}
       onClose={closePanel}
       onUpdated={() => {
-        // Trigger a refetch of content items
-        // This will be handled by the individual pages' refetch functions
-        closePanel();
+        // Re-fetch the item to reflect changes without closing the panel
+        if (selectedItemId) {
+          supabase
+            .from('content_items')
+            .select('*')
+            .eq('id', selectedItemId)
+            .single()
+            .then(({ data }) => {
+              if (data) setSelectedItem(data);
+            });
+        }
       }}
       addToast={(msg, type = 'success') => {
         if (type === 'error') toast.error(msg);

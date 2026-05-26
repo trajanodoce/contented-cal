@@ -29,6 +29,8 @@ export function FiltersProvider({
     assignees: [],
     priorities: [],
     channels: [],
+    projects: [],
+    linkedPlatforms: [],
   });
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -52,6 +54,8 @@ export function FiltersProvider({
           assignees: parsed.assignees || [],
           priorities: parsed.priorities || [],
           channels: parsed.channels || [],
+          projects: parsed.projects || [],
+          linkedPlatforms: parsed.linkedPlatforms || [],
         });
       } catch (e) {
         console.error('Failed to parse saved filters:', e);
@@ -70,13 +74,15 @@ export function FiltersProvider({
   }, [workspaceId]);
 
   const resetFilters = useCallback(() => {
-    const defaultFilters = {
+    const defaultFilters: FilterState = {
       search: '',
       contentTypes: [],
       statuses: [],
       assignees: [],
       priorities: [],
       channels: [],
+      projects: [],
+      linkedPlatforms: [],
     };
     setFilters(defaultFilters);
   }, [setFilters]);
@@ -88,7 +94,9 @@ export function FiltersProvider({
       filters.statuses.length > 0 ||
       filters.assignees.length > 0 ||
       filters.priorities.length > 0 ||
-      filters.channels.length > 0
+      filters.channels.length > 0 ||
+      filters.projects.length > 0 ||
+      filters.linkedPlatforms.length > 0
     );
   }, [filters]);
 

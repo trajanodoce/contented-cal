@@ -1,6 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import type { OrdinalUserConnection } from '../lib/database.types';
+
+// This type represents the ordinal_user_connections table shape.
+// The table may not be in the generated schema yet, so we define it here.
+interface OrdinalUserConnection {
+  id: string;
+  workspace_id: string;
+  profile_id: string;
+  profile_name: string;
+  platform: string;
+  connected_at: string;
+}
 
 interface SyncStatus {
   total_posts: number;
@@ -25,13 +35,13 @@ export function useOrdinalUser(workspaceId: string | null) {
 
     try {
       const { data, error: supabaseError } = await supabase
-        .from('ordinal_user_connections')
+        .from('ordinal_user_connections' as 'ordinal_post_links')
         .select('*')
-        .eq('workspace_id', workspaceId)
-        .order('connected_at', { ascending: false });
+        .eq('workspace_id' as 'content_item_id', workspaceId)
+        .order('connected_at' as 'created_at', { ascending: false });
 
       if (supabaseError) throw supabaseError;
-      setConnections(data || []);
+      setConnections((data as unknown as OrdinalUserConnection[]) || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch connections');
     }
@@ -48,8 +58,10 @@ export function useOrdinalUser(workspaceId: string | null) {
         .rpc('get_ordinal_sync_status', { p_workspace_id: workspaceId });
 
       if (supabaseError) throw supabaseError;
-      if (data && data.length > 0) {
-        setSyncStatus(data[0] as SyncStatus);
+      if (data && typeof data === 'object' && !Array.isArray(data)) {
+        setSyncStatus(data as unknown as SyncStatus);
+      } else if (Array.isArray(data) && data.length > 0) {
+        setSyncStatus(data[0] as unknown as SyncStatus);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch sync status');
@@ -67,13 +79,13 @@ export function useOrdinalUser(workspaceId: string | null) {
     setLoading(true);
     try {
       const { error: supabaseError } = await supabase
-        .from('ordinal_user_connections')
+        .from('ordinal_user_connections' as 'ordinal_post_links')
         .insert({
           workspace_id: workspaceId,
           profile_id: profileId,
           profile_name: profileName,
           platform,
-        });
+        } as never);
 
       if (supabaseError) throw supabaseError;
       await fetchConnections();
@@ -88,9 +100,9 @@ export function useOrdinalUser(workspaceId: string | null) {
     setLoading(true);
     try {
       const { error: supabaseError } = await supabase
-        .from('ordinal_user_connections')
+        .from('ordinal_user_connections' as 'ordinal_post_links')
         .delete()
-        .eq('id', connectionId);
+        .eq('id' as 'content_item_id', connectionId);
 
       if (supabaseError) throw supabaseError;
       await fetchConnections();
