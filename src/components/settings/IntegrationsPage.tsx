@@ -555,7 +555,7 @@ export function IntegrationsPage({ addToast }: Props) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session?.access_token}`,
         },
-        body: JSON.stringify({ workspace_id: workspace.id }),
+        body: JSON.stringify({ workspace_id: workspace.id, user_id: user?.id }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Sync failed');

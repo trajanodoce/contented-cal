@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
   };
 
   try {
-    const { workspace_id } = await req.json();
+    const { workspace_id, user_id } = await req.json();
     if (!workspace_id) {
       return new Response(
         JSON.stringify({ error: "workspace_id required" }),
@@ -249,6 +249,7 @@ Deno.serve(async (req) => {
             status: defaultStatus,
             due_date: issue.dueDate,
             priority: mapPriority(issue.priority),
+            assignee_ids: user_id ? [user_id] : [],
             tags,
             custom_fields: {
               _source: "linear",
