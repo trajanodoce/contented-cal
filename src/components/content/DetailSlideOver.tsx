@@ -185,7 +185,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={onClose}>
       <div
-        className="w-full max-w-2xl bg-white h-full flex flex-col shadow-2xl border-l border-gray-200"
+        className="w-full max-w-2xl bg-white h-full flex flex-col shadow-2xl border-l border-slate-200"
         onClick={e => e.stopPropagation()}
       >
         {/* Ordinal Banner */}
@@ -200,8 +200,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">This post is managed in Ordinal</p>
-                  <p className="text-xs text-gray-500">To edit, open it in Ordinal</p>
+                  <p className="text-sm font-medium text-slate-900">This post is managed in Ordinal</p>
+                  <p className="text-xs text-slate-500">To edit, open it in Ordinal</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -244,8 +244,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   L
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">This issue is managed in Linear</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm font-medium text-slate-900">This issue is managed in Linear</p>
+                  <p className="text-xs text-slate-500">
                     {linearInfo.identifier} · {linearInfo.team}
                     {linearInfo.project ? ` · ${linearInfo.project}` : ''}
                   </p>
@@ -282,7 +282,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         )}
 
         {/* Header */}
-        <div className="flex items-start gap-3 px-6 py-4 border-b border-gray-100">
+        <div className="flex items-start gap-3 px-6 py-4 border-b border-slate-100">
           <div className="flex-1 min-w-0">
             {isOrdinalPost ? (
               // Read-only title for Ordinal items
@@ -294,7 +294,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
                   {/* Ordinal Profile */}
                   {ordinalProfile && (
                     <div className="flex items-center gap-2 mt-1">
@@ -307,15 +307,15 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       >
                         {PLATFORM_META[ordinalProfile.platform]?.icon?.charAt(0) ?? '●'}
                       </span>
-                      <span className="text-xs text-gray-500">{ordinalProfile.handle}</span>
-                      <span className="text-gray-300">•</span>
-                      <span className="text-xs text-gray-400">{ordinalProfile.name}</span>
+                      <span className="text-xs text-slate-500">{ordinalProfile.handle}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-xs text-slate-400">{ordinalProfile.name}</span>
                     </div>
                   )}
                 </div>
               </div>
             ) : isReadOnly ? (
-              <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
             ) : (
               <>
                 {editingField === 'title' ? (
@@ -324,7 +324,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       autoFocus
                       value={editValues.title ?? item.title}
                       onChange={e => setEditValues({ ...editValues, title: e.target.value })}
-                      className="flex-1 text-lg font-semibold text-gray-900 border-b-2 border-brand-400 outline-none bg-transparent"
+                      className="flex-1 text-lg font-semibold text-slate-900 border-b-2 border-brand-400 outline-none bg-transparent"
                       onKeyDown={e => {
                         if (e.key === 'Enter') updateField('title', editValues.title ?? item.title);
                         if (e.key === 'Escape') setEditingField(null);
@@ -339,20 +339,20 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     className="text-left group"
                     onClick={() => { setEditingField('title'); setEditValues({ title: item.title }); }}
                   >
-                    <h2 className="text-lg font-semibold text-gray-900 group-hover:text-brand-600 transition-colors">{item.title}</h2>
+                    <h2 className="text-lg font-semibold text-slate-900 group-hover:text-brand-600 transition-colors">{item.title}</h2>
                   </button>
                 )}
               </>
             )}
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               {contentType && (
-                <span className="flex items-center gap-1 text-xs text-gray-500">
+                <span className="flex items-center gap-1 text-xs text-slate-500">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: contentType.color ?? undefined }} />
                   {contentType.name}
                 </span>
               )}
-              <span className="text-gray-300">•</span>
-              <span className="text-xs text-gray-400">Created {formatDateFull(item.created_at)}</span>
+              <span className="text-slate-300">•</span>
+              <span className="text-xs text-slate-400">Created {formatDateFull(item.created_at)}</span>
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0 mt-1">
@@ -361,47 +361,48 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 const url = `${window.location.origin}${window.location.pathname}?item=${item.id}`;
                 navigator.clipboard.writeText(url).then(() => addToast('Link copied to clipboard'));
               }}
-              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
               title="Copy link"
             >
               <Link2 className="w-4 h-4" />
             </button>
-            <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
+            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-100 px-6">
+        <div className="flex border-b border-slate-100 px-6">
           {(['details', 'comments', 'activity'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`py-3 px-1 mr-5 text-sm font-medium border-b-2 transition-colors capitalize
-                ${activeTab === tab ? 'border-brand-400 text-brand-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                ${activeTab === tab ? 'border-brand-400 text-brand-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
             >
               {tab}
               {tab === 'comments' && comments.length > 0 && (
-                <span className="ml-1.5 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
+                <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
               )}
             </button>
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-slate-50">
           {activeTab === 'details' && (
-            <div className="p-6 space-y-6">
-              {/* Key fields grid */}
+            <div className="p-5 space-y-4">
+              {/* Key fields card */}
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
               <div className="grid grid-cols-2 gap-4">
                 {/* Status */}
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</label>
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Status</label>
                   <select
                     value={item.status ?? ''}
                     onChange={e => updateField('status', e.target.value || null)}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {allowedStatuses.map(col => (
@@ -413,12 +414,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Priority */}
                 {fieldVisibility.priority && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Priority</label>
+                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Priority</label>
                     <select
                       value={item.priority ?? undefined}
                       onChange={e => updateField('priority', e.target.value)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       {PRIORITIES.map(p => (
                         <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -430,7 +431,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Due date */}
                 {fieldVisibility.dueDate && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Due date
                     </label>
                     <input
@@ -438,7 +439,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.due_date ?? ''}
                       onChange={e => updateField('due_date', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -446,7 +447,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Publish date */}
                 {fieldVisibility.publishDate && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Publish date
                     </label>
                     <input
@@ -454,7 +455,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.publish_date ?? ''}
                       onChange={e => updateField('publish_date', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -462,12 +463,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Channel */}
                 {fieldVisibility.channel && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Channel</label>
+                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Channel</label>
                     <select
                       value={item.channel ?? ''}
                       onChange={e => updateField('channel', e.target.value)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">None</option>
                       {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -477,12 +478,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
                 {/* Content type */}
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Content type</label>
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Content type</label>
                   <select
                     value={item.content_type_id ?? ''}
                     onChange={e => updateField('content_type_id', e.target.value || null)}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
@@ -492,12 +493,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Project */}
                 {projects.length > 0 && (
                   <div className="col-span-2">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Project</label>
+                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Project</label>
                     <select
                       value={item.project_id ?? ''}
                       onChange={e => updateField('project_id', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">No project</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
@@ -509,19 +510,21 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {/* Tags */}
               {fieldVisibility.tags && item.tags && item.tags.length > 0 && (
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1 mb-2">
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-2">
                     <Hash className="w-3 h-3" /> Tags
                   </label>
                   <div className="flex flex-wrap gap-1.5">
                     {item.tags.map(tag => (
-                      <span key={tag} className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">{tag}</span>
+                      <span key={tag} className="text-xs px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">{tag}</span>
                     ))}
                   </div>
                 </div>
               )}
 
+              </div>
+
               {/* Linked Assets */}
-              <div className="border-t border-gray-100 pt-5">
+              <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>
 
@@ -540,9 +543,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Description */}
               {fieldVisibility.description && (
-                <div>
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Description</label>
+                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Description</label>
                     {!editingDescription && !isReadOnly && (
                       <button
                         onClick={() => setEditingDescription(true)}
@@ -559,7 +562,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         value={description ?? ''}
                         onChange={e => setDescription(e.target.value)}
                         rows={6}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none font-mono"
+                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none font-mono"
                       />
                       <div className="flex gap-2 mt-2">
                         <button
@@ -571,7 +574,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         </button>
                         <button
                           onClick={() => { setEditingDescription(false); setDescription(item.description); }}
-                          className="px-3 py-1.5 text-gray-600 text-xs border border-gray-200 rounded-lg hover:bg-gray-50"
+                          className="px-3 py-1.5 text-slate-600 text-xs border border-slate-200 rounded-lg hover:bg-slate-50"
                         >
                           Cancel
                         </button>
@@ -579,10 +582,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     </div>
                   ) : (
                     <div
-                      className={`text-sm text-gray-700 whitespace-pre-wrap min-h-[60px] p-3 bg-gray-50 rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-gray-100'}`}
+                      className={`text-sm text-slate-700 whitespace-pre-wrap min-h-[60px] p-3 bg-slate-50 rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-slate-100'}`}
                       onClick={() => !isReadOnly && setEditingDescription(true)}
                     >
-                      {item.description || <span className="text-gray-400 italic">{isReadOnly ? 'No description' : 'Click to add description...'}</span>}
+                      {item.description || <span className="text-slate-400 italic">{isReadOnly ? 'No description' : 'Click to add description...'}</span>}
                     </div>
                   )}
                 </div>
@@ -590,8 +593,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Custom fields */}
               {activeCustomFields.length > 0 && (
-                <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3 block">Custom fields</label>
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3 block">Custom fields</label>
                   <CustomFieldsSection
                     fields={activeCustomFields}
                     values={customFieldValues}
@@ -629,7 +632,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           {activeTab === 'comments' && (
             <div className="p-6 space-y-4">
               {comments.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-slate-400">
                   <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
                   <p className="text-sm">No comments yet</p>
                 </div>
@@ -652,22 +655,22 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     )}
                     <div className="flex-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-medium text-gray-700">{authorName}</span>
-                        <span className="text-xs text-gray-400">{formatDateFull(comment.created_at)}</span>
+                        <span className="text-xs font-medium text-slate-700">{authorName}</span>
+                        <span className="text-xs text-slate-400">{formatDateFull(comment.created_at)}</span>
                       </div>
-                      <p className="text-sm text-gray-700 mt-0.5 whitespace-pre-wrap">{comment.body}</p>
+                      <p className="text-sm text-slate-700 mt-0.5 whitespace-pre-wrap">{comment.body}</p>
                     </div>
                   </div>
                 );
               })}
 
-              <div className="pt-2 border-t border-gray-100">
+              <div className="pt-2 border-t border-slate-100">
                 <textarea
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
                   placeholder="Add a comment..."
                   rows={3}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
                 />
                 <button
                   onClick={addComment}
@@ -683,19 +686,19 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           {activeTab === 'activity' && (
             <div className="p-6 space-y-3">
               {activity.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
+                <div className="text-center py-8 text-slate-400">
                   <Activity className="w-8 h-8 mx-auto mb-2 opacity-40" />
                   <p className="text-sm">No activity yet</p>
                 </div>
               )}
               {activity.map(log => (
                 <div key={log.id} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <Activity className="w-3 h-3 text-gray-400" />
+                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <Activity className="w-3 h-3 text-slate-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-700">{log.action}</p>
-                    <p className="text-xs text-gray-400">{formatDateFull(log.created_at)}</p>
+                    <p className="text-sm text-slate-700">{log.action}</p>
+                    <p className="text-xs text-slate-400">{formatDateFull(log.created_at)}</p>
                   </div>
                 </div>
               ))}
