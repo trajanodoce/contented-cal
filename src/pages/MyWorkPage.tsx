@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import type { ContentItem, Subtask } from '../lib/database.types';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate } from '../lib/utils';
-import { isOrdinalItem, ORDINAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { PersonalTasksSection } from '../components/personal/PersonalTasksSection';
 import {
@@ -229,13 +229,16 @@ export function MyWorkPage() {
                         !isToday(parseLocalDate(item.due_date));
 
                       const isOrdinal = isOrdinalItem(item);
+                      const isLinear = isLinearItem(item);
 
-                      // Determine row background: done → blue, ordinal → ordinal tint, default → none
+                      // Determine row background: done → blue, ordinal/linear → tint, default → none
                       const rowBg = done
                         ? DONE_BG
                         : isOrdinal
                           ? `${ORDINAL_COLOR}0A`
-                          : undefined;
+                          : isLinear
+                            ? `${LINEAR_COLOR}0A`
+                            : undefined;
 
                       return (
                         <tr

@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, Profile, BoardColumn, Project, Subtask } from '../lib/database.types';
 import { parseLocalDate } from '../lib/utils';
-import { isOrdinalItem, ORDINAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
@@ -117,6 +117,9 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
 
   const borderColor = isOverdue && !isPublished ? '#ef4444' : contentType?.color || '#e2e8f0';
   const isOrdinal = isOrdinalItem(item);
+  const isLinear = isLinearItem(item);
+
+  const itemBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : 'white';
 
   return (
     <div
@@ -128,11 +131,19 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
-        borderLeftColor: borderColor,
+        borderLeftColor: isLinear ? LINEAR_COLOR : borderColor,
         borderLeftWidth: '2px',
-        backgroundColor: isOrdinal ? `${ORDINAL_COLOR}0A` : 'white',
+        backgroundColor: itemBg,
       }}
     >
+      {isLinear && (
+        <span
+          className="w-3.5 h-3.5 rounded flex items-center justify-center flex-shrink-0 text-[8px] font-bold"
+          style={{ backgroundColor: `${LINEAR_COLOR}20`, color: LINEAR_COLOR }}
+        >
+          L
+        </span>
+      )}
       <span className="truncate flex-1 font-medium text-slate-700">{item.title}</span>
       {subtaskCount && subtaskCount.total > 0 && subtaskCount.completed < subtaskCount.total && (
         <span
@@ -679,15 +690,19 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
   const isPublished = statusCol?.name?.toLowerCase() === 'published';
   const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isPublished;
   const isOrdinal = isOrdinalItem(item);
+  const isLinear = isLinearItem(item);
+  const isExternal = isOrdinal || isLinear;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: item.id,
     data: { item },
   });
 
+  const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
+
   const style = {
     transform: CSS.Translate.toString(transform),
-    ...(isOrdinal ? { backgroundColor: `${ORDINAL_COLOR}0A` } : {}),
+    ...(externalBg ? { backgroundColor: externalBg } : {}),
   };
 
   return (
@@ -698,7 +713,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
       {...attributes}
       onClick={onClick}
       className={`rounded-lg border p-4 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing ${
-        isOrdinal ? '' : 'bg-slate-50'
+        isExternal ? '' : 'bg-slate-50'
       } ${isOverdue ? 'border-red-300' : 'border-slate-200'
       }`}
     >
@@ -864,7 +879,8 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
                       ))}
                       {dayItems.slice(0, 2).map((item) => {
                         const isOrdinal = isOrdinalItem(item);
-                        const ctColor = isOrdinal ? ORDINAL_COLOR : (contentTypes.find(ct => ct.id === item.content_type_id)?.color || '#94a3b8');
+                        const isLinear = isLinearItem(item);
+                        const ctColor = isOrdinal ? ORDINAL_COLOR : isLinear ? LINEAR_COLOR : (contentTypes.find(ct => ct.id === item.content_type_id)?.color || '#94a3b8');
                         return (
                           <div
                             key={item.id}

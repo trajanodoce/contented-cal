@@ -195,6 +195,15 @@ Deno.serve(async (req) => {
       const existingContentId = existingMap.get(issue.id);
 
       if (existingContentId) {
+        // Fetch the existing item to merge custom_fields
+        const { data: existingItem } = await supabase
+          .from("content_items")
+          .select("custom_fields")
+          .eq("id", existingContentId)
+          .single();
+
+        const existingCustom = (existingItem?.custom_fields as Record<string, unknown>) ?? {};
+
         // Update existing content item and link
         await supabase
           .from("content_items")
@@ -203,6 +212,11 @@ Deno.serve(async (req) => {
             description: issue.description ?? undefined,
             due_date: issue.dueDate ?? undefined,
             priority: mapPriority(issue.priority),
+            custom_fields: {
+              ...existingCustom,
+              _linear_status: issue.state.name,
+              _linear_project: issue.project?.name ?? null,
+            },
             updated_at: new Date().toISOString(),
           })
           .eq("id", existingContentId);
@@ -243,6 +257,7 @@ Deno.serve(async (req) => {
               _linear_url: issue.url,
               _linear_team: issue.team.name,
               _linear_project: issue.project?.name ?? null,
+              _linear_status: issue.state.name,
             },
           })
           .select("id")

@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate } from '../lib/utils';
-import { isOrdinalItem, ORDINAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import {
   DndContext,
@@ -81,6 +81,9 @@ function BoardCard({ item, contentTypes, members, subtaskCount, linkInfo, hasGra
 
   const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date));
   const isOrdinal = isOrdinalItem(item);
+  const isLinear = isLinearItem(item);
+  const isExternal = isOrdinal || isLinear;
+  const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
 
   if (isDragging && !isOverlay) {
     return (
@@ -97,13 +100,13 @@ function BoardCard({ item, contentTypes, members, subtaskCount, linkInfo, hasGra
       ref={setNodeRef}
       style={{
         ...style,
-        ...(isOrdinal ? { backgroundColor: `${ORDINAL_COLOR}0A` } : {}),
+        ...(externalBg ? { backgroundColor: externalBg } : {}),
       }}
       {...listeners}
       {...attributes}
       onClick={onClick}
       className={`rounded-lg p-4 shadow-sm border border-slate-200 cursor-grab active:cursor-grabbing hover:shadow-md hover:border-slate-300 transition-all relative overflow-hidden ${
-        isOrdinal ? '' : 'bg-slate-50'
+        isExternal ? '' : 'bg-slate-50'
       } ${isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
       }`}
     >

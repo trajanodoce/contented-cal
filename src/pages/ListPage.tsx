@@ -13,7 +13,7 @@ import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
-import { isOrdinalItem, ORDINAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
@@ -348,6 +348,8 @@ export function ListPage() {
                 const priority = priorityConfig[(item.priority ?? 'medium') as keyof typeof priorityConfig] || priorityConfig.medium;
 
                 const isOrdinal = isOrdinalItem(item);
+                const isLinear = isLinearItem(item);
+                const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
 
                 return (
                   <tr
@@ -356,7 +358,7 @@ export function ListPage() {
                     className={`hover:bg-slate-50 cursor-pointer transition-colors ${
                       isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''
                     }`}
-                    style={isOrdinal && !isSelected ? { backgroundColor: `${ORDINAL_COLOR}0A` } : {}}
+                    style={externalBg && !isSelected ? { backgroundColor: externalBg } : {}}
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button

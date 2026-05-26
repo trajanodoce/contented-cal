@@ -9,8 +9,39 @@ export function isOrdinalItem(item: ContentItem): boolean {
   return customFields._source === 'ordinal' || (item.tags?.includes('ordinal-sync') ?? false);
 }
 
+// Linear brand color
+export const LINEAR_COLOR = '#5E6AD2';
+
+// Check if an item is from Linear (synced)
+export function isLinearItem(item: ContentItem): boolean {
+  const customFields = (item.custom_fields as Record<string, unknown>) ?? {};
+  return customFields._source === 'linear' || (item.tags?.includes('linear') ?? false);
+}
+
+// Get Linear issue info from custom fields
+export interface LinearIssueInfo {
+  identifier: string;
+  url: string;
+  team: string;
+  project: string | null;
+  status: string | null;
+}
+
+export function getLinearIssueInfo(item: ContentItem): LinearIssueInfo | null {
+  const customFields = (item.custom_fields as Record<string, unknown>) ?? {};
+  if (customFields._source !== 'linear') return null;
+
+  return {
+    identifier: (customFields._linear_identifier as string) ?? '',
+    url: (customFields._linear_url as string) ?? '',
+    team: (customFields._linear_team as string) ?? 'Unknown',
+    project: (customFields._linear_project as string) ?? null,
+    status: (customFields._linear_status as string) ?? null,
+  };
+}
+
 // Get the source of an item
-export type ItemSource = 'calendar' | 'ordinal' | 'slack' | 'intake' | 'unknown';
+export type ItemSource = 'calendar' | 'ordinal' | 'linear' | 'slack' | 'intake' | 'unknown';
 
 export function getItemSource(item: ContentItem): ItemSource {
   const customFields = (item.custom_fields as Record<string, unknown>) ?? {};
@@ -18,6 +49,7 @@ export function getItemSource(item: ContentItem): ItemSource {
 
   if (source === 'ordinal') return 'ordinal';
   if (item.tags?.includes('ordinal-sync')) return 'ordinal';
+  if (source === 'linear') return 'linear';
   if (item.tags?.includes('slack-request')) return 'slack';
   if (source === 'intake') return 'intake';
   if (source === 'calendar' || !source) return 'calendar';
@@ -64,6 +96,12 @@ export const PLATFORM_META: Record<string, PlatformMeta> = {
     bgColor: '#F3F0FF',
     label: 'Ordinal',
   },
+  linear: {
+    icon: 'L',
+    color: '#5E6AD2',
+    bgColor: '#EFF6FF',
+    label: 'Linear',
+  },
 };
 
 // Get Ordinal profile info from custom fields
@@ -106,6 +144,7 @@ export const SOURCE_FILTER_OPTIONS = [
   { value: '', label: 'All sources' },
   { value: 'calendar', label: 'Calendar (native)' },
   { value: 'ordinal', label: 'Ordinal (synced)' },
+  { value: 'linear', label: 'Linear (synced)' },
   { value: 'slack', label: 'Slack requests' },
   { value: 'intake', label: 'Intake forms' },
 ] as const;
