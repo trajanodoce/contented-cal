@@ -165,8 +165,8 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
   const existingConfig = (existing?.config ?? {}) as Record<string, string>;
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries((meta.fields ?? []).map(f => {
-      // For Claude, the api_key is stored in access_token
-      if (meta.id === 'claude' && f.key === 'api_key' && existing?.access_token) {
+      // For Claude and Linear, the api_key is stored in access_token
+      if ((meta.id === 'claude' || meta.id === 'linear') && f.key === 'api_key' && existing?.access_token) {
         return [f.key, existing.access_token];
       }
       return [f.key, existingConfig[f.key] ?? ''];
@@ -262,11 +262,13 @@ interface CardProps {
   onOAuthConnect?: () => void;
   onDisconnect: () => Promise<void>;
   onTest: () => Promise<void>;
+  onSync?: () => Promise<void>;
   saving: boolean;
   testing: boolean;
+  syncing?: boolean;
 }
 
-function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthConnect, onTest, saving, testing }: CardProps) {
+function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthConnect, onTest, onSync, saving, testing, syncing }: CardProps) {
   const [expanded, setExpanded] = useState(false);
   const connected = integration?.status === 'connected';
   const isOAuth = meta.setupType === 'oauth';
@@ -293,6 +295,17 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
             <p className="text-xs text-gray-500 mt-1 leading-relaxed">{meta.description}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {connected && onSync && (
+              <button
+                onClick={onSync}
+                disabled={syncing}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50"
+                title="Sync issues"
+              >
+                {syncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                {syncing ? 'Syncing...' : 'Sync Issues'}
+              </button>
+            )}
             {connected && (
               <button
                 onClick={onTest}
@@ -393,8 +406,16 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
       {meta.id === 'notion' && config.database_id && (
         <span>Database: <span className="text-gray-700 font-medium truncate max-w-[160px] inline-block">{config.database_id}</span></span>
       )}
-      {meta.id === 'linear' && config.team_id && (
-        <span>Team: <span className="text-gray-700 font-medium">{config.team_id}</span></span>
+      {meta.id === 'linear' && (
+        <>
+          {config.issues_count && (
+            <span><span className="text-gray-700 font-medium">{config.issues_count}</span> issues synced</span>
+          )}
+          {config.last_synced && (
+            <span>Last sync: <span className="text-gray-700 font-medium">{new Date(config.last_synced).toLocaleString()}</span></span>
+          )}
+          {!config.last_synced && <span>Click "Sync Issues" to import your Linear issues</span>}
+        </>
       )}
       {meta.id === 'ordinal' && (
         <>
@@ -425,6 +446,7 @@ export function IntegrationsPage({ addToast }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<IntegrationPlatform | null>(null);
   const [testing, setTesting] = useState<IntegrationPlatform | null>(null);
+  const [syncing, setSyncing] = useState<IntegrationPlatform | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const isAdmin = userRole === 'admin';
@@ -468,9 +490,9 @@ export function IntegrationsPage({ addToast }: Props) {
     if (!workspace || !user) return;
     setSaving(platform);
     try {
-      // For Claude, store the API key in access_token rather than config
-      const accessToken = platform === 'claude' ? (config.api_key || '') : '';
-      const storedConfig = platform === 'claude'
+      // For Claude and Linear, store the API key in access_token rather than config
+      const accessToken = (platform === 'claude' || platform === 'linear') ? (config.api_key || '') : '';
+      const storedConfig = (platform === 'claude' || platform === 'linear')
         ? {} // Don't duplicate the key in config
         : config;
 
@@ -520,6 +542,30 @@ export function IntegrationsPage({ addToast }: Props) {
     if (!workspace || !user) return;
     const oauthUrl = `${SUPABASE_URL}/functions/v1/slack-oauth?action=authorize&workspace_id=${workspace.id}&user_id=${user.id}`;
     window.location.href = oauthUrl;
+  }
+
+  async function syncLinear() {
+    if (!workspace) return;
+    setSyncing('linear');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/sync-linear`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ workspace_id: workspace.id }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Sync failed');
+      addToast(`Synced ${result.total} issues (${result.created} new, ${result.updated} updated)`);
+      await load();
+    } catch (err: unknown) {
+      addToast((err as Error).message, 'error');
+    } finally {
+      setSyncing(null);
+    }
   }
 
   async function testConnection(platform: IntegrationPlatform) {
@@ -587,8 +633,10 @@ export function IntegrationsPage({ addToast }: Props) {
                 onOAuthConnect={meta.setupType === 'oauth' ? () => startOAuth(meta.id) : undefined}
                 onDisconnect={() => disconnect(meta.id)}
                 onTest={() => testConnection(meta.id)}
+                onSync={meta.id === 'linear' ? syncLinear : undefined}
                 saving={saving === meta.id}
                 testing={testing === meta.id}
+                syncing={syncing === meta.id}
               />
             ))}
           </div>
