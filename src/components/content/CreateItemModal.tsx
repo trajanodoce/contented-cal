@@ -406,7 +406,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, meetingPrefill }
         const session = await supabase.auth.getSession();
         if (session.data.session) {
           fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/granola-sync`,
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-granola-notes`,
             {
               method: 'POST',
               headers: {

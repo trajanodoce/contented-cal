@@ -57,7 +57,7 @@ function LoginRoute() {
   }
 
   if (user) {
-    return <Navigate to="/list" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <LoginPage />;
@@ -81,7 +81,7 @@ function CreateWorkspaceRoute() {
 
   // If user has workspaces and one is selected, redirect to app
   if (workspaces.length > 0 && currentWorkspace) {
-    return <Navigate to="/list" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   return <CreateWorkspacePage />;
@@ -108,7 +108,7 @@ function ProtectedLayout() {
   }
 
   if (workspaces.length > 1 && !currentWorkspace) {
-    return <Navigate to="/list" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   if (workspaces.length === 0) {

@@ -42,6 +42,24 @@ async function verifySlackSignature(
   return signature === `v0=${hex}`;
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+async function getSlackUserName(
+  botToken: string,
+  userId: string
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://slack.com/api/users.info?user=${userId}`,
+      { headers: { Authorization: `Bearer ${botToken}` } }
+    );
+    const data = await res.json();
+    return data.ok ? data.user?.real_name || data.user?.name || null : null;
+  } catch {
+    return null;
+  }
+}
+
 // ── Handler ──────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
@@ -109,21 +127,9 @@ Deno.serve(async (req) => {
       firstLine.length > 120 ? firstLine.slice(0, 117) + "..." : firstLine;
 
     // Look up who sent the original message
-    let authorName: string | null = null;
-    if (message?.user) {
-      try {
-        const res = await fetch(
-          `https://slack.com/api/users.info?user=${message.user}`,
-          { headers: { Authorization: `Bearer ${botToken}` } }
-        );
-        const data = await res.json();
-        if (data.ok) {
-          authorName = data.user?.real_name || data.user?.name || null;
-        }
-      } catch {
-        // non-critical
-      }
-    }
+    const authorName = message?.user
+      ? await getSlackUserName(botToken, message.user)
+      : null;
 
     // Get the default board column
     const { data: columns } = await supabase
@@ -190,6 +196,100 @@ Deno.serve(async (req) => {
       JSON.stringify({
         response_type: "ephemeral",
         text: `Added to content calendar: *${title}*\n<${itemUrl}|View in ContentedCal>`,
+      }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  // ── Message shortcut: "Add as Project" ─────────────────────────────────
+
+  if (
+    payload.type === "message_action" &&
+    payload.callback_id === "message_to_project"
+  ) {
+    const teamId: string = payload.team?.id ?? "";
+    const message = payload.message;
+    const triggeredBy = payload.user;
+    const channel = payload.channel;
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Look up the connected workspace
+    const { data: integration, error: lookupError } = await supabase
+      .from("integrations")
+      .select("*")
+      .eq("platform", "slack")
+      .eq("status", "connected")
+      .filter("config->>slack_team_id", "eq", teamId)
+      .single();
+
+    if (lookupError || !integration) {
+      return new Response(
+        JSON.stringify({
+          response_type: "ephemeral",
+          text: "ContentedCal isn't connected to this Slack workspace yet. Ask a workspace admin to set it up in Settings → Integrations.",
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const botToken = integration.access_token;
+
+    // Extract content from the message
+    const messageText: string = message?.text ?? "";
+    const firstLine = messageText.split("\n")[0]?.trim() ?? "Slack project";
+    const title =
+      firstLine.length > 120 ? firstLine.slice(0, 117) + "..." : firstLine;
+
+    // Look up who sent the original message
+    const authorName = message?.user
+      ? await getSlackUserName(botToken, message.user)
+      : null;
+
+    // Create the project
+    const { data: newProject, error: insertError } = await supabase
+      .from("projects")
+      .insert({
+        workspace_id: integration.workspace_id,
+        title,
+        description: messageText,
+        status: "active",
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      console.error("Failed to create project:", insertError);
+      return new Response(
+        JSON.stringify({
+          response_type: "ephemeral",
+          text: "Sorry, I couldn't create that project. Please try again.",
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const projectUrl = `${APP_URL}/projects`;
+    const fromLine = authorName ? ` (from ${authorName})` : "";
+
+    // Reply in the thread of the original message
+    await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${botToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        channel: channel?.id,
+        thread_ts: message?.ts,
+        text: `📁 Created project${fromLine}: *${title}*\n<${projectUrl}|View in ContentedCal>`,
+      }),
+    });
+
+    return new Response(
+      JSON.stringify({
+        response_type: "ephemeral",
+        text: `Project created: *${title}*\n<${projectUrl}|View in ContentedCal>`,
       }),
       { headers: { "Content-Type": "application/json" } }
     );

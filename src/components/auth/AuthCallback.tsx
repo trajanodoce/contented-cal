@@ -46,7 +46,7 @@ export function AuthCallback() {
 
               const redirectTo = returnTo && returnTo !== '/login' && returnTo !== '/auth/callback'
                 ? returnTo
-                : '/list';
+                : '/home';
 
               navigate(redirectTo, { replace: true });
             }, 1000); // 1 second delay to ensure AuthContext has updated
@@ -68,7 +68,7 @@ export function AuthCallback() {
               localStorage.removeItem('authReturnTo');
               const redirectTo = returnTo && returnTo !== '/login' && returnTo !== '/auth/callback'
                 ? returnTo
-                : '/list';
+                : '/home';
 
               navigate(redirectTo, { replace: true });
             } else {

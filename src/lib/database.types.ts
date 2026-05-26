@@ -176,6 +176,8 @@ export type Database = {
         Row: {
           assignee_ids: string[] | null
           channel: string | null
+          completed: boolean
+          completed_at: string | null
           content_type_id: string | null
           created_at: string
           created_by: string | null
@@ -196,6 +198,8 @@ export type Database = {
         Insert: {
           assignee_ids?: string[] | null
           channel?: string | null
+          completed?: boolean
+          completed_at?: string | null
           content_type_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -216,6 +220,8 @@ export type Database = {
         Update: {
           assignee_ids?: string[] | null
           channel?: string | null
+          completed?: boolean
+          completed_at?: string | null
           content_type_id?: string | null
           created_at?: string
           created_by?: string | null

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ import {
   ClipboardCheck,
   Search,
   FolderOpen,
+  Pencil,
   X,
 } from 'lucide-react';
 
@@ -187,6 +188,23 @@ export function PersonalTasksSection({ workspaceId }: Props) {
     fetchTasks();
   }, [fetchTasks]);
 
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+
+  const updateTask = async (taskId: string, updates: Partial<Pick<PersonalTask, 'title' | 'category' | 'priority' | 'due_date'>>): Promise<boolean> => {
+    const { error } = await supabase
+      .from('personal_tasks')
+      .update(updates)
+      .eq('id', taskId);
+    if (error) {
+      toast.error('Failed to update task');
+      return false;
+    }
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, ...updates } : t))
+    );
+    return true;
+  };
+
   const toggleComplete = async (task: PersonalTask) => {
     const nowCompleted = !task.completed;
     const { error } = await supabase
@@ -296,6 +314,10 @@ export function PersonalTasksSection({ workspaceId }: Props) {
                       <TaskRow
                         key={task.id}
                         task={task}
+                        isEditing={editingTaskId === task.id}
+                        onStartEdit={() => setEditingTaskId(task.id)}
+                        onStopEdit={() => setEditingTaskId(null)}
+                        onUpdate={async (updates) => updateTask(task.id, updates)}
                         onToggle={() => toggleComplete(task)}
                         onDelete={() => deleteTask(task.id)}
                       />
@@ -323,6 +345,10 @@ export function PersonalTasksSection({ workspaceId }: Props) {
                     <TaskRow
                       key={task.id}
                       task={task}
+                      isEditing={editingTaskId === task.id}
+                      onStartEdit={() => setEditingTaskId(task.id)}
+                      onStopEdit={() => setEditingTaskId(null)}
+                      onUpdate={async (updates) => updateTask(task.id, updates)}
                       onToggle={() => toggleComplete(task)}
                       onDelete={() => deleteTask(task.id)}
                     />
@@ -341,24 +367,159 @@ export function PersonalTasksSection({ workspaceId }: Props) {
 
 function TaskRow({
   task,
+  isEditing,
+  onStartEdit,
+  onStopEdit,
+  onUpdate,
   onToggle,
   onDelete,
 }: {
   task: PersonalTask;
+  isEditing: boolean;
+  onStartEdit: () => void;
+  onStopEdit: () => void;
+  onUpdate: (updates: Partial<Pick<PersonalTask, 'title' | 'category' | 'priority' | 'due_date'>>) => Promise<boolean>;
   onToggle: () => void;
   onDelete: () => void;
 }) {
+  const [editTitle, setEditTitle] = useState(task.title);
+  const [editCategory, setEditCategory] = useState(task.category || 'general');
+  const [editPriority, setEditPriority] = useState(task.priority || 'medium');
+  const [editDueDate, setEditDueDate] = useState(task.due_date || '');
+  const [saving, setSaving] = useState(false);
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  // Reset edit fields only when entering edit mode (not on every task object change)
+  useEffect(() => {
+    if (isEditing) {
+      setEditTitle(task.title);
+      setEditCategory(task.category || 'general');
+      setEditPriority(task.priority || 'medium');
+      setEditDueDate(task.due_date || '');
+      setTimeout(() => titleRef.current?.focus(), 50);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
+
+  const hasChanges = () => {
+    return (
+      editTitle.trim() !== task.title ||
+      editCategory !== (task.category || 'general') ||
+      editPriority !== (task.priority || 'medium') ||
+      editDueDate !== (task.due_date || '')
+    );
+  };
+
+  const saveChanges = async () => {
+    if (!editTitle.trim()) return;
+    if (!hasChanges()) {
+      onStopEdit();
+      return;
+    }
+    setSaving(true);
+    const ok = await onUpdate({
+      title: editTitle.trim(),
+      category: editCategory,
+      priority: editPriority,
+      due_date: editDueDate || null,
+    });
+    setSaving(false);
+    if (ok) {
+      onStopEdit();
+      toast.success('Task updated');
+    }
+  };
+
+  const handleClose = () => {
+    // Auto-save on X if there are changes
+    if (hasChanges() && editTitle.trim()) {
+      saveChanges();
+    } else {
+      onStopEdit();
+    }
+  };
+
   const isOverdue =
     !task.completed &&
     task.due_date &&
     isPast(parseLocalDate(task.due_date)) &&
     !isToday(parseLocalDate(task.due_date));
 
+  if (isEditing) {
+    return (
+      <div className="px-4 py-3 bg-blue-50/50 border-l-2 border-blue-400">
+        {/* Row 1: Title + X */}
+        <div className="flex items-center gap-2 mb-2">
+          <input
+            ref={titleRef}
+            type="text"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') saveChanges();
+              if (e.key === 'Escape') handleClose();
+            }}
+            className="flex-1 text-sm border border-slate-200 rounded-md px-2.5 py-1.5 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none bg-white"
+            placeholder="Task title"
+          />
+          <button
+            onClick={handleClose}
+            className="p-1 text-slate-400 hover:text-slate-600 transition-colors flex-shrink-0"
+            title="Close (auto-saves)"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Row 2: Fields + Save */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={editCategory}
+            onChange={(e) => setEditCategory(e.target.value)}
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
+          >
+            {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
+              <option key={key} value={key}>{cat.label}</option>
+            ))}
+          </select>
+          <select
+            value={editPriority}
+            onChange={(e) => setEditPriority(e.target.value)}
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
+          >
+            {Object.entries(priorityLabels).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={editDueDate}
+            onChange={(e) => setEditDueDate(e.target.value)}
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
+          />
+          <button
+            onClick={saveChanges}
+            disabled={!editTitle.trim() || saving}
+            className="ml-auto px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group">
+    <div
+      className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group cursor-pointer"
+      onClick={() => !task.completed && onStartEdit()}
+    >
       {/* Checkbox */}
       <button
-        onClick={onToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle();
+        }}
         className={`flex-shrink-0 transition-colors ${
           task.completed
             ? 'text-green-500 hover:text-green-600'
@@ -376,6 +537,11 @@ function TaskRow({
       >
         {task.title}
       </span>
+
+      {/* Edit icon on hover */}
+      {!task.completed && (
+        <Pencil className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+      )}
 
       {/* Priority dot */}
       {!task.completed && task.priority !== 'medium' && (

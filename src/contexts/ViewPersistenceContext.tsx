@@ -18,7 +18,7 @@ const CALENDAR_VIEW_STORAGE_KEY_PREFIX = 'cc-calendarView-';
 
 export function ViewPersistenceProvider({ children }: { children: React.ReactNode }) {
   const { currentWorkspace } = useWorkspace();
-  const [lastUsedView, setLastUsedViewState] = useState<ViewType>('list');
+  const [lastUsedView, setLastUsedViewState] = useState<ViewType>('home');
   const [calendarViewType, setCalendarViewTypeState] = useState<CalendarViewType>('month');
   const [isInitialized, setIsInitialized] = useState(false);
 

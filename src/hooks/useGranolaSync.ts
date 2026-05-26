@@ -46,7 +46,7 @@ export function useGranolaSync(workspaceId: string | null) {
       if (!session) throw new Error('Not authenticated');
 
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/granola-sync`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-granola-notes`,
         {
           method: 'POST',
           headers: {

@@ -42,6 +42,15 @@ function stripMention(text: string, botUserId: string): string {
     .trim();
 }
 
+/** Detect "project:" prefix and return { isProject, cleanText }. */
+function parseProjectPrefix(text: string): { isProject: boolean; cleanText: string } {
+  const match = text.match(/^project[:\s]\s*(.*)/i);
+  if (match) {
+    return { isProject: true, cleanText: match[1].trim() };
+  }
+  return { isProject: false, cleanText: text };
+}
+
 async function getSlackUserName(
   botToken: string,
   userId: string
@@ -194,11 +203,15 @@ Deno.serve(async (req) => {
     // Determine if this is a thread mention
     const isThread = !!event.thread_ts;
     const threadTs = event.thread_ts ?? event.ts;
-    const replyTs = event.thread_ts ?? event.ts; // Reply in the thread
+    const replyTs = event.thread_ts ?? event.ts;
 
-    // Parse the mention text for the title
-    const cleanText = stripMention(event.text ?? "", botUserId);
-    const titleSource = cleanText || "Slack request";
+    // Parse the mention text
+    const rawText = stripMention(event.text ?? "", botUserId);
+
+    // Check for "project:" prefix
+    const { isProject, cleanText } = parseProjectPrefix(rawText);
+
+    const titleSource = cleanText || (isProject ? "Slack project" : "Slack request");
     const title =
       titleSource.length > 120
         ? titleSource.slice(0, 117) + "..."
@@ -221,59 +234,93 @@ Deno.serve(async (req) => {
     // Resolve the Slack user's name
     const slackUserName = await getSlackUserName(botToken, event.user);
 
-    // Get the default (first) board column for new items
-    const { data: columns } = await supabase
-      .from("board_columns")
-      .select("id")
-      .eq("workspace_id", integration.workspace_id)
-      .order("position", { ascending: true })
-      .limit(1);
+    if (isProject) {
+      // ── Create a project ────────────────────────────────────────────────
+      const { data: newProject, error: insertError } = await supabase
+        .from("projects")
+        .insert({
+          workspace_id: integration.workspace_id,
+          title,
+          description,
+          status: "active",
+        })
+        .select("id")
+        .single();
 
-    const defaultStatus = columns?.[0]?.id ?? null;
+      if (insertError) {
+        console.error("Failed to create project:", insertError);
+        await postSlackMessage(
+          botToken,
+          event.channel,
+          replyTs,
+          "Sorry, I couldn't create that project. Please try again or create it directly in ContentedCal."
+        );
+        return new Response("OK", { status: 200 });
+      }
 
-    // Create the content item
-    const { data: newItem, error: insertError } = await supabase
-      .from("content_items")
-      .insert({
-        workspace_id: integration.workspace_id,
-        title,
-        description,
-        status: defaultStatus,
-        tags: ["slack-request"],
-        custom_fields: {
-          _source: "slack",
-          _slack_channel: event.channel,
-          _slack_ts: event.ts,
-          _slack_thread_ts: isThread ? event.thread_ts : null,
-          _slack_user: event.user,
-          _slack_user_name: slackUserName,
-          _slack_team_id: teamId,
-          _slack_is_thread: isThread,
-        },
-      })
-      .select("id")
-      .single();
-
-    if (insertError) {
-      console.error("Failed to create content item:", insertError);
+      const projectUrl = `${APP_URL}/projects`;
+      const fromLine = slackUserName ? ` from ${slackUserName}` : "";
+      const threadNote = isThread ? " (thread captured)" : "";
       await postSlackMessage(
         botToken,
         event.channel,
         replyTs,
-        "Sorry, I couldn't create that item. Please try again or create it directly in ContentedCal."
+        `📁 Created project *${title}*${fromLine}${threadNote}.\n<${projectUrl}|View in ContentedCal>`
       );
-      return new Response("OK", { status: 200 });
-    }
+    } else {
+      // ── Create a content item (existing behavior) ───────────────────────
+      const { data: columns } = await supabase
+        .from("board_columns")
+        .select("id")
+        .eq("workspace_id", integration.workspace_id)
+        .order("position", { ascending: true })
+        .limit(1);
 
-    const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
-    const fromLine = slackUserName ? ` from ${slackUserName}` : "";
-    const threadNote = isThread ? " (thread captured)" : "";
-    await postSlackMessage(
-      botToken,
-      event.channel,
-      replyTs,
-      `Got it! Created *${title}*${fromLine}${threadNote}.\n<${itemUrl}|View in ContentedCal>`
-    );
+      const defaultStatus = columns?.[0]?.id ?? null;
+
+      const { data: newItem, error: insertError } = await supabase
+        .from("content_items")
+        .insert({
+          workspace_id: integration.workspace_id,
+          title,
+          description,
+          status: defaultStatus,
+          tags: ["slack-request"],
+          custom_fields: {
+            _source: "slack",
+            _slack_channel: event.channel,
+            _slack_ts: event.ts,
+            _slack_thread_ts: isThread ? event.thread_ts : null,
+            _slack_user: event.user,
+            _slack_user_name: slackUserName,
+            _slack_team_id: teamId,
+            _slack_is_thread: isThread,
+          },
+        })
+        .select("id")
+        .single();
+
+      if (insertError) {
+        console.error("Failed to create content item:", insertError);
+        await postSlackMessage(
+          botToken,
+          event.channel,
+          replyTs,
+          "Sorry, I couldn't create that item. Please try again or create it directly in ContentedCal."
+        );
+        return new Response("OK", { status: 200 });
+      }
+
+      const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
+      const fromLine = slackUserName ? ` from ${slackUserName}` : "";
+      const threadNote = isThread ? " (thread captured)" : "";
+      await postSlackMessage(
+        botToken,
+        event.channel,
+        replyTs,
+        `Got it! Created *${title}*${fromLine}${threadNote}.\n<${itemUrl}|View in ContentedCal>`
+      );
+    }
 
     return new Response("OK", { status: 200 });
   }

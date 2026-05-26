@@ -42,6 +42,17 @@ async function verifySlackSignature(
   return signature === `v0=${hex}`;
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Detect "project:" prefix and return { isProject, cleanText }. */
+function parseProjectPrefix(text: string): { isProject: boolean; cleanText: string } {
+  const match = text.match(/^project[:\s]\s*(.*)/is);
+  if (match) {
+    return { isProject: true, cleanText: match[1].trim() };
+  }
+  return { isProject: false, cleanText: text };
+}
+
 // ── Handler ──────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
@@ -73,7 +84,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         response_type: "ephemeral",
-        text: "Please provide a title for the content request.\nUsage: `/content-request Blog post about our new feature`",
+        text: "Please provide a title.\n" +
+          "Usage:\n" +
+          "• `/content-request Blog post about our new feature` — creates a content item\n" +
+          "• `/content-request project: Q3 marketing campaign` — creates a project",
       }),
       { headers: { "Content-Type": "application/json" } }
     );
@@ -117,76 +131,123 @@ Deno.serve(async (req) => {
     // non-critical
   }
 
+  // Check for "project:" prefix
+  const { isProject, cleanText } = parseProjectPrefix(text);
+  const contentText = isProject ? cleanText : text;
+
   // Parse title and description
-  const lines = text.split("\n").map((l: string) => l.trim()).filter(Boolean);
-  const firstLine = lines[0] ?? "Slack request";
+  const lines = contentText.split("\n").map((l: string) => l.trim()).filter(Boolean);
+  const firstLine = lines[0] ?? (isProject ? "Slack project" : "Slack request");
   const title =
     firstLine.length > 120 ? firstLine.slice(0, 117) + "..." : firstLine;
-  const description = text;
+  const description = contentText;
 
-  // Get default board column
-  const { data: columns } = await supabase
-    .from("board_columns")
-    .select("id")
-    .eq("workspace_id", integration.workspace_id)
-    .order("position", { ascending: true })
-    .limit(1);
+  if (isProject) {
+    // ── Create a project ──────────────────────────────────────────────────
+    const { data: newProject, error: insertError } = await supabase
+      .from("projects")
+      .insert({
+        workspace_id: integration.workspace_id,
+        title,
+        description,
+        status: "active",
+      })
+      .select("id")
+      .single();
 
-  const defaultStatus = columns?.[0]?.id ?? null;
+    if (insertError) {
+      console.error("Failed to create project:", insertError);
+      return new Response(
+        JSON.stringify({
+          response_type: "ephemeral",
+          text: "Sorry, I couldn't create that project. Please try again.",
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-  // Create the content item
-  const { data: newItem, error: insertError } = await supabase
-    .from("content_items")
-    .insert({
-      workspace_id: integration.workspace_id,
-      title,
-      description,
-      status: defaultStatus,
-      tags: ["slack-request"],
-      custom_fields: {
-        _source: "slack",
-        _slack_channel: channelId,
-        _slack_user: userId,
-        _slack_user_name: userName,
-        _slack_team_id: teamId,
-        _slack_via: "slash_command",
-      },
-    })
-    .select("id")
-    .single();
+    const projectUrl = `${APP_URL}/projects`;
 
-  if (insertError) {
-    console.error("Failed to create content item:", insertError);
+    // Respond with in_channel confirmation
+    if (responseUrl) {
+      await fetch(responseUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          response_type: "in_channel",
+          text: `📁 *Project created* by ${userName ?? "someone"}:\n*${title}*\n<${projectUrl}|View in ContentedCal>`,
+        }),
+      });
+    }
+
     return new Response(
       JSON.stringify({
         response_type: "ephemeral",
-        text: "Sorry, I couldn't create that item. Please try again.",
+        text: `Project created: *${title}*\n<${projectUrl}|View in ContentedCal>`,
+      }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+  } else {
+    // ── Create a content item (existing behavior) ─────────────────────────
+    const { data: columns } = await supabase
+      .from("board_columns")
+      .select("id")
+      .eq("workspace_id", integration.workspace_id)
+      .order("position", { ascending: true })
+      .limit(1);
+
+    const defaultStatus = columns?.[0]?.id ?? null;
+
+    const { data: newItem, error: insertError } = await supabase
+      .from("content_items")
+      .insert({
+        workspace_id: integration.workspace_id,
+        title,
+        description,
+        status: defaultStatus,
+        tags: ["slack-request"],
+        custom_fields: {
+          _source: "slack",
+          _slack_channel: channelId,
+          _slack_user: userId,
+          _slack_user_name: userName,
+          _slack_team_id: teamId,
+          _slack_via: "slash_command",
+        },
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      console.error("Failed to create content item:", insertError);
+      return new Response(
+        JSON.stringify({
+          response_type: "ephemeral",
+          text: "Sorry, I couldn't create that item. Please try again.",
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
+
+    if (responseUrl) {
+      await fetch(responseUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          response_type: "in_channel",
+          text: `📋 *Content request added* by ${userName ?? "someone"}:\n*${title}*\n<${itemUrl}|View in ContentedCal>`,
+        }),
+      });
+    }
+
+    return new Response(
+      JSON.stringify({
+        response_type: "ephemeral",
+        text: `Content request created: *${title}*\n<${itemUrl}|View in ContentedCal>`,
       }),
       { headers: { "Content-Type": "application/json" } }
     );
   }
-
-  const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
-
-  // Respond with in_channel confirmation so the team can see it
-  // Use the response_url for a follow-up visible message
-  if (responseUrl) {
-    await fetch(responseUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        response_type: "in_channel",
-        text: `📋 *Content request added* by ${userName ?? "someone"}:\n*${title}*\n<${itemUrl}|View in ContentedCal>`,
-      }),
-    });
-  }
-
-  // Immediate ephemeral ack
-  return new Response(
-    JSON.stringify({
-      response_type: "ephemeral",
-      text: `Content request created: *${title}*\n<${itemUrl}|View in ContentedCal>`,
-    }),
-    { headers: { "Content-Type": "application/json" } }
-  );
 });
