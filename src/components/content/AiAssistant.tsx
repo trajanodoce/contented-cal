@@ -233,17 +233,10 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
   const secondaryActions = visibleActions.filter(a => a.tier === 'secondary');
   const tertiaryActions = visibleActions.filter(a => a.tier === 'tertiary');
 
-  // Check if Claude is connected
+  // Always enable AI panel — server may have ANTHROPIC_API_KEY env var as fallback
   const checkIntegration = useCallback(async () => {
-    if (!workspace) return;
-    const { data } = await supabase
-      .from('integrations')
-      .select('status')
-      .eq('workspace_id', workspace.id)
-      .eq('platform', 'claude')
-      .maybeSingle();
-    setHasIntegration(data?.status === 'connected');
-  }, [workspace]);
+    setHasIntegration(true);
+  }, []);
 
   const loadHistory = useCallback(async () => {
     setLoadingHistory(true);

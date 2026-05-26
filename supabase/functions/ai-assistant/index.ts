@@ -371,7 +371,9 @@ Deno.serve(async (req: Request) => {
     const body = (await req.json()) as RequestBody;
     const { workspace_id, content_item_id, action } = body;
 
-    // Fetch the Claude API key from access_token field
+    // Resolve API key: DB integration → env var fallback
+    let apiKey = "";
+
     const { data: integration } = await supabaseClient
       .from("integrations")
       .select("access_token, config, status")
@@ -379,22 +381,23 @@ Deno.serve(async (req: Request) => {
       .eq("platform", "claude")
       .maybeSingle();
 
-    if (!integration || integration.status !== "connected") {
-      return new Response(
-        JSON.stringify({
-          error: "Claude integration not connected. Add your API key in Settings → Integrations.",
-        }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (integration?.status === "connected") {
+      apiKey =
+        integration.access_token ||
+        (integration.config as Record<string, string>)?.api_key ||
+        "";
     }
 
-    // Try access_token first (new approach), fall back to config.api_key (legacy)
-    const apiKey =
-      integration.access_token ||
-      (integration.config as Record<string, string>)?.api_key;
+    // Fall back to server-side env var if no DB key
+    if (!apiKey) {
+      apiKey = Deno.env.get("ANTHROPIC_API_KEY") ?? "";
+    }
+
     if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: "Claude API key not configured." }),
+        JSON.stringify({
+          error: "Claude API key not configured. Add your key in Settings → Integrations, or ask an admin to set the ANTHROPIC_API_KEY secret.",
+        }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
