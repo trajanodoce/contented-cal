@@ -166,7 +166,7 @@ export function HomePage() {
         {/* Left Column: High Priority + Upcoming */}
         <div className="lg:col-span-2 space-y-6">
           {/* High Priority Items */}
-          <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Flame className="w-4.5 h-4.5 text-orange-500" />
@@ -228,7 +228,7 @@ export function HomePage() {
           </section>
 
           {/* Upcoming Due */}
-          <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4.5 h-4.5 text-blue-500" />
@@ -281,7 +281,7 @@ export function HomePage() {
 
           {/* Projects Overview */}
           {projects.length > 0 && (
-            <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <FolderOpen className="w-4.5 h-4.5 text-violet-500" />
@@ -324,7 +324,7 @@ export function HomePage() {
         {/* Right Column: Status Breakdown + Activity */}
         <div className="space-y-6">
           {/* Status Breakdown */}
-          <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4.5 h-4.5 text-slate-500" />
@@ -364,7 +364,7 @@ export function HomePage() {
           </section>
 
           {/* Priority Breakdown */}
-          <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4.5 h-4.5 text-slate-500" />
@@ -390,7 +390,7 @@ export function HomePage() {
           </section>
 
           {/* Recent Activity */}
-          <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Activity className="w-4.5 h-4.5 text-slate-500" />

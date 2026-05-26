@@ -268,12 +268,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   };
 
   return (
-    <div className="border border-gray-200 rounded-xl p-4">
+    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden p-4">
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-sm font-medium text-gray-700">Subtasks</span>
+        <span className="text-sm font-medium text-slate-700">Subtasks</span>
         {totalCount > 0 && (
-          <span className="text-xs font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
             {completedCount}/{totalCount}
           </span>
         )}
@@ -281,7 +281,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
 
       {/* Progress bar */}
       {totalCount > 0 && (
-        <div className="h-1.5 rounded-full bg-gray-200 mb-3">
+        <div className="h-1.5 rounded-full bg-slate-200 mb-3">
           <div
             className="h-1.5 rounded-full bg-green-500 transition-all duration-300"
             style={{ width: `${progressPct}%` }}
@@ -297,7 +297,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
           return (
             <div
               key={subtask.id}
-              className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-gray-50 rounded-lg transition-colors ${
+              className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-slate-50 rounded-lg transition-colors ${
                 subtask.completed ? 'opacity-60' : ''
               } ${dragOverId === subtask.id ? 'bg-blue-50' : ''}`}
               draggable
@@ -308,7 +308,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
             >
               {/* Drag handle */}
               <div className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab">
-                <GripVertical className="w-3.5 h-3.5 text-gray-300 hover:text-gray-500 transition-colors" />
+                <GripVertical className="w-3.5 h-3.5 text-slate-300 hover:text-slate-500 transition-colors" />
               </div>
 
               {/* Checkbox */}
@@ -345,7 +345,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       setEditTitle(subtask.title);
                     }}
                     className={`text-sm cursor-pointer truncate block ${
-                      subtask.completed ? 'line-through text-gray-400' : 'text-gray-700'
+                      subtask.completed ? 'line-through text-slate-400' : 'text-slate-700'
                     }`}
                   >
                     {subtask.title}
@@ -375,7 +375,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       </span>
                     )
                   ) : (
-                    <User className="w-3.5 h-3.5 text-gray-400" />
+                    <User className="w-3.5 h-3.5 text-slate-400" />
                   )}
                 </button>
 
@@ -386,7 +386,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                   >
                     <button
                       onClick={() => updateAssignee(subtask.id, null)}
-                      className="w-full text-left px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
+                      className="w-full text-left px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-50 transition-colors"
                     >
                       None
                     </button>
@@ -394,7 +394,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       <button
                         key={m.id}
                         onClick={() => updateAssignee(subtask.id, m.id)}
-                        className="w-full text-left px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
                       >
                         {m.avatar_url ? (
                           <img
@@ -439,11 +439,11 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                   onClick={() =>
                     setDueDateEditId(dueDateEditId === subtask.id ? null : subtask.id)
                   }
-                  className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
                   title={subtask.due_date ? formatDate(subtask.due_date) : 'Set due date'}
                 >
                   {subtask.due_date ? (
-                    <span className="text-gray-500">{formatDate(subtask.due_date)}</span>
+                    <span className="text-slate-500">{formatDate(subtask.due_date)}</span>
                   ) : (
                     <Calendar className="w-3.5 h-3.5" />
                   )}
@@ -453,7 +453,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
               {/* Delete button */}
               <button
                 onClick={() => deleteSubtask(subtask.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-red-500 flex-shrink-0"
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500 flex-shrink-0"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -478,7 +478,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
         <button
           onClick={addSubtask}
           disabled={!newTitle.trim()}
-          className="p-1.5 text-gray-400 hover:text-blue-500 disabled:opacity-30 transition-colors"
+          className="p-1.5 text-slate-400 hover:text-blue-500 disabled:opacity-30 transition-colors"
         >
           <Plus className="w-4 h-4" />
         </button>
