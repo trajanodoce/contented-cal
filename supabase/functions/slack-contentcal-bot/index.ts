@@ -1,12 +1,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-// ── Env ──────────────────────────────────────────────────────────────────────
-
 const SLACK_SIGNING_SECRET = Deno.env.get("SLACK_SIGNING_SECRET") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
-const SUPABASE_SERVICE_ROLE_KEY =
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const APP_URL = Deno.env.get("APP_URL") ?? "https://contentedcal.com";
 
 // ── Signature verification ───────────────────────────────────────────────────
@@ -17,8 +14,6 @@ async function verifySlackSignature(
   signature: string
 ): Promise<boolean> {
   if (!SLACK_SIGNING_SECRET) return false;
-
-  // Reject requests older than 5 minutes (replay protection)
   const now = Math.floor(Date.now() / 1000);
   if (Math.abs(now - parseInt(timestamp, 10)) > 300) return false;
 
@@ -31,21 +26,15 @@ async function verifySlackSignature(
     false,
     ["sign"]
   );
-  const sig = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    encoder.encode(sigBasestring)
-  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(sigBasestring));
   const hex = Array.from(new Uint8Array(sig))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
-
   return signature === `v0=${hex}`;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Strip the <@UBOT> mention prefix from the message text. */
 function stripMention(text: string, botUserId: string): string {
   return text
     .replace(new RegExp(`<@${botUserId}>\\s*`, "gi"), "")
@@ -53,38 +42,21 @@ function stripMention(text: string, botUserId: string): string {
     .trim();
 }
 
-/** Extract title (first line, max 120 chars) and full description. */
-function parseContent(text: string): { title: string; description: string } {
-  const lines = text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-  const firstLine = lines[0] ?? "Slack request";
-  const title =
-    firstLine.length > 120 ? firstLine.slice(0, 117) + "..." : firstLine;
-  return { title, description: text };
-}
-
-/** Look up the Slack user's real name via users.info. */
 async function getSlackUserName(
   botToken: string,
   userId: string
 ): Promise<string | null> {
   try {
-    const res = await fetch(
-      `https://slack.com/api/users.info?user=${userId}`,
-      { headers: { Authorization: `Bearer ${botToken}` } }
-    );
+    const res = await fetch(`https://slack.com/api/users.info?user=${userId}`, {
+      headers: { Authorization: `Bearer ${botToken}` },
+    });
     const data = await res.json();
-    return data.ok
-      ? data.user?.real_name || data.user?.name || null
-      : null;
+    return data.ok ? data.user?.real_name || data.user?.name || null : null;
   } catch {
     return null;
   }
 }
 
-/** Post a message to Slack. */
 async function postSlackMessage(
   botToken: string,
   channel: string,
@@ -104,6 +76,61 @@ async function postSlackMessage(
   return data;
 }
 
+/** Fetch full thread replies from Slack. */
+async function getThreadReplies(
+  botToken: string,
+  channel: string,
+  threadTs: string
+): Promise<{ user: string; text: string }[]> {
+  try {
+    const res = await fetch(
+      `https://slack.com/api/conversations.replies?channel=${channel}&ts=${threadTs}&limit=50`,
+      { headers: { Authorization: `Bearer ${botToken}` } }
+    );
+    const data = await res.json();
+    if (!data.ok || !data.messages) return [];
+    return data.messages.map((m: { user?: string; text?: string }) => ({
+      user: m.user ?? "",
+      text: m.text ?? "",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+/** Build a readable thread summary for the content item description. */
+async function buildThreadDescription(
+  botToken: string,
+  channel: string,
+  threadTs: string,
+  botUserId: string
+): Promise<string> {
+  const messages = await getThreadReplies(botToken, channel, threadTs);
+  if (messages.length === 0) return "";
+
+  // Resolve user names for all unique users
+  const userIds = [...new Set(messages.map((m) => m.user).filter(Boolean))];
+  const userNames: Record<string, string> = {};
+  await Promise.all(
+    userIds.map(async (uid) => {
+      const name = await getSlackUserName(botToken, uid);
+      if (name) userNames[uid] = name;
+    })
+  );
+
+  // Format thread as readable conversation, skip bot messages
+  const lines = messages
+    .filter((m) => m.user !== botUserId && !m.text.includes(`<@${botUserId}>`))
+    .map((m) => {
+      const name = userNames[m.user] ?? m.user;
+      const clean = stripMention(m.text, botUserId);
+      return `${name}: ${clean}`;
+    })
+    .filter((l) => l.trim());
+
+  return lines.join("\n");
+}
+
 // ── Handler ──────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
@@ -114,11 +141,9 @@ Deno.serve(async (req) => {
   const body = await req.text();
   const timestamp = req.headers.get("x-slack-request-timestamp") ?? "";
   const signature = req.headers.get("x-slack-signature") ?? "";
-
   const payload = JSON.parse(body);
 
   // ── URL verification challenge ─────────────────────────────────────────
-
   if (payload.type === "url_verification") {
     return new Response(JSON.stringify({ challenge: payload.challenge }), {
       headers: { "Content-Type": "application/json" },
@@ -133,7 +158,6 @@ Deno.serve(async (req) => {
   }
 
   // ── Event callback ─────────────────────────────────────────────────────
-
   if (payload.type === "event_callback") {
     const event = payload.event;
 
@@ -159,11 +183,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (lookupError || !integration) {
-      console.error(
-        "No workspace found for Slack team:",
-        teamId,
-        lookupError
-      );
+      console.error("No workspace found for Slack team:", teamId, lookupError);
       return new Response("OK", { status: 200 });
     }
 
@@ -171,9 +191,32 @@ Deno.serve(async (req) => {
     const botUserId = config?.bot_user_id ?? "";
     const botToken = integration.access_token;
 
-    // Parse the message
+    // Determine if this is a thread mention
+    const isThread = !!event.thread_ts;
+    const threadTs = event.thread_ts ?? event.ts;
+    const replyTs = event.thread_ts ?? event.ts; // Reply in the thread
+
+    // Parse the mention text for the title
     const cleanText = stripMention(event.text ?? "", botUserId);
-    const { title, description } = parseContent(cleanText);
+    const titleSource = cleanText || "Slack request";
+    const title =
+      titleSource.length > 120
+        ? titleSource.slice(0, 117) + "..."
+        : titleSource;
+
+    // Build description: if in a thread, capture the full thread context
+    let description: string;
+    if (isThread) {
+      const threadContent = await buildThreadDescription(
+        botToken,
+        event.channel,
+        event.thread_ts,
+        botUserId
+      );
+      description = threadContent || cleanText;
+    } else {
+      description = cleanText;
+    }
 
     // Resolve the Slack user's name
     const slackUserName = await getSlackUserName(botToken, event.user);
@@ -201,9 +244,11 @@ Deno.serve(async (req) => {
           _source: "slack",
           _slack_channel: event.channel,
           _slack_ts: event.ts,
+          _slack_thread_ts: isThread ? event.thread_ts : null,
           _slack_user: event.user,
           _slack_user_name: slackUserName,
           _slack_team_id: teamId,
+          _slack_is_thread: isThread,
         },
       })
       .select("id")
@@ -214,20 +259,20 @@ Deno.serve(async (req) => {
       await postSlackMessage(
         botToken,
         event.channel,
-        event.ts,
+        replyTs,
         "Sorry, I couldn't create that item. Please try again or create it directly in ContentedCal."
       );
       return new Response("OK", { status: 200 });
     }
 
-    // Reply in the thread
     const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
     const fromLine = slackUserName ? ` from ${slackUserName}` : "";
+    const threadNote = isThread ? " (thread captured)" : "";
     await postSlackMessage(
       botToken,
       event.channel,
-      event.ts,
-      `Got it! Created *${title}*${fromLine}.\n<${itemUrl}|View in ContentedCal>`
+      replyTs,
+      `Got it! Created *${title}*${fromLine}${threadNote}.\n<${itemUrl}|View in ContentedCal>`
     );
 
     return new Response("OK", { status: 200 });

@@ -11,7 +11,7 @@ const SUPABASE_SERVICE_ROLE_KEY =
 const APP_URL = Deno.env.get("APP_URL") ?? "https://contentedcal.com";
 
 const SCOPES = "app_mentions:read,channels:history,groups:history,chat:write,chat:write.public,commands,users:read,users:read.email";
-const REDIRECT_URI = `${SUPABASE_URL}/functions/v1/slack-oauth?action=callback`;
+const REDIRECT_URI = `${SUPABASE_URL}/functions/v1/slack-oauth-callback`;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
