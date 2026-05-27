@@ -20,6 +20,8 @@ import {
   Plus,
   CircleUser,
   LayoutDashboard,
+  Palette,
+  FileText,
 } from 'lucide-react';
 
 interface NavItem {
@@ -71,7 +73,9 @@ export function AppLayout() {
   const { setLastUsedView } = useViewPersistence();
   const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const createMenuRef = useRef<HTMLDivElement>(null);
   const { selectedItemId, setSelectedItemId } = useSelectedItem();
   const canCreate = userRole === 'admin' || userRole === 'editor';
   const canAccessSettings = userRole === 'admin';
@@ -116,6 +120,17 @@ export function AppLayout() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItemId]);
+
+  // Close create menu on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (createMenuRef.current && !createMenuRef.current.contains(e.target as Node)) {
+        setShowCreateMenu(false);
+      }
+    }
+    if (showCreateMenu) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCreateMenu]);
 
   // Handle view transitions
   const handleNavigation = useCallback(() => {
@@ -266,13 +281,34 @@ export function AppLayout() {
             {getPageTitle(location.pathname)}
           </h1>
           {canCreate && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              New Item
-            </button>
+            <div className="relative" ref={createMenuRef}>
+              <button
+                onClick={() => setShowCreateMenu(v => !v)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                New
+                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              </button>
+              {showCreateMenu && (
+                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50">
+                  <button
+                    onClick={() => { setShowCreateMenu(false); setIsModalOpen(true); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <FileText className="w-4 h-4 text-blue-500" />
+                    Content Item
+                  </button>
+                  <button
+                    onClick={() => { setShowCreateMenu(false); navigate('/intake/q9ybey7y'); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <Palette className="w-4 h-4 text-purple-500" />
+                    Design Request
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Create Item Modal */}
@@ -298,14 +334,34 @@ export function AppLayout() {
 
         {/* Floating Action Button - visible for editors and admins, hidden when detail panel is open */}
         {canCreate && !selectedItemId && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 z-50"
-            aria-label="Create new item"
-            title="Create new item"
-          >
-            <Plus className="w-6 h-6" />
-          </button>
+          <div className="fixed bottom-6 right-6 z-50">
+            {showCreateMenu && (
+              <div className="absolute bottom-16 right-0 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 mb-2">
+                <button
+                  onClick={() => { setShowCreateMenu(false); setIsModalOpen(true); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <FileText className="w-4 h-4 text-blue-500" />
+                  Content Item
+                </button>
+                <button
+                  onClick={() => { setShowCreateMenu(false); navigate('/intake/q9ybey7y'); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <Palette className="w-4 h-4 text-purple-500" />
+                  Design Request
+                </button>
+              </div>
+            )}
+            <button
+              onClick={() => setShowCreateMenu(v => !v)}
+              className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 ${showCreateMenu ? 'rotate-45' : ''}`}
+              aria-label="Create new item"
+              title="Create new item"
+            >
+              <Plus className="w-6 h-6 transition-transform" />
+            </button>
+          </div>
         )}
       </main>
     </div>
