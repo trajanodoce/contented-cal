@@ -314,9 +314,12 @@ export function MyWorkPage() {
       {/* My Tasks */}
       {sortedItems.length > 0 && (
             <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
-                <h2 className="text-lg font-semibold text-slate-900">My Tasks</h2>
-                <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+              <div
+                className="flex items-center gap-2 px-5 py-4 border-b border-slate-100"
+                style={{ background: 'linear-gradient(135deg, #b8c4cc 0%, #1e293b 100%)' }}
+              >
+                <h2 className="text-lg font-semibold text-white">My Tasks</h2>
+                <span className="text-xs font-medium text-white/80 bg-white/20 px-2 py-0.5 rounded-full">
                   {sortedItems.length}
                 </span>
               </div>
