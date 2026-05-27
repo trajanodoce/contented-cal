@@ -125,6 +125,10 @@ export function ListPage() {
     const saved = localStorage.getItem('cc-show-ordinal');
     return saved !== null ? saved === 'true' : true;
   });
+  const [showGranola, setShowGranola] = useState(() => {
+    const saved = localStorage.getItem('cc-show-granola');
+    return saved !== null ? saved === 'true' : true;
+  });
 
   // Extract unique channels from items
   useEffect(() => {
@@ -138,8 +142,9 @@ export function ListPage() {
   const items = useMemo(() => {
     let result = isLoaded ? applyFilters(rawItems, filters, linkCounts) : rawItems;
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    if (!showGranola) result = result.filter(i => !granolaItemIds.has(i.id));
     return result;
-  }, [rawItems, filters, isLoaded, linkCounts, showOrdinal]);
+  }, [rawItems, filters, isLoaded, linkCounts, showOrdinal, showGranola, granolaItemIds]);
 
   // Sort items
   const sortedItems = useMemo(() => {
@@ -299,7 +304,34 @@ export function ListPage() {
         filteredCount={items.length}
       />
 
-      <div className="flex items-center justify-end mt-3 mb-1">
+      <div className="flex items-center justify-end gap-2 mt-3 mb-1">
+        <button
+          onClick={() => {
+            setShowGranola(prev => {
+              const next = !prev;
+              localStorage.setItem('cc-show-granola', String(next));
+              return next;
+            });
+          }}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+          style={{
+            borderColor: showGranola ? '#86EFAC' : '#e2e8f0',
+            backgroundColor: showGranola ? '#F0FDF4' : 'white',
+            color: showGranola ? '#345A11' : '#64748b',
+          }}
+          title={showGranola ? 'Hide meeting notes' : 'Show meeting notes'}
+        >
+          <div
+            className="relative w-8 h-[18px] rounded-full transition-colors"
+            style={{ backgroundColor: showGranola ? '#345A11' : '#CBD5E1' }}
+          >
+            <div
+              className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
+              style={{ left: showGranola ? '18px' : '2px' }}
+            />
+          </div>
+          Meeting Notes
+        </button>
         <button
           onClick={() => {
             setShowOrdinal(prev => {
@@ -386,7 +418,8 @@ export function ListPage() {
 
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
-                const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
+                const hasGranola = granolaItemIds.has(item.id);
+                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : hasGranola ? '#F0FDF4' : undefined;
 
                 return (
                   <tr
@@ -395,7 +428,7 @@ export function ListPage() {
                     className={`hover:bg-slate-50 cursor-pointer transition-colors ${
                       isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''
                     }`}
-                    style={externalBg && !isSelected ? { backgroundColor: externalBg } : {}}
+                    style={rowBg && !isSelected ? { backgroundColor: rowBg } : {}}
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button
