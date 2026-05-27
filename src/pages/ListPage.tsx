@@ -377,8 +377,11 @@ export function ListPage() {
                 const isSelected = selectedItems.has(item.id);
                 const contentType = getContentType(item.content_type_id, contentTypes);
                 const status = getBoardColumn(item.status, boardColumns);
+                const statusName = status?.name?.toLowerCase();
+                const isDone = statusName === 'published' || statusName === 'completed';
                 const assignees = getAssignees(item.assignee_ids || [], members);
                 const dueDate = formatDueDateWithStatus(item.due_date);
+                if (isDone) dueDate.isOverdue = false;
                 const priority = priorityConfig[(item.priority ?? 'medium') as keyof typeof priorityConfig] || priorityConfig.medium;
 
                 const isOrdinal = isOrdinalItem(item);
@@ -486,6 +489,7 @@ export function ListPage() {
                         <InlineDueDateEdit
                           dueDate={item.due_date}
                           contentItemId={item.id}
+                          isDone={isDone}
                           onUpdate={handleItemUpdated}
                         />
                       ) : (
@@ -878,10 +882,12 @@ function InlineAssigneeEdit({
 function InlineDueDateEdit({
   dueDate,
   contentItemId,
+  isDone,
   onUpdate,
 }: {
   dueDate: string | null;
   contentItemId: string;
+  isDone?: boolean;
   onUpdate: () => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -889,6 +895,7 @@ function InlineDueDateEdit({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const formatted = formatDueDateWithStatus(dueDate);
+  if (isDone) formatted.isOverdue = false;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

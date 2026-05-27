@@ -131,16 +131,19 @@ export function MyWorkPage() {
 
   const DONE_BG = '#DCEDF4';
 
-  // The last board column is treated as the "published/done" status
-  const doneColumnId = useMemo(() => {
-    if (boardColumns.length === 0) return null;
-    return boardColumns[boardColumns.length - 1].id;
+  // Columns treated as "done" — Published or Completed
+  const doneColumnIds = useMemo(() => {
+    return new Set(
+      boardColumns
+        .filter(c => c.name.toLowerCase() === 'published' || c.name.toLowerCase() === 'completed')
+        .map(c => c.id)
+    );
   }, [boardColumns]);
 
-  // An item is "done" if explicitly completed OR its status is the last column
+  // An item is "done" if explicitly completed OR its status is Published/Completed
   const isItemDone = useCallback(
-    (item: ContentItem) => item.completed || (doneColumnId != null && item.status === doneColumnId),
-    [doneColumnId],
+    (item: ContentItem) => item.completed || (item.status != null && doneColumnIds.has(item.status)),
+    [doneColumnIds],
   );
 
   // Build a board column position lookup for status sorting

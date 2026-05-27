@@ -113,11 +113,12 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
   });
 
   const dateField = dateMode === 'due' ? item.due_date : item.publish_date;
-  const isOverdue = dateField && isPast(parseLocalDate(dateField)) && !isToday(parseLocalDate(dateField));
   const statusCol = boardColumns.find(c => c.id === item.status);
-  const isPublished = statusCol?.name?.toLowerCase() === 'published';
+  const statusName = statusCol?.name?.toLowerCase();
+  const isDone = statusName === 'published' || statusName === 'completed';
+  const isOverdue = dateField && isPast(parseLocalDate(dateField)) && !isToday(parseLocalDate(dateField)) && !isDone;
 
-  const borderColor = isOverdue && !isPublished ? '#ef4444' : contentType?.color || '#e2e8f0';
+  const borderColor = isOverdue ? '#ef4444' : contentType?.color || '#e2e8f0';
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
 
@@ -594,9 +595,10 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                 ))}
                 {dayItems.map((item) => {
                   const statusCol = boardColumns.find(c => c.id === item.status);
-                  const isPublished = statusCol?.name?.toLowerCase() === 'published';
+                  const statusName = statusCol?.name?.toLowerCase();
+                  const isDone = statusName === 'published' || statusName === 'completed';
                   const itemDate = dateMode === 'due' ? item.due_date : item.publish_date;
-                  const isOverdue = itemDate && isPast(parseLocalDate(itemDate)) && !isToday(parseLocalDate(itemDate)) && !isPublished;
+                  const isOverdue = itemDate && isPast(parseLocalDate(itemDate)) && !isToday(parseLocalDate(itemDate)) && !isDone;
                   const ctColor = contentTypes.find(ct => ct.id === item.content_type_id)?.color || '#e2e8f0';
                   const borderColor = isOverdue ? '#ef4444' : ctColor;
 
@@ -828,8 +830,9 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
   const contentType = contentTypes.find((ct) => ct.id === item.content_type_id);
   const itemMembers = members.filter((m) => item.assignee_ids?.includes(m.id));
   const statusCol = boardColumns.find(c => c.id === item.status);
-  const isPublished = statusCol?.name?.toLowerCase() === 'published';
-  const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isPublished;
+  const statusName = statusCol?.name?.toLowerCase();
+  const isDone = statusName === 'published' || statusName === 'completed';
+  const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isDone;
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
   const isExternal = isOrdinal || isLinear;

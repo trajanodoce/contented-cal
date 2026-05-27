@@ -243,10 +243,13 @@ export function ProjectDetailPage() {
     () =>
       items.filter((i) => {
         if (!i.due_date) return false;
+        const statusCol = boardColumns.find(c => c.id === i.status);
+        const statusName = statusCol?.name?.toLowerCase();
+        if (statusName === 'published' || statusName === 'completed') return false;
         const d = parseLocalDate(i.due_date);
         return d < new Date() && !isToday(d);
       }).length,
-    [items]
+    [items, boardColumns]
   );
 
   const uniqueAssignees = useMemo(() => {

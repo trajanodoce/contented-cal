@@ -57,6 +57,7 @@ const LINK_PLATFORM_META: Record<string, { label: string; bg: string; color: str
 interface BoardCardProps {
   item: ContentItem;
   contentTypes: ContentType[];
+  boardColumns: BoardColumn[];
   members: Profile[];
   subtaskCount?: SubtaskCount;
   linkInfo?: LinkInfo;
@@ -65,7 +66,7 @@ interface BoardCardProps {
   onClick: () => void;
 }
 
-function BoardCard({ item, contentTypes, members, subtaskCount, linkInfo, hasGranolaNotes, isOverlay, onClick }: BoardCardProps) {
+function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, linkInfo, hasGranolaNotes, isOverlay, onClick }: BoardCardProps) {
   const contentType = contentTypes.find((ct) => ct.id === item.content_type_id);
   const itemMembers = members.filter((m) => item.assignee_ids?.includes(m.id));
 
@@ -79,7 +80,10 @@ function BoardCard({ item, contentTypes, members, subtaskCount, linkInfo, hasGra
     opacity: isDragging ? 0.3 : 1,
   };
 
-  const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date));
+  const statusCol = boardColumns.find(c => c.id === item.status);
+  const statusName = statusCol?.name?.toLowerCase();
+  const isDone = statusName === 'published' || statusName === 'completed';
+  const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isDone;
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
   const isExternal = isOrdinal || isLinear;
@@ -227,6 +231,7 @@ interface BoardColumnContainerProps {
   column: BoardColumn;
   items: ContentItem[];
   contentTypes: ContentType[];
+  boardColumns: BoardColumn[];
   members: Profile[];
   subtaskCounts: Map<string, SubtaskCount>;
   linkCounts: Map<string, LinkInfo>;
@@ -234,7 +239,7 @@ interface BoardColumnContainerProps {
   onCardClick: (item: ContentItem) => void;
 }
 
-function BoardColumnContainer({ column, items, contentTypes, members, subtaskCounts, linkCounts, granolaItemIds, onCardClick }: BoardColumnContainerProps) {
+function BoardColumnContainer({ column, items, contentTypes, boardColumns, members, subtaskCounts, linkCounts, granolaItemIds, onCardClick }: BoardColumnContainerProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
     data: { column },
@@ -272,6 +277,7 @@ function BoardColumnContainer({ column, items, contentTypes, members, subtaskCou
               key={item.id}
               item={item}
               contentTypes={contentTypes}
+              boardColumns={boardColumns}
               members={members}
               subtaskCount={subtaskCounts.get(item.id)}
               linkInfo={linkCounts.get(item.id)}
@@ -491,6 +497,7 @@ export function BoardPage() {
                 column={column}
                 items={itemsByColumn[column.id] || []}
                 contentTypes={contentTypes}
+                boardColumns={columns}
                 members={members}
                 subtaskCounts={subtaskCounts}
                 linkCounts={linkCounts}
@@ -505,6 +512,7 @@ export function BoardPage() {
                 <BoardCard
                   item={activeDragItem}
                   contentTypes={contentTypes}
+                  boardColumns={columns}
                   members={members}
                   isOverlay={true}
                   onClick={() => {}}
