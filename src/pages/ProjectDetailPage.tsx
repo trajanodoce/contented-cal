@@ -40,11 +40,14 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Users,
   Clock,
   AlertTriangle,
 } from 'lucide-react';
 import { formatDate, getPriorityDot, getUserInitials } from '../lib/utils';
+import { ContentLibrary } from '../components/projects/ContentLibrary';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
 
@@ -452,6 +455,8 @@ export function ProjectDetailPage() {
       <div className="flex-1 overflow-y-auto">
         {activeTab === 'overview' && (
           <OverviewTab
+            projectId={projectId!}
+            workspaceId={currentWorkspace?.id ?? ''}
             items={items}
             boardColumns={boardColumns}
             contentTypes={contentTypes}
@@ -500,6 +505,8 @@ export function ProjectDetailPage() {
 // ────────────────────────────────────────────────────────────────────────────────
 
 function OverviewTab({
+  projectId,
+  workspaceId,
   items,
   boardColumns,
   members,
@@ -508,6 +515,8 @@ function OverviewTab({
   overdueCount,
   uniqueAssignees,
 }: {
+  projectId: string;
+  workspaceId: string;
   items: ContentItem[];
   boardColumns: BoardColumn[];
   contentTypes: ContentType[];
@@ -602,6 +611,9 @@ function OverviewTab({
           value={uniqueAssignees.length}
         />
       </div>
+
+      {/* Content Library */}
+      <ContentLibrary projectId={projectId} workspaceId={workspaceId} />
 
       {/* Recent activity */}
       <div className="bg-white rounded-lg border border-slate-200 p-5">

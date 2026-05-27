@@ -1,0 +1,432 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'sonner';
+import {
+  FolderOpen,
+  Plus,
+  Link2,
+  Upload,
+  Trash2,
+  ExternalLink,
+  FileText,
+  FileImage,
+  FileSpreadsheet,
+  File,
+  X,
+  Loader2,
+} from 'lucide-react';
+
+interface LibraryItem {
+  id: string;
+  type: 'file' | 'link';
+  title: string;
+  url: string | null;
+  file_name: string | null;
+  file_size: number | null;
+  file_type: string | null;
+  storage_path: string | null;
+  created_at: string;
+}
+
+interface Props {
+  projectId: string;
+  workspaceId: string;
+  readOnly?: boolean;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getFileIcon(mimeType: string | null) {
+  if (!mimeType) return <File className="w-5 h-5 text-slate-400" />;
+  if (mimeType.startsWith('image/')) return <FileImage className="w-5 h-5 text-purple-500" />;
+  if (mimeType.includes('spreadsheet') || mimeType.includes('csv') || mimeType.includes('excel'))
+    return <FileSpreadsheet className="w-5 h-5 text-green-500" />;
+  if (mimeType.includes('pdf')) return <FileText className="w-5 h-5 text-red-500" />;
+  if (mimeType.includes('document') || mimeType.includes('word'))
+    return <FileText className="w-5 h-5 text-blue-500" />;
+  return <File className="w-5 h-5 text-slate-400" />;
+}
+
+export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
+  const { user } = useAuth();
+  const [items, setItems] = useState<LibraryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [linkTitle, setLinkTitle] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const addMenuRef = useRef<HTMLDivElement>(null);
+
+  const fetchItems = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('project_library')
+      .select('*')
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load library:', error);
+    } else {
+      setItems(data ?? []);
+    }
+    setLoading(false);
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  // Close add menu on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target as Node)) {
+        setShowAddMenu(false);
+      }
+    }
+    if (showAddMenu) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showAddMenu]);
+
+  async function addLink() {
+    if (!linkTitle.trim() || !linkUrl.trim()) return;
+    setSaving(true);
+
+    let url = linkUrl.trim();
+    if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+
+    const { error } = await supabase.from('project_library').insert({
+      project_id: projectId,
+      workspace_id: workspaceId,
+      type: 'link',
+      title: linkTitle.trim(),
+      url,
+      added_by: user?.id,
+    });
+
+    if (error) {
+      toast.error('Failed to add link');
+    } else {
+      toast.success('Link added');
+      setLinkTitle('');
+      setLinkUrl('');
+      setShowLinkForm(false);
+      fetchItems();
+    }
+    setSaving(false);
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    let uploaded = 0;
+
+    for (const file of Array.from(files)) {
+      const storagePath = `${workspaceId}/${projectId}/${Date.now()}-${file.name}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('project-files')
+        .upload(storagePath, file);
+
+      if (uploadError) {
+        toast.error(`Failed to upload ${file.name}`);
+        continue;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('project-files')
+        .getPublicUrl(storagePath);
+
+      const { error: dbError } = await supabase.from('project_library').insert({
+        project_id: projectId,
+        workspace_id: workspaceId,
+        type: 'file',
+        title: file.name,
+        url: urlData.publicUrl,
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+        storage_path: storagePath,
+        added_by: user?.id,
+      });
+
+      if (dbError) {
+        toast.error(`Failed to save ${file.name}`);
+      } else {
+        uploaded++;
+      }
+    }
+
+    if (uploaded > 0) {
+      toast.success(`${uploaded} file${uploaded > 1 ? 's' : ''} uploaded`);
+      fetchItems();
+    }
+
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    setUploading(false);
+  }
+
+  async function deleteItem(item: LibraryItem) {
+    // Delete from storage if it's a file
+    if (item.type === 'file' && item.storage_path) {
+      await supabase.storage.from('project-files').remove([item.storage_path]);
+    }
+
+    const { error } = await supabase
+      .from('project_library')
+      .delete()
+      .eq('id', item.id);
+
+    if (error) {
+      toast.error('Failed to delete');
+    } else {
+      toast.success('Removed');
+      setItems(prev => prev.filter(i => i.id !== item.id));
+    }
+  }
+
+  const fileItems = items.filter(i => i.type === 'file');
+  const linkItems = items.filter(i => i.type === 'link');
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <FolderOpen className="w-4 h-4 text-slate-400" />
+          <h3 className="text-sm font-semibold text-slate-700">Content Library</h3>
+          {items.length > 0 && (
+            <span className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">
+              {items.length}
+            </span>
+          )}
+        </div>
+
+        {!readOnly && (
+          <div className="relative" ref={addMenuRef}>
+            <button
+              onClick={() => setShowAddMenu(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add
+            </button>
+            {showAddMenu && (
+              <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+                <button
+                  onClick={() => {
+                    setShowAddMenu(false);
+                    fileInputRef.current?.click();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                >
+                  <Upload className="w-4 h-4 text-slate-400" />
+                  Upload file
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAddMenu(false);
+                    setShowLinkForm(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                >
+                  <Link2 className="w-4 h-4 text-slate-400" />
+                  Add link
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={handleFileUpload}
+      />
+
+      {/* Uploading indicator */}
+      {uploading && (
+        <div className="flex items-center gap-2 text-sm text-blue-600 mb-3 px-1">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Uploading...
+        </div>
+      )}
+
+      {/* Add link form */}
+      {showLinkForm && (
+        <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-slate-600">Add external link</span>
+            <button
+              onClick={() => { setShowLinkForm(false); setLinkTitle(''); setLinkUrl(''); }}
+              className="p-0.5 text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <input
+            type="text"
+            placeholder="Title (e.g., Brand Guidelines)"
+            value={linkTitle}
+            onChange={e => setLinkTitle(e.target.value)}
+            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="url"
+            placeholder="https://..."
+            value={linkUrl}
+            onChange={e => setLinkUrl(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') addLink(); }}
+            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={addLink}
+            disabled={saving || !linkTitle.trim() || !linkUrl.trim()}
+            className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 flex items-center gap-1.5"
+          >
+            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
+            Add Link
+          </button>
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
+        </div>
+      ) : items.length === 0 && !showLinkForm ? (
+        <div className="text-center py-8">
+          <FolderOpen className="w-8 h-8 text-slate-200 mx-auto mb-2" />
+          <p className="text-sm text-slate-400">No files or links yet</p>
+          {!readOnly && (
+            <p className="text-xs text-slate-400 mt-1">
+              Upload documents or add external links to organize project resources.
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Files section */}
+          {fileItems.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
+                Documents ({fileItems.length})
+              </p>
+              <div className="space-y-1.5">
+                {fileItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
+                  >
+                    {getFileIcon(item.file_type)}
+                    <div className="flex-1 min-w-0">
+                      <a
+                        href={item.url ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                      >
+                        {item.title}
+                      </a>
+                      {item.file_size != null && (
+                        <span className="text-xs text-slate-400">
+                          {formatFileSize(item.file_size)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a
+                        href={item.url ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 text-slate-400 hover:text-blue-500 rounded"
+                        title="Open"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                      {!readOnly && (
+                        <button
+                          onClick={() => deleteItem(item)}
+                          className="p-1 text-slate-400 hover:text-red-500 rounded"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Links section */}
+          {linkItems.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
+                Links ({linkItems.length})
+              </p>
+              <div className="space-y-1.5">
+                {linkItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
+                  >
+                    <Link2 className="w-5 h-5 text-blue-400" />
+                    <div className="flex-1 min-w-0">
+                      <a
+                        href={item.url ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                      >
+                        {item.title}
+                      </a>
+                      <span className="text-xs text-slate-400 truncate block">
+                        {item.url}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a
+                        href={item.url ?? '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 text-slate-400 hover:text-blue-500 rounded"
+                        title="Open"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                      {!readOnly && (
+                        <button
+                          onClick={() => deleteItem(item)}
+                          className="p-1 text-slate-400 hover:text-red-500 rounded"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
