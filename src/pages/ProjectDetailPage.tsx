@@ -501,6 +501,64 @@ export function ProjectDetailPage() {
 }
 
 // ────────────────────────────────────────────────────────────────────────────────
+// Recent Activity (collapsible)
+// ────────────────────────────────────────────────────────────────────────────────
+
+function RecentActivitySection({ activityLogs, members }: { activityLogs: ActivityLog[]; members: Profile[] }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors"
+      >
+        <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+          <Clock className="w-4 h-4 text-slate-400" />
+          Recent Activity
+          {activityLogs.length > 0 && (
+            <span className="text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">{activityLogs.length}</span>
+          )}
+        </h3>
+        {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+      </button>
+      {open && (
+        <div className="px-5 pb-5">
+          {activityLogs.length > 0 ? (
+            <div className="space-y-3">
+              {activityLogs.map((log) => {
+                const member = members.find((m) => m.id === log.user_id);
+                return (
+                  <div key={log.id} className="flex items-start gap-3">
+                    <AvatarCircle profile={member ?? null} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-700">
+                        <span className="font-medium">
+                          {member?.full_name || member?.email || 'Unknown'}
+                        </span>{' '}
+                        {log.action}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {formatDistanceToNow(parseISO(log.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center py-6">
+              <Clock className="w-8 h-8 text-slate-200 mb-2" />
+              <p className="text-sm text-slate-400">No recent activity.</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────────────
 // Overview Tab
 // ────────────────────────────────────────────────────────────────────────────────
 
@@ -615,42 +673,8 @@ function OverviewTab({
       {/* Content Library */}
       <ContentLibrary projectId={projectId} workspaceId={workspaceId} />
 
-      {/* Recent activity */}
-      <div className="bg-white rounded-lg border border-slate-200 p-5">
-        <h3 className="text-sm font-semibold text-slate-700 mb-4">
-          Recent Activity
-        </h3>
-        {activityLogs.length > 0 ? (
-          <div className="space-y-3">
-            {activityLogs.map((log) => {
-              const member = members.find((m) => m.id === log.user_id);
-              return (
-                <div key={log.id} className="flex items-start gap-3">
-                  <AvatarCircle profile={member ?? null} size="sm" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-slate-700">
-                      <span className="font-medium">
-                        {member?.full_name || member?.email || 'Unknown'}
-                      </span>{' '}
-                      {log.action}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {formatDistanceToNow(parseISO(log.created_at), {
-                        addSuffix: true,
-                      })}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center py-6">
-            <Clock className="w-8 h-8 text-slate-200 mb-2" />
-            <p className="text-sm text-slate-400">No recent activity.</p>
-          </div>
-        )}
-      </div>
+      {/* Recent activity — collapsible, hidden by default */}
+      <RecentActivitySection activityLogs={activityLogs} members={members} />
 
       {/* Team members */}
       {uniqueAssignees.length > 0 && (
