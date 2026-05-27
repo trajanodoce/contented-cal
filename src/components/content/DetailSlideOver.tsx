@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   X, Calendar, MessageSquare,
   Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2, Copy
@@ -61,6 +61,40 @@ function getAllowedStatuses(contentType: ContentType | null, allColumns: BoardCo
   if (!workflow.columns || workflow.columns.length === 0) return allColumns;
 
   return allColumns.filter(col => workflow.columns?.includes(col.id));
+}
+
+function TitleInput({ title, onSave }: { title: string; onSave: (val: string) => void }) {
+  const [draft, setDraft] = useState(title);
+  const savedRef = useRef(title);
+
+  // Sync draft when the parent refreshes with a new title (after save)
+  useEffect(() => {
+    if (title !== savedRef.current) {
+      setDraft(title);
+      savedRef.current = title;
+    }
+  }, [title]);
+
+  const save = useCallback(() => {
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== savedRef.current) {
+      savedRef.current = trimmed;
+      onSave(trimmed);
+    }
+  }, [draft, onSave]);
+
+  return (
+    <input
+      value={draft}
+      onChange={e => setDraft(e.target.value)}
+      onBlur={save}
+      onKeyDown={e => {
+        if (e.key === 'Enter') e.currentTarget.blur();
+        if (e.key === 'Escape') { setDraft(savedRef.current); e.currentTarget.blur(); }
+      }}
+      className="w-full text-xl font-bold text-slate-900 outline-none bg-transparent border-b-2 border-transparent focus:border-brand-400 transition-colors"
+    />
+  );
 }
 
 export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
@@ -447,33 +481,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <h2 className="text-xl font-bold text-slate-900">{item.title}</h2>
                 ) : (
                   <>
-                    {editingField === 'title' ? (
-                      <input
-                        autoFocus
-                        value={editValues.title ?? item.title}
-                        onChange={e => setEditValues({ ...editValues, title: e.target.value })}
-                        className="w-full text-xl font-bold text-slate-900 border-b-2 border-brand-400 outline-none bg-transparent"
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') { e.currentTarget.blur(); }
-                          if (e.key === 'Escape') { setEditValues({ title: item.title }); setEditingField(null); }
-                        }}
-                        onBlur={() => {
-                          const draft = (editValues.title ?? '').trim();
-                          if (draft && draft !== item.title) {
-                            updateField('title', draft);
-                          } else {
-                            setEditingField(null);
-                          }
-                        }}
-                      />
-                    ) : (
-                      <button
-                        className="text-left group w-full"
-                        onClick={() => { setEditingField('title'); setEditValues({ title: item.title }); }}
-                      >
-                        <h2 className="text-xl font-bold text-slate-900 group-hover:text-brand-600 transition-colors">{item.title}</h2>
-                      </button>
-                    )}
+                    <TitleInput title={item.title} onSave={(val) => updateField('title', val)} />
                   </>
                 )}
               </div>
@@ -839,7 +847,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         <div className="flex-shrink-0 px-6 py-4 border-t-2 border-blue-100 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400">
+              <span className="text-xs font-medium" style={{ color: '#FAE4E5' }}>
                 {hasChanges ? 'All changes saved' : 'No unsaved changes'}
               </span>
               {!isReadOnly && (
@@ -847,14 +855,16 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <button
                     onClick={duplicateItem}
                     disabled={duplicating}
-                    className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-1.5 rounded-lg transition-colors hover:opacity-80"
+                    style={{ color: '#FAE4E5' }}
                     title="Duplicate item"
                   >
                     {duplicating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-1.5 rounded-lg transition-colors hover:opacity-80"
+                    style={{ color: '#8B2500' }}
                     title="Delete item"
                   >
                     <X className="w-4 h-4" />
