@@ -117,7 +117,7 @@ function PageLoader() {
 function LazyPage({ children }: { children: ReactNode }) {
   return (
     <ChunkErrorBoundary>
-      <LazyPage>{children}</LazyPage>
+      <Suspense fallback={<PageLoader />}>{children}</Suspense>
     </ChunkErrorBoundary>
   );
 }
