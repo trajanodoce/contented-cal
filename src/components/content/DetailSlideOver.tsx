@@ -102,7 +102,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const { userRole } = useWorkspace();
   const isOrdinalPost = isOrdinalItem(item);
   const isLinearIssue = isLinearItem(item);
-  const isReadOnly = userRole === 'viewer';
+  const isReadOnly = userRole === 'viewer' || isOrdinalPost;
   const isExternalSource = isOrdinalPost || isLinearIssue;
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'activity'>('details');
   const [comments, setComments] = useState<CommentWithProfile[]>([]);
@@ -300,18 +300,25 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={handleClose}>
       <div
-        className="w-full max-w-2xl bg-white h-full flex flex-col border-l-2 border-blue-200"
-        style={{ boxShadow: '-8px 0 30px -5px rgba(59, 130, 246, 0.15), -2px 0 10px -2px rgba(59, 130, 246, 0.08)' }}
+        className="w-full max-w-2xl bg-white h-full flex flex-col border-l-2"
+        style={{
+          borderColor: isLinearIssue ? '#FFE4D6' : isOrdinalPost ? '#C4B5FD' : '#bfdbfe',
+          boxShadow: isLinearIssue
+            ? '-8px 0 30px -5px rgba(255, 228, 214, 0.4), -2px 0 10px -2px rgba(255, 228, 214, 0.25)'
+            : isOrdinalPost
+            ? '-8px 0 30px -5px rgba(126, 97, 255, 0.2), -2px 0 10px -2px rgba(126, 97, 255, 0.12)'
+            : '-8px 0 30px -5px rgba(59, 130, 246, 0.15), -2px 0 10px -2px rgba(59, 130, 246, 0.08)',
+        }}
         onClick={e => e.stopPropagation()}
       >
         {/* External source banner — Ordinal or Linear */}
         {isExternalSource && (
-          <div className="px-6 py-3 border-b" style={{ backgroundColor: '#FFF3E0', borderColor: '#E65100' }}>
+          <div className="px-6 py-3 border-b" style={{ backgroundColor: isOrdinalPost ? '#F3F0FF' : '#FFF3E0', borderColor: isOrdinalPost ? '#7E61FF' : '#E65100' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <div
                   className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: '#E65100', color: 'white' }}
+                  style={{ backgroundColor: isOrdinalPost ? '#7E61FF' : '#E65100', color: 'white' }}
                 >
                   {isOrdinalPost ? (
                     <Zap className="w-3.5 h-3.5" />
@@ -320,11 +327,11 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold" style={{ color: '#BF360C' }}>
-                    Sourced from {isOrdinalPost ? 'Ordinal' : 'Linear'} — edits here are local only
+                  <p className="text-sm font-semibold" style={{ color: isOrdinalPost ? '#5B45B0' : '#BF360C' }}>
+                    Sourced from {isOrdinalPost ? 'Ordinal' : 'Linear'} — {isOrdinalPost ? 'read-only' : 'edits here are local only'}
                   </p>
-                  <p className="text-xs" style={{ color: '#E65100' }}>
-                    Changes made in ContentedCal will not sync back to {isOrdinalPost ? 'Ordinal' : 'Linear'}
+                  <p className="text-xs" style={{ color: isOrdinalPost ? '#7E61FF' : '#E65100' }}>
+                    {isOrdinalPost ? 'This item is managed in Ordinal and cannot be edited here' : `Changes made in ContentedCal will not sync back to Linear`}
                     {isLinearIssue && linearInfo ? ` · ${linearInfo.identifier} · ${linearInfo.team}${linearInfo.project ? ` · ${linearInfo.project}` : ''}` : ''}
                   </p>
                 </div>
@@ -811,7 +818,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         </div>
 
         {/* Sticky footer */}
-        <div className="flex-shrink-0 px-6 py-4 border-t-2 border-blue-100 bg-white">
+        <div className="flex-shrink-0 px-6 py-4 border-t-2 bg-white" style={{ borderColor: isLinearIssue ? '#FFE4D6' : isOrdinalPost ? '#C4B5FD' : '#dbeafe' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-xs font-medium" style={{ color: '#25476C' }}>
