@@ -367,7 +367,7 @@ function FilterDropdown({
 
       {isOpen && (
         <div className="absolute top-full mt-1 bg-white border-2 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ borderColor: '#002339' }}>
-          <div className="p-2">
+          <div className="p-2 space-y-1">
             <p className="text-xs font-medium uppercase px-2 py-1" style={{ color: '#002339' }}>{label}</p>
             {options.map((option, idx) => {
               const isSelected = selectedIds.includes(option.id);
