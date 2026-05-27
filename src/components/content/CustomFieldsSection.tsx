@@ -15,7 +15,7 @@ export function CustomFieldsSection({ fields, values, onChange, compact = false,
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
       {fields.map(field => (
         <div key={field.id}>
-          <label className={`block font-medium text-gray-700 mb-1.5 ${compact ? 'text-xs' : 'text-sm'}`}>
+          <label className={`block font-medium text-slate-700 mb-1.5 ${compact ? 'text-xs' : 'text-sm'}`}>
             {field.name}
             {field.required && <span className="text-red-500 ml-0.5">*</span>}
           </label>
@@ -35,7 +35,7 @@ interface InputProps {
 }
 
 function CustomFieldInput({ field, value, onChange, compact, members = [] }: InputProps) {
-  const cls = `w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
+  const cls = `w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
   const rawOpts = field.options;
   const options: SelectOption[] = Array.isArray(rawOpts)
     ? rawOpts
@@ -93,9 +93,9 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
             type="checkbox"
             checked={!!value}
             onChange={e => onChange(e.target.checked)}
-            className="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-400"
+            className="w-4 h-4 text-brand-600 border-slate-300 rounded focus:ring-brand-400"
           />
-          <span className="text-sm text-gray-600">Enabled</span>
+          <span className="text-sm text-slate-600">Enabled</span>
         </label>
       );
 
@@ -132,7 +132,7 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
                 className={`px-2.5 py-1 text-xs rounded-full border transition-colors
                   ${active
                     ? 'bg-brand-600 text-white border-brand-600'
-                    : 'text-gray-600 border-gray-300 hover:border-gray-400'}`}
+                    : 'text-slate-600 border-slate-300 hover:border-slate-400'}`}
               >
                 {opt.label}
               </button>

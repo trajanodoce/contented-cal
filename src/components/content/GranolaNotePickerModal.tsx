@@ -92,7 +92,7 @@ export function GranolaNotePickerModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -101,10 +101,10 @@ export function GranolaNotePickerModal({
               <Mic className="w-4 h-4" style={{ color: GRANOLA_GREEN }} />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-gray-900">
+              <h2 className="text-base font-semibold text-slate-900">
                 {contentItemId ? 'Link Meeting Note' : 'Meeting Notes'}
               </h2>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-500">
                 {contentItemId
                   ? 'Choose a note to link to this item'
                   : 'Browse your Granola meeting notes'}
@@ -113,22 +113,22 @@ export function GranolaNotePickerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
           >
-            <X className="w-4 h-4 text-gray-500" />
+            <X className="w-4 h-4 text-slate-500" />
           </button>
         </div>
 
         {/* Search */}
-        <div className="px-5 py-3 border-b border-gray-50">
+        <div className="px-5 py-3 border-b border-slate-50">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               placeholder="Search notes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none transition-colors"
             />
           </div>
         </div>
@@ -143,20 +143,20 @@ export function GranolaNotePickerModal({
           )}
 
           {loading && notes.length === 0 ? (
-            <div className="flex items-center justify-center gap-2 py-12 text-sm text-gray-400">
+            <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-400">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span>Loading your Granola notes...</span>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="text-center py-12 text-sm text-gray-400">
+            <div className="text-center py-12 text-sm text-slate-400">
               {search ? 'No notes match your search' : 'No notes found in your Granola account'}
             </div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-slate-50">
               {filtered.map((note) => (
                 <div
                   key={note.id}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors group"
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
                 >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -166,10 +166,10 @@ export function GranolaNotePickerModal({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
+                    <p className="text-sm font-medium text-slate-900 truncate">
                       {note.title || 'Untitled Meeting'}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-slate-500">
                       {format(new Date(note.created_at), 'MMM d, yyyy · h:mm a')}
                     </p>
                   </div>
@@ -205,7 +205,7 @@ export function GranolaNotePickerModal({
                         Create Item
                       </button>
                     )}
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
                   </div>
                 </div>
               ))}
@@ -214,11 +214,11 @@ export function GranolaNotePickerModal({
 
           {/* Load more */}
           {hasMore && !search && (
-            <div className="px-5 py-3 border-t border-gray-50">
+            <div className="px-5 py-3 border-t border-slate-50">
               <button
                 onClick={() => loadNotes(cursor || undefined)}
                 disabled={loading}
-                className="w-full py-2 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                className="w-full py-2 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-1.5">

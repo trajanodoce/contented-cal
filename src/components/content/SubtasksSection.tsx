@@ -317,7 +317,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                 className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
                   subtask.completed
                     ? 'bg-green-500 border-green-500'
-                    : 'border-gray-300 hover:border-gray-400'
+                    : 'border-slate-300 hover:border-slate-400'
                 }`}
               >
                 {subtask.completed && <Check className="w-3 h-3 text-white" />}
@@ -336,7 +336,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                     }}
                     onBlur={() => saveTitle(subtask.id)}
                     autoFocus
-                    className="w-full text-sm px-1 py-0 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full text-sm px-1 py-0 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 ) : (
                   <span
@@ -382,7 +382,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                 {assigneePopoverId === subtask.id && (
                   <div
                     ref={assigneePopoverRef}
-                    className="absolute right-0 top-6 z-50 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[160px]"
+                    className="absolute right-0 top-6 z-50 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px]"
                   >
                     <button
                       onClick={() => updateAssignee(subtask.id, null)}
@@ -417,13 +417,13 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
               {/* Due date */}
               <div className="relative flex-shrink-0">
                 {dueDateEditId === subtask.id ? (
-                  <div ref={dueDateRef} className="absolute right-0 top-6 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex flex-col gap-1">
+                  <div ref={dueDateRef} className="absolute right-0 top-6 z-50 bg-white border border-slate-200 rounded-lg shadow-lg p-2 flex flex-col gap-1">
                     <input
                       type="date"
                       value={subtask.due_date ?? ''}
                       onChange={e => updateDueDate(subtask.id, e.target.value || null)}
                       autoFocus
-                      className="text-xs border border-gray-300 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="text-xs border border-slate-300 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                     {subtask.due_date && (
                       <button
@@ -473,7 +473,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
             if (e.key === 'Enter') addSubtask();
           }}
           placeholder="Add a subtask..."
-          className="flex-1 text-sm px-2 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="flex-1 text-sm px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         />
         <button
           onClick={addSubtask}

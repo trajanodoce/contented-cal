@@ -180,8 +180,11 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   }
 
   // Close with green check animation if changes were made
+  const [closing, setClosing] = useState(false);
   function handleClose() {
+    if (closing) return; // prevent double-close
     if (hasChanges) {
+      setClosing(true);
       setShowSavedCheck(true);
       setTimeout(() => {
         setShowSavedCheck(false);
