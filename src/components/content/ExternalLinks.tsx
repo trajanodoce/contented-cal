@@ -84,7 +84,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
   return (
     <div className="group bg-white border border-slate-300 rounded-xl overflow-hidden hover:shadow-md hover:border-slate-400 transition-all">
       {/* Thumbnail */}
-      <div className="w-full h-28 bg-slate-50 flex items-center justify-center overflow-hidden relative">
+      <div className="w-full h-16 bg-slate-50 flex items-center justify-center overflow-hidden relative">
         {isFile && isImage && !imgError ? (
           <img
             src={link.url}
@@ -100,13 +100,13 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
             onError={() => setImgError(true)}
           />
         ) : isFile ? (
-          <div className="flex flex-col items-center gap-2 text-slate-400">
-            <FileIcon className="w-8 h-8" />
+          <div className="flex items-center gap-1.5 text-slate-400">
+            <FileIcon className="w-5 h-5" />
             <span className="text-xs text-slate-400">{fileName.split('.').pop()?.toUpperCase()}</span>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 text-slate-300">
-            <Image className="w-8 h-8" />
+          <div className="flex items-center gap-1.5 text-slate-300">
+            <Image className="w-5 h-5" />
             <span className="text-xs">No preview</span>
           </div>
         )}
