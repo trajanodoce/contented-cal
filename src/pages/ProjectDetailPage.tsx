@@ -16,6 +16,7 @@ import type {
   ActivityLog,
 } from '../lib/database.types';
 import { parseLocalDate } from '../lib/utils';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR } from '../lib/ordinal';
 import {
   format,
   startOfMonth,
@@ -952,29 +953,29 @@ function ListTab({
       ) : (
         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-100">
-                <th className="text-left text-xs font-medium text-slate-500 px-4 py-3">
+            <thead className="bg-slate-100 border-b-2 border-slate-300">
+              <tr>
+                <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Title
                 </th>
-                <th className="text-left text-xs font-medium text-slate-500 px-4 py-3">
+                <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Type
                 </th>
-                <th className="text-left text-xs font-medium text-slate-500 px-4 py-3">
+                <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Status
                 </th>
-                <th className="text-left text-xs font-medium text-slate-500 px-4 py-3">
+                <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Assignee
                 </th>
-                <th className="text-left text-xs font-medium text-slate-500 px-4 py-3">
+                <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Due Date
                 </th>
-                <th className="text-left text-xs font-medium text-slate-500 px-4 py-3">
+                <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Priority
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-300">
               {filteredItems.map((item) => {
                 const ct = contentTypes.find(
                   (c) => c.id === item.content_type_id
@@ -983,11 +984,15 @@ function ListTab({
                 const assignee = members.find((m) =>
                   item.assignee_ids?.includes(m.id)
                 );
+                const isOrdinal = isOrdinalItem(item);
+                const isLinear = isLinearItem(item);
+                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
                 return (
                   <tr
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
                     className="hover:bg-slate-50 cursor-pointer transition-colors"
+                    style={rowBg ? { backgroundColor: rowBg } : {}}
                   >
                     <td className="px-4 py-3 text-sm font-medium text-slate-800 max-w-[300px] truncate">
                       {item.title}
