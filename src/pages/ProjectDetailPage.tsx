@@ -1318,8 +1318,9 @@ function BoardTab({
 // ────────────────────────────────────────────────────────────────────────────────
 
 // Grid columns for Sun-start layout: indices 0 (Sun) and 6 (Sat) are weekends
-const PROJECT_GRID_EXPANDED = 'repeat(7, 1fr)';
-const PROJECT_GRID_COLLAPSED = '40px 1fr 1fr 1fr 1fr 1fr 40px';
+// Use minmax(0, 1fr) to prevent content from inflating column width
+const PROJECT_GRID_EXPANDED = 'repeat(7, minmax(0, 1fr))';
+const PROJECT_GRID_COLLAPSED = '40px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px';
 
 function CalendarTab({
   items,
@@ -1408,15 +1409,15 @@ function CalendarTab({
       {/* Calendar grid */}
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {/* Weekday headers */}
-        <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: gridCols }}>
+        <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
           {weekDays.map((d, i) => {
             const isWeekend = i === 0 || i === 6;
             const collapsed = isWeekend && weekendsCollapsed;
             return (
               <div
                 key={d}
-                className={`text-xs font-medium text-slate-500 text-center py-2 ${
-                  collapsed ? 'cursor-pointer hover:bg-slate-100 transition-colors' : ''
+                className={`px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide ${
+                  collapsed ? 'cursor-pointer hover:bg-teal-700 transition-colors' : ''
                 }`}
                 onClick={collapsed ? toggleWeekends : undefined}
                 title={collapsed ? 'Click to expand weekends' : undefined}
@@ -1428,7 +1429,7 @@ function CalendarTab({
         </div>
 
         {/* Day cells */}
-        <div className="grid" style={{ gridTemplateColumns: gridCols }}>
+        <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(120px, auto)' }}>
           {days.map((day, index) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayItems = itemsByDate.get(dateKey) ?? [];
@@ -1440,17 +1441,18 @@ function CalendarTab({
             return (
               <div
                 key={dateKey}
-                className={`${collapsed ? 'min-h-[80px] p-1' : 'min-h-[100px] p-1.5'} border-b border-r border-slate-100 ${
-                  collapsed ? (inMonth ? 'bg-slate-50/80' : 'bg-slate-50') : (inMonth ? 'bg-white' : 'bg-slate-50')
-                } ${collapsed ? 'cursor-pointer' : ''}`}
+                className={`${collapsed ? 'min-h-[120px] p-1' : 'min-h-[120px] p-2'} border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
+                  !inMonth ? 'bg-slate-50/50' : collapsed ? 'bg-slate-50/80' : 'bg-white'
+                } ${collapsed ? 'cursor-pointer' : ''} ${index % 7 === 6 ? 'border-r-0' : ''}`}
                 onClick={collapsed ? toggleWeekends : undefined}
               >
                 {collapsed ? (
                   <div className="flex flex-col items-center gap-0.5">
                     <span
-                      className={`text-xs font-medium inline-flex items-center justify-center w-5 h-5 rounded-full ${
-                        today ? 'bg-blue-600 text-white' : inMonth ? 'text-slate-700' : 'text-slate-300'
+                      className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
+                        today ? 'bg-blue-600 text-white' : ''
                       }`}
+                      style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
                     >
                       {format(day, 'd')}
                     </span>
@@ -1462,18 +1464,20 @@ function CalendarTab({
                   </div>
                 ) : (
                   <>
-                <span
-                  className={`text-xs font-medium inline-flex items-center justify-center w-6 h-6 rounded-full ${
-                    today
-                      ? 'bg-blue-600 text-white'
-                      : inMonth
-                        ? 'text-slate-700'
-                        : 'text-slate-300'
-                  }`}
-                >
-                  {format(day, 'd')}
-                </span>
-                <div className="mt-1 space-y-0.5">
+                <div className="flex justify-between items-center mb-1">
+                  <span
+                    className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
+                      today ? 'bg-blue-600 text-white' : ''
+                    }`}
+                    style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
+                  >
+                    {format(day, 'd')}
+                  </span>
+                  {dayItems.length > 0 && (
+                    <span className="text-xs text-slate-400">{dayItems.length}</span>
+                  )}
+                </div>
+                <div className="space-y-1 min-w-0 overflow-hidden">
                   {dayItems.slice(0, 3).map((item) => {
                     const ct = contentTypes.find(
                       (c) => c.id === item.content_type_id
@@ -1497,9 +1501,14 @@ function CalendarTab({
                     );
                   })}
                   {dayItems.length > 3 && (
-                    <span className="text-xs text-slate-400 pl-1">
+                    <button
+                      className="text-xs text-slate-500 hover:text-blue-600 px-1 py-0.5"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
                       +{dayItems.length - 3} more
-                    </span>
+                    </button>
                   )}
                 </div>
                   </>
