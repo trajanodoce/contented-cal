@@ -44,22 +44,6 @@ const PLATFORMS: PlatformMeta[] = [
     docsUrl: 'https://ordinal.social/settings/api',
   },
   {
-    id: 'notion',
-    name: 'Notion',
-    description: 'Two-way sync with Notion databases. Import and push content items.',
-    iconBg: '#F9FAFB',
-    iconText: 'N',
-    iconColor: '#191919',
-    category: 'Productivity',
-    setupType: 'api_key',
-    fields: [
-      { key: 'api_key', label: 'Notion API Key', placeholder: 'secret_...', secret: true },
-      { key: 'database_id', label: 'Database ID', placeholder: 'Paste the Notion database ID or URL' },
-    ],
-    setupNote: 'Notion integration requires an API key. Create an internal integration in your Notion workspace to get started.',
-    docsUrl: 'https://www.notion.so/my-integrations',
-  },
-  {
     id: 'claude',
     name: 'Claude AI',
     description: 'AI-powered content assistant. Generate headlines, summaries, social posts, and more.',
@@ -369,9 +353,6 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
   return (
     <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
       <span>Connected {connectedAt}</span>
-      {meta.id === 'notion' && config.database_id && (
-        <span>Database: <span className="text-gray-700 font-medium truncate max-w-[160px] inline-block">{config.database_id}</span></span>
-      )}
       {meta.id === 'ordinal' && (
         <>
           <span className="text-[#7E61FF] font-medium">● Connected</span>
@@ -583,10 +564,10 @@ const SUPABASE_FN_URL = import.meta.env.VITE_SUPABASE_URL ?? '';
 
 function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, type?: 'success' | 'error' | 'info') => void }) {
   const { workspace, user } = useApp();
-  const [integrations, setIntegrations] = useState<Record<string, UserIntegration | null>>({ granola: null, linear: null });
+  const [integrations, setIntegrations] = useState<Record<string, UserIntegration | null>>({ granola: null, linear: null, notion: null });
   const [loading, setLoading] = useState(true);
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null);
-  const [apiKeys, setApiKeys] = useState<Record<string, string>>({ granola: '', linear: '' });
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>({ granola: '', linear: '', notion: '' });
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
@@ -599,10 +580,10 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       .select('*')
       .eq('workspace_id', workspace.id)
       .eq('user_id', user.id)
-      .in('platform', ['granola', 'linear']);
+      .in('platform', ['granola', 'linear', 'notion']);
 
-    const map: Record<string, UserIntegration | null> = { granola: null, linear: null };
-    const keys: Record<string, string> = { granola: '', linear: '' };
+    const map: Record<string, UserIntegration | null> = { granola: null, linear: null, notion: null };
+    const keys: Record<string, string> = { granola: '', linear: '', notion: '' };
     (data || []).forEach((d: UserIntegration) => {
       map[d.platform] = d;
       if (d.access_token) keys[d.platform] = d.access_token;
@@ -757,6 +738,18 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       placeholder: 'lin_api_...',
       docsUrl: 'https://linear.app/settings/api',
       docsLabel: 'Get your API key from Linear',
+    },
+    {
+      id: 'notion',
+      name: 'Notion',
+      description: 'Connect your Notion workspace to import and push content items. Each person connects their own Notion account.',
+      iconBg: '#F9FAFB',
+      iconText: 'N',
+      iconColor: '#191919',
+      tag: 'Productivity',
+      placeholder: 'secret_...',
+      docsUrl: 'https://www.notion.so/my-integrations',
+      docsLabel: 'Get your API key from Notion',
     },
     {
       id: 'granola',
