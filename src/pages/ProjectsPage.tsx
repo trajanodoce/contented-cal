@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { parseLocalDate } from '../lib/utils';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
+import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { Profile } from '../lib/database.types';
@@ -235,6 +236,7 @@ export function ProjectsPage() {
   const { currentWorkspace } = useWorkspace();
   const workspaceId = currentWorkspace?.id ?? null;
   const { members, boardColumns } = useWorkspaceData(workspaceId);
+  const { refreshProjects } = useApp();
   const navigate = useNavigate();
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -416,7 +418,7 @@ export function ProjectsPage() {
           members={members}
           workspaceId={workspaceId}
           onClose={() => setShowCreate(false)}
-          onCreated={fetchData}
+          onCreated={() => { fetchData(); refreshProjects(); }}
         />
       )}
     </div>
