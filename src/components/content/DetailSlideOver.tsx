@@ -102,7 +102,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const { userRole } = useWorkspace();
   const isOrdinalPost = isOrdinalItem(item);
   const isLinearIssue = isLinearItem(item);
-  const isReadOnly = userRole === 'viewer' || isOrdinalPost || isLinearIssue;
+  const isReadOnly = userRole === 'viewer';
+  const isExternalSource = isOrdinalPost || isLinearIssue;
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'activity'>('details');
   const [comments, setComments] = useState<CommentWithProfile[]>([]);
   const [activity, setActivity] = useState<ActivityLog[]>([]);
@@ -303,71 +304,41 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         style={{ boxShadow: '-8px 0 30px -5px rgba(59, 130, 246, 0.15), -2px 0 10px -2px rgba(59, 130, 246, 0.08)' }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Ordinal Banner */}
-        {isOrdinalPost && (
-          <div className="px-6 py-3 border-b" style={{ backgroundColor: `${ORDINAL_COLOR}08`, borderColor: `${ORDINAL_COLOR}20` }}>
+        {/* External source banner — Ordinal or Linear */}
+        {isExternalSource && (
+          <div className="px-6 py-3 border-b" style={{ backgroundColor: '#FFF3E0', borderColor: '#E65100' }}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
                 <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: `${ORDINAL_COLOR}15` }}
+                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: '#E65100', color: 'white' }}
                 >
-                  <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
+                  {isOrdinalPost ? (
+                    <Zap className="w-3.5 h-3.5" />
+                  ) : (
+                    <span className="text-xs font-bold">L</span>
+                  )}
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-900">This post is managed in Ordinal</p>
-                  <p className="text-xs text-slate-500">To edit, open it in Ordinal</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide"
-                  style={{ backgroundColor: `${DRAFT_COLOR}15`, color: DRAFT_COLOR }}
-                >
-                  Draft
-                </span>
-                {ordinalLink?.post_url && (
-                  <a
-                    href={ordinalLink.post_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{
-                      color: ORDINAL_COLOR,
-                      borderColor: `${ORDINAL_COLOR}40`,
-                      backgroundColor: `${ORDINAL_COLOR}08`,
-                    }}
-                  >
-                    <span>Open in Ordinal</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Linear Banner */}
-        {isLinearIssue && linearInfo && (
-          <div className="px-6 py-3 border-b" style={{ backgroundColor: `${LINEAR_COLOR}08`, borderColor: `${LINEAR_COLOR}20` }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs"
-                  style={{ backgroundColor: `${LINEAR_COLOR}15`, color: LINEAR_COLOR }}
-                >
-                  L
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-900">This issue is managed in Linear</p>
-                  <p className="text-xs text-slate-500">
-                    {linearInfo.identifier} · {linearInfo.team}
-                    {linearInfo.project ? ` · ${linearInfo.project}` : ''}
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold" style={{ color: '#BF360C' }}>
+                    Sourced from {isOrdinalPost ? 'Ordinal' : 'Linear'} — edits here are local only
+                  </p>
+                  <p className="text-xs" style={{ color: '#E65100' }}>
+                    Changes made in ContentedCal will not sync back to {isOrdinalPost ? 'Ordinal' : 'Linear'}
+                    {isLinearIssue && linearInfo ? ` · ${linearInfo.identifier} · ${linearInfo.team}${linearInfo.project ? ` · ${linearInfo.project}` : ''}` : ''}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {linearInfo.status && (
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {isOrdinalPost && (
+                  <span
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide"
+                    style={{ backgroundColor: `${DRAFT_COLOR}15`, color: DRAFT_COLOR }}
+                  >
+                    Draft
+                  </span>
+                )}
+                {isLinearIssue && linearInfo?.status && (
                   <span
                     className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium"
                     style={{ backgroundColor: `${LINEAR_COLOR}15`, color: LINEAR_COLOR }}
@@ -375,17 +346,25 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     {linearInfo.status}
                   </span>
                 )}
-                {linearInfo.url && (
+                {isOrdinalPost && ordinalLink?.post_url && (
+                  <a
+                    href={ordinalLink.post_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+                    style={{ color: '#BF360C', borderColor: '#E6510040', backgroundColor: 'white' }}
+                  >
+                    <span>Open in Ordinal</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+                {isLinearIssue && linearInfo?.url && (
                   <a
                     href={linearInfo.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{
-                      color: LINEAR_COLOR,
-                      borderColor: `${LINEAR_COLOR}40`,
-                      backgroundColor: `${LINEAR_COLOR}08`,
-                    }}
+                    style={{ color: '#BF360C', borderColor: '#E6510040', backgroundColor: 'white' }}
                   >
                     <span>Open in Linear</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -449,39 +428,27 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   borderLeftColor: titleColor,
                 }}
               >
-                {isOrdinalPost ? (
-                  <div className="flex items-start gap-2">
-                    <div
-                      className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                      style={{ backgroundColor: `${ORDINAL_COLOR}15` }}
-                    >
-                      <Zap className="w-3.5 h-3.5" style={{ color: ORDINAL_COLOR }} />
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-xl font-bold text-slate-900">{item.title}</h2>
-                      {ordinalProfile && (
-                        <div className="flex items-center gap-2 mt-1">
-                          <span
-                            className="inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold"
-                            style={{
-                              backgroundColor: PLATFORM_META[ordinalProfile.platform]?.bgColor ?? '#F5F5F5',
-                              color: PLATFORM_META[ordinalProfile.platform]?.color ?? '#666',
-                            }}
-                          >
-                            {PLATFORM_META[ordinalProfile.platform]?.icon?.charAt(0) ?? '●'}
-                          </span>
-                          <span className="text-xs text-slate-500">{ordinalProfile.handle}</span>
-                          <span className="text-slate-300">•</span>
-                          <span className="text-xs text-slate-400">{ordinalProfile.name}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : isReadOnly ? (
+                {isReadOnly ? (
                   <h2 className="text-xl font-bold text-slate-900">{item.title}</h2>
                 ) : (
                   <>
                     <TitleInput title={item.title} onSave={(val) => updateField('title', val)} />
+                    {isOrdinalPost && ordinalProfile && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <span
+                          className="inline-flex items-center justify-center w-4 h-4 rounded text-[9px] font-bold"
+                          style={{
+                            backgroundColor: PLATFORM_META[ordinalProfile.platform]?.bgColor ?? '#F5F5F5',
+                            color: PLATFORM_META[ordinalProfile.platform]?.color ?? '#666',
+                          }}
+                        >
+                          {PLATFORM_META[ordinalProfile.platform]?.icon?.charAt(0) ?? '●'}
+                        </span>
+                        <span className="text-xs text-slate-500">{ordinalProfile.handle}</span>
+                        <span className="text-slate-300">•</span>
+                        <span className="text-xs text-slate-400">{ordinalProfile.name}</span>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
