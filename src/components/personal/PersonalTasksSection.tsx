@@ -92,7 +92,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+        className="flex items-center gap-1.5 text-sm font-medium text-white hover:text-white/80 transition-colors"
       >
         <Plus className="w-4 h-4" />
         Add Task
