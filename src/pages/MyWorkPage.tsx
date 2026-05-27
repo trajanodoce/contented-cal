@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useApp } from '../contexts/AppContext';
+import { useFilters } from '../contexts/FiltersContext';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
@@ -10,6 +11,7 @@ import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
+import { FilterBar, applyFilters } from '../components/FilterBar';
 import { PersonalTasksSection } from '../components/personal/PersonalTasksSection';
 import {
   Calendar,
@@ -44,12 +46,14 @@ interface SubtaskWithParent extends Subtask {
 export function MyWorkPage() {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
-  const { contentTypes, boardColumns } = useApp();
+  const { contentTypes, boardColumns, members, projects } = useApp();
+  const { filters, setFilters, isLoaded } = useFilters();
   const { setSelectedItemId } = useSelectedItem();
 
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [subtasks, setSubtasks] = useState<SubtaskWithParent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [channels, setChannels] = useState<string[]>([]);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
 
   const fetchData = useCallback(async () => {
@@ -95,6 +99,20 @@ export function MyWorkPage() {
     fetchData();
   }, [fetchData]);
 
+  // Extract unique channels from items
+  useEffect(() => {
+    if (contentItems.length > 0) {
+      const uniqueChannels = [...new Set(contentItems.map((item) => item.channel).filter(Boolean))];
+      setChannels(uniqueChannels as string[]);
+    }
+  }, [contentItems]);
+
+  // Apply filters to items
+  const filteredItems = useMemo(() => {
+    if (!isLoaded) return contentItems;
+    return applyFilters(contentItems, filters);
+  }, [contentItems, filters, isLoaded]);
+
   const DONE_BG = '#DCEDF4';
 
   // The last board column is treated as the "published/done" status
@@ -111,10 +129,10 @@ export function MyWorkPage() {
 
   // Sort: active items first, then completed/published items
   const sortedItems = useMemo(() => {
-    const active = contentItems.filter((i) => !isItemDone(i));
-    const done = contentItems.filter((i) => isItemDone(i));
+    const active = filteredItems.filter((i) => !isItemDone(i));
+    const done = filteredItems.filter((i) => isItemDone(i));
     return [...active, ...done];
-  }, [contentItems, isItemDone]);
+  }, [filteredItems, isItemDone]);
 
   const toggleItemComplete = async (item: ContentItem) => {
     const nowCompleted = !item.completed;
@@ -192,6 +210,20 @@ export function MyWorkPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
+      {/* FilterBar */}
+      <FilterBar
+        workspaceId={currentWorkspace?.id || null}
+        contentTypes={contentTypes}
+        boardColumns={boardColumns}
+        members={members.map(m => ({ id: m.user_id, full_name: m.full_name ?? '', email: m.email ?? '', avatar_url: m.avatar_url ?? null }))}
+        channels={channels}
+        projects={projects.map(p => ({ id: p.id, label: p.title }))}
+        filters={filters}
+        onFiltersChange={setFilters}
+        totalCount={contentItems.length}
+        filteredCount={filteredItems.length}
+      />
+
       {/* Personal Tasks — always visible */}
       <PersonalTasksSection workspaceId={currentWorkspace.id} />
 
