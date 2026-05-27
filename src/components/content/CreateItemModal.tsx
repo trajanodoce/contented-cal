@@ -29,6 +29,7 @@ interface CreateItemModalProps {
   onClose: () => void;
   initialDate?: string | null;
   initialProjectId?: string | null;
+  initialTags?: string[];
   meetingPrefill?: MeetingPrefill | null;
 }
 
@@ -270,7 +271,7 @@ function AssigneeMultiSelect({
 }
 
 // Main modal component
-export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId, meetingPrefill }: CreateItemModalProps) {
+export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId, initialTags, meetingPrefill }: CreateItemModalProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { contentTypes, boardColumns, members } = useWorkspaceData(
@@ -400,7 +401,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
         channel: channel.trim(),
         description: description.trim(),
         created_by: user.id,
-        tags: [],
+        tags: initialTags ?? [],
         project_id: projectId || null,
         custom_fields: customFieldValues as Json,
       }).select('id').single();
@@ -466,7 +467,16 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-900">Create Content Item</h2>
+          <div className="flex items-center gap-2">
+            {initialTags?.includes('design-request') && (
+              <span className="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs font-bold">D</span>
+              </span>
+            )}
+            <h2 className="font-semibold text-slate-900">
+              {initialTags?.includes('design-request') ? 'Create Design Request' : 'Create Content Item'}
+            </h2>
+          </div>
           <button onClick={handleClose} className="text-slate-400 hover:text-slate-600 transition-colors">
             <X className="w-5 h-5" />
           </button>

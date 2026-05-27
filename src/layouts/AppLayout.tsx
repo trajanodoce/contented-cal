@@ -73,6 +73,7 @@ export function AppLayout() {
   const { setLastUsedView } = useViewPersistence();
   const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTags, setModalTags] = useState<string[]>([]);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [showFabMenu, setShowFabMenu] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -295,14 +296,14 @@ export function AppLayout() {
               {showCreateMenu && (
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50">
                   <button
-                    onClick={() => { setShowCreateMenu(false); setIsModalOpen(true); }}
+                    onClick={() => { setShowCreateMenu(false); setModalTags([]); setIsModalOpen(true); }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     <FileText className="w-4 h-4 text-blue-500" />
                     Content Item
                   </button>
                   <button
-                    onClick={() => { setShowCreateMenu(false); navigate('/design-request'); }}
+                    onClick={() => { setShowCreateMenu(false); setModalTags(['design-request']); setIsModalOpen(true); }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     <Palette className="w-4 h-4 text-purple-500" />
@@ -317,8 +318,9 @@ export function AppLayout() {
           {canCreate && (
             <CreateItemModal
               isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+              onClose={() => { setIsModalOpen(false); setModalTags([]); }}
               initialProjectId={location.pathname.startsWith('/projects/') ? location.pathname.split('/projects/')[1] : null}
+              initialTags={modalTags}
             />
           )}
         </header>
@@ -337,14 +339,14 @@ export function AppLayout() {
             {showFabMenu && (
               <div className="absolute bottom-16 right-0 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 mb-2">
                 <button
-                  onClick={() => { setShowFabMenu(false); setIsModalOpen(true); }}
+                  onClick={() => { setShowFabMenu(false); setModalTags([]); setIsModalOpen(true); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <FileText className="w-4 h-4 text-blue-500" />
                   Content Item
                 </button>
                 <button
-                  onClick={() => { setShowFabMenu(false); navigate('/design-request'); }}
+                  onClick={() => { setShowFabMenu(false); setModalTags(['design-request']); setIsModalOpen(true); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <Palette className="w-4 h-4 text-purple-500" />
