@@ -218,6 +218,11 @@ function SubtaskPill({ subtask }: { subtask: SubtaskWithParent }) {
   );
 }
 
+// CSS grid template for collapsible weekends (Mon–Sun, weekStartsOn=1 → indices 5,6 are Sat,Sun)
+const GRID_COLS_EXPANDED = 'repeat(7, 1fr)';
+const GRID_COLS_COLLAPSED = '1fr 1fr 1fr 1fr 1fr 40px 40px';
+const GRID_COLS_COLLAPSED_QUARTER = '1fr 1fr 1fr 1fr 1fr 20px 20px';
+
 interface MonthViewProps {
   currentDate: Date;
   items: ContentItem[];
@@ -230,12 +235,14 @@ interface MonthViewProps {
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
+  weekendsCollapsed: boolean;
+  onToggleWeekends: () => void;
   onItemClick: (item: ContentItem) => void;
   onDateClick: (date: Date) => void;
   onShowMore: (date: Date) => void;
 }
 
-function MonthView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, onItemClick, onDateClick, onShowMore }: MonthViewProps) {
+function MonthView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick, onShowMore }: MonthViewProps) {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -268,18 +275,26 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
   };
 
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const gridCols = weekendsCollapsed ? GRID_COLS_COLLAPSED : GRID_COLS_EXPANDED;
 
   return (
     <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-      <div className="grid grid-cols-7" style={{ backgroundColor: '#115e59' }}>
-        {weekDays.map((day) => (
-          <div key={day} className="px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide">
-            {day}
+      <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
+        {weekDays.map((day, i) => (
+          <div
+            key={day}
+            className={`px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide ${
+              i >= 5 && weekendsCollapsed ? 'cursor-pointer hover:bg-teal-700 transition-colors' : ''
+            }`}
+            onClick={i >= 5 && weekendsCollapsed ? onToggleWeekends : undefined}
+            title={i >= 5 && weekendsCollapsed ? 'Click to expand weekends' : undefined}
+          >
+            {weekendsCollapsed && i >= 5 ? day.charAt(0) : day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 auto-rows-fr">
+      <div className="grid auto-rows-fr" style={{ gridTemplateColumns: gridCols }}>
         {days.map((day, index) => {
           const dayItems = getItemsForDate(day);
           const dayProjectMarkers = getProjectMarkersForDate(day);
@@ -287,69 +302,90 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
           const isCurrentMonth = isSameMonth(day, currentDate);
           const isTodayDate = isToday(day);
           const totalSlots = dayItems.length + dayProjectMarkers.length + daySubtasks.length;
+          const isWeekend = index % 7 >= 5;
+          const collapsed = isWeekend && weekendsCollapsed;
 
           return (
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`min-h-[120px] p-2 border-b border-r border-slate-100 ${
-                !isCurrentMonth ? 'bg-slate-50/50' : 'bg-white'
+              className={`${collapsed ? 'min-h-[120px] p-1' : 'min-h-[120px] p-2'} border-b border-r border-slate-100 ${
+                !isCurrentMonth ? 'bg-slate-50/50' : collapsed ? 'bg-slate-50/80' : 'bg-white'
               } ${index % 7 === 6 ? 'border-r-0' : ''}`}
-              onClick={() => onDateClick(day)}
+              onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
             >
-              <div className="flex justify-between items-center mb-1">
-                <span
-                  className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                    isTodayDate
-                      ? 'bg-blue-600 text-white'
-                      : isCurrentMonth
-                      ? 'text-slate-700'
-                      : 'text-slate-400'
-                  }`}
-                >
-                  {format(day, 'd')}
-                </span>
-                {totalSlots > 0 && (
-                  <span className="text-xs text-slate-400">{totalSlots}</span>
-                )}
-              </div>
-
-              <div className="space-y-1">
-                {dayProjectMarkers.map((m) => (
-                  <ProjectMarker key={`proj-${m.type}-${m.project.id}`} project={m.project} type={m.type} />
-                ))}
-                {dayItems.slice(0, 3).map((item) => (
-                  <CalendarItemPill
-                    key={item.id}
-                    item={item}
-                    contentTypes={contentTypes}
-                    boardColumns={boardColumns}
-                    members={members}
-                    dateMode={dateMode}
-                    subtaskCount={subtaskCounts.get(item.id)}
-                    linkInfo={linkCounts.get(item.id)}
-                    hasGranolaNotes={granolaItemIds.has(item.id)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onItemClick(item);
-                    }}
-                  />
-                ))}
-                {daySubtasks.slice(0, 2).map((st) => (
-                  <SubtaskPill key={`sub-${st.id}`} subtask={st} />
-                ))}
-                {dayItems.length > 3 && (
-                  <button
-                    className="text-xs text-slate-500 hover:text-blue-600 px-1 py-0.5"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onShowMore(day);
-                    }}
+              {collapsed ? (
+                <div className="flex flex-col items-center gap-0.5">
+                  <span
+                    className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
+                      isTodayDate ? 'bg-blue-600 text-white' : isCurrentMonth ? 'text-slate-700' : 'text-slate-400'
+                    }`}
                   >
-                    +{dayItems.length - 3} more
-                  </button>
-                )}
-              </div>
+                    {format(day, 'd')}
+                  </span>
+                  {totalSlots > 0 && (
+                    <span className="text-[10px] text-slate-500 font-medium bg-slate-200 rounded-full w-4 h-4 flex items-center justify-center">
+                      {totalSlots}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center mb-1">
+                    <span
+                      className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
+                        isTodayDate
+                          ? 'bg-blue-600 text-white'
+                          : isCurrentMonth
+                          ? 'text-slate-700'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      {format(day, 'd')}
+                    </span>
+                    {totalSlots > 0 && (
+                      <span className="text-xs text-slate-400">{totalSlots}</span>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    {dayProjectMarkers.map((m) => (
+                      <ProjectMarker key={`proj-${m.type}-${m.project.id}`} project={m.project} type={m.type} />
+                    ))}
+                    {dayItems.slice(0, 3).map((item) => (
+                      <CalendarItemPill
+                        key={item.id}
+                        item={item}
+                        contentTypes={contentTypes}
+                        boardColumns={boardColumns}
+                        members={members}
+                        dateMode={dateMode}
+                        subtaskCount={subtaskCounts.get(item.id)}
+                        linkInfo={linkCounts.get(item.id)}
+                        hasGranolaNotes={granolaItemIds.has(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onItemClick(item);
+                        }}
+                      />
+                    ))}
+                    {daySubtasks.slice(0, 2).map((st) => (
+                      <SubtaskPill key={`sub-${st.id}`} subtask={st} />
+                    ))}
+                    {dayItems.length > 3 && (
+                      <button
+                        className="text-xs text-slate-500 hover:text-blue-600 px-1 py-0.5"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onShowMore(day);
+                        }}
+                      >
+                        +{dayItems.length - 3} more
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
             </DroppableDayCell>
           );
         })}
@@ -371,11 +407,13 @@ interface WeekViewProps {
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
+  weekendsCollapsed: boolean;
+  onToggleWeekends: () => void;
   onItemClick: (item: ContentItem) => void;
   onDateClick: (date: Date) => void;
 }
 
-function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, onItemClick, onDateClick }: WeekViewProps) {
+function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick }: WeekViewProps) {
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -405,23 +443,29 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
     return subtasks.filter((st) => st.due_date && isSameDay(parseLocalDate(st.due_date), date));
   };
 
+  const gridCols = weekendsCollapsed ? GRID_COLS_COLLAPSED : GRID_COLS_EXPANDED;
+
   return (
     <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-      <div className="grid grid-cols-7" style={{ backgroundColor: '#115e59' }}>
-        {days.map((day) => {
+      <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
+        {days.map((day, i) => {
           const isTodayDate = isToday(day);
+          const isWeekend = i >= 5;
+          const collapsed = isWeekend && weekendsCollapsed;
           return (
             <div
               key={day.toISOString()}
-              className={`px-2 py-3 text-center border-r border-teal-700 last:border-r-0 ${
+              className={`${collapsed ? 'px-1 py-2' : 'px-2 py-3'} text-center border-r border-teal-700 last:border-r-0 ${
                 isTodayDate ? 'bg-teal-700' : ''
-              }`}
+              } ${collapsed ? 'cursor-pointer hover:bg-teal-700 transition-colors' : ''}`}
+              onClick={collapsed ? onToggleWeekends : undefined}
+              title={collapsed ? 'Click to expand weekends' : undefined}
             >
               <div className={`text-xs font-semibold uppercase mb-1 tracking-wide ${isTodayDate ? 'text-teal-100' : 'text-teal-200'}`}>
-                {format(day, 'EEE')}
+                {collapsed ? format(day, 'EEEEE') : format(day, 'EEE')}
               </div>
               <div
-                className={`text-lg font-semibold w-8 h-8 flex items-center justify-center mx-auto rounded-full ${
+                className={`${collapsed ? 'text-sm w-6 h-6' : 'text-lg w-8 h-8'} font-semibold flex items-center justify-center mx-auto rounded-full ${
                   isTodayDate ? 'bg-white text-teal-900' : 'text-white'
                 }`}
               >
@@ -432,22 +476,34 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
         })}
       </div>
 
-      <div className="grid grid-cols-7 auto-rows-fr min-h-[400px]">
-        {days.map((day) => {
+      <div className="grid auto-rows-fr min-h-[400px]" style={{ gridTemplateColumns: gridCols }}>
+        {days.map((day, i) => {
           const dayItems = getItemsForDate(day);
           const dayProjectMarkers = getProjectMarkersForDate(day);
           const daySubtasks = getSubtasksForDate(day);
           const isTodayDate = isToday(day);
+          const isWeekend = i >= 5;
+          const collapsed = isWeekend && weekendsCollapsed;
+          const totalCount = dayItems.length + dayProjectMarkers.length + daySubtasks.length;
 
           return (
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`p-2 border-r border-slate-100 last:border-r-0 border-b border-slate-100 min-h-[100px] ${
-                isTodayDate ? 'bg-blue-50/30' : ''
+              className={`${collapsed ? 'p-1' : 'p-2'} border-r border-slate-100 last:border-r-0 border-b border-slate-100 min-h-[100px] ${
+                isTodayDate ? 'bg-blue-50/30' : collapsed ? 'bg-slate-50/80' : ''
               }`}
-              onClick={() => onDateClick(day)}
+              onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
             >
+              {collapsed ? (
+                <div className="flex flex-col items-center gap-1 mt-2">
+                  {totalCount > 0 && (
+                    <span className="text-[10px] text-slate-500 font-medium bg-slate-200 rounded-full w-5 h-5 flex items-center justify-center">
+                      {totalCount}
+                    </span>
+                  )}
+                </div>
+              ) : (
               <div className="space-y-2">
                 {dayProjectMarkers.map((m) => (
                   <ProjectMarker key={`proj-${m.type}-${m.project.id}`} project={m.project} type={m.type} />
@@ -527,6 +583,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                   <SubtaskPill key={`sub-${st.id}`} subtask={st} />
                 ))}
               </div>
+              )}
             </DroppableDayCell>
           );
         })}
@@ -776,12 +833,14 @@ interface QuarterViewProps {
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
+  weekendsCollapsed: boolean;
+  onToggleWeekends: () => void;
   onItemClick: (item: ContentItem) => void;
   onDateClick: (date: Date) => void;
   onShowMore: (date: Date) => void;
 }
 
-function QuarterView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, onItemClick, onDateClick, onShowMore }: QuarterViewProps) {
+function QuarterView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick, onShowMore }: QuarterViewProps) {
   const months = [currentDate, addMonths(currentDate, 1), addMonths(currentDate, 2)];
 
   const getItemsForDate = (date: Date) => {
@@ -810,6 +869,7 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
   };
 
   const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  const gridColsQ = weekendsCollapsed ? GRID_COLS_COLLAPSED_QUARTER : GRID_COLS_EXPANDED;
 
   return (
     <div className="grid grid-cols-3 gap-4">
@@ -828,15 +888,21 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
               </h3>
             </div>
 
-            <div className="grid grid-cols-7" style={{ backgroundColor: '#115e59' }}>
+            <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridColsQ }}>
               {weekDays.map((d, i) => (
-                <div key={`${d}-${i}`} className="px-0.5 py-1 text-center text-[10px] font-semibold text-white uppercase">
-                  {d}
+                <div
+                  key={`${d}-${i}`}
+                  className={`px-0.5 py-1 text-center text-[10px] font-semibold text-white uppercase ${
+                    i >= 5 && weekendsCollapsed ? 'cursor-pointer hover:bg-teal-700 transition-colors' : ''
+                  }`}
+                  onClick={i >= 5 && weekendsCollapsed ? onToggleWeekends : undefined}
+                >
+                  {weekendsCollapsed && i >= 5 ? '' : d}
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7">
+            <div className="grid" style={{ gridTemplateColumns: gridColsQ }}>
               {days.map((day, index) => {
                 const dayItems = getItemsForDate(day);
                 const dayProjectMarkers = getProjectMarkersForDate(day);
@@ -844,16 +910,33 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
                 const isCurrentMonth = isSameMonth(day, monthDate);
                 const isTodayDate = isToday(day);
                 const totalCount = dayItems.length + dayProjectMarkers.length + daySubtasks.length;
+                const isWeekend = index % 7 >= 5;
+                const collapsed = isWeekend && weekendsCollapsed;
 
                 return (
                   <DroppableDayCell
                     key={day.toISOString()}
                     dateId={format(day, 'yyyy-MM-dd')}
-                    className={`min-h-[72px] p-0.5 border-b border-r border-slate-50 ${
-                      !isCurrentMonth ? 'bg-slate-50/30' : 'bg-white'
+                    className={`${collapsed ? 'min-h-[40px]' : 'min-h-[72px]'} p-0.5 border-b border-r border-slate-50 ${
+                      !isCurrentMonth ? 'bg-slate-50/30' : collapsed ? 'bg-slate-50/80' : 'bg-white'
                     } ${index % 7 === 6 ? 'border-r-0' : ''}`}
-                    onClick={() => onDateClick(day)}
+                    onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
                   >
+                    {collapsed ? (
+                      <div className="flex flex-col items-center">
+                        <span
+                          className={`text-[8px] font-medium w-4 h-4 flex items-center justify-center rounded-full ${
+                            isTodayDate ? 'bg-blue-600 text-white' : isCurrentMonth ? 'text-slate-600' : 'text-slate-300'
+                          }`}
+                        >
+                          {format(day, 'd')}
+                        </span>
+                        {totalCount > 0 && (
+                          <span className="text-[7px] text-slate-400 font-medium">{totalCount}</span>
+                        )}
+                      </div>
+                    ) : (
+                    <>
                     <div className="flex justify-between items-center">
                       <span
                         className={`text-[10px] font-medium w-5 h-5 flex items-center justify-center rounded-full ${
@@ -916,6 +999,8 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
                         </button>
                       )}
                     </div>
+                    </>
+                    )}
                   </DroppableDayCell>
                 );
               })}
@@ -950,6 +1035,18 @@ export function CalendarPage() {
   // Use persisted calendar view type
   const [view, setView] = useState<CalendarView>(calendarViewType);
   const [dateMode, setDateMode] = useState<DateMode>('due');
+  const [weekendsCollapsed, setWeekendsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('cc-weekends-collapsed');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const toggleWeekends = useCallback(() => {
+    setWeekendsCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('cc-weekends-collapsed', String(next));
+      return next;
+    });
+  }, []);
 
   // Sync local view state with persistence
   const handleViewChange = useCallback((newView: CalendarView) => {
@@ -1200,6 +1297,20 @@ export function CalendarPage() {
               </button>
             </div>
 
+            {view !== 'day' && (
+              <button
+                onClick={toggleWeekends}
+                className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
+                  weekendsCollapsed
+                    ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    : 'border-blue-200 bg-blue-50 text-blue-700'
+                }`}
+                title={weekendsCollapsed ? 'Show weekends' : 'Collapse weekends'}
+              >
+                {weekendsCollapsed ? 'Show Weekends' : 'Hide Weekends'}
+              </button>
+            )}
+
             <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
               <button
                 onClick={() => handleViewChange('month')}
@@ -1255,6 +1366,8 @@ export function CalendarPage() {
               projects={projects}
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
+              weekendsCollapsed={weekendsCollapsed}
+              onToggleWeekends={toggleWeekends}
               onItemClick={(item: ContentItem) => setSelectedItemId(item.id)}
               onDateClick={handleDateClick}
               onShowMore={(date) => {
@@ -1276,6 +1389,8 @@ export function CalendarPage() {
               projects={projects}
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
+              weekendsCollapsed={weekendsCollapsed}
+              onToggleWeekends={toggleWeekends}
               onItemClick={(item: ContentItem) => setSelectedItemId(item.id)}
               onDateClick={handleDateClick}
               onShowMore={(date) => {
@@ -1297,6 +1412,8 @@ export function CalendarPage() {
               projects={projects}
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
+              weekendsCollapsed={weekendsCollapsed}
+              onToggleWeekends={toggleWeekends}
               onItemClick={(item: ContentItem) => setSelectedItemId(item.id)}
               onDateClick={handleDateClick}
             />

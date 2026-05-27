@@ -1315,6 +1315,10 @@ function BoardTab({
 // Calendar Tab
 // ────────────────────────────────────────────────────────────────────────────────
 
+// Grid columns for Sun-start layout: indices 0 (Sun) and 6 (Sat) are weekends
+const PROJECT_GRID_EXPANDED = 'repeat(7, 1fr)';
+const PROJECT_GRID_COLLAPSED = '40px 1fr 1fr 1fr 1fr 1fr 40px';
+
 function CalendarTab({
   items,
   contentTypes,
@@ -1325,6 +1329,18 @@ function CalendarTab({
   onItemClick: (id: string) => void;
 }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [weekendsCollapsed, setWeekendsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('cc-weekends-collapsed');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const toggleWeekends = useCallback(() => {
+    setWeekendsCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('cc-weekends-collapsed', String(next));
+      return next;
+    });
+  }, []);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -1345,6 +1361,8 @@ function CalendarTab({
   }, [items]);
 
   const goToday = () => setCurrentMonth(new Date());
+  const gridCols = weekendsCollapsed ? PROJECT_GRID_COLLAPSED : PROJECT_GRID_EXPANDED;
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
     <div className="p-6">
@@ -1354,6 +1372,16 @@ function CalendarTab({
           {format(currentMonth, 'MMMM yyyy')}
         </h3>
         <div className="flex items-center gap-2">
+          <button
+            onClick={toggleWeekends}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+              weekendsCollapsed
+                ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                : 'border-blue-200 bg-blue-50 text-blue-700'
+            }`}
+          >
+            {weekendsCollapsed ? 'Show Weekends' : 'Hide Weekends'}
+          </button>
           <button
             onClick={goToday}
             className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
@@ -1378,32 +1406,60 @@ function CalendarTab({
       {/* Calendar grid */}
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         {/* Weekday headers */}
-        <div className="grid grid-cols-7 border-b border-slate-200">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-            <div
-              key={d}
-              className="text-xs font-medium text-slate-500 text-center py-2"
-            >
-              {d}
-            </div>
-          ))}
+        <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: gridCols }}>
+          {weekDays.map((d, i) => {
+            const isWeekend = i === 0 || i === 6;
+            const collapsed = isWeekend && weekendsCollapsed;
+            return (
+              <div
+                key={d}
+                className={`text-xs font-medium text-slate-500 text-center py-2 ${
+                  collapsed ? 'cursor-pointer hover:bg-slate-100 transition-colors' : ''
+                }`}
+                onClick={collapsed ? toggleWeekends : undefined}
+                title={collapsed ? 'Click to expand weekends' : undefined}
+              >
+                {collapsed ? d.charAt(0) : d}
+              </div>
+            );
+          })}
         </div>
 
         {/* Day cells */}
-        <div className="grid grid-cols-7">
-          {days.map((day) => {
+        <div className="grid" style={{ gridTemplateColumns: gridCols }}>
+          {days.map((day, index) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayItems = itemsByDate.get(dateKey) ?? [];
             const inMonth = isSameMonth(day, currentMonth);
             const today = isToday(day);
+            const isWeekend = index % 7 === 0 || index % 7 === 6;
+            const collapsed = isWeekend && weekendsCollapsed;
 
             return (
               <div
                 key={dateKey}
-                className={`min-h-[100px] border-b border-r border-slate-100 p-1.5 ${
-                  inMonth ? 'bg-white' : 'bg-slate-50'
-                }`}
+                className={`${collapsed ? 'min-h-[80px] p-1' : 'min-h-[100px] p-1.5'} border-b border-r border-slate-100 ${
+                  collapsed ? (inMonth ? 'bg-slate-50/80' : 'bg-slate-50') : (inMonth ? 'bg-white' : 'bg-slate-50')
+                } ${collapsed ? 'cursor-pointer' : ''}`}
+                onClick={collapsed ? toggleWeekends : undefined}
               >
+                {collapsed ? (
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span
+                      className={`text-xs font-medium inline-flex items-center justify-center w-5 h-5 rounded-full ${
+                        today ? 'bg-blue-600 text-white' : inMonth ? 'text-slate-700' : 'text-slate-300'
+                      }`}
+                    >
+                      {format(day, 'd')}
+                    </span>
+                    {dayItems.length > 0 && (
+                      <span className="text-[10px] text-slate-500 font-medium bg-slate-200 rounded-full w-4 h-4 flex items-center justify-center">
+                        {dayItems.length}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <>
                 <span
                   className={`text-xs font-medium inline-flex items-center justify-center w-6 h-6 rounded-full ${
                     today
@@ -1444,6 +1500,8 @@ function CalendarTab({
                     </span>
                   )}
                 </div>
+                  </>
+                )}
               </div>
             );
           })}
