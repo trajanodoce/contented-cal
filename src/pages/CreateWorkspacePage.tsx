@@ -85,7 +85,8 @@ export function CreateWorkspacePage() {
             {hasWorkspaces && (
               <Link
                 to="/list"
-                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                className="flex items-center gap-2 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: '#0B2763' }}
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to workspace

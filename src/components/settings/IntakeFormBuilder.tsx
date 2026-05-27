@@ -193,7 +193,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
 
   return (
     <div className="max-w-3xl">
-      <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 mb-5">
+      <button onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity mb-5" style={{ backgroundColor: '#0B2763' }}>
         <ArrowLeft className="w-4 h-4" /> Back to Intake Forms
       </button>
 

@@ -278,7 +278,8 @@ export function ProjectDetailPage() {
       <div className="p-8">
         <button
           onClick={() => navigate('/projects')}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-6"
+          className="flex items-center gap-1.5 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity mb-6"
+          style={{ backgroundColor: '#0B2763' }}
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Projects
@@ -310,7 +311,8 @@ export function ProjectDetailPage() {
       <div className="bg-white border-b border-slate-200 px-6 py-4 shrink-0">
         <button
           onClick={() => navigate('/projects')}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-3 transition-colors"
+          className="flex items-center gap-1.5 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity mb-3"
+          style={{ backgroundColor: '#0B2763' }}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Projects
