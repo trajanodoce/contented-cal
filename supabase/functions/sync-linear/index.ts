@@ -131,32 +131,32 @@ Deno.serve(async (req) => {
 
   try {
     const { workspace_id, user_id } = await req.json();
-    if (!workspace_id) {
+    if (!workspace_id || !user_id) {
       return new Response(
-        JSON.stringify({ error: "workspace_id required" }),
+        JSON.stringify({ error: "workspace_id and user_id required" }),
         { status: 400, headers: corsHeaders }
       );
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Get Linear integration credentials
+    // Get Linear credentials from user_integrations (personal integration)
     const { data: integration, error: intError } = await supabase
-      .from("integrations")
+      .from("user_integrations")
       .select("*")
       .eq("workspace_id", workspace_id)
+      .eq("user_id", user_id)
       .eq("platform", "linear")
-      .eq("status", "connected")
       .single();
 
     if (intError || !integration) {
       return new Response(
-        JSON.stringify({ error: "Linear integration not connected" }),
+        JSON.stringify({ error: "Linear integration not connected. Connect your Linear API key in Settings." }),
         { status: 400, headers: corsHeaders }
       );
     }
 
-    const apiKey = integration.access_token || (integration.config as Record<string, string>)?.api_key;
+    const apiKey = integration.access_token;
     if (!apiKey) {
       return new Response(
         JSON.stringify({ error: "No Linear API key found" }),
@@ -293,16 +293,15 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Update last synced time on the integration
+    // Update last synced time on the user integration
     await supabase
-      .from("integrations")
+      .from("user_integrations")
       .update({
         config: {
           ...(integration.config as Record<string, unknown>),
           last_synced: new Date().toISOString(),
           issues_count: issues.length,
         },
-        updated_at: new Date().toISOString(),
       })
       .eq("id", integration.id);
 

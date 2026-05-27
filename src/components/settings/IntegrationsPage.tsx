@@ -76,21 +76,6 @@ const PLATFORMS: PlatformMeta[] = [
     docsUrl: 'https://www.notion.so/my-integrations',
   },
   {
-    id: 'linear',
-    name: 'Linear',
-    description: 'Link Linear issues to content items. Track issue status alongside content.',
-    iconBg: '#EFF6FF',
-    iconText: 'L',
-    iconColor: '#5E6AD2',
-    category: 'Engineering',
-    setupType: 'api_key',
-    fields: [
-      { key: 'api_key', label: 'Linear API Key', placeholder: 'lin_api_...', secret: true },
-    ],
-    setupNote: 'Linear integration requires an API key. Generate a personal API key from your Linear settings.',
-    docsUrl: 'https://linear.app/settings/api',
-  },
-  {
     id: 'claude',
     name: 'Claude AI',
     description: 'AI-powered content assistant. Generate headlines, summaries, social posts, and more.',
@@ -165,8 +150,8 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
   const existingConfig = (existing?.config ?? {}) as Record<string, string>;
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries((meta.fields ?? []).map(f => {
-      // For Claude and Linear, the api_key is stored in access_token
-      if ((meta.id === 'claude' || meta.id === 'linear') && f.key === 'api_key' && existing?.access_token) {
+      // For Claude, the api_key is stored in access_token
+      if (meta.id === 'claude' && f.key === 'api_key' && existing?.access_token) {
         return [f.key, existing.access_token];
       }
       return [f.key, existingConfig[f.key] ?? ''];
@@ -406,23 +391,6 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
       {meta.id === 'notion' && config.database_id && (
         <span>Database: <span className="text-gray-700 font-medium truncate max-w-[160px] inline-block">{config.database_id}</span></span>
       )}
-      {meta.id === 'linear' && (
-        <>
-          {config.linear_user_name && (
-            <span className="text-[#5E6AD2] font-medium">{config.linear_user_name}</span>
-          )}
-          {config.linear_teams && (
-            <span>Teams: <span className="text-gray-700 font-medium">{config.linear_teams}</span></span>
-          )}
-          {config.issues_count && (
-            <span><span className="text-gray-700 font-medium">{config.issues_count}</span> issues synced</span>
-          )}
-          {config.last_synced && (
-            <span>Last sync: <span className="text-gray-700 font-medium">{new Date(config.last_synced).toLocaleString()}</span></span>
-          )}
-          {!config.last_synced && !config.linear_user_name && <span>Click "Test" to verify, then "Sync Issues" to import</span>}
-        </>
-      )}
       {meta.id === 'ordinal' && (
         <>
           <span className="text-[#7E61FF] font-medium">● Connected</span>
@@ -452,7 +420,6 @@ export function IntegrationsPage({ addToast }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<IntegrationPlatform | null>(null);
   const [testing, setTesting] = useState<IntegrationPlatform | null>(null);
-  const [syncing, setSyncing] = useState<IntegrationPlatform | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const isAdmin = userRole === 'admin';
@@ -496,9 +463,9 @@ export function IntegrationsPage({ addToast }: Props) {
     if (!workspace || !user) return;
     setSaving(platform);
     try {
-      // For Claude and Linear, store the API key in access_token rather than config
-      const accessToken = (platform === 'claude' || platform === 'linear') ? (config.api_key || '') : '';
-      const storedConfig = (platform === 'claude' || platform === 'linear')
+      // For Claude, store the API key in access_token rather than config
+      const accessToken = platform === 'claude' ? (config.api_key || '') : '';
+      const storedConfig = platform === 'claude'
         ? {} // Don't duplicate the key in config
         : config;
 
@@ -527,10 +494,6 @@ export function IntegrationsPage({ addToast }: Props) {
       }
       await load();
       addToast(`${PLATFORMS.find(p => p.id === platform)?.name} connected`);
-      // Auto-test Linear to fetch team/user info
-      if (platform === 'linear') {
-        testConnection('linear');
-      }
     } catch (err: unknown) {
       addToast((err as Error).message, 'error');
     } finally {
@@ -554,76 +517,11 @@ export function IntegrationsPage({ addToast }: Props) {
     window.location.href = oauthUrl;
   }
 
-  async function syncLinear() {
-    if (!workspace) return;
-    setSyncing('linear');
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/sync-linear`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({ workspace_id: workspace.id, user_id: user?.id }),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || 'Sync failed');
-      addToast(`Synced ${result.total} issues (${result.created} new, ${result.updated} updated)`);
-      await load();
-    } catch (err: unknown) {
-      addToast((err as Error).message, 'error');
-    } finally {
-      setSyncing(null);
-    }
-  }
-
   async function testConnection(platform: IntegrationPlatform) {
     setTesting(platform);
-    try {
-      if (platform === 'linear') {
-        const integration = getIntegration('linear');
-        const apiKey = integration?.access_token || (integration?.config as Record<string, string>)?.api_key;
-        if (!apiKey) throw new Error('No API key found');
-
-        const res = await fetch('https://api.linear.app/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: apiKey },
-          body: JSON.stringify({ query: '{ viewer { id name email } teams { nodes { id name } } }' }),
-        });
-        const json = await res.json();
-        if (json.errors) throw new Error(json.errors[0]?.message || 'API error');
-
-        const viewer = json.data.viewer;
-        const teams = json.data.teams.nodes;
-        const teamNames = teams.map((t: { name: string }) => t.name).join(', ');
-
-        // Store team info in config
-        if (integration) {
-          await supabase
-            .from('integrations')
-            .update({
-              config: {
-                ...(integration.config as Record<string, unknown>),
-                linear_user_name: viewer.name,
-                linear_user_email: viewer.email,
-                linear_teams: teamNames,
-              },
-            })
-            .eq('id', integration.id);
-          await load();
-        }
-
-        addToast(`Connected as ${viewer.name} (${teamNames})`, 'success');
-      } else {
-        await new Promise(r => setTimeout(r, 800));
-        addToast('Connection is working', 'success');
-      }
-    } catch (err: unknown) {
-      addToast(`Connection failed: ${(err as Error).message}`, 'error');
-    } finally {
-      setTesting(null);
-    }
+    await new Promise(r => setTimeout(r, 800));
+    setTesting(null);
+    addToast('Connection is working', 'success');
   }
 
   const categories = Array.from(new Set(PLATFORMS.map(p => p.category)));
@@ -684,10 +582,8 @@ export function IntegrationsPage({ addToast }: Props) {
                 onOAuthConnect={meta.setupType === 'oauth' ? () => startOAuth(meta.id) : undefined}
                 onDisconnect={() => disconnect(meta.id)}
                 onTest={() => testConnection(meta.id)}
-                onSync={meta.id === 'linear' ? syncLinear : undefined}
                 saving={saving === meta.id}
                 testing={testing === meta.id}
-                syncing={syncing === meta.id}
               />
             ))}
           </div>
@@ -702,40 +598,66 @@ export function IntegrationsPage({ addToast }: Props) {
 
 // ── Personal integrations (per-user, not workspace-level) ────────────────────
 
+const SUPABASE_FN_URL = import.meta.env.VITE_SUPABASE_URL ?? '';
+
 function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, type?: 'success' | 'error' | 'info') => void }) {
   const { workspace, user } = useApp();
-  const [granola, setGranola] = useState<UserIntegration | null>(null);
+  const [integrations, setIntegrations] = useState<Record<string, UserIntegration | null>>({ granola: null, linear: null });
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [showKey, setShowKey] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null);
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>({ granola: '', linear: '' });
+  const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
+  const [saving, setSaving] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [linearInfo, setLinearInfo] = useState<{ name: string; teams: string; issuesCount?: number; lastSynced?: string } | null>(null);
 
-  useEffect(() => {
+  const loadIntegrations = useCallback(async () => {
     if (!workspace || !user) return;
-    supabase
+    const { data } = await supabase
       .from('user_integrations')
       .select('*')
       .eq('workspace_id', workspace.id)
       .eq('user_id', user.id)
-      .eq('platform', 'granola')
-      .maybeSingle()
-      .then(({ data }) => {
-        setGranola(data as UserIntegration | null);
-        if (data?.access_token) setApiKey(data.access_token);
-        setLoading(false);
-      });
+      .in('platform', ['granola', 'linear']);
+
+    const map: Record<string, UserIntegration | null> = { granola: null, linear: null };
+    const keys: Record<string, string> = { granola: '', linear: '' };
+    (data || []).forEach((d: UserIntegration) => {
+      map[d.platform] = d;
+      if (d.access_token) keys[d.platform] = d.access_token;
+    });
+    setIntegrations(map);
+    setApiKeys(keys);
+
+    // Load Linear info from config
+    const linearInt = map.linear;
+    if (linearInt) {
+      const config = (linearInt.config ?? {}) as Record<string, string>;
+      if (config.linear_user_name) {
+        setLinearInfo({
+          name: config.linear_user_name,
+          teams: config.linear_teams || '',
+          issuesCount: config.issues_count ? Number(config.issues_count) : undefined,
+          lastSynced: config.last_synced || undefined,
+        });
+      }
+    }
+
+    setLoading(false);
   }, [workspace, user]);
 
-  async function saveGranola() {
-    if (!workspace || !user || !apiKey.trim()) return;
-    setSaving(true);
+  useEffect(() => { loadIntegrations(); }, [loadIntegrations]);
+
+  async function savePersonalIntegration(platform: string) {
+    if (!workspace || !user || !apiKeys[platform]?.trim()) return;
+    setSaving(platform);
     try {
-      if (granola) {
+      const existing = integrations[platform];
+      if (existing) {
         const { error } = await supabase
           .from('user_integrations')
-          .update({ access_token: apiKey.trim(), connected_at: new Date().toISOString() })
-          .eq('id', granola.id);
+          .update({ access_token: apiKeys[platform].trim(), connected_at: new Date().toISOString() })
+          .eq('id', existing.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -743,43 +665,131 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
           .insert({
             workspace_id: workspace.id,
             user_id: user.id,
-            platform: 'granola',
-            access_token: apiKey.trim(),
+            platform,
+            access_token: apiKeys[platform].trim(),
             connected_at: new Date().toISOString(),
           });
         if (error) throw error;
       }
-      // Reload
-      const { data } = await supabase
-        .from('user_integrations')
-        .select('*')
-        .eq('workspace_id', workspace.id)
-        .eq('user_id', user.id)
-        .eq('platform', 'granola')
-        .maybeSingle();
-      setGranola(data as UserIntegration | null);
-      setExpanded(false);
-      addToast('Granola connected');
+      await loadIntegrations();
+      setExpandedPlatform(null);
+      addToast(`${platform === 'linear' ? 'Linear' : 'Granola'} connected`);
+
+      // Auto-test Linear on connect
+      if (platform === 'linear') {
+        testLinear(apiKeys[platform].trim());
+      }
     } catch (err: any) {
       addToast(err.message || 'Failed to save', 'error');
     } finally {
-      setSaving(false);
+      setSaving(null);
     }
   }
 
-  async function disconnectGranola() {
-    if (!granola) return;
-    if (!confirm('Disconnect Granola? Your linked meeting notes will remain, but syncing will stop.')) return;
-    const { error } = await supabase.from('user_integrations').delete().eq('id', granola.id);
+  async function disconnectPersonal(platform: string) {
+    const existing = integrations[platform];
+    if (!existing) return;
+    const name = platform === 'linear' ? 'Linear' : 'Granola';
+    if (!confirm(`Disconnect ${name}?`)) return;
+    const { error } = await supabase.from('user_integrations').delete().eq('id', existing.id);
     if (error) { addToast(error.message, 'error'); return; }
-    setGranola(null);
-    setApiKey('');
-    addToast('Granola disconnected');
+    setIntegrations(prev => ({ ...prev, [platform]: null }));
+    setApiKeys(prev => ({ ...prev, [platform]: '' }));
+    if (platform === 'linear') setLinearInfo(null);
+    addToast(`${name} disconnected`);
+  }
+
+  async function testLinear(key?: string) {
+    const apiKey = key || apiKeys.linear;
+    if (!apiKey) return;
+    try {
+      const res = await fetch('https://api.linear.app/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: apiKey },
+        body: JSON.stringify({ query: '{ viewer { id name email } teams { nodes { id name } } }' }),
+      });
+      const json = await res.json();
+      if (json.errors) throw new Error(json.errors[0]?.message || 'API error');
+
+      const viewer = json.data.viewer;
+      const teams = json.data.teams.nodes;
+      const teamNames = teams.map((t: { name: string }) => t.name).join(', ');
+      setLinearInfo(prev => ({ ...prev, name: viewer.name, teams: teamNames }));
+
+      // Store info in user_integrations config
+      const linearInt = integrations.linear;
+      if (linearInt) {
+        await supabase
+          .from('user_integrations')
+          .update({
+            config: {
+              ...((linearInt.config ?? {}) as Record<string, unknown>),
+              linear_user_name: viewer.name,
+              linear_user_email: viewer.email,
+              linear_teams: teamNames,
+            },
+          })
+          .eq('id', linearInt.id);
+      }
+
+      addToast(`Connected as ${viewer.name}`, 'success');
+    } catch (err: unknown) {
+      addToast(`Linear test failed: ${(err as Error).message}`, 'error');
+    }
+  }
+
+  async function syncLinear() {
+    if (!workspace || !user) return;
+    setSyncing(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`${SUPABASE_FN_URL}/functions/v1/sync-linear`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ workspace_id: workspace.id, user_id: user.id }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Sync failed');
+      setLinearInfo(prev => ({ ...prev, name: prev?.name || '', teams: prev?.teams || '', issuesCount: result.total, lastSynced: new Date().toISOString() }));
+      addToast(`Synced ${result.total} issues (${result.created} new, ${result.updated} updated)`);
+    } catch (err: unknown) {
+      addToast((err as Error).message, 'error');
+    } finally {
+      setSyncing(false);
+    }
   }
 
   if (loading) return null;
 
-  const isConnected = !!granola;
+  const personalPlatforms = [
+    {
+      id: 'linear',
+      name: 'Linear',
+      description: 'Sync your assigned Linear issues into ContentedCal. Each person connects their own Linear key.',
+      iconBg: '#EFF6FF',
+      iconText: 'L',
+      iconColor: '#5E6AD2',
+      tag: 'Engineering',
+      placeholder: 'lin_api_...',
+      docsUrl: 'https://linear.app/settings/api',
+      docsLabel: 'Get your API key from Linear',
+    },
+    {
+      id: 'granola',
+      name: 'Granola',
+      description: 'Link your meeting notes to content items. Each person connects their own Granola account — your notes stay private to you.',
+      iconBg: '#F0FDF4',
+      iconText: '🎙️',
+      iconColor: '#345A11',
+      tag: 'Meetings',
+      placeholder: 'gra_...',
+      docsUrl: 'https://granola.ai/settings',
+      docsLabel: 'Get your API key from Granola',
+    },
+  ];
 
   return (
     <div className="mb-8">
@@ -788,121 +798,154 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Personal</h3>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="p-5">
-          <div className="flex items-start gap-4">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0"
-              style={{ backgroundColor: '#F0FDF4', color: '#345A11' }}
-            >
-              🎙️
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-sm font-semibold text-gray-900">Granola</h3>
-                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Meetings</span>
-                {isConnected && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-green-700 bg-green-50 border-green-200">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Connected
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                Link your meeting notes to content items. Each person connects their own Granola account — your notes stay private to you.
-              </p>
-            </div>
-            <button
-              onClick={() => setExpanded(e => !e)}
-              className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
-                ${isConnected
-                  ? 'text-gray-700 border border-gray-200 hover:bg-gray-50'
-                  : 'bg-brand-600 text-white hover:bg-brand-500'}`}
-            >
-              {isConnected ? (
-                <><Check className="w-3.5 h-3.5 text-green-500" /> Manage</>
-              ) : (
-                <><Plug className="w-3.5 h-3.5" /> Connect</>
-              )}
-            </button>
-          </div>
+      <div className="space-y-3">
+        {personalPlatforms.map(platform => {
+          const integration = integrations[platform.id];
+          const isConnected = !!integration;
+          const isExpanded = expandedPlatform === platform.id;
 
-          {expanded && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Your Granola Connection</p>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-xs text-blue-700 leading-relaxed">
-                  This is a personal connection — only you can see your meeting notes. Your API key is not shared with other workspace members.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Granola API Key</label>
-                <div className="relative">
-                  <input
-                    type={showKey ? 'text' : 'password'}
-                    value={apiKey}
-                    onChange={e => setApiKey(e.target.value)}
-                    placeholder="gra_..."
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowKey(s => !s)}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          return (
+            <div key={platform.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="p-5">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0"
+                    style={{ backgroundColor: platform.iconBg, color: platform.iconColor }}
                   >
-                    {showKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                  </button>
+                    {platform.iconText}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-sm font-semibold text-gray-900">{platform.name}</h3>
+                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{platform.tag}</span>
+                      {isConnected && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-green-700 bg-green-50 border-green-200">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Connected
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{platform.description}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {isConnected && platform.id === 'linear' && (
+                      <button
+                        onClick={syncLinear}
+                        disabled={syncing}
+                        className="flex items-center gap-1 px-3 py-1.5 text-xs text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50"
+                      >
+                        {syncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                        {syncing ? 'Syncing...' : 'Sync Issues'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setExpandedPlatform(isExpanded ? null : platform.id)}
+                      className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
+                        ${isConnected
+                          ? 'text-gray-700 border border-gray-200 hover:bg-gray-50'
+                          : 'bg-brand-600 text-white hover:bg-brand-500'}`}
+                    >
+                      {isConnected ? (
+                        <><Check className="w-3.5 h-3.5 text-green-500" /> Manage</>
+                      ) : (
+                        <><Plug className="w-3.5 h-3.5" /> Connect</>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <a
-                href="https://granola.ai/settings"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-brand-500 hover:text-brand-700"
-              >
-                <ExternalLink className="w-3 h-3" /> Get your API key from Granola
-              </a>
+                {isExpanded && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Your {platform.name} Connection</p>
 
-              <div className="flex items-center gap-2 pt-1">
-                <button
-                  onClick={saveGranola}
-                  disabled={saving || !apiKey.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 transition-colors disabled:opacity-50"
-                >
-                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                  {isConnected ? 'Update' : 'Connect'}
-                </button>
-                <button
-                  onClick={() => setExpanded(false)}
-                  className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                {isConnected && (
-                  <button
-                    onClick={disconnectGranola}
-                    className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Disconnect
-                  </button>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-xs text-blue-700 leading-relaxed">
+                        This is a personal connection — your API key is not shared with other workspace members.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">{platform.name} API Key</label>
+                      <div className="relative">
+                        <input
+                          type={showKeys[platform.id] ? 'text' : 'password'}
+                          value={apiKeys[platform.id] ?? ''}
+                          onChange={e => setApiKeys(prev => ({ ...prev, [platform.id]: e.target.value }))}
+                          placeholder={platform.placeholder}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowKeys(prev => ({ ...prev, [platform.id]: !prev[platform.id] }))}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showKeys[platform.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <a
+                      href={platform.docsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-brand-500 hover:text-brand-700"
+                    >
+                      <ExternalLink className="w-3 h-3" /> {platform.docsLabel}
+                    </a>
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <button
+                        onClick={() => savePersonalIntegration(platform.id)}
+                        disabled={saving === platform.id || !apiKeys[platform.id]?.trim()}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 transition-colors disabled:opacity-50"
+                      >
+                        {saving === platform.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                        {isConnected ? 'Update' : 'Connect'}
+                      </button>
+                      <button
+                        onClick={() => setExpandedPlatform(null)}
+                        className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      {isConnected && (
+                        <button
+                          onClick={() => disconnectPersonal(platform.id)}
+                          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Disconnect
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Connected summary */}
+                {isConnected && !isExpanded && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
+                      {platform.id === 'linear' && linearInfo && (
+                        <>
+                          <span className="text-[#5E6AD2] font-medium">{linearInfo.name}</span>
+                          {linearInfo.teams && <span className="truncate max-w-[200px]" title={linearInfo.teams}>Teams: <span className="text-gray-700 font-medium">{linearInfo.teams}</span></span>}
+                          {linearInfo.issuesCount != null && <span><span className="text-gray-700 font-medium">{linearInfo.issuesCount}</span> issues synced</span>}
+                          {linearInfo.lastSynced && <span>Last sync: <span className="text-gray-700 font-medium">{new Date(linearInfo.lastSynced).toLocaleString()}</span></span>}
+                        </>
+                      )}
+                      {platform.id === 'granola' && (
+                        <>
+                          <span className="text-[#345A11] font-medium">● Connected</span>
+                          {integration?.connected_at && <span>Connected {new Date(integration.connected_at).toLocaleDateString()}</span>}
+                          <span>Meeting notes linking enabled</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
-          )}
-
-          {isConnected && !expanded && granola?.connected_at && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
-                <span className="text-[#345A11] font-medium">● Connected</span>
-                <span>Connected {new Date(granola.connected_at).toLocaleDateString()}</span>
-                <span>Meeting notes linking enabled</span>
-              </div>
-            </div>
-          )}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
