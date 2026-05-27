@@ -266,7 +266,7 @@ export function PersonalTasksSection({ workspaceId }: Props) {
       {/* Header */}
       <div
         className="flex items-center justify-between px-5 py-4 border-b border-slate-100"
-        style={{ background: 'linear-gradient(135deg, #b8c4cc 0%, #00395D 100%)' }}
+        style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
       >
         <div className="flex items-center gap-2">
           <Briefcase className="w-5 h-5 text-white/80" />

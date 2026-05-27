@@ -291,12 +291,9 @@ export function AppLayout() {
         {/* Header */}
         <header
           className="h-16 border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0"
-          style={location.pathname === '/my-work'
-            ? { background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }
-            : { backgroundColor: 'white' }
-          }
+          style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
         >
-          <h1 className={`text-lg font-semibold ${location.pathname === '/my-work' ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className="text-lg font-semibold text-white">
             {getPageTitle(location.pathname)}
           </h1>
           {canCreate && (
