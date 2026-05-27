@@ -987,12 +987,20 @@ function ListTab({
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
                 const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
+                const colName = col?.name?.toLowerCase();
+                const isDone = colName === 'published' || colName === 'completed';
+                const isBlocked = colName === 'blocked';
+                const isOverdue = item.due_date && !isDone && new Date(item.due_date + 'T00:00:00') < new Date(new Date().toDateString());
+                const isUrgentRow = isBlocked || isOverdue;
                 return (
                   <tr
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
                     className="hover:bg-slate-50 cursor-pointer transition-colors"
-                    style={rowBg ? { backgroundColor: rowBg } : {}}
+                    style={{
+                      ...(rowBg ? { backgroundColor: rowBg } : {}),
+                      ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
+                    }}
                   >
                     <td className="px-4 py-3 text-sm font-medium text-slate-800 max-w-[300px] truncate">
                       {item.title}

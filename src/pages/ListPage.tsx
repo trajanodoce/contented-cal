@@ -420,6 +420,8 @@ export function ListPage() {
                 const isLinear = isLinearItem(item);
                 const hasGranola = granolaItemIds.has(item.id);
                 const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : hasGranola ? '#F0FDF4' : undefined;
+                const isBlocked = statusName === 'blocked';
+                const isUrgentRow = isBlocked || (dueDate.isOverdue && !isDone);
 
                 return (
                   <tr
@@ -428,7 +430,10 @@ export function ListPage() {
                     className={`hover:bg-slate-50 cursor-pointer transition-colors ${
                       isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''
                     }`}
-                    style={rowBg && !isSelected ? { backgroundColor: rowBg } : {}}
+                    style={{
+                      ...(rowBg && !isSelected ? { backgroundColor: rowBg } : {}),
+                      ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
+                    }}
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button
