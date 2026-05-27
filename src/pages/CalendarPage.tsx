@@ -322,8 +322,9 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                 <div className="flex flex-col items-center gap-0.5">
                   <span
                     className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
-                      isTodayDate ? 'bg-blue-600 text-white' : isCurrentMonth ? 'text-slate-700' : 'text-slate-400'
+                      isTodayDate ? 'bg-blue-600 text-white' : ''
                     }`}
+                    style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#94a3b8' } : undefined}
                   >
                     {format(day, 'd')}
                   </span>
@@ -338,12 +339,9 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                   <div className="flex justify-between items-center mb-1">
                     <span
                       className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                        isTodayDate
-                          ? 'bg-blue-600 text-white'
-                          : isCurrentMonth
-                          ? 'text-slate-700'
-                          : 'text-slate-400'
+                        isTodayDate ? 'bg-blue-600 text-white' : ''
                       }`}
+                      style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#94a3b8' } : undefined}
                     >
                       {format(day, 'd')}
                     </span>
@@ -1046,8 +1044,9 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
                         <div className="flex flex-col items-center">
                           <span
                             className={`text-[8px] font-medium w-4 h-4 flex items-center justify-center rounded-full ${
-                              isTodayDate ? 'bg-blue-600 text-white' : isCurrentMonth ? 'text-slate-600' : 'text-slate-300'
+                              isTodayDate ? 'bg-blue-600 text-white' : ''
                             }`}
+                            style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#cbd5e1' } : undefined}
                           >
                             {format(day, 'd')}
                           </span>
@@ -1060,12 +1059,9 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
                       <div className="flex justify-between items-center">
                         <span
                           className={`text-[10px] font-medium w-5 h-5 flex items-center justify-center rounded-full ${
-                            isTodayDate
-                              ? 'bg-blue-600 text-white'
-                              : isCurrentMonth
-                              ? 'text-slate-600'
-                              : 'text-slate-300'
+                            isTodayDate ? 'bg-blue-600 text-white' : ''
                           }`}
+                          style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#cbd5e1' } : undefined}
                         >
                           {format(day, 'd')}
                         </span>
