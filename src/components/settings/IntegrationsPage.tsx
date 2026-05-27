@@ -44,22 +44,6 @@ const PLATFORMS: PlatformMeta[] = [
     docsUrl: 'https://ordinal.social/settings/api',
   },
   {
-    id: 'google',
-    name: 'Google Workspace',
-    description: 'Sync content items with Google Calendar. Attach files from Google Drive.',
-    iconBg: '#FFF7ED',
-    iconText: 'G',
-    iconColor: '#EA4335',
-    category: 'Productivity',
-    setupType: 'api_key',
-    fields: [
-      { key: 'client_id', label: 'Google Client ID', placeholder: 'your-client-id.apps.googleusercontent.com' },
-      { key: 'redirect_uri', label: 'Redirect URI', placeholder: 'https://your-app.com/auth/google/callback' },
-    ],
-    setupNote: 'Google Workspace integration requires OAuth setup. Add your Google OAuth credentials to enable Calendar sync and Drive file picking.',
-    docsUrl: 'https://console.cloud.google.com/apis/credentials',
-  },
-  {
     id: 'notion',
     name: 'Notion',
     description: 'Two-way sync with Notion databases. Import and push content items.',
@@ -385,9 +369,6 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
   return (
     <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
       <span>Connected {connectedAt}</span>
-      {meta.id === 'google' && config.calendar_id && (
-        <span>Calendar: <span className="text-gray-700 font-medium">{config.calendar_id}</span></span>
-      )}
       {meta.id === 'notion' && config.database_id && (
         <span>Database: <span className="text-gray-700 font-medium truncate max-w-[160px] inline-block">{config.database_id}</span></span>
       )}
