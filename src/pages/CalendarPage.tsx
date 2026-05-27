@@ -427,8 +427,11 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
       {months.map((monthDate, idx) => (
         <div key={monthDate.toISOString()} className="bg-white rounded-lg border border-slate-200 overflow-hidden" style={{ marginTop: idx > 0 ? '-1px' : 0 }}>
           {/* Month header bar */}
-          <div className="px-4 py-2.5 border-b border-slate-200 bg-slate-50">
-            <h3 className="text-sm font-semibold text-slate-700">
+          <div
+            className="px-5 py-3 border-b border-slate-200"
+            style={{ background: 'linear-gradient(135deg, #8EC9CA 0%, #b5dfe0 100%)' }}
+          >
+            <h3 className="text-lg font-bold text-white tracking-wide" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
               {format(monthDate, 'MMMM yyyy')}
             </h3>
           </div>
