@@ -35,6 +35,7 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ defa
 const IntakeQueuePage = lazy(() => import('./pages/IntakeQueuePage').then(m => ({ default: m.IntakeQueuePage })));
 const IntakeFormPage = lazy(() => import('./pages/IntakeFormPage').then(m => ({ default: m.IntakeFormPage })));
 const MyWorkPage = lazy(() => import('./pages/MyWorkPage').then(m => ({ default: m.MyWorkPage })));
+const DesignRequestPage = lazy(() => import('./pages/DesignRequestPage').then(m => ({ default: m.DesignRequestPage })));
 const AuthCallback = lazy(() => import('./components/auth/AuthCallback').then(m => ({ default: m.AuthCallback })));
 
 function PageLoader() {
@@ -149,6 +150,7 @@ function AppRoutes() {
         <Route path="/projects" element={<Suspense fallback={<PageLoader />}><ProjectsPage /></Suspense>} />
         <Route path="/projects/:projectId" element={<Suspense fallback={<PageLoader />}><ProjectDetailPage /></Suspense>} />
         <Route path="/intake-queue" element={<Suspense fallback={<PageLoader />}><IntakeQueuePage /></Suspense>} />
+        <Route path="/design-request" element={<Suspense fallback={<PageLoader />}><DesignRequestPage /></Suspense>} />
         <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
         <Route path="/" element={<LastViewRedirect />} />
       </Route>

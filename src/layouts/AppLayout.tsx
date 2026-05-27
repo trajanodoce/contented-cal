@@ -74,8 +74,10 @@ export function AppLayout() {
   const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
+  const [showFabMenu, setShowFabMenu] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const createMenuRef = useRef<HTMLDivElement>(null);
+  const fabMenuRef = useRef<HTMLDivElement>(null);
   const { selectedItemId, setSelectedItemId } = useSelectedItem();
   const canCreate = userRole === 'admin' || userRole === 'editor';
   const canAccessSettings = userRole === 'admin';
@@ -121,16 +123,19 @@ export function AppLayout() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItemId]);
 
-  // Close create menu on outside click
+  // Close create menus on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (createMenuRef.current && !createMenuRef.current.contains(e.target as Node)) {
         setShowCreateMenu(false);
       }
+      if (fabMenuRef.current && !fabMenuRef.current.contains(e.target as Node)) {
+        setShowFabMenu(false);
+      }
     }
-    if (showCreateMenu) document.addEventListener('mousedown', handleClickOutside);
+    if (showCreateMenu || showFabMenu) document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showCreateMenu]);
+  }, [showCreateMenu, showFabMenu]);
 
   // Handle view transitions
   const handleNavigation = useCallback(() => {
@@ -300,7 +305,7 @@ export function AppLayout() {
                     Content Item
                   </button>
                   <button
-                    onClick={() => { setShowCreateMenu(false); navigate('/intake/q9ybey7y'); }}
+                    onClick={() => { setShowCreateMenu(false); navigate('/design-request'); }}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     <Palette className="w-4 h-4 text-purple-500" />
@@ -334,18 +339,18 @@ export function AppLayout() {
 
         {/* Floating Action Button - visible for editors and admins, hidden when detail panel is open */}
         {canCreate && !selectedItemId && (
-          <div className="fixed bottom-6 right-6 z-50">
-            {showCreateMenu && (
+          <div className="fixed bottom-6 right-6 z-50" ref={fabMenuRef}>
+            {showFabMenu && (
               <div className="absolute bottom-16 right-0 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 mb-2">
                 <button
-                  onClick={() => { setShowCreateMenu(false); setIsModalOpen(true); }}
+                  onClick={() => { setShowFabMenu(false); setIsModalOpen(true); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <FileText className="w-4 h-4 text-blue-500" />
                   Content Item
                 </button>
                 <button
-                  onClick={() => { setShowCreateMenu(false); navigate('/intake/q9ybey7y'); }}
+                  onClick={() => { setShowFabMenu(false); navigate('/design-request'); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <Palette className="w-4 h-4 text-purple-500" />
@@ -354,8 +359,8 @@ export function AppLayout() {
               </div>
             )}
             <button
-              onClick={() => setShowCreateMenu(v => !v)}
-              className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 ${showCreateMenu ? 'rotate-45' : ''}`}
+              onClick={() => setShowFabMenu(v => !v)}
+              className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 ${showFabMenu ? 'rotate-45' : ''}`}
               aria-label="Create new item"
               title="Create new item"
             >
