@@ -105,7 +105,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`rounded-lg p-4 shadow-sm border cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden ${
+      className={`rounded-lg p-4 shadow-md border cursor-grab active:cursor-grabbing hover:shadow-lg transition-all relative overflow-hidden ${
         isExternal ? '' : 'bg-slate-50'
       } ${isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
       }`}
@@ -254,7 +254,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
       className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl border-2 transition-all ${
         isOver ? 'border-blue-400' : 'border-slate-200'
       }`}
-      style={{ backgroundColor: isOver ? `${colColor}18` : `${colColor}0A` }}
+      style={{ backgroundColor: isOver ? `${colColor}0C` : `${colColor}05` }}
     >
       {/* Column Header */}
       <div
