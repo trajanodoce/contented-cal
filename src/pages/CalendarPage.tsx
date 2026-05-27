@@ -312,7 +312,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`${collapsed ? 'min-h-[120px] p-1' : 'min-h-[120px] p-2'} border-b border-r border-slate-100 ${
+              className={`${collapsed ? 'min-h-[120px] p-1' : 'min-h-[120px] p-2'} border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
                 !isCurrentMonth ? 'bg-slate-50/50' : collapsed ? 'bg-slate-50/80' : 'bg-white'
               } ${index % 7 === 6 ? 'border-r-0' : ''}`}
               onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
@@ -1036,7 +1036,7 @@ function QuarterView({ currentDate, items, contentTypes, boardColumns, members, 
                     <DroppableDayCell
                       key={day.toISOString()}
                       dateId={format(day, 'yyyy-MM-dd')}
-                      className={`${collapsed ? 'min-h-[40px]' : 'min-h-[72px]'} p-0.5 border-b border-r border-slate-50 ${
+                      className={`${collapsed ? 'min-h-[40px]' : 'min-h-[72px]'} p-0.5 border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
                         !isCurrentMonth ? 'bg-slate-50/30' : collapsed ? 'bg-slate-50/80' : 'bg-white'
                       } ${index % 7 === 6 ? 'border-r-0' : ''}`}
                       onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
