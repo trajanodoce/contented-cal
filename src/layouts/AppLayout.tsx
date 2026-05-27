@@ -213,9 +213,14 @@ export function AppLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-slate-700 text-white border-l-2 border-blue-400'
+                    ? 'text-white border-l-2 border-pink-300'
                     : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                 }`
+              }
+              style={({ isActive }) =>
+                isActive
+                  ? { background: 'linear-gradient(135deg, rgba(250,228,229,0.5) 0%, rgba(250,228,229,0.25) 100%)' }
+                  : undefined
               }
             >
               <span className="text-slate-400">{item.icon}</span>
@@ -233,9 +238,14 @@ export function AppLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-slate-700 text-white border-l-2 border-blue-400'
+                    ? 'text-white border-l-2 border-pink-300'
                     : 'text-slate-300 hover:bg-slate-700 hover:text-white'
                 }`
+              }
+              style={({ isActive }) =>
+                isActive
+                  ? { background: 'linear-gradient(135deg, rgba(250,228,229,0.5) 0%, rgba(250,228,229,0.25) 100%)' }
+                  : undefined
               }
             >
               <Settings className="w-5 h-5 text-slate-400" />
