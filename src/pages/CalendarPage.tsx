@@ -221,9 +221,10 @@ function SubtaskPill({ subtask }: { subtask: SubtaskWithParent }) {
 }
 
 // CSS grid template for collapsible weekends (Mon–Sun, weekStartsOn=1 → indices 5,6 are Sat,Sun)
-const GRID_COLS_EXPANDED = 'repeat(7, 1fr)';
-const GRID_COLS_COLLAPSED = '1fr 1fr 1fr 1fr 1fr 40px 40px';
-const GRID_COLS_COLLAPSED_QUARTER = '1fr 1fr 1fr 1fr 1fr 20px 20px';
+// Use minmax(0, 1fr) instead of 1fr to prevent content from inflating column width
+const GRID_COLS_EXPANDED = 'repeat(7, minmax(0, 1fr))';
+const GRID_COLS_COLLAPSED = 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px 40px';
+const GRID_COLS_COLLAPSED_QUARTER = 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 20px 20px';
 
 // Shared single-month grid used by both MonthView (full-size) and QuarterView (mini)
 interface SingleMonthGridProps {
