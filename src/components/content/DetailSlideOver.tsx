@@ -475,7 +475,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     value={item.status ?? ''}
                     onChange={e => updateField('status', e.target.value || null)}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {allowedStatuses.map(col => (
@@ -492,7 +492,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.priority ?? undefined}
                       onChange={e => updateField('priority', e.target.value)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       {PRIORITIES.map(p => (
                         <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -512,7 +512,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.due_date ?? ''}
                       onChange={e => updateField('due_date', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -528,7 +528,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.publish_date ?? ''}
                       onChange={e => updateField('publish_date', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -541,7 +541,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.channel ?? ''}
                       onChange={e => updateField('channel', e.target.value)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">None</option>
                       {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -556,7 +556,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     value={item.content_type_id ?? ''}
                     onChange={e => updateField('content_type_id', e.target.value || null)}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
@@ -571,7 +571,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.project_id ?? ''}
                       onChange={e => updateField('project_id', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">No project</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
@@ -588,7 +588,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     value={item.assignee_ids?.[0] ?? ''}
                     onChange={e => updateField('assignee_ids', e.target.value ? [e.target.value] : [])}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">Unassigned</option>
                     {members.map(m => (
