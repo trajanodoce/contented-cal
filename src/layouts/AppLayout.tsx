@@ -321,6 +321,7 @@ export function AppLayout() {
             <CreateItemModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
+              initialProjectId={location.pathname.startsWith('/projects/') ? location.pathname.split('/projects/')[1] : null}
             />
           )}
         </header>

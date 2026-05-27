@@ -28,6 +28,7 @@ interface CreateItemModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialDate?: string | null;
+  initialProjectId?: string | null;
   meetingPrefill?: MeetingPrefill | null;
 }
 
@@ -269,7 +270,7 @@ function AssigneeMultiSelect({
 }
 
 // Main modal component
-export function CreateItemModal({ isOpen, onClose, initialDate, meetingPrefill }: CreateItemModalProps) {
+export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId, meetingPrefill }: CreateItemModalProps) {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { contentTypes, boardColumns, members } = useWorkspaceData(
@@ -285,7 +286,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, meetingPrefill }
   const [priority, setPriority] = useState('medium');
   const [channel, setChannel] = useState('');
   const [description, setDescription] = useState('');
-  const [projectId, setProjectId] = useState('');
+  const [projectId, setProjectId] = useState(initialProjectId ?? '');
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -308,6 +309,13 @@ export function CreateItemModal({ isOpen, onClose, initialDate, meetingPrefill }
       setDueDate(initialDate);
     }
   }, [isOpen, initialDate]);
+
+  // Pre-fill project when opened from project page
+  useEffect(() => {
+    if (isOpen && initialProjectId) {
+      setProjectId(initialProjectId);
+    }
+  }, [isOpen, initialProjectId]);
 
   // Pre-fill from meeting note
   useEffect(() => {
