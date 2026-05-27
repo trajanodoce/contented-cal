@@ -10,7 +10,7 @@ import type { IntakeForm, IntakeFormField } from '../../lib/database.types';
 const STANDARD_FIELDS = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'description', label: 'Description', type: 'long_text' },
-  { key: 'channel', label: 'Channel', type: 'select', options: ['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Other'] },
+  { key: 'channel', label: 'Channel', type: 'single_select', options: ['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Other'] },
   { key: 'due_date', label: 'Due Date', type: 'date' },
   { key: 'publish_date', label: 'Publish Date', type: 'date' },
   { key: 'tags', label: 'Tags', type: 'text' },
@@ -116,16 +116,20 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
     addToast('Form settings saved');
   }
 
-  async function addField(fieldKey: string, label: string, fieldType: string) {
+  async function addField(fieldKey: string, label: string, fieldType: string, options?: string[]) {
     const maxPos = fields.length;
-    const { data, error } = await supabase.from('intake_form_fields').insert({
+    const insertData: Record<string, unknown> = {
       form_id: form.id,
       field_key: fieldKey,
       label,
       field_type: fieldType,
       position: maxPos,
       required: fieldKey === 'title',
-    }).select().single();
+    };
+    if (options) {
+      insertData.options = options.map(o => ({ value: o, label: o }));
+    }
+    const { data, error } = await supabase.from('intake_form_fields').insert(insertData).select().single();
     if (error) { addToast(error.message, 'error'); return; }
     if (data) {
       setFields(prev => [...prev, data]);
@@ -311,7 +315,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
                   return (
                     <button
                       key={f.key}
-                      onClick={() => !added && addField(f.key, f.label, f.type)}
+                      onClick={() => !added && addField(f.key, f.label, f.type, (f as any).options)}
                       disabled={added}
                       className={`w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-lg transition-colors
                         ${added ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50 cursor-pointer'}`}
@@ -352,6 +356,13 @@ function FormPreview({ form, fields }: { form: IntakeForm; fields: IntakeFormFie
               <textarea rows={3} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none" placeholder={field.label} disabled />
             ) : field.field_type === 'date' ? (
               <input type="date" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" disabled />
+            ) : field.field_type === 'single_select' ? (
+              <select className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white" disabled>
+                <option value="">Select...</option>
+                {((field.options as { value: string; label: string }[]) ?? []).map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
             ) : (
               <input type="text" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" placeholder={field.label} disabled />
             )}
