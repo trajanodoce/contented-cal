@@ -48,6 +48,8 @@ import {
   Plus,
   X,
   UserPlus,
+  Link2,
+  Share2,
 } from 'lucide-react';
 import { formatDate, getPriorityDot, getUserInitials } from '../lib/utils';
 import {
@@ -339,11 +341,23 @@ export function ProjectDetailPage() {
               {project.title}
             </h1>
           )}
-          <span
-            className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0 mt-1 ${statusBadge(project.status)}`}
-          >
-            {project.status}
-          </span>
+          <div className="flex items-center gap-2 shrink-0 mt-1">
+            <span
+              className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusBadge(project.status)}`}
+            >
+              {project.status}
+            </span>
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/projects/${projectId}`;
+                navigator.clipboard.writeText(url).then(() => toast.success('Project link copied'));
+              }}
+              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+              title="Copy project link"
+            >
+              <Link2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Description */}
