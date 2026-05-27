@@ -10,7 +10,7 @@ import type { IntakeForm, IntakeFormField } from '../../lib/database.types';
 const STANDARD_FIELDS = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'description', label: 'Description', type: 'long_text' },
-  { key: 'channel', label: 'Channel', type: 'text' },
+  { key: 'channel', label: 'Channel', type: 'select', options: ['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Other'] },
   { key: 'due_date', label: 'Due Date', type: 'date' },
   { key: 'publish_date', label: 'Publish Date', type: 'date' },
   { key: 'tags', label: 'Tags', type: 'text' },

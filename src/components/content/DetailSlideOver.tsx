@@ -29,7 +29,7 @@ interface CommentWithProfile extends Comment {
   profiles: Pick<Profile, 'id' | 'full_name' | 'email' | 'avatar_url'> | null;
 }
 
-const CHANNELS = ['Blog', 'LinkedIn', 'Twitter/X', 'Instagram', 'Facebook', 'YouTube', 'Email', 'Website', 'Other'];
+const CHANNELS = ['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Other'];
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
 // Default field visibility - all fields visible by default

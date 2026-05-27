@@ -584,13 +584,16 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
           {fieldVisibility.channel && (
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Channel</label>
-              <input
-                type="text"
+              <select
                 value={channel}
                 onChange={(e) => setChannel(e.target.value)}
-                placeholder="e.g., Email, Social Media, Blog..."
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              >
+                <option value="">Select a channel...</option>
+                {['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Other'].map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
           )}
 
