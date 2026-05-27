@@ -408,13 +408,19 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
       )}
       {meta.id === 'linear' && (
         <>
+          {config.linear_user_name && (
+            <span className="text-[#5E6AD2] font-medium">{config.linear_user_name}</span>
+          )}
+          {config.linear_teams && (
+            <span>Teams: <span className="text-gray-700 font-medium">{config.linear_teams}</span></span>
+          )}
           {config.issues_count && (
             <span><span className="text-gray-700 font-medium">{config.issues_count}</span> issues synced</span>
           )}
           {config.last_synced && (
             <span>Last sync: <span className="text-gray-700 font-medium">{new Date(config.last_synced).toLocaleString()}</span></span>
           )}
-          {!config.last_synced && <span>Click "Sync Issues" to import your Linear issues</span>}
+          {!config.last_synced && !config.linear_user_name && <span>Click "Test" to verify, then "Sync Issues" to import</span>}
         </>
       )}
       {meta.id === 'ordinal' && (
@@ -521,6 +527,10 @@ export function IntegrationsPage({ addToast }: Props) {
       }
       await load();
       addToast(`${PLATFORMS.find(p => p.id === platform)?.name} connected`);
+      // Auto-test Linear to fetch team/user info
+      if (platform === 'linear') {
+        testConnection('linear');
+      }
     } catch (err: unknown) {
       addToast((err as Error).message, 'error');
     } finally {
@@ -570,9 +580,50 @@ export function IntegrationsPage({ addToast }: Props) {
 
   async function testConnection(platform: IntegrationPlatform) {
     setTesting(platform);
-    await new Promise(r => setTimeout(r, 800));
-    setTesting(null);
-    addToast('Connection is working', 'success');
+    try {
+      if (platform === 'linear') {
+        const integration = getIntegration('linear');
+        const apiKey = integration?.access_token || (integration?.config as Record<string, string>)?.api_key;
+        if (!apiKey) throw new Error('No API key found');
+
+        const res = await fetch('https://api.linear.app/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: apiKey },
+          body: JSON.stringify({ query: '{ viewer { id name email } teams { nodes { id name } } }' }),
+        });
+        const json = await res.json();
+        if (json.errors) throw new Error(json.errors[0]?.message || 'API error');
+
+        const viewer = json.data.viewer;
+        const teams = json.data.teams.nodes;
+        const teamNames = teams.map((t: { name: string }) => t.name).join(', ');
+
+        // Store team info in config
+        if (integration) {
+          await supabase
+            .from('integrations')
+            .update({
+              config: {
+                ...(integration.config as Record<string, unknown>),
+                linear_user_name: viewer.name,
+                linear_user_email: viewer.email,
+                linear_teams: teamNames,
+              },
+            })
+            .eq('id', integration.id);
+          await load();
+        }
+
+        addToast(`Connected as ${viewer.name} (${teamNames})`, 'success');
+      } else {
+        await new Promise(r => setTimeout(r, 800));
+        addToast('Connection is working', 'success');
+      }
+    } catch (err: unknown) {
+      addToast(`Connection failed: ${(err as Error).message}`, 'error');
+    } finally {
+      setTesting(null);
+    }
   }
 
   const categories = Array.from(new Set(PLATFORMS.map(p => p.category)));
