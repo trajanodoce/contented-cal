@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   X, Calendar, MessageSquare,
-  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2
+  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2, Copy
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
@@ -204,6 +204,39 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     } finally {
       setDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  }
+
+  const [duplicating, setDuplicating] = useState(false);
+  async function duplicateItem() {
+    setDuplicating(true);
+    try {
+      const { data, error } = await supabase.from('content_items').insert({
+        workspace_id: item.workspace_id,
+        title: `${item.title} (copy)`,
+        description: item.description,
+        content_type_id: item.content_type_id,
+        status: item.status,
+        priority: item.priority,
+        channel: item.channel,
+        project_id: item.project_id,
+        assignee_ids: item.assignee_ids,
+        tags: item.tags,
+        custom_fields: item.custom_fields,
+        due_date: item.due_date,
+        publish_date: item.publish_date,
+        created_by: user?.id ?? null,
+      }).select().single();
+
+      if (error) throw error;
+
+      addToast('Item duplicated');
+      onUpdated();
+      onClose();
+    } catch (err: unknown) {
+      addToast((err as Error).message, 'error');
+    } finally {
+      setDuplicating(false);
     }
   }
 
@@ -807,13 +840,23 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {hasChanges ? 'All changes saved' : 'No unsaved changes'}
               </span>
               {!isReadOnly && (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Delete item"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <>
+                  <button
+                    onClick={duplicateItem}
+                    disabled={duplicating}
+                    className="p-1.5 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="Duplicate item"
+                  >
+                    {duplicating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete item"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
               )}
             </div>
             <button
