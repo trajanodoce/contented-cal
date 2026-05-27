@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -57,13 +57,29 @@ export function ProjectDetailPage() {
   );
   const { setSelectedItemId } = useSelectedItem();
   const { filters, setFilters } = useFilters();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [project, setProject] = useState<Project | null>(null);
   const [items, setItems] = useState<ContentItem[]>([]);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+
+  // Persist active tab in URL (?tab=list)
+  const VALID_TABS: TabId[] = ['overview', 'list', 'board', 'calendar'];
+  const tabParam = searchParams.get('tab') as TabId | null;
+  const activeTab: TabId = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'overview';
+  const setActiveTab = useCallback((tab: TabId) => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (tab === 'overview') {
+        next.delete('tab');
+      } else {
+        next.set('tab', tab);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   // Inline editing state
   const [editingTitle, setEditingTitle] = useState(false);
