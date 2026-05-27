@@ -156,7 +156,9 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
   const [url, setUrl] = useState('');
   const [fetching, setFetching] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounterRef = useRef(0);
 
   const loadLinks = useCallback(async () => {
     const { data } = await supabase
@@ -240,15 +242,13 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
     }
   }
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files;
-    if (!files || files.length === 0 || !user) return;
+  // Shared upload logic for both file input and drag-and-drop
+  async function uploadFiles(files: File[]) {
+    if (files.length === 0 || !user) return;
 
     setUploading(true);
     try {
-      for (const file of Array.from(files)) {
-        // Upload to Supabase storage
-        const fileExt = file.name.split('.').pop();
+      for (const file of files) {
         const filePath = `${contentItemId}/${Date.now()}-${file.name}`;
 
         const { error: uploadError } = await supabase.storage
@@ -257,18 +257,14 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
 
         if (uploadError) throw uploadError;
 
-        // Get public URL
         const { data: urlData } = supabase.storage
           .from('project-files')
           .getPublicUrl(filePath);
 
-        const publicUrl = urlData.publicUrl;
-
-        // Create external_link record
         const { error: insertError } = await supabase.from('external_links').insert({
           content_item_id: contentItemId,
           platform: 'file' as ExternalLinkPlatform,
-          url: publicUrl,
+          url: urlData.publicUrl,
           title: file.name,
           thumbnail_url: null,
           metadata: {
@@ -288,13 +284,54 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
       addToast((err as Error).message, 'error');
     } finally {
       setUploading(false);
-      // Reset file input
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }
 
+  function handleFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (files) uploadFiles(Array.from(files));
+  }
+
+  // Drag-and-drop handlers
+  function handleDragEnter(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current++;
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDragging(true);
+    }
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) {
+      setIsDragging(false);
+    }
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounterRef.current = 0;
+
+    if (readOnly) return;
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      uploadFiles(files);
+    }
+  }
+
   async function handleDelete(link: ExternalLink) {
-    // If it's a file, also delete from storage
     if (link.platform === 'file') {
       const metadata = (link.metadata ?? {}) as Record<string, unknown>;
       const storagePath = metadata.storage_path as string | undefined;
@@ -310,7 +347,22 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
   }
 
   return (
-    <div>
+    <div
+      onDragEnter={!readOnly ? handleDragEnter : undefined}
+      onDragLeave={!readOnly ? handleDragLeave : undefined}
+      onDragOver={!readOnly ? handleDragOver : undefined}
+      onDrop={!readOnly ? handleDrop : undefined}
+      className="relative"
+    >
+      {/* Full-section drag overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/80 flex flex-col items-center justify-center pointer-events-none">
+          <Upload className="w-8 h-8 text-blue-500 mb-2" />
+          <p className="text-sm font-semibold text-blue-600">Drop files to upload</p>
+          <p className="text-xs text-blue-400 mt-0.5">Release to add to linked assets</p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-3">
         <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
           <Link2 className="w-3.5 h-3.5" />
@@ -323,16 +375,8 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
               type="file"
               multiple
               className="hidden"
-              onChange={handleFileUpload}
+              onChange={handleFileInputChange}
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
-            >
-              {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-              {uploading ? 'Uploading...' : 'Upload file'}
-            </button>
             {!adding && (
               <button
                 onClick={() => setAdding(true)}
@@ -380,18 +424,65 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
         <div className="flex items-center justify-center py-6">
           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
         </div>
-      ) : links.length === 0 ? (
+      ) : links.length === 0 && !readOnly ? (
+        /* Empty state = clickable drop zone */
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full flex flex-col items-center justify-center py-8 text-center border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group"
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="w-7 h-7 text-blue-500 mb-2 animate-spin" />
+              <p className="text-sm font-medium text-blue-600">Uploading...</p>
+            </>
+          ) : (
+            <>
+              <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center mb-2 transition-colors">
+                <Upload className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+              </div>
+              <p className="text-sm font-medium text-slate-600 group-hover:text-blue-600 transition-colors">
+                Drop files here or click to upload
+              </p>
+              <p className="text-xs text-slate-400 mt-0.5">or paste a link using "Add link" above</p>
+            </>
+          )}
+        </button>
+      ) : links.length === 0 && readOnly ? (
         <div className="flex flex-col items-center justify-center py-6 text-center border border-dashed border-slate-200 rounded-xl">
           <Link2 className="w-7 h-7 text-slate-300 mb-2" />
           <p className="text-xs text-slate-400">No linked assets yet</p>
-          <p className="text-xs text-slate-400 mt-0.5">Upload files or paste a URL to attach assets</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
-          {links.map(link => (
-            <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link)} />
-          ))}
-        </div>
+        /* Has links — show grid + drop zone at bottom */
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            {links.map(link => (
+              <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link)} />
+            ))}
+          </div>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full mt-3 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                  <span className="text-xs font-medium text-blue-600">Uploading...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                  <span className="text-xs font-medium text-slate-500 group-hover:text-blue-600 transition-colors">
+                    Drop files or click to upload more
+                  </span>
+                </>
+              )}
+            </button>
+          )}
+        </>
       )}
     </div>
   );
