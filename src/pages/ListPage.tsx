@@ -419,7 +419,7 @@ export function ListPage() {
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
                 const hasGranola = granolaItemIds.has(item.id);
-                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF0E8' : hasGranola ? '#F0FDF4' : undefined;
+                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : hasGranola ? '#F0FDF4' : undefined;
 
                 return (
                   <tr
