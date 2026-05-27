@@ -118,7 +118,7 @@ export function FilterBar({
   }), [filters]);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-4 mb-4">
+    <div className="bg-white border-2 rounded-lg p-4 mb-4" style={{ borderColor: '#002339' }}>
       <div className="flex flex-wrap items-center gap-3">
         {/* Search input */}
         <div className="relative flex-shrink-0 min-w-[200px] max-w-[300px]">
@@ -128,7 +128,8 @@ export function FilterBar({
             placeholder="Search items..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="w-full pl-10 pr-9 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-9 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            style={{ borderColor: '#002339' }}
           />
           {searchValue && (
             <button
@@ -140,7 +141,7 @@ export function FilterBar({
           )}
         </div>
 
-        <div className="h-6 w-px bg-slate-200" />
+        <div className="h-6 w-px" style={{ backgroundColor: '#002339' }} />
 
         {/* Content Type filter */}
         <FilterDropdown
@@ -337,19 +338,19 @@ function FilterDropdown({
     <div ref={containerRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
           count > 1
-            ? 'text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100'
+            ? 'text-blue-700 bg-blue-50 hover:bg-blue-100'
             : count === 1
               ? indicatorColor
-                ? 'border hover:bg-slate-50'
+                ? 'hover:bg-slate-50'
                 : 'text-slate-700 hover:bg-slate-100'
-              : 'text-slate-600 hover:bg-slate-100 border border-slate-200'
+              : 'text-slate-600 hover:bg-slate-100'
         }`}
         style={
           count === 1 && indicatorColor
             ? { backgroundColor: `${indicatorColor}15`, borderColor: indicatorColor }
-            : {}
+            : { borderColor: '#002339' }
         }
       >
         {count === 1 && indicatorColor && (
@@ -365,18 +366,20 @@ function FilterDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto z-50">
+        <div className="absolute top-full mt-1 bg-white border-2 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ borderColor: '#002339' }}>
           <div className="p-2">
-            <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">{label}</p>
-            {options.map((option) => {
+            <p className="text-xs font-medium uppercase px-2 py-1" style={{ color: '#002339' }}>{label}</p>
+            {options.map((option, idx) => {
               const isSelected = selectedIds.includes(option.id);
+              // Very subtle alternating cool-tone washes
+              const coolWashes = ['#f0f4f8', '#f5f0f8', '#f0f6f5', '#f2f4f8', '#f5f3f0', '#f0f2f6', '#f4f0f5'];
+              const rowBg = isSelected ? '#e8f0fe' : coolWashes[idx % coolWashes.length];
               return (
                 <button
                   key={option.id}
                   onClick={() => onToggle(option.id)}
-                  className={`w-full px-2 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 rounded ${
-                    isSelected ? 'bg-blue-50' : ''
-                  }`}
+                  className="w-full px-2 py-2 text-left text-sm flex items-center gap-2 rounded transition-colors"
+                  style={{ backgroundColor: rowBg }}
                 >
                   {option.avatarUrl !== undefined ? (
                     // Avatar for assignees
