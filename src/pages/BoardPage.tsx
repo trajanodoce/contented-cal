@@ -87,7 +87,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
   const isExternal = isOrdinal || isLinear;
-  const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
+  const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
 
   if (isDragging && !isOverlay) {
     return (
@@ -102,17 +102,18 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
   return (
     <div
       ref={setNodeRef}
-      style={{
-        ...style,
-        ...(externalBg ? { backgroundColor: externalBg } : {}),
-      }}
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`rounded-lg p-4 shadow-sm border border-slate-200 cursor-grab active:cursor-grabbing hover:shadow-md hover:border-slate-300 transition-all relative overflow-hidden ${
+      className={`rounded-lg p-4 shadow-sm border cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden ${
         isExternal ? '' : 'bg-slate-50'
       } ${isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
       }`}
+      style={{
+        ...style,
+        ...(externalBg ? { backgroundColor: externalBg } : {}),
+        borderColor: '#002339',
+      }}
     >
       {/* Priority indicator */}
       <div
@@ -245,21 +246,31 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
     data: { column },
   });
 
+  const colColor = column.color ?? '#94a3b8';
+
   return (
     <div
       ref={setNodeRef}
-      className={`flex-shrink-0 w-[300px] flex flex-col bg-slate-50 rounded-xl border-2 transition-all ${
-        isOver ? 'border-blue-400 bg-blue-50/30' : 'border-slate-200'
+      className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl border-2 transition-all ${
+        isOver ? 'border-blue-400' : 'border-slate-200'
       }`}
+      style={{ backgroundColor: isOver ? `${colColor}18` : `${colColor}0A` }}
     >
       {/* Column Header */}
       <div
-        className="px-4 py-3 border-b border-slate-200 rounded-t-xl bg-white"
-        style={{ borderTop: `3px solid ${column.color ?? '#94a3b8'}` }}
+        className="px-4 py-3 border-b rounded-t-xl"
+        style={{
+          borderTop: `3px solid ${colColor}`,
+          borderBottomColor: `${colColor}30`,
+          backgroundColor: `${colColor}15`,
+        }}
       >
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-slate-900">{column.name}</h3>
-          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+          <span
+            className="text-xs font-medium px-2 py-1 rounded-full"
+            style={{ backgroundColor: `${colColor}20`, color: colColor }}
+          >
             {items.length}
           </span>
         </div>
