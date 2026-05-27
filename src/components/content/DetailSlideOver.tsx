@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   X, Calendar, MessageSquare,
-  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2
+  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
@@ -550,6 +550,26 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     </select>
                   </div>
                 )}
+
+                {/* Assignee */}
+                <div className="col-span-2">
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1">
+                    <User className="w-3 h-3" /> Assignee
+                  </label>
+                  <select
+                    value={item.assignee_ids?.[0] ?? ''}
+                    onChange={e => updateField('assignee_ids', e.target.value ? [e.target.value] : [])}
+                    disabled={isReadOnly}
+                    className={`mt-1.5 w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  >
+                    <option value="">Unassigned</option>
+                    {members.map(m => (
+                      <option key={m.user_id} value={m.user_id}>
+                        {m.full_name || m.email || 'Unknown member'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Tags */}
