@@ -847,7 +847,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         <div className="flex-shrink-0 px-6 py-4 border-t-2 border-blue-100 bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-medium" style={{ color: '#FAE4E5' }}>
+              <span className="text-xs font-medium" style={{ color: '#25476C' }}>
                 {hasChanges ? 'All changes saved' : 'No unsaved changes'}
               </span>
               {!isReadOnly && (
@@ -856,7 +856,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     onClick={duplicateItem}
                     disabled={duplicating}
                     className="p-1.5 rounded-lg transition-colors hover:opacity-80"
-                    style={{ color: '#FAE4E5' }}
+                    style={{ color: '#25476C' }}
                     title="Duplicate item"
                   >
                     {duplicating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
