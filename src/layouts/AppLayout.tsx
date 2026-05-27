@@ -289,8 +289,14 @@ export function AppLayout() {
       {/* Main content */}
       <main className="flex-1 flex flex-col min-w-1 bg-slate-50 overflow-hidden relative">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0">
-          <h1 className="text-lg font-semibold text-slate-900">
+        <header
+          className="h-16 border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0"
+          style={location.pathname === '/my-work'
+            ? { background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }
+            : { backgroundColor: 'white' }
+          }
+        >
+          <h1 className={`text-lg font-semibold ${location.pathname === '/my-work' ? 'text-white' : 'text-slate-900'}`}>
             {getPageTitle(location.pathname)}
           </h1>
           {canCreate && (
