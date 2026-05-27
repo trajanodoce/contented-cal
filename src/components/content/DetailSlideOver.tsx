@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   X, Calendar, MessageSquare,
-  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User
+  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
@@ -82,6 +82,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const [granolaRefreshKey, setGranolaRefreshKey] = useState(0);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSavedCheck, setShowSavedCheck] = useState(false);
+
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const contentType = contentTypes.find(ct => ct.id === item.content_type_id);
 
@@ -177,6 +180,31 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     setCommentText('');
     loadComments();
     addToast('Comment added');
+  }
+
+  async function deleteItem() {
+    setDeleting(true);
+    try {
+      // Delete subtasks first
+      await supabase.from('subtasks').delete().eq('content_item_id', item.id);
+      // Delete comments
+      await supabase.from('comments').delete().eq('content_item_id', item.id);
+      // Delete activity log
+      await supabase.from('activity_log').delete().eq('content_item_id', item.id);
+      // Delete linear issue links if any
+      await supabase.from('linear_issue_links').delete().eq('content_item_id', item.id);
+      // Delete the content item
+      const { error } = await supabase.from('content_items').delete().eq('id', item.id);
+      if (error) throw error;
+      addToast('Item deleted');
+      onClose();
+      onUpdated();
+    } catch (err: unknown) {
+      addToast((err as Error).message, 'error');
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
   }
 
   // Close with green check animation if changes were made
@@ -774,9 +802,20 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         {/* Sticky footer */}
         <div className="flex-shrink-0 px-6 py-4 border-t-2 border-blue-100 bg-white">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">
-              {hasChanges ? 'All changes saved' : 'No unsaved changes'}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-400">
+                {hasChanges ? 'All changes saved' : 'No unsaved changes'}
+              </span>
+              {!isReadOnly && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Delete item"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
             <button
               onClick={handleClose}
               className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1.5"
@@ -795,6 +834,37 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             </button>
           </div>
         </div>
+
+        {/* Delete confirmation modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
+            <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-100">
+                <Trash2 className="w-6 h-6 text-red-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 text-center">Are you sure?</h3>
+              <p className="mt-2 text-sm text-slate-500 text-center">
+                Once it's gone, it's gone for good.
+              </p>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={deleteItem}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Delete forever
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
