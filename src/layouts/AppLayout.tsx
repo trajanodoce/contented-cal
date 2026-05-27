@@ -137,11 +137,8 @@ export function AppLayout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showCreateMenu, showFabMenu]);
 
-  // Handle view transitions
-  const handleNavigation = useCallback(() => {
-    setIsTransitioning(true);
-    setTimeout(() => setIsTransitioning(false), 150);
-  }, []);
+  // Handle view transitions (no-op — transitions now handled by Suspense)
+  const handleNavigation = useCallback(() => {}, []);
 
   async function handleSignOut() {
     await signOut();
@@ -327,11 +324,7 @@ export function AppLayout() {
         </header>
 
         {/* Page content with fade transition */}
-        <div
-          className={`flex-1 overflow-auto transition-opacity duration-150 ${
-            isTransitioning ? 'opacity-0' : 'opacity-100'
-          }`}
-        >
+        <div className="flex-1 overflow-auto">
           <Outlet />
         </div>
 

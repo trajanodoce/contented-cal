@@ -1,4 +1,5 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, Component } from 'react';
+import type { ReactNode, ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -24,25 +25,100 @@ import { Loader2 } from 'lucide-react';
 // Layout (always loaded)
 import { AppLayout } from './layouts/AppLayout';
 
-// Lazy-loaded pages
-const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
-const ListPage = lazy(() => import('./pages/ListPage').then(m => ({ default: m.ListPage })));
-const BoardPage = lazy(() => import('./pages/BoardPage').then(m => ({ default: m.BoardPage })));
-const CalendarPage = lazy(() => import('./pages/CalendarPage').then(m => ({ default: m.CalendarPage })));
-const ProjectsPage = lazy(() => import('./pages/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
-const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
-const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
-const IntakeQueuePage = lazy(() => import('./pages/IntakeQueuePage').then(m => ({ default: m.IntakeQueuePage })));
-const IntakeFormPage = lazy(() => import('./pages/IntakeFormPage').then(m => ({ default: m.IntakeFormPage })));
-const MyWorkPage = lazy(() => import('./pages/MyWorkPage').then(m => ({ default: m.MyWorkPage })));
-const DesignRequestPage = lazy(() => import('./pages/DesignRequestPage').then(m => ({ default: m.DesignRequestPage })));
-const AuthCallback = lazy(() => import('./components/auth/AuthCallback').then(m => ({ default: m.AuthCallback })));
+// Retry wrapper for lazy imports — handles stale chunks after deploys
+function lazyRetry<T extends { default: React.ComponentType }>(
+  importer: () => Promise<T>,
+  retries = 2
+): Promise<T> {
+  return importer().catch((error: unknown) => {
+    if (retries > 0) {
+      // Clear module cache and retry after a brief delay
+      return new Promise<T>(resolve =>
+        setTimeout(() => resolve(lazyRetry(importer, retries - 1)), 500)
+      );
+    }
+    throw error;
+  });
+}
+
+// Error boundary — catches chunk load failures and auto-reloads
+class ChunkErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, _info: ErrorInfo) {
+    // If it's a chunk load error, reload the page once
+    const isChunkError =
+      error.name === 'ChunkLoadError' ||
+      error.message?.includes('Loading chunk') ||
+      error.message?.includes('Failed to fetch dynamically imported module');
+
+    if (isChunkError) {
+      const reloadKey = 'chunk_reload_ts';
+      const lastReload = sessionStorage.getItem(reloadKey);
+      const now = Date.now();
+      // Only auto-reload if we haven't reloaded in the last 10 seconds
+      if (!lastReload || now - Number(lastReload) > 10000) {
+        sessionStorage.setItem(reloadKey, String(now));
+        window.location.reload();
+      }
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full py-20 gap-3">
+          <p className="text-sm text-slate-500">Something went wrong loading this page.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Reload
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Lazy-loaded pages with retry
+const HomePage = lazy(() => lazyRetry(() => import('./pages/HomePage').then(m => ({ default: m.HomePage }))));
+const ListPage = lazy(() => lazyRetry(() => import('./pages/ListPage').then(m => ({ default: m.ListPage }))));
+const BoardPage = lazy(() => lazyRetry(() => import('./pages/BoardPage').then(m => ({ default: m.BoardPage }))));
+const CalendarPage = lazy(() => lazyRetry(() => import('./pages/CalendarPage').then(m => ({ default: m.CalendarPage }))));
+const ProjectsPage = lazy(() => lazyRetry(() => import('./pages/ProjectsPage').then(m => ({ default: m.ProjectsPage }))));
+const ProjectDetailPage = lazy(() => lazyRetry(() => import('./pages/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage }))));
+const SettingsPage = lazy(() => lazyRetry(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage }))));
+const IntakeQueuePage = lazy(() => lazyRetry(() => import('./pages/IntakeQueuePage').then(m => ({ default: m.IntakeQueuePage }))));
+const IntakeFormPage = lazy(() => lazyRetry(() => import('./pages/IntakeFormPage').then(m => ({ default: m.IntakeFormPage }))));
+const MyWorkPage = lazy(() => lazyRetry(() => import('./pages/MyWorkPage').then(m => ({ default: m.MyWorkPage }))));
+const DesignRequestPage = lazy(() => lazyRetry(() => import('./pages/DesignRequestPage').then(m => ({ default: m.DesignRequestPage }))));
+const AuthCallback = lazy(() => lazyRetry(() => import('./components/auth/AuthCallback').then(m => ({ default: m.AuthCallback }))));
 
 function PageLoader() {
   return (
     <div className="flex items-center justify-center h-full py-20">
       <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
     </div>
+  );
+}
+
+function LazyPage({ children }: { children: ReactNode }) {
+  return (
+    <ChunkErrorBoundary>
+      <LazyPage>{children}</LazyPage>
+    </ChunkErrorBoundary>
   );
 }
 
@@ -139,19 +215,19 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/create-workspace" element={<CreateWorkspaceRoute />} />
-      <Route path="/auth/callback" element={<Suspense fallback={<PageLoader />}><AuthCallback /></Suspense>} />
-      <Route path="/intake/:slug" element={<Suspense fallback={<PageLoader />}><IntakeFormPage /></Suspense>} />
+      <Route path="/auth/callback" element={<LazyPage><AuthCallback /></LazyPage>} />
+      <Route path="/intake/:slug" element={<LazyPage><IntakeFormPage /></LazyPage>} />
       <Route element={<ProtectedLayout />}>
-        <Route path="/home" element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
-        <Route path="/list" element={<Suspense fallback={<PageLoader />}><ListPage /></Suspense>} />
-        <Route path="/my-work" element={<Suspense fallback={<PageLoader />}><MyWorkPage /></Suspense>} />
-        <Route path="/board" element={<Suspense fallback={<PageLoader />}><BoardPage /></Suspense>} />
-        <Route path="/calendar" element={<Suspense fallback={<PageLoader />}><CalendarPage /></Suspense>} />
-        <Route path="/projects" element={<Suspense fallback={<PageLoader />}><ProjectsPage /></Suspense>} />
-        <Route path="/projects/:projectId" element={<Suspense fallback={<PageLoader />}><ProjectDetailPage /></Suspense>} />
-        <Route path="/intake-queue" element={<Suspense fallback={<PageLoader />}><IntakeQueuePage /></Suspense>} />
-        <Route path="/design-request" element={<Suspense fallback={<PageLoader />}><DesignRequestPage /></Suspense>} />
-        <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
+        <Route path="/home" element={<LazyPage><HomePage /></LazyPage>} />
+        <Route path="/list" element={<LazyPage><ListPage /></LazyPage>} />
+        <Route path="/my-work" element={<LazyPage><MyWorkPage /></LazyPage>} />
+        <Route path="/board" element={<LazyPage><BoardPage /></LazyPage>} />
+        <Route path="/calendar" element={<LazyPage><CalendarPage /></LazyPage>} />
+        <Route path="/projects" element={<LazyPage><ProjectsPage /></LazyPage>} />
+        <Route path="/projects/:projectId" element={<LazyPage><ProjectDetailPage /></LazyPage>} />
+        <Route path="/intake-queue" element={<LazyPage><IntakeQueuePage /></LazyPage>} />
+        <Route path="/design-request" element={<LazyPage><DesignRequestPage /></LazyPage>} />
+        <Route path="/settings" element={<LazyPage><SettingsPage /></LazyPage>} />
         <Route path="/" element={<LastViewRedirect />} />
       </Route>
     </Routes>
