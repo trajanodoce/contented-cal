@@ -15,6 +15,8 @@ import {
   File,
   X,
   Loader2,
+  Pencil,
+  Check,
 } from 'lucide-react';
 
 interface LibraryItem {
@@ -62,6 +64,9 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
   const [linkUrl, setLinkUrl] = useState('');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editUrl, setEditUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const addMenuRef = useRef<HTMLDivElement>(null);
 
@@ -193,6 +198,41 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
       toast.success('Removed');
       setItems(prev => prev.filter(i => i.id !== item.id));
     }
+  }
+
+  function startEditing(item: LibraryItem) {
+    setEditingId(item.id);
+    setEditTitle(item.title);
+    setEditUrl(item.url ?? '');
+  }
+
+  async function saveEdit(item: LibraryItem) {
+    if (!editTitle.trim()) return;
+    const updates: Record<string, string> = { title: editTitle.trim() };
+    if (item.type === 'link' && editUrl.trim()) {
+      let url = editUrl.trim();
+      if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+      updates.url = url;
+    }
+
+    const { error } = await supabase
+      .from('project_library')
+      .update(updates)
+      .eq('id', item.id);
+
+    if (error) {
+      toast.error('Failed to update');
+    } else {
+      setItems(prev => prev.map(i => i.id === item.id ? { ...i, ...updates } : i));
+      toast.success('Updated');
+    }
+    setEditingId(null);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditTitle('');
+    setEditUrl('');
   }
 
   const fileItems = items.filter(i => i.type === 'file');
@@ -334,38 +374,73 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                   >
                     {getFileIcon(item.file_type)}
                     <div className="flex-1 min-w-0">
-                      <a
-                        href={item.url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
-                      >
-                        {item.title}
-                      </a>
-                      {item.file_size != null && (
+                      {editingId === item.id ? (
+                        <input
+                          autoFocus
+                          value={editTitle}
+                          onChange={e => setEditTitle(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') saveEdit(item);
+                            if (e.key === 'Escape') cancelEdit();
+                          }}
+                          onBlur={() => saveEdit(item)}
+                          className="w-full text-sm font-medium text-slate-800 border-b border-blue-400 outline-none bg-transparent"
+                        />
+                      ) : (
+                        <a
+                          href={item.url ?? '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                        >
+                          {item.title}
+                        </a>
+                      )}
+                      {item.file_size != null && editingId !== item.id && (
                         <span className="text-xs text-slate-400">
                           {formatFileSize(item.file_size)}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <a
-                        href={item.url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 text-slate-400 hover:text-blue-500 rounded"
-                        title="Open"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                      {!readOnly && (
+                    <div className={`flex items-center gap-1 transition-opacity ${editingId === item.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                      {editingId === item.id ? (
                         <button
-                          onClick={() => deleteItem(item)}
-                          className="p-1 text-slate-400 hover:text-red-500 rounded"
-                          title="Remove"
+                          onClick={() => saveEdit(item)}
+                          className="p-1 text-green-500 hover:text-green-600 rounded"
+                          title="Save"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Check className="w-3.5 h-3.5" />
                         </button>
+                      ) : (
+                        <>
+                          {!readOnly && (
+                            <button
+                              onClick={() => startEditing(item)}
+                              className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                              title="Edit"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          <a
+                            href={item.url ?? '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 text-slate-400 hover:text-blue-500 rounded"
+                            title="Open"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                          {!readOnly && (
+                            <button
+                              onClick={() => deleteItem(item)}
+                              className="p-1 text-slate-400 hover:text-red-500 rounded"
+                              title="Remove"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -386,38 +461,95 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     key={item.id}
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
                   >
-                    <Link2 className="w-5 h-5 text-blue-400" />
+                    <Link2 className="w-5 h-5 text-blue-400 shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <a
-                        href={item.url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
-                      >
-                        {item.title}
-                      </a>
-                      <span className="text-xs text-slate-400 truncate block">
-                        {item.url}
-                      </span>
+                      {editingId === item.id ? (
+                        <div className="space-y-1.5">
+                          <input
+                            autoFocus
+                            value={editTitle}
+                            onChange={e => setEditTitle(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Escape') cancelEdit();
+                            }}
+                            placeholder="Title"
+                            className="w-full text-sm font-medium text-slate-800 border-b border-blue-400 outline-none bg-transparent"
+                          />
+                          <input
+                            value={editUrl}
+                            onChange={e => setEditUrl(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') saveEdit(item);
+                              if (e.key === 'Escape') cancelEdit();
+                            }}
+                            placeholder="https://..."
+                            className="w-full text-xs text-slate-500 border-b border-slate-300 outline-none bg-transparent"
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <a
+                            href={item.url ?? '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                          >
+                            {item.title}
+                          </a>
+                          <span className="text-xs text-slate-400 truncate block">
+                            {item.url}
+                          </span>
+                        </>
+                      )}
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <a
-                        href={item.url ?? '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1 text-slate-400 hover:text-blue-500 rounded"
-                        title="Open"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                      {!readOnly && (
-                        <button
-                          onClick={() => deleteItem(item)}
-                          className="p-1 text-slate-400 hover:text-red-500 rounded"
-                          title="Remove"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                    <div className={`flex items-center gap-1 shrink-0 transition-opacity ${editingId === item.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                      {editingId === item.id ? (
+                        <>
+                          <button
+                            onClick={() => saveEdit(item)}
+                            className="p-1 text-green-500 hover:text-green-600 rounded"
+                            title="Save"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                            title="Cancel"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {!readOnly && (
+                            <button
+                              onClick={() => startEditing(item)}
+                              className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                              title="Edit"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          <a
+                            href={item.url ?? '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1 text-slate-400 hover:text-blue-500 rounded"
+                            title="Open"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                          {!readOnly && (
+                            <button
+                              onClick={() => deleteItem(item)}
+                              className="p-1 text-slate-400 hover:text-red-500 rounded"
+                              title="Remove"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
