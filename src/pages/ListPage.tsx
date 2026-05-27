@@ -377,7 +377,7 @@ export function ListPage() {
       <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="bg-slate-100 border-b-2 border-slate-300">
               <tr>
                 <th className="px-4 py-3 w-12">
                   <button
@@ -404,7 +404,7 @@ export function ListPage() {
                 <SortHeader label="Channel" field="channel" sort={sort} onSort={handleSort} />
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-300">
               {sortedItems.map((item) => {
                 const isSelected = selectedItems.has(item.id);
                 const contentType = getContentType(item.content_type_id, contentTypes);
@@ -419,7 +419,7 @@ export function ListPage() {
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
                 const hasGranola = granolaItemIds.has(item.id);
-                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : hasGranola ? '#F0FDF4' : undefined;
+                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF0E8' : hasGranola ? '#F0FDF4' : undefined;
 
                 return (
                   <tr
@@ -1031,7 +1031,7 @@ function SortHeader({
     <th className="px-4 py-3 text-left">
       <button
         onClick={() => onSort(field)}
-        className="flex items-center gap-1 text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-700 transition-colors"
+        className="flex items-center gap-1 text-xs font-bold text-slate-700 uppercase tracking-wider hover:text-slate-900 transition-colors"
       >
         {label}
         {isActive ? (
