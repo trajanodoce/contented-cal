@@ -1157,6 +1157,11 @@ export function CalendarPage() {
     return saved !== null ? saved === 'true' : true;
   });
 
+  const [showOrdinal, setShowOrdinal] = useState(() => {
+    const saved = localStorage.getItem('cc-show-ordinal');
+    return saved !== null ? saved === 'true' : true;
+  });
+
   const toggleWeekends = useCallback(() => {
     setWeekendsCollapsed(prev => {
       const next = !prev;
@@ -1243,9 +1248,10 @@ export function CalendarPage() {
   }, [currentWorkspace]);
 
   const filteredItems = useMemo(() => {
-    if (!isLoaded) return items;
-    return applyFilters(items, filters, linkCounts);
-  }, [items, filters, isLoaded, linkCounts]);
+    let result = isLoaded ? applyFilters(items, filters, linkCounts) : items;
+    if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    return result;
+  }, [items, filters, isLoaded, linkCounts, showOrdinal]);
 
   // Build subtasks with parent titles for calendar display
   const subtasksWithParent: SubtaskWithParent[] = useMemo(() => {
@@ -1416,6 +1422,34 @@ export function CalendarPage() {
                 Publish Date
               </button>
             </div>
+
+            <button
+              onClick={() => {
+                setShowOrdinal(prev => {
+                  const next = !prev;
+                  localStorage.setItem('cc-show-ordinal', String(next));
+                  return next;
+                });
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+              style={{
+                borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
+                backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
+                color: showOrdinal ? '#7E61FF' : '#64748b',
+              }}
+              title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
+            >
+              <div
+                className="relative w-8 h-[18px] rounded-full transition-colors"
+                style={{ backgroundColor: showOrdinal ? '#7E61FF' : '#CBD5E1' }}
+              >
+                <div
+                  className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
+                  style={{ left: showOrdinal ? '18px' : '2px' }}
+                />
+              </div>
+              Ordinal
+            </button>
 
             {view !== 'day' && (
               <button
