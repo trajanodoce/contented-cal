@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link2, Plus, ExternalLink as ExternalLinkIcon, Loader2, X, Image } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Link2, Plus, ExternalLink as ExternalLinkIcon, Loader2, X, Image, Upload, FileText, FileImage, FileVideo, FileArchive, File } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import type { ExternalLink, ExternalLinkPlatform } from '../../lib/database.types';
@@ -21,8 +21,43 @@ const PLATFORM_META: Record<ExternalLinkPlatform, { label: string; bgColor: stri
   notion:       { label: 'Notion',       bgColor: '#F9FAFB', textColor: '#374151', icon: 'N' },
   linear:       { label: 'Linear',       bgColor: '#EFF6FF', textColor: '#1D4ED8', icon: 'L' },
   granola:      { label: 'Granola',      bgColor: '#345A11', textColor: '#FFFFFF', icon: '🎙️' },
+  file:         { label: 'File',         bgColor: '#F0F9FF', textColor: '#0369A1', icon: '📎' },
   other:        { label: 'Link',         bgColor: '#F9FAFB', textColor: '#4B5563', icon: '↗' },
 };
+
+const FILE_TYPE_ICONS: Record<string, typeof FileText> = {
+  pdf: FileText,
+  doc: FileText,
+  docx: FileText,
+  txt: FileText,
+  png: FileImage,
+  jpg: FileImage,
+  jpeg: FileImage,
+  gif: FileImage,
+  webp: FileImage,
+  svg: FileImage,
+  mp4: FileVideo,
+  mov: FileVideo,
+  avi: FileVideo,
+  zip: FileArchive,
+  rar: FileArchive,
+};
+
+function getFileIcon(filename: string) {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+  return FILE_TYPE_ICONS[ext] ?? File;
+}
+
+function isImageFile(filename: string) {
+  const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+  return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext);
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 function PlatformBadge({ platform }: { platform: ExternalLinkPlatform }) {
   const meta = PLATFORM_META[platform] ?? PLATFORM_META.other;
@@ -39,18 +74,36 @@ function PlatformBadge({ platform }: { platform: ExternalLinkPlatform }) {
 
 function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; onDelete: () => void; readOnly?: boolean }) {
   const [imgError, setImgError] = useState(false);
+  const isFile = link.platform === 'file';
+  const metadata = (link.metadata ?? {}) as Record<string, unknown>;
+  const fileName = (metadata.file_name as string) ?? link.title ?? 'File';
+  const fileSize = metadata.file_size as number | undefined;
+  const isImage = isFile && isImageFile(fileName);
+  const FileIcon = isFile ? getFileIcon(fileName) : Image;
 
   return (
     <div className="group bg-white border border-slate-300 rounded-xl overflow-hidden hover:shadow-md hover:border-slate-400 transition-all">
       {/* Thumbnail */}
       <div className="w-full h-28 bg-slate-50 flex items-center justify-center overflow-hidden relative">
-        {link.thumbnail_url && !imgError ? (
+        {isFile && isImage && !imgError ? (
+          <img
+            src={link.url}
+            alt={fileName}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : link.thumbnail_url && !imgError && !isFile ? (
           <img
             src={link.thumbnail_url}
             alt=""
             className="w-full h-full object-cover"
             onError={() => setImgError(true)}
           />
+        ) : isFile ? (
+          <div className="flex flex-col items-center gap-2 text-slate-400">
+            <FileIcon className="w-8 h-8" />
+            <span className="text-xs text-slate-400">{fileName.split('.').pop()?.toUpperCase()}</span>
+          </div>
         ) : (
           <div className="flex flex-col items-center gap-2 text-slate-300">
             <Image className="w-8 h-8" />
@@ -71,13 +124,15 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
       <div className="p-3">
         <PlatformBadge platform={link.platform as ExternalLinkPlatform} />
         <p className="mt-1.5 text-sm font-medium text-slate-800 line-clamp-2 leading-snug">
-          {link.title || 'Untitled'}
+          {isFile ? fileName : (link.title || 'Untitled')}
         </p>
-        {(link.metadata as Record<string, string>)?.description && (
+        {isFile && fileSize ? (
+          <p className="mt-0.5 text-xs text-slate-400">{formatFileSize(fileSize)}</p>
+        ) : (metadata.description as string) ? (
           <p className="mt-0.5 text-xs text-slate-400 line-clamp-2">
-            {(link.metadata as Record<string, string>).description}
+            {metadata.description as string}
           </p>
-        )}
+        ) : null}
         <a
           href={link.url}
           target="_blank"
@@ -86,7 +141,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
           className="mt-2 inline-flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
         >
           <ExternalLinkIcon className="w-3 h-3" />
-          Open in {PLATFORM_META[link.platform as ExternalLinkPlatform]?.label ?? 'browser'}
+          {isFile ? 'Download' : `Open in ${PLATFORM_META[link.platform as ExternalLinkPlatform]?.label ?? 'browser'}`}
         </a>
       </div>
     </div>
@@ -100,6 +155,8 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
   const [adding, setAdding] = useState(false);
   const [url, setUrl] = useState('');
   const [fetching, setFetching] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadLinks = useCallback(async () => {
     const { data } = await supabase
@@ -183,11 +240,73 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
     }
   }
 
-  async function handleDelete(linkId: string) {
-    const { error } = await supabase.from('external_links').delete().eq('id', linkId);
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !user) return;
+
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        // Upload to Supabase storage
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${contentItemId}/${Date.now()}-${file.name}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('project-files')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('project-files')
+          .getPublicUrl(filePath);
+
+        const publicUrl = urlData.publicUrl;
+
+        // Create external_link record
+        const { error: insertError } = await supabase.from('external_links').insert({
+          content_item_id: contentItemId,
+          platform: 'file' as ExternalLinkPlatform,
+          url: publicUrl,
+          title: file.name,
+          thumbnail_url: null,
+          metadata: {
+            file_name: file.name,
+            file_size: file.size,
+            file_type: file.type,
+            storage_path: filePath,
+          },
+        });
+
+        if (insertError) throw insertError;
+      }
+
+      await loadLinks();
+      addToast(files.length === 1 ? 'File uploaded' : `${files.length} files uploaded`);
+    } catch (err: unknown) {
+      addToast((err as Error).message, 'error');
+    } finally {
+      setUploading(false);
+      // Reset file input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  async function handleDelete(link: ExternalLink) {
+    // If it's a file, also delete from storage
+    if (link.platform === 'file') {
+      const metadata = (link.metadata ?? {}) as Record<string, unknown>;
+      const storagePath = metadata.storage_path as string | undefined;
+      if (storagePath) {
+        await supabase.storage.from('project-files').remove([storagePath]);
+      }
+    }
+
+    const { error } = await supabase.from('external_links').delete().eq('id', link.id);
     if (error) { addToast(error.message, 'error'); return; }
-    setLinks(prev => prev.filter(l => l.id !== linkId));
-    addToast('Link removed');
+    setLinks(prev => prev.filter(l => l.id !== link.id));
+    addToast(link.platform === 'file' ? 'File removed' : 'Link removed');
   }
 
   return (
@@ -197,13 +316,32 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
           <Link2 className="w-3.5 h-3.5" />
           Linked Assets {links.length > 0 && `(${links.length})`}
         </label>
-        {!adding && !readOnly && (
-          <button
-            onClick={() => setAdding(true)}
-            className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
-          >
-            <Plus className="w-3.5 h-3.5" /> Add link
-          </button>
+        {!readOnly && (
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
+            >
+              {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+              {uploading ? 'Uploading...' : 'Upload file'}
+            </button>
+            {!adding && (
+              <button
+                onClick={() => setAdding(true)}
+                className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
+              >
+                <Plus className="w-3.5 h-3.5" /> Add link
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -246,12 +384,12 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
         <div className="flex flex-col items-center justify-center py-6 text-center border border-dashed border-slate-200 rounded-xl">
           <Link2 className="w-7 h-7 text-slate-300 mb-2" />
           <p className="text-xs text-slate-400">No linked assets yet</p>
-          <p className="text-xs text-slate-400 mt-0.5">Paste a Figma, Canva, Miro, or any URL to attach it</p>
+          <p className="text-xs text-slate-400 mt-0.5">Upload files or paste a URL to attach assets</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {links.map(link => (
-            <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link.id)} />
+            <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link)} />
           ))}
         </div>
       )}

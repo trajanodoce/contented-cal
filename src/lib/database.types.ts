@@ -1372,6 +1372,7 @@ export type Database = {
         | "linear"
         | "other"
         | "granola"
+        | "file"
       priority_level: "low" | "medium" | "high" | "urgent"
       project_status: "active" | "completed" | "archived"
       workspace_role: "admin" | "editor" | "viewer"
@@ -1524,6 +1525,7 @@ export const Constants = {
         "linear",
         "other",
         "granola",
+        "file",
       ],
       priority_level: ["low", "medium", "high", "urgent"],
       project_status: ["active", "completed", "archived"],
