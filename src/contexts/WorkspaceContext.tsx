@@ -36,6 +36,32 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
+      // Auto-accept any pending invites for this user's email
+      if (user.email) {
+        const { data: pendingInvites } = await supabase
+          .from('workspace_invites')
+          .select('*')
+          .eq('email', user.email.toLowerCase())
+          .is('accepted_at', null);
+
+        if (pendingInvites && pendingInvites.length > 0) {
+          for (const invite of pendingInvites) {
+            // Add as member (ignore if already exists)
+            await supabase
+              .from('workspace_members')
+              .upsert(
+                { workspace_id: invite.workspace_id, user_id: user.id, role: invite.role },
+                { onConflict: 'workspace_id,user_id' }
+              );
+            // Mark invite accepted
+            await supabase
+              .from('workspace_invites')
+              .update({ accepted_at: new Date().toISOString() })
+              .eq('id', invite.id);
+          }
+        }
+      }
+
       // Get all workspaces the user is a member of
       const { data: memberships, error: membershipError } = await supabase
         .from('workspace_members')

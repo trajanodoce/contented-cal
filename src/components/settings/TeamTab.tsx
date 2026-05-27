@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useApp } from '../../contexts/AppContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import type { Profile } from '../../lib/database.types';
+import type { Profile, WorkspaceInvite } from '../../lib/database.types';
 import {
   User,
   UserPlus,
@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   Eye,
   Loader2,
+  Mail,
+  X,
+  Clock,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -39,10 +42,12 @@ export function TeamTab() {
   const { user } = useAuth();
   const { refreshWorkspaceData } = useApp();
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<WorkspaceInvite[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
+  const [cancellingInviteId, setCancellingInviteId] = useState<string | null>(null);
 
   const isAdmin = userRole === 'admin';
 
@@ -50,16 +55,24 @@ export function TeamTab() {
     if (!currentWorkspace) return;
     setLoading(true);
 
-    const { data, error } = await supabase
-      .from('workspace_members')
-      .select('user_id, role, created_at, profiles:user_id(id, full_name, email, avatar_url)')
-      .eq('workspace_id', currentWorkspace.id)
-      .order('created_at');
+    const [membersRes, invitesRes] = await Promise.all([
+      supabase
+        .from('workspace_members')
+        .select('user_id, role, created_at, profiles:user_id(id, full_name, email, avatar_url)')
+        .eq('workspace_id', currentWorkspace.id)
+        .order('created_at'),
+      supabase
+        .from('workspace_invites')
+        .select('*')
+        .eq('workspace_id', currentWorkspace.id)
+        .is('accepted_at', null)
+        .order('created_at', { ascending: false }),
+    ]);
 
-    if (error) {
+    if (membersRes.error) {
       toast.error('Failed to load team members');
     } else {
-      const mapped = (data || []).map((m: any) => ({
+      const mapped = (membersRes.data || []).map((m: any) => ({
         user_id: m.user_id,
         role: m.role as Role,
         created_at: m.created_at,
@@ -67,12 +80,33 @@ export function TeamTab() {
       }));
       setMembers(mapped);
     }
+
+    if (!invitesRes.error) {
+      setPendingInvites(invitesRes.data || []);
+    }
+
     setLoading(false);
   }, [currentWorkspace]);
 
   useEffect(() => {
     fetchMembers();
   }, [fetchMembers]);
+
+  const handleCancelInvite = async (inviteId: string) => {
+    setCancellingInviteId(inviteId);
+    const { error } = await supabase
+      .from('workspace_invites')
+      .delete()
+      .eq('id', inviteId);
+
+    if (error) {
+      toast.error('Failed to cancel invite');
+    } else {
+      toast.success('Invite cancelled');
+      fetchMembers();
+    }
+    setCancellingInviteId(null);
+  };
 
   const handleRoleChange = async (userId: string, newRole: Role) => {
     if (!currentWorkspace) return;
@@ -138,6 +172,52 @@ export function TeamTab() {
           </button>
         )}
       </div>
+
+      {/* Pending Invites */}
+      {pendingInvites.length > 0 && (
+        <div className="border border-amber-200 bg-amber-50/50 rounded-lg p-4">
+          <h4 className="text-sm font-medium text-amber-800 flex items-center gap-2 mb-3">
+            <Mail className="w-4 h-4" />
+            Pending Invites ({pendingInvites.length})
+          </h4>
+          <div className="space-y-2">
+            {pendingInvites.map((invite) => {
+              const roleConfig = ROLE_CONFIG[invite.role as Role] ?? ROLE_CONFIG.viewer;
+              return (
+                <div key={invite.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2.5 border border-amber-200/60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-900">{invite.email}</p>
+                      <p className="text-xs text-slate-500">
+                        <span className={`${roleConfig.color}`}>{roleConfig.label}</span>
+                        {' · Invited '}
+                        {format(new Date(invite.created_at), 'MMM d, yyyy')}
+                      </p>
+                    </div>
+                  </div>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleCancelInvite(invite.id)}
+                      disabled={cancellingInviteId === invite.id}
+                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Cancel invite"
+                    >
+                      {cancellingInviteId === invite.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <X className="w-4 h-4" />
+                      )}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="border border-slate-200 rounded-lg overflow-hidden">
         <table className="w-full">
@@ -317,68 +397,97 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
 }
 
 function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string; onClose: () => void; onInvited: () => void }) {
-  useAuth(); // ensure auth context is available
+  const { user } = useAuth();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<Role>('editor');
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   const handleInvite = async () => {
-    if (!email.trim()) return;
+    if (!email.trim() || !user) return;
     setSending(true);
     setMessage(null);
 
-    // Look up user by email in profiles
-    const { data: profile, error: profileError } = await supabase
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check if invite already pending
+    const { data: existingInvite } = await supabase
+      .from('workspace_invites')
+      .select('id')
+      .eq('workspace_id', workspaceId)
+      .eq('email', normalizedEmail)
+      .is('accepted_at', null)
+      .maybeSingle();
+
+    if (existingInvite) {
+      setMessage({ type: 'error', text: 'An invite has already been sent to this email.' });
+      setSending(false);
+      return;
+    }
+
+    // Check if user already has an account
+    const { data: profile } = await supabase
       .from('profiles')
       .select('id, email, full_name')
-      .eq('email', email.trim().toLowerCase())
+      .eq('email', normalizedEmail)
       .maybeSingle();
 
-    if (profileError) {
-      setMessage({ type: 'error', text: 'Error looking up user: ' + profileError.message });
-      setSending(false);
-      return;
-    }
+    if (profile) {
+      // Check if already a member
+      const { data: existingMember } = await supabase
+        .from('workspace_members')
+        .select('user_id')
+        .eq('workspace_id', workspaceId)
+        .eq('user_id', profile.id)
+        .maybeSingle();
 
-    if (!profile) {
-      setMessage({
-        type: 'info',
-        text: 'No account found with this email. The user must create an account first, then you can add them.',
-      });
-      setSending(false);
-      return;
-    }
+      if (existingMember) {
+        setMessage({ type: 'error', text: 'This user is already a member of this workspace.' });
+        setSending(false);
+        return;
+      }
 
-    // Check if already a member
-    const { data: existing } = await supabase
-      .from('workspace_members')
-      .select('user_id')
-      .eq('workspace_id', workspaceId)
-      .eq('user_id', profile.id)
-      .maybeSingle();
+      // User exists — add them directly and mark invite as accepted
+      const { error: memberError } = await supabase
+        .from('workspace_members')
+        .insert({ workspace_id: workspaceId, user_id: profile.id, role });
 
-    if (existing) {
-      setMessage({ type: 'error', text: 'This user is already a member of this workspace.' });
-      setSending(false);
-      return;
-    }
+      if (memberError) {
+        setMessage({ type: 'error', text: 'Failed to add member: ' + memberError.message });
+        setSending(false);
+        return;
+      }
 
-    // Add as member
-    const { error: insertError } = await supabase
-      .from('workspace_members')
-      .insert({
+      // Create invite record as already accepted
+      await supabase.from('workspace_invites').insert({
         workspace_id: workspaceId,
-        user_id: profile.id,
+        email: normalizedEmail,
         role,
+        invited_by: user.id,
+        accepted_at: new Date().toISOString(),
       });
 
-    if (insertError) {
-      setMessage({ type: 'error', text: 'Failed to add member: ' + insertError.message });
-    } else {
       toast.success(`${profile.full_name || profile.email} added as ${role}`);
       onInvited();
       onClose();
+    } else {
+      // User doesn't exist yet — create pending invite
+      const { error: inviteError } = await supabase
+        .from('workspace_invites')
+        .insert({
+          workspace_id: workspaceId,
+          email: normalizedEmail,
+          role,
+          invited_by: user.id,
+        });
+
+      if (inviteError) {
+        setMessage({ type: 'error', text: 'Failed to send invite: ' + inviteError.message });
+      } else {
+        toast.success(`Invite sent to ${normalizedEmail}`);
+        onInvited();
+        onClose();
+      }
     }
     setSending(false);
   };
@@ -442,7 +551,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
           >
             {sending && <Loader2 className="w-4 h-4 animate-spin" />}
-            {sending ? 'Adding...' : 'Add Member'}
+            {sending ? 'Sending...' : 'Send Invite'}
           </button>
         </div>
       </div>
