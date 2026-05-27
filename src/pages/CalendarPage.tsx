@@ -428,7 +428,7 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
           {/* Month header bar */}
           <div
             className="px-5 py-3 border-b border-slate-200"
-            style={{ background: 'linear-gradient(135deg, #8EC9CA 0%, #b5dfe0 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #B1CDDC 0%, #c8dde8 100%)' }}
           >
             <h3 className="text-lg font-bold text-white tracking-wide" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
               {format(monthDate, 'MMMM yyyy')}
