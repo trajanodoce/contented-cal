@@ -145,11 +145,16 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [url, setUrl] = useState('');
+  const [linkTitle, setLinkTitle] = useState('');
   const [fetching, setFetching] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounterRef = useRef(0);
+
+  // Split links into URL links vs file uploads
+  const urlLinks = links.filter(l => l.platform !== 'file');
+  const fileLinks = links.filter(l => l.platform === 'file');
 
   const loadLinks = useCallback(async () => {
     const { data } = await supabase
@@ -215,7 +220,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
         content_item_id: contentItemId,
         platform: platform as ExternalLinkPlatform,
         url: url.trim(),
-        title: title || parsedUrl.hostname,
+        title: linkTitle.trim() || title || parsedUrl.hostname,
         thumbnail_url,
         metadata: { description },
       });
@@ -223,6 +228,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
       if (error) throw error;
 
       setUrl('');
+      setLinkTitle('');
       setAdding(false);
       await loadLinks();
       addToast('Link added');
@@ -381,33 +387,42 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
       </div>
 
       {adding && (
-        <div className="mb-3 flex gap-2">
+        <div className="mb-3 space-y-2">
           <input
             autoFocus
-            type="url"
-            value={url}
-            onChange={e => setUrl(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') handleAddLink();
-              if (e.key === 'Escape') { setAdding(false); setUrl(''); }
-            }}
-            placeholder="https://www.figma.com/..."
-            className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+            type="text"
+            value={linkTitle}
+            onChange={e => setLinkTitle(e.target.value)}
+            placeholder="Title (e.g., Brand Guidelines)"
+            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
           />
-          <button
-            onClick={handleAddLink}
-            disabled={fetching || !url.trim()}
-            className="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors flex items-center gap-1.5"
-          >
-            {fetching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-            {fetching ? 'Fetching...' : 'Add'}
-          </button>
-          <button
-            onClick={() => { setAdding(false); setUrl(''); }}
-            className="px-2 py-1.5 text-slate-400 hover:text-slate-600 text-xs border border-slate-200 rounded-lg transition-colors"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleAddLink();
+                if (e.key === 'Escape') { setAdding(false); setUrl(''); setLinkTitle(''); }
+              }}
+              placeholder="https://..."
+              className="flex-1 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+            />
+            <button
+              onClick={handleAddLink}
+              disabled={fetching || !url.trim()}
+              className="px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+            >
+              {fetching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+              {fetching ? 'Fetching...' : 'Add'}
+            </button>
+            <button
+              onClick={() => { setAdding(false); setUrl(''); setLinkTitle(''); }}
+              className="px-2 py-1.5 text-slate-400 hover:text-slate-600 text-xs border border-slate-200 rounded-lg transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -445,18 +460,73 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
           <p className="text-xs text-slate-400">No linked assets yet</p>
         </div>
       ) : (
-        /* Has links — show grid + drop zone at bottom */
-        <>
-          <div className="grid grid-cols-2 gap-3">
-            {links.map(link => (
-              <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link)} />
-            ))}
-          </div>
+        /* Has links — split into URL links list + file upload thumbnails */
+        <div className="space-y-4">
+          {/* URL Links list */}
+          {urlLinks.length > 0 && (
+            <div>
+              <div className="space-y-1">
+                {urlLinks.map(link => {
+                  const meta = PLATFORM_META[link.platform] ?? PLATFORM_META.other;
+                  return (
+                    <div
+                      key={link.id}
+                      className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      <span
+                        className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold leading-none shrink-0"
+                        style={{ backgroundColor: meta.bgColor, color: meta.textColor }}
+                      >
+                        {meta.icon}
+                      </span>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        className="flex-1 min-w-0 text-sm text-blue-600 hover:text-blue-800 hover:underline truncate transition-colors"
+                        title={link.url}
+                      >
+                        {link.title || link.url}
+                      </a>
+                      <ExternalLinkIcon className="w-3 h-3 text-slate-300 shrink-0" />
+                      {!readOnly && (
+                        <button
+                          onClick={() => handleDelete(link)}
+                          className="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* File uploads — thumbnail grid */}
+          {fileLinks.length > 0 && (
+            <div>
+              {urlLinks.length > 0 && (
+                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mb-2 block">
+                  Files
+                </label>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                {fileLinks.map(link => (
+                  <LinkCard key={link.id} link={link} readOnly={readOnly} onDelete={() => handleDelete(link)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Drop zone for more files */}
           {!readOnly && (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full mt-3 flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group"
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group"
             >
               {uploading ? (
                 <>
@@ -473,7 +543,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
               )}
             </button>
           )}
-        </>
+        </div>
       )}
     </div>
   );
