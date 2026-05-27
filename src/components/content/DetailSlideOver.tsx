@@ -448,21 +448,24 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 ) : (
                   <>
                     {editingField === 'title' ? (
-                      <div className="flex items-center gap-2">
-                        <input
-                          autoFocus
-                          value={editValues.title ?? item.title}
-                          onChange={e => setEditValues({ ...editValues, title: e.target.value })}
-                          className="flex-1 text-xl font-bold text-slate-900 border-b-2 border-brand-400 outline-none bg-transparent"
-                          onKeyDown={e => {
-                            if (e.key === 'Enter') updateField('title', editValues.title ?? item.title);
-                            if (e.key === 'Escape') setEditingField(null);
-                          }}
-                        />
-                        <button onClick={() => updateField('title', editValues.title ?? item.title)}>
-                          {savingField === 'title' ? <Loader2 className="w-4 h-4 animate-spin text-brand-500" /> : <Check className="w-4 h-4 text-green-500" />}
-                        </button>
-                      </div>
+                      <input
+                        autoFocus
+                        value={editValues.title ?? item.title}
+                        onChange={e => setEditValues({ ...editValues, title: e.target.value })}
+                        className="w-full text-xl font-bold text-slate-900 border-b-2 border-brand-400 outline-none bg-transparent"
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') { e.currentTarget.blur(); }
+                          if (e.key === 'Escape') { setEditValues({ title: item.title }); setEditingField(null); }
+                        }}
+                        onBlur={() => {
+                          const draft = (editValues.title ?? '').trim();
+                          if (draft && draft !== item.title) {
+                            updateField('title', draft);
+                          } else {
+                            setEditingField(null);
+                          }
+                        }}
+                      />
                     ) : (
                       <button
                         className="text-left group w-full"
