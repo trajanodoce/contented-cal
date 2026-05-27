@@ -168,7 +168,6 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
         title: title || parsedUrl.hostname,
         thumbnail_url,
         metadata: { description },
-        created_by: user.id,
       });
 
       if (error) throw error;
