@@ -479,10 +479,13 @@ export function MyWorkPage() {
           {/* My Subtasks */}
           {subtasks.length > 0 && (
             <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100">
-                <ListChecks className="w-5 h-5 text-slate-400" />
-                <h2 className="text-lg font-semibold text-slate-900">My Subtasks</h2>
-                <span className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+              <div
+                className="flex items-center gap-2 px-5 py-4 border-b border-slate-100"
+                style={{ background: 'linear-gradient(135deg, #b8c4cc 0%, #002238 100%)' }}
+              >
+                <ListChecks className="w-5 h-5 text-white/80" />
+                <h2 className="text-lg font-semibold text-white">My Subtasks</h2>
+                <span className="text-xs font-medium text-white/80 bg-white/20 px-2 py-0.5 rounded-full">
                   {subtasks.length}
                 </span>
               </div>
