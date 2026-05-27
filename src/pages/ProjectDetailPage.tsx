@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
@@ -45,6 +45,9 @@ import {
   Users,
   Clock,
   AlertTriangle,
+  Plus,
+  X,
+  UserPlus,
 } from 'lucide-react';
 import { formatDate, getPriorityDot, getUserInitials } from '../lib/utils';
 import {
@@ -693,24 +696,163 @@ function OverviewTab({
       <RecentActivitySection activityLogs={activityLogs} members={members} />
 
       {/* Team members */}
-      {uniqueAssignees.length > 0 && (
-        <div className="bg-white rounded-lg border border-slate-200 p-5">
-          <h3 className="text-sm font-semibold text-slate-700 mb-4">
-            Team Members
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {uniqueAssignees.map((m) => (
-              <div
-                key={m.id}
-                className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg"
-              >
-                <AvatarCircle profile={m} size="sm" />
-                <span className="text-sm text-slate-700">
-                  {m.full_name || m.email}
-                </span>
-              </div>
-            ))}
-          </div>
+      <TeamMembersSection
+        projectId={projectId}
+        allMembers={members}
+        taskAssigneeIds={items.flatMap(i => i.assignee_ids ?? [])}
+      />
+    </div>
+  );
+}
+
+function TeamMembersSection({
+  projectId,
+  allMembers,
+  taskAssigneeIds,
+}: {
+  projectId: string;
+  allMembers: Profile[];
+  taskAssigneeIds: string[];
+}) {
+  const [manualMemberIds, setManualMemberIds] = useState<string[]>([]);
+  const [showPicker, setShowPicker] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch manually-added project members
+  useEffect(() => {
+    supabase
+      .from('project_members')
+      .select('user_id')
+      .eq('project_id', projectId)
+      .then(({ data }) => {
+        if (data) setManualMemberIds(data.map(d => d.user_id));
+      });
+  }, [projectId]);
+
+  // Close picker on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setShowPicker(false);
+      }
+    }
+    if (showPicker) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showPicker]);
+
+  // Merge task-derived + manually added, deduplicated
+  const allMemberIds = useMemo(() => {
+    const ids = new Set<string>([...taskAssigneeIds, ...manualMemberIds]);
+    return Array.from(ids);
+  }, [taskAssigneeIds, manualMemberIds]);
+
+  const teamMembers = useMemo(
+    () => allMembers.filter(m => allMemberIds.includes(m.id)),
+    [allMembers, allMemberIds]
+  );
+
+  // Members available to add (not already on the project)
+  const availableToAdd = useMemo(
+    () => allMembers.filter(m => !allMemberIds.includes(m.id)),
+    [allMembers, allMemberIds]
+  );
+
+  async function addMember(userId: string) {
+    const { error } = await supabase.from('project_members').insert({
+      project_id: projectId,
+      user_id: userId,
+    });
+    if (error) {
+      toast.error('Failed to add member');
+    } else {
+      setManualMemberIds(prev => [...prev, userId]);
+      toast.success('Member added');
+    }
+    setShowPicker(false);
+  }
+
+  async function removeMember(userId: string) {
+    // Only allow removing manually-added members, not task-derived ones
+    const { error } = await supabase
+      .from('project_members')
+      .delete()
+      .eq('project_id', projectId)
+      .eq('user_id', userId);
+    if (error) {
+      toast.error('Failed to remove member');
+    } else {
+      setManualMemberIds(prev => prev.filter(id => id !== userId));
+      toast.success('Member removed');
+    }
+  }
+
+  const isManualMember = (userId: string) => manualMemberIds.includes(userId);
+  const isTaskAssignee = (userId: string) => taskAssigneeIds.includes(userId);
+
+  return (
+    <div className="bg-white rounded-lg border border-slate-200 p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-slate-700">
+          Team Members
+        </h3>
+        <div className="relative" ref={pickerRef}>
+          <button
+            onClick={() => setShowPicker(v => !v)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="Add team member"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            Add
+          </button>
+          {showPicker && (
+            <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50 max-h-64 overflow-y-auto">
+              {availableToAdd.length === 0 ? (
+                <p className="text-xs text-slate-400 text-center py-3">All workspace members are on this project</p>
+              ) : (
+                availableToAdd.map(m => (
+                  <button
+                    key={m.id}
+                    onClick={() => addMember(m.id)}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <AvatarCircle profile={m} size="sm" />
+                    <span className="truncate">{m.full_name || m.email}</span>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {teamMembers.length > 0 ? (
+        <div className="flex flex-wrap gap-3">
+          {teamMembers.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg group"
+            >
+              <AvatarCircle profile={m} size="sm" />
+              <span className="text-sm text-slate-700">
+                {m.full_name || m.email}
+              </span>
+              {/* Only show remove for manually-added members who aren't also task assignees */}
+              {isManualMember(m.id) && !isTaskAssignee(m.id) && (
+                <button
+                  onClick={() => removeMember(m.id)}
+                  className="p-0.5 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all rounded"
+                  title="Remove from project"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-4">
+          <Users className="w-6 h-6 text-slate-200 mx-auto mb-1.5" />
+          <p className="text-xs text-slate-400">No team members yet. Add someone or assign a task.</p>
         </div>
       )}
     </div>
