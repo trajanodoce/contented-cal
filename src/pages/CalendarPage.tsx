@@ -297,7 +297,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
         ))}
       </div>
 
-      <div className="grid auto-rows-fr" style={{ gridTemplateColumns: gridCols }}>
+      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(120px, auto)' }}>
         {days.map((day, index) => {
           const dayItems = getItemsForDate(day);
           const dayProjectMarkers = getProjectMarkersForDate(day);
