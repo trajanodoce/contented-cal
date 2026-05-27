@@ -47,6 +47,21 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { formatDate, getPriorityDot, getUserInitials } from '../lib/utils';
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragStartEvent,
+  DragEndEvent,
+  defaultDropAnimationSideEffects,
+  DropAnimation,
+} from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import { ContentLibrary } from '../components/projects/ContentLibrary';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -486,6 +501,7 @@ export function ProjectDetailPage() {
             contentTypes={contentTypes}
             members={members}
             onItemClick={setSelectedItemId}
+            onItemMoved={fetchItems}
           />
         )}
         {activeTab === 'calendar' && (
@@ -880,19 +896,170 @@ function ListTab({
 // Board Tab
 // ────────────────────────────────────────────────────────────────────────────────
 
+// Draggable card for the project board
+function ProjectBoardCard({
+  item,
+  contentTypes,
+  members,
+  onClick,
+  isOverlay,
+}: {
+  item: ContentItem;
+  contentTypes: ContentType[];
+  members: Profile[];
+  onClick: () => void;
+  isOverlay?: boolean;
+}) {
+  const ct = contentTypes.find((c) => c.id === item.content_type_id);
+  const assignee = members.find((m) => item.assignee_ids?.includes(m.id));
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: item.id,
+    data: { item },
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.3 : 1,
+  };
+
+  if (isDragging && !isOverlay) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg p-3 h-20"
+      />
+    );
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className={`bg-white rounded-lg border border-slate-200 p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow ${
+        isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
+      }`}
+    >
+      <p className="text-sm font-medium text-slate-800 mb-2">
+        {item.title}
+      </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {ct && (
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: ct.color ?? undefined }}
+            />
+          )}
+          {assignee && (
+            <AvatarCircle profile={assignee} size="xs" />
+          )}
+        </div>
+        {item.due_date && (
+          <span className="text-xs text-slate-400">
+            {formatDate(item.due_date)}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Droppable column for the project board
+function ProjectBoardColumn({
+  column,
+  items,
+  contentTypes,
+  members,
+  onItemClick,
+}: {
+  column: BoardColumn;
+  items: ContentItem[];
+  contentTypes: ContentType[];
+  members: Profile[];
+  onItemClick: (id: string) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: column.id,
+    data: { column },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`w-72 flex-shrink-0 rounded-lg border-2 transition-all ${
+        isOver ? 'border-blue-400 bg-blue-50/30' : 'border-slate-200 bg-slate-100'
+      }`}
+    >
+      {/* Column header */}
+      <div className="flex items-center gap-2 px-3 py-3">
+        <span
+          className="w-2.5 h-2.5 rounded-full shrink-0"
+          style={{ backgroundColor: column.color ?? undefined }}
+        />
+        <span className="text-sm font-medium text-slate-700">
+          {column.name}
+        </span>
+        <span className="text-xs text-slate-400 ml-auto">
+          {items.length}
+        </span>
+      </div>
+
+      {/* Cards */}
+      <div className="px-2 pb-2 space-y-2 min-h-[80px]">
+        {items.map((item) => (
+          <ProjectBoardCard
+            key={item.id}
+            item={item}
+            contentTypes={contentTypes}
+            members={members}
+            onClick={() => onItemClick(item.id)}
+          />
+        ))}
+        {items.length === 0 && !isOver && (
+          <p className="text-xs text-slate-400 text-center py-4">
+            Drop items here
+          </p>
+        )}
+        {isOver && (
+          <div className="h-16 border-2 border-dashed border-blue-300 rounded-lg bg-blue-50/50 flex items-center justify-center">
+            <p className="text-xs text-blue-500 font-medium">Drop here</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function BoardTab({
   items,
   boardColumns,
   contentTypes,
   members,
   onItemClick,
+  onItemMoved,
 }: {
   items: ContentItem[];
   boardColumns: BoardColumn[];
   contentTypes: ContentType[];
   members: Profile[];
   onItemClick: (id: string) => void;
+  onItemMoved: () => void;
 }) {
+  const { userRole } = useWorkspace();
+  const canDrag = userRole === 'admin' || userRole === 'editor';
+
+  const [activeDragItem, setActiveDragItem] = useState<ContentItem | null>(null);
+
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+  );
+
   const itemsByColumn = useMemo(() => {
     const map = new Map<string, ContentItem[]>();
     boardColumns.forEach((col) => map.set(col.id, []));
@@ -904,79 +1071,86 @@ function BoardTab({
     return map;
   }, [items, boardColumns]);
 
+  const handleDragStart = (event: DragStartEvent) => {
+    if (!canDrag) return;
+    const item = items.find((i) => i.id === event.active.id);
+    if (item) setActiveDragItem(item);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragItem(null);
+
+    if (!canDrag || !over) return;
+
+    const itemId = active.id as string;
+    const targetColumnId = over.id as string;
+
+    const item = items.find((i) => i.id === itemId);
+    const targetColumn = boardColumns.find((c) => c.id === targetColumnId);
+
+    if (!item || !targetColumn) return;
+    if (item.status === targetColumnId) return;
+
+    const { error } = await supabase
+      .from('content_items')
+      .update({ status: targetColumnId })
+      .eq('id', itemId);
+
+    if (error) {
+      toast.error('Failed to move item: ' + error.message);
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('activity_log').insert({
+      content_item_id: itemId,
+      user_id: user?.id || null,
+      action: `moved to ${targetColumn.name}`,
+      metadata: { previousStatus: item.status, newStatus: targetColumnId },
+    });
+
+    toast.success(`Moved "${item.title}" to ${targetColumn.name}`);
+    onItemMoved();
+  };
+
+  const dropAnimation: DropAnimation = {
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: { active: { opacity: '1' } },
+    }),
+  };
+
   return (
     <div className="p-6 overflow-x-auto">
-      <div className="flex gap-4 min-w-max">
-        {boardColumns.map((col) => {
-          const colItems = itemsByColumn.get(col.id) ?? [];
-          return (
-            <div
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex gap-4 min-w-max">
+          {boardColumns.map((col) => (
+            <ProjectBoardColumn
               key={col.id}
-              className="w-72 flex-shrink-0 bg-slate-100 rounded-lg"
-            >
-              {/* Column header */}
-              <div className="flex items-center gap-2 px-3 py-3">
-                <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: col.color ?? undefined }}
-                />
-                <span className="text-sm font-medium text-slate-700">
-                  {col.name}
-                </span>
-                <span className="text-xs text-slate-400 ml-auto">
-                  {colItems.length}
-                </span>
-              </div>
-
-              {/* Cards */}
-              <div className="px-2 pb-2 space-y-2">
-                {colItems.map((item) => {
-                  const ct = contentTypes.find(
-                    (c) => c.id === item.content_type_id
-                  );
-                  const assignee = members.find((m) =>
-                    item.assignee_ids?.includes(m.id)
-                  );
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => onItemClick(item.id)}
-                      className="bg-white rounded-lg border border-slate-200 p-3 cursor-pointer hover:shadow-md transition-shadow"
-                    >
-                      <p className="text-sm font-medium text-slate-800 mb-2">
-                        {item.title}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          {ct && (
-                            <span
-                              className="w-2 h-2 rounded-full"
-                              style={{ backgroundColor: ct.color ?? undefined }}
-                            />
-                          )}
-                          {assignee && (
-                            <AvatarCircle profile={assignee} size="xs" />
-                          )}
-                        </div>
-                        {item.due_date && (
-                          <span className="text-xs text-slate-400">
-                            {formatDate(item.due_date)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-                {colItems.length === 0 && (
-                  <p className="text-xs text-slate-400 text-center py-4">
-                    No items
-                  </p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              column={col}
+              items={itemsByColumn.get(col.id) ?? []}
+              contentTypes={contentTypes}
+              members={members}
+              onItemClick={onItemClick}
+            />
+          ))}
+        </div>
+        <DragOverlay dropAnimation={dropAnimation}>
+          {activeDragItem ? (
+            <ProjectBoardCard
+              item={activeDragItem}
+              contentTypes={contentTypes}
+              members={members}
+              isOverlay
+              onClick={() => {}}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
 }
