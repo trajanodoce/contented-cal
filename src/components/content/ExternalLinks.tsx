@@ -121,28 +121,19 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
       </div>
 
       {/* Content */}
-      <div className="p-3">
-        <PlatformBadge platform={link.platform as ExternalLinkPlatform} />
-        <p className="mt-1.5 text-sm font-medium text-slate-800 line-clamp-2 leading-snug">
-          {isFile ? fileName : (link.title || 'Untitled')}
-        </p>
-        {isFile && fileSize ? (
-          <p className="mt-0.5 text-xs text-slate-400">{formatFileSize(fileSize)}</p>
-        ) : (metadata.description as string) ? (
-          <p className="mt-0.5 text-xs text-slate-400 line-clamp-2">
-            {metadata.description as string}
-          </p>
-        ) : null}
+      <div className="px-3 py-2">
         <a
           href={link.url}
           target="_blank"
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
-          className="mt-2 inline-flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
+          className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline line-clamp-1 leading-snug transition-colors"
         >
-          <ExternalLinkIcon className="w-3 h-3" />
-          {isFile ? 'Download' : `Open in ${PLATFORM_META[link.platform as ExternalLinkPlatform]?.label ?? 'browser'}`}
+          {isFile ? fileName : (link.title || 'Untitled')}
         </a>
+        {isFile && fileSize && (
+          <p className="mt-0.5 text-xs text-slate-400">{formatFileSize(fileSize)}</p>
+        )}
       </div>
     </div>
   );
