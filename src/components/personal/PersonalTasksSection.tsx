@@ -123,7 +123,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none"
+          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-blue-200 outline-none"
         >
           {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
             <option key={key} value={key}>{cat.label}</option>
@@ -132,7 +132,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none"
+          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-blue-200 outline-none"
         >
           {Object.entries(priorityLabels).map(([key, label]) => (
             <option key={key} value={key}>{label}</option>
@@ -142,7 +142,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none"
+          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-blue-200 outline-none"
         />
         <button
           type="submit"

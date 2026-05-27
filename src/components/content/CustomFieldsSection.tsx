@@ -35,7 +35,7 @@ interface InputProps {
 }
 
 function CustomFieldInput({ field, value, onChange, compact, members = [] }: InputProps) {
-  const cls = `w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
+  const cls = `w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
   const rawOpts = field.options;
   const options: SelectOption[] = Array.isArray(rawOpts)
     ? rawOpts

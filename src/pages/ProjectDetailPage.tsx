@@ -410,7 +410,7 @@ export function ProjectDetailPage() {
               onChange={(e) =>
                 updateProject({ owner_id: e.target.value || null })
               }
-              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (
@@ -457,7 +457,7 @@ export function ProjectDetailPage() {
             <select
               value={project.status}
               onChange={(e) => updateProject({ status: e.target.value as 'active' | 'completed' | 'archived' })}
-              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="active">Active</option>
               <option value="completed">Completed</option>

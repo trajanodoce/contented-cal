@@ -190,7 +190,7 @@ export function OrdinalSettings() {
                   value={profileId}
                   onChange={(e) => setProfileId(e.target.value)}
                   placeholder="e.g., profile_123456"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
               <div>
@@ -200,7 +200,7 @@ export function OrdinalSettings() {
                   value={profileName}
                   onChange={(e) => setProfileName(e.target.value)}
                   placeholder="e.g., John Doe"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
               <div>
@@ -208,7 +208,7 @@ export function OrdinalSettings() {
                 <select
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value as typeof platform)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                 >
                   <option value="LinkedIn">LinkedIn</option>
                   <option value="X">X</option>
