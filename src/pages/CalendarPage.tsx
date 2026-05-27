@@ -83,7 +83,7 @@ function DroppableDayCell({ dateId, children, className, onClick }: {
   return (
     <div
       ref={setNodeRef}
-      className={`${className || ''} ${isOver ? 'ring-2 ring-inset ring-blue-400 !bg-blue-50/60' : ''}`}
+      className={`overflow-hidden min-w-0 ${className || ''} ${isOver ? 'ring-2 ring-inset ring-blue-400 !bg-blue-50/60' : ''}`}
       onClick={onClick}
     >
       {children}
@@ -129,7 +129,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1.5 rounded text-xs cursor-pointer hover:bg-slate-100 transition-colors border shadow-sm mb-1"
+      className="flex items-center gap-1.5 px-2 py-1.5 rounded text-xs cursor-pointer hover:bg-slate-100 transition-colors border shadow-sm mb-1 overflow-hidden min-w-0"
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
@@ -351,7 +351,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                     )}
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0 overflow-hidden">
                     {dayProjectMarkers.map((m) => (
                       <ProjectMarker key={`proj-${m.type}-${m.project.id}`} project={m.project} type={m.type} />
                     ))}
