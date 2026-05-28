@@ -52,6 +52,17 @@ interface SortState {
   direction: SortDirection;
 }
 
+// Darken a hex color for text readability — pastel column colors need
+// their text/border tint pulled toward black so every pill reads at the
+// same visual weight.
+function darkenHex(hex: string, amount = 0.35): string {
+  const h = hex.replace('#', '');
+  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - amount));
+  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - amount));
+  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - amount));
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
 // Helper to get content type info
 function getContentType(
   contentTypeId: string | null,
@@ -468,10 +479,13 @@ export function ListPage() {
                           onUpdate={handleItemUpdated}
                         />
                       ) : (
-                        status && (
+                        status && (() => {
+                          const base = status.color ?? '#94a3b8';
+                          const dark = darkenHex(base, 0.35);
+                          return (
                           <span
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                            style={{ backgroundColor: `${status.color ?? '#94a3b8'}20`, color: status.color ?? undefined, border: `0.5px solid ${status.color ?? '#94a3b8'}` }}
+                            style={{ backgroundColor: `${base}20`, color: dark, border: `0.5px solid ${dark}40` }}
                           >
                             {status.name}
                           </span>

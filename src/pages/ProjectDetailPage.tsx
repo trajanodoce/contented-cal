@@ -1462,7 +1462,7 @@ function ProjectMonthGrid({
           return (
             <div
               key={dateKey}
-              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-300 ${
+              className={`min-h-[140px] px-2 pt-2 pb-2.5 border-b border-r border-slate-300 ${
                 today ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
             >
@@ -1476,7 +1476,7 @@ function ProjectMonthGrid({
                   <span className="text-[10px] text-slate-400">{dayItems.length}</span>
                 )}
               </div>
-              <div className="space-y-[3px] min-w-0 overflow-hidden">
+              <div className="space-y-[6px] min-w-0 overflow-hidden">
                 {dayItems.slice(0, 3).map((item) => {
                   const ct = contentTypes.find(
                     (c) => c.id === item.content_type_id

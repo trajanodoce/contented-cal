@@ -133,7 +133,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1 rounded-[3px] text-[14px] cursor-pointer hover:opacity-80 transition-opacity mb-[3px] overflow-hidden min-w-0 leading-tight"
+      className="flex items-center gap-1.5 px-2 py-1 rounded-[3px] text-[14px] cursor-pointer hover:opacity-80 transition-opacity mb-[6px] overflow-hidden min-w-0 leading-tight"
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
@@ -330,7 +330,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-300 ${
+              className={`min-h-[140px] px-2 pt-2 pb-2.5 border-b border-r border-slate-300 ${
                 isTodayDate ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
               onClick={() => onDateClick(day)}
@@ -346,7 +346,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                 )}
               </div>
 
-              <div className="space-y-1 min-w-0 overflow-hidden">
+              <div className="space-y-1.5 min-w-0 overflow-hidden">
                 {dayProjectMarkers.map((m) => (
                   <ProjectMarker key={`proj-${m.type}-${m.project.id}`} project={m.project} type={m.type} />
                 ))}
