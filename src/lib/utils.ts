@@ -47,6 +47,40 @@ export function getPriorityColor(priority: string): string {
   }
 }
 
+/**
+ * Convert any hex color into a vivid, dark variant for pill text/borders.
+ * Extracts the hue, then forces high saturation (65%) and low lightness (32%)
+ * so pastels like #B7CEEC become a rich navy instead of a washed-out gray.
+ */
+export function pillTextColor(hex: string): string {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16) / 255;
+  const g = parseInt(h.substring(2, 4), 16) / 255;
+  const b = parseInt(h.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  let hue = 0;
+  if (d !== 0) {
+    if (max === r) hue = ((g - b) / d + 6) % 6;
+    else if (max === g) hue = (b - r) / d + 2;
+    else hue = (r - g) / d + 4;
+    hue *= 60;
+  }
+  const sat = 0.65, lit = 0.32;
+  const c = (1 - Math.abs(2 * lit - 1)) * sat;
+  const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
+  const m = lit - c / 2;
+  let r1 = 0, g1 = 0, b1 = 0;
+  if (hue < 60) { r1 = c; g1 = x; }
+  else if (hue < 120) { r1 = x; g1 = c; }
+  else if (hue < 180) { g1 = c; b1 = x; }
+  else if (hue < 240) { g1 = x; b1 = c; }
+  else if (hue < 300) { r1 = x; b1 = c; }
+  else { r1 = c; b1 = x; }
+  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r1)}${toHex(g1)}${toHex(b1)}`;
+}
+
 export function getPriorityDot(priority: string): string {
   switch (priority) {
     case 'urgent': return 'bg-red-500';

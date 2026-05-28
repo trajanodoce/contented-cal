@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, Subtask } from '../lib/database.types';
 import { isPast, isToday } from 'date-fns';
-import { parseLocalDate, formatDate } from '../lib/utils';
+import { parseLocalDate, formatDate, pillTextColor } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -379,10 +379,11 @@ export function MyWorkPage() {
                           <td className="px-4 py-3">
                             {status && (
                               <span
-                                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
                                 style={{
-                                  backgroundColor: `${status.color ?? '#94a3b8'}20`,
-                                  color: status.color ?? undefined,
+                                  backgroundColor: `${status.color ?? '#94a3b8'}55`,
+                                  color: pillTextColor(status.color ?? '#94a3b8'),
+                                  border: `0.5px solid ${pillTextColor(status.color ?? '#94a3b8')}`,
                                 }}
                               >
                                 {status.name}

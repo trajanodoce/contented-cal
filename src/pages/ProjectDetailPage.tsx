@@ -15,7 +15,7 @@ import type {
   Profile,
   ActivityLog,
 } from '../lib/database.types';
-import { parseLocalDate } from '../lib/utils';
+import { parseLocalDate, pillTextColor } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import {
   format,
@@ -1031,10 +1031,11 @@ function ListTab({
                     <td className="px-4 py-3">
                       {col ? (
                         <span
-                          className="text-xs font-medium px-2 py-0.5 rounded-full"
+                          className="text-xs font-semibold px-2 py-0.5 rounded-full"
                           style={{
-                            backgroundColor: `${col.color ?? '#94a3b8'}20`,
-                            color: col.color ?? undefined,
+                            backgroundColor: `${col.color ?? '#94a3b8'}55`,
+                            color: pillTextColor(col.color ?? '#94a3b8'),
+                            border: `0.5px solid ${pillTextColor(col.color ?? '#94a3b8')}`,
                           }}
                         >
                           {col.name}

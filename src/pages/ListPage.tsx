@@ -4,7 +4,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 // UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
-import { parseLocalDate, formatDate } from '../lib/utils';
+import { parseLocalDate, formatDate, pillTextColor } from '../lib/utils';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
 import { CreateItemModal } from '../components/content/CreateItemModal';
@@ -50,39 +50,6 @@ type SortDirection = 'asc' | 'desc';
 interface SortState {
   field: SortField;
   direction: SortDirection;
-}
-
-// Return a dark, saturated variant of any hex color for pill text/borders.
-// Pastels need heavy treatment — we convert to HSL, force high saturation,
-// and pull lightness down so every status reads at the same weight.
-function pillTextColor(hex: string): string {
-  const h = hex.replace('#', '');
-  let r = parseInt(h.substring(0, 2), 16) / 255;
-  let g = parseInt(h.substring(2, 4), 16) / 255;
-  let b = parseInt(h.substring(4, 6), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  const d = max - min;
-  let hue = 0;
-  if (d !== 0) {
-    if (max === r) hue = ((g - b) / d + 6) % 6;
-    else if (max === g) hue = (b - r) / d + 2;
-    else hue = (r - g) / d + 4;
-    hue *= 60;
-  }
-  // Force: high saturation (65%) + low lightness (32%) → vivid dark tone
-  const sat = 0.65, lit = 0.32;
-  const c = (1 - Math.abs(2 * lit - 1)) * sat;
-  const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
-  const m = lit - c / 2;
-  let r1 = 0, g1 = 0, b1 = 0;
-  if (hue < 60) { r1 = c; g1 = x; }
-  else if (hue < 120) { r1 = x; g1 = c; }
-  else if (hue < 180) { g1 = c; b1 = x; }
-  else if (hue < 240) { g1 = x; b1 = c; }
-  else if (hue < 300) { r1 = x; b1 = c; }
-  else { r1 = c; b1 = x; }
-  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
-  return `#${toHex(r1)}${toHex(g1)}${toHex(b1)}`;
 }
 
 // Helper to get content type info
@@ -507,7 +474,7 @@ export function ListPage() {
                           return (
                           <span
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                            style={{ backgroundColor: `${base}25`, color: dark, border: `0.5px solid ${dark}50` }}
+                            style={{ backgroundColor: `${base}55`, color: dark, border: `0.5px solid ${dark}` }}
                           >
                             {status.name}
                           </span>
@@ -640,10 +607,11 @@ function InlineStatusEdit({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium hover:opacity-80 transition-opacity"
+        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity"
         style={{
-          backgroundColor: currentColumn?.color ? `${currentColumn.color}20` : '#f1f5f9',
-          color: currentColumn?.color ?? '#64748b',
+          backgroundColor: currentColumn?.color ? `${currentColumn.color}55` : '#f1f5f9',
+          color: currentColumn?.color ? pillTextColor(currentColumn.color) : '#64748b',
+          border: currentColumn?.color ? `0.5px solid ${pillTextColor(currentColumn.color)}` : undefined,
         }}
       >
         {currentColumn?.name || 'None'}
