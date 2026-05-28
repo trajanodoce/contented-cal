@@ -95,7 +95,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       <div
         ref={setNodeRef}
         style={style}
-        className="bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg p-4 h-32"
+        className="bg-[#005D9712] border-2 border-dashed border-slate-300 rounded-lg p-4 h-32"
       />
     );
   }
@@ -151,7 +151,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
               <ListChecks className="w-3.5 h-3.5" />
               <span>{subtaskCount.completed}/{subtaskCount.total}</span>
             </div>
-            <div className="flex-1 h-1 bg-slate-200 rounded-full overflow-hidden">
+            <div className="flex-1 h-1 bg-[#005D9712] rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"
                 style={{

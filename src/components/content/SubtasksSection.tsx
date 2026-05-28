@@ -333,7 +333,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
 
       {/* Progress bar */}
       {totalCount > 0 && (
-        <div className="h-1.5 rounded-full bg-slate-200 mb-3">
+        <div className="h-1.5 rounded-full bg-[#005D9712] mb-3">
           <div
             className="h-1.5 rounded-full bg-green-500 transition-all duration-300"
             style={{ width: `${progressPct}%` }}

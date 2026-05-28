@@ -324,7 +324,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
         {/* Header toggle */}
         <button
           onClick={() => setOpen(o => !o)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-surface-nested to-white hover:bg-[#005D9708] transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-surface-nested to-surface-card hover:bg-[#005D9708] transition-colors"
         >
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#2F8889' }}>

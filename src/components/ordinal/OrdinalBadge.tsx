@@ -99,7 +99,7 @@ export function OrdinalProfileChip({ name, handle, platform }: OrdinalProfileChi
     : `@${displayHandle}`;
 
   return (
-    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-50 border border-slate-200">
+    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-surface-nested border border-slate-200">
       <PlatformIcon platform={platformLabel} size="sm" />
       <div className="flex flex-col">
         <span className="text-xs font-medium text-slate-900">{displayName}</span>

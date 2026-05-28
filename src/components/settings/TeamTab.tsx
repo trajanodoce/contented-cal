@@ -503,7 +503,7 @@ function AddMemberModal({
           <select
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
           >
             <option value="editor">Editor — can create, edit, and manage content</option>
             <option value="admin">Admin — full access including settings</option>
@@ -518,7 +518,7 @@ function AddMemberModal({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-9 pr-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
             placeholder="Search by name or email..."
             autoFocus
           />

@@ -156,7 +156,7 @@ export function BulkActionsToolbar({
           <button
             onClick={() => setShowAssignDropdown(!showAssignDropdown)}
             disabled={isProcessing}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors disabled:opacity-50"
           >
             <UserPlus className="w-4 h-4" />
             Assign to...
@@ -197,7 +197,7 @@ export function BulkActionsToolbar({
           <button
             onClick={() => setShowStatusDropdown(!showStatusDropdown)}
             disabled={isProcessing}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors disabled:opacity-50"
           >
             Change status...
             <ChevronDown className="w-3 h-3" />
@@ -243,7 +243,7 @@ export function BulkActionsToolbar({
         <button
           onClick={onClear}
           disabled={isProcessing}
-          className="px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors disabled:opacity-50"
         >
           <X className="w-4 h-4" />
         </button>
@@ -266,7 +266,7 @@ export function BulkActionsToolbar({
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isProcessing}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

@@ -53,7 +53,7 @@ function CustomSelect({ options, value, onChange, placeholder }: {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between min-h-[42px]">
+        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 flex items-center justify-between min-h-[42px]">
         <div className="flex items-center gap-2">
           {selected?.color && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: selected.color }} />}
           <span className={selected ? 'text-slate-900' : 'text-slate-400'}>{selected?.label || placeholder || 'Select...'}</span>
@@ -98,7 +98,7 @@ function AssigneeMultiSelect({ members, value, onChange }: {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between min-h-[42px]">
+        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-400 flex items-center justify-between min-h-[42px]">
         <div className="flex items-center gap-2 flex-wrap">
           {selected.length === 0 ? <span className="text-slate-400">Select assignees...</span>
             : selected.length === 1 ? (
@@ -254,7 +254,7 @@ export function DesignRequestPage() {
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="What do you need designed?"
-                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                 autoFocus
                 required
               />
@@ -268,7 +268,7 @@ export function DesignRequestPage() {
                 onChange={e => setDescription(e.target.value)}
                 placeholder="Describe the design request in detail..."
                 rows={4}
-                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                className="w-full px-3 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent resize-none"
               />
             </div>
 
@@ -332,7 +332,7 @@ export function DesignRequestPage() {
                       value={link}
                       onChange={e => updateLink(i, e.target.value)}
                       placeholder="https://figma.com/..."
-                      className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                     />
                     {assetLinks.length > 1 && (
                       <button type="button" onClick={() => removeLink(i)} className="text-slate-400 hover:text-red-500 transition-colors">
@@ -363,7 +363,7 @@ export function DesignRequestPage() {
                       value={task}
                       onChange={e => updateSubtask(i, e.target.value)}
                       placeholder={`Subtask ${i + 1}...`}
-                      className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                     />
                     {subtasks.length > 1 && (
                       <button type="button" onClick={() => removeSubtask(i)} className="text-slate-400 hover:text-red-500 transition-colors">

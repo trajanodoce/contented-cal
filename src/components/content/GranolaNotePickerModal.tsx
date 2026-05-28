@@ -127,7 +127,7 @@ export function GranolaNotePickerModal({
               placeholder="Search notes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-green-200 focus:border-green-400 outline-none transition-colors"
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-brand-200 focus:border-brand-400 outline-none transition-colors"
             />
           </div>
         </div>
