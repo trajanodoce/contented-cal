@@ -17,6 +17,7 @@ import { GranolaNoteSection } from './GranolaNoteSection';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
 import { StyledSelect } from '../ui/StyledSelect';
+import DatePicker from '../ui/DatePicker';
 
 interface Props {
   item: ContentItem;
@@ -606,15 +607,13 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Due date */}
                 {fieldVisibility.dueDate && (
                   <div>
-                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-1.5">
                       <Calendar className="w-3 h-3" /> Due date
                     </label>
-                    <input
-                      type="date"
-                      value={item.due_date ?? ''}
-                      onChange={e => updateField('due_date', e.target.value || null)}
+                    <DatePicker
+                      value={item.due_date}
+                      onChange={val => updateField('due_date', val || null)}
                       disabled={isReadOnly}
-                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -622,15 +621,13 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Publish date */}
                 {fieldVisibility.publishDate && (
                   <div>
-                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-1.5">
                       <Calendar className="w-3 h-3" /> Publish date
                     </label>
-                    <input
-                      type="date"
-                      value={item.publish_date ?? ''}
-                      onChange={e => updateField('publish_date', e.target.value || null)}
+                    <DatePicker
+                      value={item.publish_date}
+                      onChange={val => updateField('publish_date', val || null)}
                       disabled={isReadOnly}
-                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}

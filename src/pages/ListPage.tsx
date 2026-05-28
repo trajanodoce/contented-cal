@@ -14,6 +14,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
+import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
@@ -898,32 +899,12 @@ function InlineDueDateEdit({
   isDone?: boolean;
   onUpdate: () => void;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [tempDate, setTempDate] = useState(dueDate || '');
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const formatted = formatDueDateWithStatus(dueDate);
-  if (isDone) formatted.isOverdue = false;
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        if (isEditing) {
-          handleSave();
-        }
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isEditing, tempDate]);
-
-  async function handleSave() {
-    setIsEditing(false);
-    if (tempDate === (dueDate || '')) return;
+  async function handleChange(newDate: string) {
+    if (newDate === (dueDate || '')) return;
 
     const { error } = await supabase
       .from('content_items')
-      .update({ due_date: tempDate || null })
+      .update({ due_date: newDate || null })
       .eq('id', contentItemId);
 
     if (error) {
@@ -931,60 +912,26 @@ function InlineDueDateEdit({
       return;
     }
 
-    // Log activity
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('activity_log').insert({
       content_item_id: contentItemId,
       user_id: user?.id || null,
-      action: `changed due date to ${tempDate || 'none'}`,
-      metadata: { oldDueDate: dueDate, newDueDate: tempDate },
+      action: `changed due date to ${newDate || 'none'}`,
+      metadata: { oldDueDate: dueDate, newDueDate: newDate },
     });
 
     toast.success('Due date updated');
     onUpdate();
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      setIsEditing(false);
-      setTempDate(dueDate || '');
-    }
-  }
-
-  if (isEditing) {
-    return (
-      <div ref={containerRef} className="inline-block">
-        <input
-          type="date"
-          value={tempDate}
-          onChange={(e) => setTempDate(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onClick={(e) => e.stopPropagation()}
-          className="px-2 py-1 text-sm border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          autoFocus
-        />
-      </div>
-    );
-  }
-
   return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setIsEditing(true);
-      }}
-      className={`text-sm hover:opacity-70 transition-opacity ${
-        formatted.isOverdue
-          ? 'text-red-600 font-medium'
-          : formatted.isSoon
-            ? 'text-amber-600'
-            : 'text-slate-600'
-      }`}
-    >
-      {formatted.text}
-    </button>
+    <div onClick={(e) => e.stopPropagation()}>
+      <DatePicker
+        value={dueDate}
+        onChange={handleChange}
+        placeholder="Set due date"
+      />
+    </div>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import type { IntakeForm, IntakeFormField } from '../../lib/database.types';
 import { CheckCircle, Loader2, Calendar } from 'lucide-react';
+import DatePicker from '../ui/DatePicker';
 
 interface Props {
   slug: string;
@@ -200,7 +201,11 @@ function FieldInput({ field, value, onChange }: {
 
   if (field.field_type === 'date') {
     return (
-      <input type="date" value={value} onChange={e => onChange(e.target.value)} className={cls} />
+      <DatePicker
+        value={value || null}
+        onChange={(val) => onChange(val)}
+        placeholder={`Select ${field.label.toLowerCase()}`}
+      />
     );
   }
 

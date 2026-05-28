@@ -24,6 +24,7 @@ import {
   Pencil,
   X,
 } from 'lucide-react';
+import DatePicker from '../ui/DatePicker';
 
 // ── Category definitions ─────────────────────────────────────────────────────
 
@@ -138,11 +139,10 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
             <option key={key} value={key}>{label}</option>
           ))}
         </select>
-        <input
-          type="date"
-          value={dueDate}
-          onChange={(e) => setDueDate(e.target.value)}
-          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-blue-200 outline-none"
+        <DatePicker
+          value={dueDate || null}
+          onChange={(val) => setDueDate(val)}
+          placeholder="Due date"
         />
         <button
           type="submit"
@@ -513,11 +513,10 @@ function TaskRow({
               <option key={key} value={key}>{label}</option>
             ))}
           </select>
-          <input
-            type="date"
-            value={editDueDate}
-            onChange={(e) => setEditDueDate(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
+          <DatePicker
+            value={editDueDate || null}
+            onChange={(val) => setEditDueDate(val)}
+            placeholder="Due date"
           />
         </div>
 
