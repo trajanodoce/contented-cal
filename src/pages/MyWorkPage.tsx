@@ -17,7 +17,6 @@ import {
   Calendar,
   AlertCircle,
   Square,
-  CheckSquare,
   ListChecks,
   ExternalLink,
   Loader2,
@@ -209,28 +208,6 @@ export function MyWorkPage() {
       : <ArrowDown className="w-3 h-3 text-brand-600" />;
   };
 
-  const toggleItemComplete = async (item: ContentItem) => {
-    const nowCompleted = !item.completed;
-    const { error } = await supabase
-      .from('content_items')
-      .update({
-        completed: nowCompleted,
-        completed_at: nowCompleted ? new Date().toISOString() : null,
-      })
-      .eq('id', item.id);
-
-    if (error) {
-      toast.error('Failed to update item');
-      return;
-    }
-
-    patchContentItem(item.id, {
-      completed: nowCompleted,
-      completed_at: nowCompleted ? new Date().toISOString() : null,
-    });
-    toast.success(nowCompleted ? 'Marked as done' : 'Marked as active');
-  };
-
   const getStatusName = (statusId: string | null) => {
     if (!statusId) return null;
     return boardColumns.find((col) => col.id === statusId);
@@ -316,7 +293,6 @@ export function MyWorkPage() {
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="w-10 px-3 py-2.5"></th>
                       <th
                         className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
                         onClick={() => handleSort('title')}
@@ -379,27 +355,6 @@ export function MyWorkPage() {
                           className={`cursor-pointer transition-colors ${done ? 'hover:brightness-95' : 'hover:bg-slate-50'}`}
                           style={rowBg ? { backgroundColor: rowBg } : {}}
                         >
-                          {/* Complete toggle */}
-                          <td className="px-3 py-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleItemComplete(item);
-                              }}
-                              className={`flex-shrink-0 transition-colors ${
-                                done
-                                  ? 'text-blue-500 hover:text-blue-600'
-                                  : 'text-slate-300 hover:text-blue-500'
-                              }`}
-                              title={done ? 'Mark as active' : 'Mark as done'}
-                            >
-                              {done ? (
-                                <CheckSquare className="w-4.5 h-4.5" />
-                              ) : (
-                                <Square className="w-4.5 h-4.5" />
-                              )}
-                            </button>
-                          </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1.5">
                               <span className={`text-sm font-medium ${done ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
