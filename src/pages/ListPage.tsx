@@ -470,8 +470,8 @@ export function ListPage() {
                       ) : (
                         status && (
                           <span
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                            style={{ backgroundColor: `${status.color ?? '#94a3b8'}20`, color: status.color ?? undefined }}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                            style={{ backgroundColor: `${status.color ?? '#94a3b8'}20`, color: status.color ?? undefined, border: `0.5px solid ${status.color ?? '#94a3b8'}` }}
                           >
                             {status.name}
                           </span>
