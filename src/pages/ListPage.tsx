@@ -127,6 +127,11 @@ export function ListPage() {
   });
   const [showGranola, setShowGranola] = useState(false);
 
+  // Clean up stale localStorage key that caused items to disappear
+  useEffect(() => {
+    localStorage.removeItem('cc-show-granola');
+  }, []);
+
   // Extract unique channels from items
   useEffect(() => {
     if (rawItems.length > 1) {
@@ -303,13 +308,7 @@ export function ListPage() {
 
       <div className="flex items-center justify-end gap-2 mt-3 mb-1">
         <button
-          onClick={() => {
-            setShowGranola(prev => {
-              const next = !prev;
-              localStorage.setItem('cc-show-granola', String(next));
-              return next;
-            });
-          }}
+          onClick={() => setShowGranola(prev => !prev)}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
           style={{
             borderColor: showGranola ? '#86EFAC' : '#e2e8f0',
