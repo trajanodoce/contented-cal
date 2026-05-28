@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Check } from 'lucide-react';
 
 interface Option {
@@ -20,23 +21,56 @@ const COOL_WASHES = ['#f0f4f8', '#f5f0f8', '#f0f6f5', '#f2f4f8', '#f5f3f0', '#f0
 
 export function StyledSelect({ value, onChange, options, placeholder = 'Select...', disabled = false, className = '' }: StyledSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
 
   const selected = options.find(o => o.value === value);
 
+  const updatePosition = useCallback(() => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPos({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, []);
+
   useEffect(() => {
+    if (!isOpen) return;
+    updatePosition();
+
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        buttonRef.current && !buttonRef.current.contains(target) &&
+        dropdownRef.current && !dropdownRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     }
+
+    function handleScroll() {
+      updatePosition();
+    }
+
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', updatePosition);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen, updatePosition]);
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`field-select w-full flex items-center justify-between px-3 py-1.5 text-sm font-medium border rounded-lg text-left transition-colors ${
@@ -54,10 +88,18 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <div
-          className="absolute z-50 top-full mt-1 w-full border rounded-lg shadow-lg overflow-y-auto max-h-[240px]"
-          style={{ borderColor: '#94a3b8', backgroundColor: '#fafbfc' }}
+          ref={dropdownRef}
+          className="fixed border rounded-lg shadow-lg overflow-y-auto max-h-[240px]"
+          style={{
+            top: pos.top,
+            left: pos.left,
+            width: pos.width,
+            zIndex: 9999,
+            borderColor: '#94a3b8',
+            backgroundColor: '#fafbfc',
+          }}
         >
           <div className="p-1 space-y-0.5">
             {options.map((option, idx) => {
@@ -85,7 +127,8 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
               );
             })}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
