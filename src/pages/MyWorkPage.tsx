@@ -59,14 +59,20 @@ interface SubtaskWithParent extends Subtask {
 export function MyWorkPage() {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
-  const { contentTypes, boardColumns, members, projects } = useApp();
+  const { contentTypes, boardColumns, members, projects, contentItems, contentItemsLoading, patchContentItem } = useApp();
   const { filters, setFilters, isLoaded } = useFilters();
   const { setSelectedItemId } = useSelectedItem();
 
-  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [subtasks, setSubtasks] = useState<SubtaskWithParent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [channels, setChannels] = useState<string[]>([]);
+  const myItems = useMemo(
+    () => (user ? contentItems.filter((i) => i.assignee_ids?.includes(user.id)) : []),
+    [contentItems, user],
+  );
+  const channels = useMemo(
+    () => [...new Set(myItems.map((item) => item.channel).filter(Boolean))] as string[],
+    [myItems],
+  );
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
 
   const fetchData = useCallback(async () => {
@@ -74,16 +80,6 @@ export function MyWorkPage() {
     setLoading(true);
 
     try {
-      // Fetch content items assigned to current user
-      const { data: items } = await supabase
-        .from('content_items')
-        .select('id, title, status, due_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags, completed')
-        .eq('workspace_id', currentWorkspace.id)
-        .contains('assignee_ids', [user.id])
-        .order('due_date', { ascending: true, nullsFirst: false });
-
-      setContentItems((items ?? []) as ContentItem[]);
-
       // Fetch subtasks assigned to current user (incomplete)
       // We need to join with content_items to get parent title
       const { data: mySubtasks } = await supabase
@@ -112,19 +108,11 @@ export function MyWorkPage() {
     fetchData();
   }, [fetchData]);
 
-  // Extract unique channels from items
-  useEffect(() => {
-    if (contentItems.length > 0) {
-      const uniqueChannels = [...new Set(contentItems.map((item) => item.channel).filter(Boolean))];
-      setChannels(uniqueChannels as string[]);
-    }
-  }, [contentItems]);
-
   // Apply filters to items
   const filteredItems = useMemo(() => {
-    if (!isLoaded) return contentItems;
-    return applyFilters(contentItems, filters);
-  }, [contentItems, filters, isLoaded]);
+    if (!isLoaded) return myItems;
+    return applyFilters(myItems, filters);
+  }, [myItems, filters, isLoaded]);
 
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -236,13 +224,10 @@ export function MyWorkPage() {
       return;
     }
 
-    setContentItems((prev) =>
-      prev.map((i) =>
-        i.id === item.id
-          ? { ...i, completed: nowCompleted, completed_at: nowCompleted ? new Date().toISOString() : null }
-          : i
-      )
-    );
+    patchContentItem(item.id, {
+      completed: nowCompleted,
+      completed_at: nowCompleted ? new Date().toISOString() : null,
+    });
     toast.success(nowCompleted ? 'Marked as done' : 'Marked as active');
   };
 
@@ -287,7 +272,7 @@ export function MyWorkPage() {
     );
   }
 
-  if (loading) {
+  if (loading || contentItemsLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -307,7 +292,7 @@ export function MyWorkPage() {
         projects={projects.map(p => ({ id: p.id, label: p.title }))}
         filters={filters}
         onFiltersChange={setFilters}
-        totalCount={contentItems.length}
+        totalCount={myItems.length}
         filteredCount={filteredItems.length}
       />
 

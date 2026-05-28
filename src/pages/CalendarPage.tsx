@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useViewPersistence } from '../contexts/ViewPersistenceContext';
+import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, Profile, BoardColumn, Project, Subtask } from '../lib/database.types';
@@ -1136,7 +1137,7 @@ export function CalendarPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
   const { calendarViewType, setCalendarViewType } = useViewPersistence();
-  const [items, setItems] = useState<ContentItem[]>([]);
+  const { contentItems, contentItemsLoading, patchContentItem } = useApp();
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
   const [members, setMembers] = useState<Profile[]>([]);
@@ -1180,7 +1181,10 @@ export function CalendarPage() {
   }, [setCalendarViewType]);
 
   const { filters, setFilters, isLoaded } = useFilters();
-  const [channels, setChannels] = useState<string[]>([]);
+  const channels = useMemo(
+    () => [...new Set(contentItems.map((item) => item.channel).filter(Boolean))] as string[],
+    [contentItems],
+  );
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
@@ -1192,22 +1196,17 @@ export function CalendarPage() {
     setLoading(true);
 
     try {
-      const [{ data: itemsData }, { data: typesData }, { data: colsData }, { data: projectsData }, { data: subtasksData }] = await Promise.all([
-        supabase.from('content_items').select('id, title, status, due_date, publish_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags').eq('workspace_id', currentWorkspace.id).order('created_at', { ascending: false }),
+      const [{ data: typesData }, { data: colsData }, { data: projectsData }, { data: subtasksData }] = await Promise.all([
         supabase.from('content_types').select('*').eq('workspace_id', currentWorkspace.id).order('name'),
         supabase.from('board_columns').select('*').eq('workspace_id', currentWorkspace.id).order('position'),
         supabase.from('projects').select('*').eq('workspace_id', currentWorkspace.id).in('status', ['active']),
         supabase.from('subtasks').select('*, content_items!inner(title, workspace_id)').eq('content_items.workspace_id', currentWorkspace.id).not('due_date', 'is', null),
       ]);
 
-      setItems((itemsData ?? []) as ContentItem[]);
       setContentTypes(typesData || []);
       setBoardColumns(colsData || []);
       setProjects(projectsData || []);
       setSubtasksRaw(subtasksData || []);
-
-      const uniqueChannels = [...new Set((itemsData || []).map((item) => item.channel).filter(Boolean))];
-      setChannels(uniqueChannels as string[]);
 
       const { data: membersData } = await supabase
         .from('workspace_members')
@@ -1227,43 +1226,20 @@ export function CalendarPage() {
     fetchData();
   }, [fetchData]);
 
-  // Realtime subscription for live updates
-  useEffect(() => {
-    if (!currentWorkspace) return;
-    const channel = supabase
-      .channel('calendar_items_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'content_items',
-        filter: `workspace_id=eq.${currentWorkspace.id}`,
-      }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setItems((prev) => [payload.new as ContentItem, ...prev]);
-        } else if (payload.eventType === 'UPDATE') {
-          setItems((prev) => prev.map((item) => item.id === payload.new.id ? (payload.new as ContentItem) : item));
-        } else if (payload.eventType === 'DELETE') {
-          setItems((prev) => prev.filter((item) => item.id !== payload.old.id));
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [currentWorkspace]);
-
   const filteredItems = useMemo(() => {
-    let result = isLoaded ? applyFilters(items, filters, linkCounts) : items;
+    let result = isLoaded ? applyFilters(contentItems, filters, linkCounts) : contentItems;
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
     return result;
-  }, [items, filters, isLoaded, linkCounts, showOrdinal]);
+  }, [contentItems, filters, isLoaded, linkCounts, showOrdinal]);
 
   // Build subtasks with parent titles for calendar display
   const subtasksWithParent: SubtaskWithParent[] = useMemo(() => {
-    const itemMap = new Map(items.map((i) => [i.id, i.title]));
+    const itemMap = new Map(contentItems.map((i) => [i.id, i.title]));
     return subtasksRaw.map((st) => ({
       ...st,
       parentTitle: itemMap.get(st.content_item_id) || undefined,
     }));
-  }, [subtasksRaw, items]);
+  }, [subtasksRaw, contentItems]);
 
   const goToToday = () => setCurrentDate(new Date());
   const goToPrevious = () => {
@@ -1315,7 +1291,7 @@ export function CalendarPage() {
     const newDateStr = over.id as string;
     const newDate = parseLocalDate(newDateStr);
 
-    const item = items.find((i) => i.id === itemId);
+    const item = contentItems.find((i) => i.id === itemId);
     if (!item) return;
 
     const dateField = dateMode === 'due' ? 'due_date' : 'publish_date';
@@ -1342,11 +1318,7 @@ export function CalendarPage() {
     });
 
     toast.success(`Rescheduled "${item.title}" to ${format(newDate, 'MMM d')}`);
-    setItems((prev) =>
-      prev.map((i) =>
-        i.id === itemId ? { ...i, [dateField]: format(newDate, 'yyyy-MM-dd') } : i
-      )
-    );
+    patchContentItem(itemId, { [dateField]: format(newDate, 'yyyy-MM-dd') });
   };
 
   if (!currentWorkspace) {
@@ -1357,7 +1329,7 @@ export function CalendarPage() {
     );
   }
 
-  if (loading) {
+  if (loading || contentItemsLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
@@ -1378,7 +1350,7 @@ export function CalendarPage() {
             linkCounts={linkCounts}
             filters={filters}
             onFiltersChange={setFilters}
-            totalCount={items.length}
+            totalCount={contentItems.length}
             filteredCount={filteredItems.length}
           />
         </div>
