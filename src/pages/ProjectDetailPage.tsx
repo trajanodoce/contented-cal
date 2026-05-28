@@ -1107,16 +1107,24 @@ function ProjectBoardCard({
     );
   }
 
+  const isOrdinal = isOrdinalItem(item);
+  const isLinear = isLinearItem(item);
+  const cardBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
+
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`bg-white rounded-lg border border-slate-200 p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow ${
+      className={`rounded-lg border p-3 shadow-md cursor-grab active:cursor-grabbing hover:shadow-lg transition-all ${
         isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
-      }`}
+      } ${!cardBg ? 'bg-slate-50' : ''}`}
+      style={{
+        ...style,
+        borderColor: '#002339',
+        ...(cardBg ? { backgroundColor: cardBg } : {}),
+      }}
     >
       <p className="text-sm font-medium text-slate-800 mb-2">
         {item.title}
@@ -1162,29 +1170,38 @@ function ProjectBoardColumn({
     data: { column },
   });
 
+  const colColor = column.color ?? '#94a3b8';
+
   return (
     <div
       ref={setNodeRef}
-      className={`w-72 flex-shrink-0 rounded-lg border-2 transition-all ${
-        isOver ? 'border-blue-400 bg-blue-50/30' : 'border-slate-200 bg-slate-100'
+      className={`w-72 flex-shrink-0 rounded-xl border-2 transition-all ${
+        isOver ? 'border-blue-400' : 'border-slate-200'
       }`}
+      style={{ backgroundColor: isOver ? `${colColor}0C` : `${colColor}05` }}
     >
       {/* Column header */}
-      <div className="flex items-center gap-2 px-3 py-3">
-        <span
-          className="w-2.5 h-2.5 rounded-full shrink-0"
-          style={{ backgroundColor: column.color ?? undefined }}
-        />
-        <span className="text-sm font-medium text-slate-700">
+      <div
+        className="flex items-center gap-2 px-3 py-3 border-b rounded-t-xl"
+        style={{
+          borderTop: `3px solid ${colColor}`,
+          borderBottomColor: `${colColor}30`,
+          backgroundColor: `${colColor}15`,
+        }}
+      >
+        <span className="text-sm font-semibold text-slate-900">
           {column.name}
         </span>
-        <span className="text-xs text-slate-400 ml-auto">
+        <span
+          className="text-xs font-medium px-2 py-0.5 rounded-full ml-auto"
+          style={{ backgroundColor: `${colColor}20`, color: colColor }}
+        >
           {items.length}
         </span>
       </div>
 
       {/* Cards */}
-      <div className="px-2 pb-2 space-y-2 min-h-[80px]">
+      <div className="px-2 pb-2 pt-2 space-y-2 min-h-[80px]">
         {items.map((item) => (
           <ProjectBoardCard
             key={item.id}
