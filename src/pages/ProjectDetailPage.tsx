@@ -424,7 +424,7 @@ export function ProjectDetailPage() {
               onChange={(e) =>
                 updateProject({ owner_id: e.target.value || null })
               }
-              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (
@@ -469,7 +469,7 @@ export function ProjectDetailPage() {
             <select
               value={project.status}
               onChange={(e) => updateProject({ status: e.target.value as 'active' | 'completed' | 'archived' })}
-              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="active">Active</option>
               <option value="completed">Completed</option>
@@ -558,7 +558,7 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
     <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#005D9708] transition-colors"
       >
         <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Clock className="w-4 h-4 text-slate-400" />
@@ -651,7 +651,7 @@ function OverviewTab({
         <h3 className="text-sm font-semibold text-slate-700 mb-4">Progress</h3>
         {totalItems > 0 ? (
           <>
-            <div className="h-3 rounded-full overflow-hidden flex bg-slate-100">
+            <div className="h-3 rounded-full overflow-hidden flex bg-[#005D9712]">
               {boardColumns.map((col) => {
                 const count = columnCounts.get(col.id) ?? 0;
                 if (count === 0) return null;
@@ -858,7 +858,7 @@ function TeamMembersSection({
           {teamMembers.map((m) => (
             <div
               key={m.id}
-              className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg group"
+              className="flex items-center gap-2 px-3 py-2 bg-surface-nested rounded-lg group"
             >
               <AvatarCircle profile={m} size="sm" />
               <span className="text-sm text-slate-700">
@@ -1004,7 +1004,7 @@ function ListTab({
                   <tr
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
-                    className="hover:bg-slate-50 cursor-pointer transition-colors"
+                    className="hover:bg-[#005D9708] cursor-pointer transition-colors"
                     style={{
                       ...(rowBg ? { backgroundColor: rowBg } : {}),
                       ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
@@ -1427,7 +1427,7 @@ function ProjectMonthGrid({
   return (
     <>
       {/* Weekday header — quiet slate-400 row inside the card */}
-      <div className="grid border-b border-slate-100" style={{ gridTemplateColumns: gridCols }}>
+      <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: gridCols }}>
         {weekDays.map((d) => (
           <div
             key={d}
@@ -1450,7 +1450,7 @@ function ProjectMonthGrid({
           return (
             <div
               key={dateKey}
-              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
+              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-200 ${
                 today ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
             >

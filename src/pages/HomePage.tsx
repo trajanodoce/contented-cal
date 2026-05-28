@@ -200,7 +200,7 @@ export function HomePage() {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left group"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors text-left group"
                     >
                       <div className={`w-2 h-2 rounded-full shrink-0 ${item.priority === 'urgent' ? 'bg-red-500' : 'bg-orange-400'}`} />
                       <div className="flex-1 min-w-0">
@@ -256,7 +256,7 @@ export function HomePage() {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left group"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors text-left group"
                     >
                       <div className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
                         isDueToday ? 'bg-brand-100 text-brand-700' : 'bg-slate-100 text-slate-600'
@@ -295,12 +295,12 @@ export function HomePage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-slate-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#005D9712]">
                 {projects.map(project => (
                   <button
                     key={project.id}
                     onClick={() => navigate(`/projects/${project.id}`)}
-                    className="bg-surface-card p-4 hover:bg-slate-50 transition-colors text-left group"
+                    className="bg-surface-card p-4 hover:bg-[#005D9708] transition-colors text-left group"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <div
@@ -347,7 +347,7 @@ export function HomePage() {
                         <span className="font-medium text-slate-700">{s.status_name}</span>
                         <span className="text-slate-500">{s.count}</span>
                       </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-[#005D9712] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{

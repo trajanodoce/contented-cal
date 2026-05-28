@@ -53,7 +53,7 @@ function CustomSelect({ options, value, onChange, placeholder }: {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between min-h-[42px]">
+        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between min-h-[42px]">
         <div className="flex items-center gap-2">
           {selected?.color && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: selected.color }} />}
           <span className={selected ? 'text-slate-900' : 'text-slate-400'}>{selected?.label || placeholder || 'Select...'}</span>
@@ -98,7 +98,7 @@ function AssigneeMultiSelect({ members, value, onChange }: {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between min-h-[42px]">
+        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-between min-h-[42px]">
         <div className="flex items-center gap-2 flex-wrap">
           {selected.length === 0 ? <span className="text-slate-400">Select assignees...</span>
             : selected.length === 1 ? (
@@ -229,7 +229,7 @@ export function DesignRequestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4">
+    <div className="min-h-screen bg-surface-page py-10 px-4">
       <div className="max-w-xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">

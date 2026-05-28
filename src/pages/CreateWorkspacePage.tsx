@@ -77,7 +77,7 @@ export function CreateWorkspacePage() {
   const isBusy = loading || contextLoading;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-surface-page">
       {/* Top bar with user info */}
       <header className="bg-surface-card border-b border-slate-200 px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

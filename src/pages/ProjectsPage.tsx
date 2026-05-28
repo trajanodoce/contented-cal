@@ -437,7 +437,7 @@ export function ProjectsPage() {
                       <span className="font-medium text-slate-700">{weightedPct}% complete</span>
                     )}
                   </div>
-                  <div className="w-full h-2 rounded-full overflow-hidden flex bg-slate-100">
+                  <div className="w-full h-2 rounded-full overflow-hidden flex bg-[#005D9712]">
                     {totalItems > 0 ? (
                       sortedColumns.map((col) => {
                         const count = colCounts.get(col.id) ?? 0;

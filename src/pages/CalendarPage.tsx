@@ -292,7 +292,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
   return (
     <>
       {/* Weekday header — quiet slate-400 row inside the card */}
-      <div className="grid border-b border-slate-100" style={{ gridTemplateColumns: gridCols }}>
+      <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: gridCols }}>
         {weekDays.map((day) => (
           <div
             key={day}
@@ -317,7 +317,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
+              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-200 ${
                 isTodayDate ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
               onClick={() => onDateClick(day)}
@@ -549,7 +549,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`p-2 border-r border-slate-100 last:border-r-0 border-b border-slate-100 min-h-[100px] ${
+              className={`p-2 border-r border-slate-200 last:border-r-0 border-b border-slate-200 min-h-[100px] ${
                 isTodayDate ? 'bg-[#005D970A]' : ''
               }`}
               onClick={() => onDateClick(day)}

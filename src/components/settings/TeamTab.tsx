@@ -351,7 +351,7 @@ export function TeamTab() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setRemovingId(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -729,7 +729,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
           >
             Cancel
           </button>

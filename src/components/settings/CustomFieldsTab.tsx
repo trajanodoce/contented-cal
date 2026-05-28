@@ -231,7 +231,7 @@ function FieldTable({
                   {opts.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {opts.slice(0, 4).map((opt, i) => (
-                        <span key={i} className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                        <span key={i} className="text-xs bg-[#005D9712] text-slate-600 px-2 py-0.5 rounded-full">
                           {opt.label}
                         </span>
                       ))}
@@ -456,7 +456,7 @@ function FieldForm({
       <div className="flex gap-2 pt-1">
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm text-slate-600 hover:bg-[#005D9710] rounded-lg transition-colors"
         >
           Cancel
         </button>

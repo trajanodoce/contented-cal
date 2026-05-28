@@ -619,12 +619,12 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
         </form>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-surface-nested">
           <button
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-200 rounded-lg transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-[#005D9715] rounded-lg transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

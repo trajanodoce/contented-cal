@@ -352,7 +352,7 @@ export function MyWorkPage() {
                         <tr
                           key={item.id}
                           onClick={() => setSelectedItemId(item.id)}
-                          className={`cursor-pointer transition-colors ${done ? 'hover:brightness-95' : 'hover:bg-slate-50'}`}
+                          className={`cursor-pointer transition-colors ${done ? 'hover:brightness-95' : 'hover:bg-[#005D9708]'}`}
                           style={rowBg ? { backgroundColor: rowBg } : {}}
                         >
                           <td className="px-4 py-3">
@@ -443,7 +443,7 @@ export function MyWorkPage() {
                   return (
                     <div
                       key={subtask.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-[#005D9708] transition-colors"
                     >
                       {/* Checkbox */}
                       <button
