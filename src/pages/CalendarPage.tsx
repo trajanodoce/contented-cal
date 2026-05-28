@@ -133,12 +133,11 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className="flex items-center gap-1.5 px-2 py-1.5 rounded text-xs cursor-pointer hover:bg-slate-100 transition-colors border shadow-sm mb-1 overflow-hidden min-w-0"
+      className="flex items-center gap-1 px-1.5 py-0.5 rounded-[3px] text-[10px] cursor-pointer hover:opacity-80 transition-opacity mb-[3px] overflow-hidden min-w-0 leading-tight"
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
-        borderLeftColor: isLinear ? LINEAR_COLOR : borderColor,
-        borderLeftWidth: '2px',
+        borderLeft: `2px solid ${isLinear ? LINEAR_COLOR : borderColor}`,
         backgroundColor: itemBg,
       }}
     >
@@ -290,18 +289,19 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
 
   return (
     <>
-      <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
+      {/* Weekday header — quiet slate-400 row inside the card */}
+      <div className="grid border-b border-slate-100" style={{ gridTemplateColumns: gridCols }}>
         {weekDays.map((day) => (
           <div
             key={day}
-            className="px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide"
+            className="px-2 py-2 text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider"
           >
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(120px, auto)' }}>
+      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(110px, auto)' }}>
         {visibleDays.map((day, index) => {
           const dayItems = getItemsForDate(day);
           const dayProjectMarkers = getProjectMarkersForDate(day);
@@ -315,22 +315,20 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`min-h-[120px] p-2 border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
-                !isCurrentMonth ? 'bg-slate-50/50' : 'bg-surface-card'
+              className={`min-h-[110px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
+                isTodayDate ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
               onClick={() => onDateClick(day)}
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                    isTodayDate ? 'bg-brand-600 text-white' : ''
-                  }`}
-                  style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#94a3b8' } : undefined}
+                  className={`text-[11px] ${isTodayDate ? 'font-bold text-[#005D97]' : 'font-semibold'}`}
+                  style={!isTodayDate ? { color: isCurrentMonth ? '#334155' : '#cbd5e1' } : undefined}
                 >
                   {format(day, 'd')}
                 </span>
                 {totalSlots > 0 && (
-                  <span className="text-xs text-slate-400">{totalSlots}</span>
+                  <span className="text-[10px] text-slate-400">{totalSlots}</span>
                 )}
               </div>
 
@@ -406,13 +404,13 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
   return (
     <div className="space-y-0">
       {months.map((monthDate, idx) => (
-        <div key={monthDate.toISOString()} className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '-1px' : 0 }}>
-          {/* Month header bar */}
+        <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '-1px' : 0 }}>
+          {/* Month header bar — navy → pink gradient per design system */}
           <div
-            className="px-5 py-3 border-b border-slate-200"
-            style={{ background: 'linear-gradient(135deg, #B1CDDC 0%, #c8dde8 100%)' }}
+            className="px-5 py-3.5 border-b border-[#002339]"
+            style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)' }}
           >
-            <h3 className="text-lg font-bold text-white tracking-wide" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+            <h3 className="text-base font-bold text-white tracking-wide" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
               {format(monthDate, 'MMMM yyyy')}
             </h3>
           </div>
@@ -515,24 +513,21 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
   const gridCols = weekendsCollapsed ? GRID_COLS_COLLAPSED : GRID_COLS_EXPANDED;
 
   return (
-    <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1.5px solid #002339' }}>
-      <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
+    <div className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339' }}>
+      {/* Week header — navy → pink gradient with day + number per design system */}
+      <div className="grid" style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)', gridTemplateColumns: gridCols }}>
         {visibleDays.map((day) => {
           const isTodayDate = isToday(day);
           return (
             <div
               key={day.toISOString()}
-              className={`px-2 py-3 text-center border-r border-teal-700 last:border-r-0 ${
-                isTodayDate ? 'bg-teal-700' : ''
-              }`}
+              className="px-2 py-3 text-center"
             >
-              <div className={`text-xs font-semibold uppercase mb-1 tracking-wide ${isTodayDate ? 'text-teal-100' : 'text-teal-200'}`}>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-white/85 mb-1">
                 {format(day, 'EEE')}
               </div>
               <div
-                className={`text-lg w-8 h-8 font-semibold flex items-center justify-center mx-auto rounded-full ${
-                  isTodayDate ? 'bg-white text-teal-900' : 'text-white'
-                }`}
+                className={`text-base font-bold ${isTodayDate ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-white text-[#005D97]' : 'text-white'}`}
               >
                 {format(day, 'd')}
               </div>
@@ -553,7 +548,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
               className={`p-2 border-r border-slate-100 last:border-r-0 border-b border-slate-100 min-h-[100px] ${
-                isTodayDate ? 'bg-brand-50/30' : ''
+                isTodayDate ? 'bg-[#005D970A]' : ''
               }`}
               onClick={() => onDateClick(day)}
             >

@@ -1426,12 +1426,12 @@ function ProjectMonthGrid({
 
   return (
     <>
-      {/* Weekday headers */}
-      <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
+      {/* Weekday header — quiet slate-400 row inside the card */}
+      <div className="grid border-b border-slate-100" style={{ gridTemplateColumns: gridCols }}>
         {weekDays.map((d) => (
           <div
             key={d}
-            className="px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide"
+            className="px-2 py-2 text-center text-[11px] font-bold text-slate-400 uppercase tracking-wider"
           >
             {d}
           </div>
@@ -1439,7 +1439,7 @@ function ProjectMonthGrid({
       </div>
 
       {/* Day cells */}
-      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(120px, auto)' }}>
+      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(110px, auto)' }}>
         {visibleDays.map((day, index) => {
           const dateKey = format(day, 'yyyy-MM-dd');
           const dayItems = itemsByDate.get(dateKey) ?? [];
@@ -1450,24 +1450,22 @@ function ProjectMonthGrid({
           return (
             <div
               key={dateKey}
-              className={`min-h-[120px] p-2 border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
-                !inMonth ? 'bg-slate-50/50' : 'bg-surface-card'
+              className={`min-h-[110px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
+                today ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                    today ? 'bg-brand-600 text-white' : ''
-                  }`}
-                  style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
+                  className={`text-[11px] ${today ? 'font-bold text-[#005D97]' : 'font-semibold'}`}
+                  style={!today ? { color: inMonth ? '#334155' : '#cbd5e1' } : undefined}
                 >
                   {format(day, 'd')}
                 </span>
                 {dayItems.length > 0 && (
-                  <span className="text-xs text-slate-400">{dayItems.length}</span>
+                  <span className="text-[10px] text-slate-400">{dayItems.length}</span>
                 )}
               </div>
-              <div className="space-y-1 min-w-0 overflow-hidden">
+              <div className="space-y-[3px] min-w-0 overflow-hidden">
                 {dayItems.slice(0, 3).map((item) => {
                   const ct = contentTypes.find(
                     (c) => c.id === item.content_type_id
@@ -1476,7 +1474,7 @@ function ProjectMonthGrid({
                     <div
                       key={item.id}
                       onClick={() => onItemClick(item.id)}
-                      className="text-xs px-1.5 py-0.5 rounded cursor-pointer truncate hover:opacity-80 transition-opacity"
+                      className="text-[10px] font-medium leading-tight px-1.5 py-0.5 rounded-[3px] cursor-pointer truncate hover:opacity-80 transition-opacity"
                       style={{
                         backgroundColor: ct
                           ? `${ct.color}15`
@@ -1492,7 +1490,7 @@ function ProjectMonthGrid({
                 })}
                 {dayItems.length > 3 && (
                   <button
-                    className="text-xs text-slate-500 hover:text-brand-600 px-1 py-0.5"
+                    className="text-[10px] text-slate-500 hover:text-brand-600 px-1 py-0.5"
                     onClick={(e) => {
                       e.stopPropagation();
                     }}
@@ -1586,17 +1584,17 @@ function CalendarTab({
         {months.map((monthDate, idx) => (
           <div
             key={monthDate.toISOString()}
-            className="bg-surface-card rounded-lg border border-slate-200 overflow-hidden"
-            style={{ marginTop: idx > 0 ? '-1px' : 0 }}
+            className="bg-[#F7F9FC] rounded-xl overflow-hidden"
+            style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '-1px' : 0 }}
           >
-            {/* Month header bar */}
+            {/* Month header bar — navy → pink gradient per design system */}
             <div
-              className="px-5 py-3 border-b border-slate-200"
-              style={{ background: 'linear-gradient(135deg, #B1CDDC 0%, #c8dde8 100%)' }}
+              className="px-5 py-3.5 border-b border-[#002339]"
+              style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)' }}
             >
               <h3
-                className="text-lg font-bold text-white tracking-wide"
-                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}
+                className="text-base font-bold text-white tracking-wide"
+                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}
               >
                 {format(monthDate, 'MMMM yyyy')}
               </h3>
