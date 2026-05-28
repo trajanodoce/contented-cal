@@ -391,7 +391,7 @@ function FieldForm({
         <select
           value={contentTypeId}
           onChange={e => setContentTypeId(e.target.value)}
-          className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+          className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface-card"
         >
           <option value="">All content types (global)</option>
           {contentTypes.map(ct => (

@@ -133,7 +133,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className="flex items-center gap-1 px-1.5 py-1 rounded-[3px] text-[11.5px] cursor-pointer hover:opacity-80 transition-opacity mb-[3px] overflow-hidden min-w-0 leading-tight"
+      className="flex items-center gap-1.5 px-2 py-1 rounded-[3px] text-[14px] cursor-pointer hover:opacity-80 transition-opacity mb-[3px] overflow-hidden min-w-0 leading-tight"
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
@@ -582,7 +582,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                         className="w-2 h-2 rounded-full mt-1 flex-shrink-0"
                         style={{ backgroundColor: contentTypes.find(ct => ct.id === item.content_type_id)?.color || 'transparent' }}
                       />
-                      <span className="text-sm font-medium text-slate-900 line-clamp-2">{item.title}</span>
+                      <span className="text-base font-medium text-slate-900 line-clamp-2">{item.title}</span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1.5">

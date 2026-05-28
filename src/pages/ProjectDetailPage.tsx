@@ -1474,7 +1474,7 @@ function ProjectMonthGrid({
                     <div
                       key={item.id}
                       onClick={() => onItemClick(item.id)}
-                      className="text-[11.5px] font-medium leading-tight px-1.5 py-1 rounded-[3px] cursor-pointer truncate hover:opacity-80 transition-opacity"
+                      className="text-[14px] font-medium leading-tight px-2 py-1 rounded-[3px] cursor-pointer truncate hover:opacity-80 transition-opacity"
                       style={{
                         backgroundColor: ct
                           ? `${ct.color}15`
