@@ -84,10 +84,16 @@ body {
 *::-webkit-scrollbar-thumb {
   background: #005D97;
   border-radius: 999px;
-  border: 2px solid white;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 *::-webkit-scrollbar-thumb:hover {
   background: #003d66;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }
 /* Firefox */
 * {

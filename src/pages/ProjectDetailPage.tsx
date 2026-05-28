@@ -1338,7 +1338,7 @@ function BoardTab({
   };
 
   return (
-    <div className="p-6 overflow-x-scroll">
+    <div className="p-6 overflow-x-auto">
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
