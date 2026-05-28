@@ -144,7 +144,7 @@ export function IntakePage({ slug }: Props) {
           <form onSubmit={handleSubmit} className="space-y-5">
             {visibleFields.map(field => (
               <div key={field.id}>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">
                   {field.label}
                   {field.required && <span className="text-red-500 ml-0.5">*</span>}
                 </label>

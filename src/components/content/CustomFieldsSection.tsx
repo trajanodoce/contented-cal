@@ -15,7 +15,7 @@ export function CustomFieldsSection({ fields, values, onChange, compact = false,
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
       {fields.map(field => (
         <div key={field.id}>
-          <label className={`block font-medium text-slate-700 mb-1.5 ${compact ? 'text-xs' : 'text-sm'}`}>
+          <label className={`block font-bold text-slate-700 mb-1.5 ${compact ? 'text-xs' : 'text-sm'}`}>
             {field.name}
             {field.required && <span className="text-red-500 ml-0.5">*</span>}
           </label>

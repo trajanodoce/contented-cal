@@ -486,7 +486,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            <label className="block text-sm font-bold text-slate-700 mb-1.5">
               Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -503,7 +503,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
           {/* Content Type & Status */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Content Type</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Content Type</label>
               <CustomSelect
                 options={contentTypeOptions}
                 value={contentTypeId}
@@ -522,7 +522,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Status</label>
               <CustomSelect
                 options={statusOptions}
                 value={statusId}
@@ -534,14 +534,14 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
 
           {/* Assignees */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Assignees</label>
+            <label className="block text-sm font-bold text-slate-700 mb-1.5">Assignees</label>
             <AssigneeMultiSelect members={members} value={assigneeIds} onChange={setAssigneeIds} />
           </div>
 
           {/* Project */}
           {projects.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Project</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Project</label>
               <CustomSelect
                 options={projects.filter(p => p.status === 'active').map(p => ({ value: p.id, label: p.title }))}
                 value={projectId}
@@ -555,7 +555,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
           <div className="grid grid-cols-2 gap-4">
             {fieldVisibility.dueDate && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Due Date</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Due Date</label>
                 <div className="relative">
                   <input
                     type="date"
@@ -570,7 +570,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
 
             {fieldVisibility.priority && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Priority</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Priority</label>
                 <CustomSelect
                   options={priorityOptions.map((p) => ({ value: p.value, label: p.label, color: p.color }))}
                   value={priority}
@@ -583,7 +583,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
           {/* Channel */}
           {fieldVisibility.channel && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Channel</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Channel</label>
               <select
                 value={channel}
                 onChange={(e) => setChannel(e.target.value)}
@@ -600,7 +600,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
           {/* Description */}
           {fieldVisibility.description && (
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Description</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}

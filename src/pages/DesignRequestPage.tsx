@@ -245,7 +245,7 @@ export function DesignRequestPage() {
           <div className="p-6 space-y-5">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">
                 Title <span className="text-red-500">*</span>
               </label>
               <input
@@ -261,7 +261,7 @@ export function DesignRequestPage() {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Description</label>
               <textarea
                 value={description}
                 onChange={e => setDescription(e.target.value)}
@@ -274,11 +274,11 @@ export function DesignRequestPage() {
             {/* Status & Priority */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Status</label>
                 <CustomSelect options={statusOptions} value={statusId} onChange={setStatusId} placeholder="Select status..." />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Priority</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Priority</label>
                 <CustomSelect
                   options={priorityOptions.map(p => ({ value: p.value, label: p.label, color: p.color }))}
                   value={priority}
@@ -289,7 +289,7 @@ export function DesignRequestPage() {
 
             {/* Assignees */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Assignees</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Assignees</label>
               <AssigneeMultiSelect members={members} value={assigneeIds} onChange={setAssigneeIds} />
             </div>
 
@@ -297,7 +297,7 @@ export function DesignRequestPage() {
             <div className="grid grid-cols-2 gap-4">
               {projects.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Project</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-1.5">Project</label>
                   <CustomSelect
                     options={projects.filter(p => p.status === 'active').map(p => ({ value: p.id, label: p.title }))}
                     value={projectId}
@@ -307,7 +307,7 @@ export function DesignRequestPage() {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Due Date</label>
+                <label className="block text-sm font-bold text-slate-700 mb-1.5">Due Date</label>
                 <div className="relative">
                   <input
                     type="date"
@@ -323,7 +323,7 @@ export function DesignRequestPage() {
             {/* Asset Links */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <label className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
                   <LinkIcon className="w-3.5 h-3.5 text-slate-400" />
                   Asset Links
                 </label>
@@ -354,7 +354,7 @@ export function DesignRequestPage() {
             {/* Subtasks */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <label className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
                   <ListChecks className="w-3.5 h-3.5 text-slate-400" />
                   Subtasks
                 </label>
