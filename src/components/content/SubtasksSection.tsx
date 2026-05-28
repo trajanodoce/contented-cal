@@ -458,13 +458,18 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       }
                     }
                   }}
-                  className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                  className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border bg-white transition-colors ${
+                    dueDateEditId === subtask.id
+                      ? 'border-[#005D97] ring-2 ring-[#005D9725]'
+                      : 'border-slate-300 hover:border-[#005D97]'
+                  }`}
                   title={subtask.due_date ? formatDate(subtask.due_date) : 'Set due date'}
                 >
+                  <Calendar className="w-3 h-3 text-[#005D97] shrink-0" />
                   {subtask.due_date ? (
-                    <span className="text-slate-500">{formatDate(subtask.due_date)}</span>
+                    <span className="text-slate-700 font-medium">{formatDate(subtask.due_date)}</span>
                   ) : (
-                    <Calendar className="w-3.5 h-3.5" />
+                    <span className="text-slate-400">Due</span>
                   )}
                 </button>
                 {dueDateEditId === subtask.id && createPortal(
