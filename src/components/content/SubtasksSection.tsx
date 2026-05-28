@@ -72,6 +72,44 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [assigneePopoverId, dueDateEditId]);
 
+  // Position the due-date popover to the right of the trigger (subtask rows sit at
+  // the bottom of a slide-over, so opening downward gets clipped). Fall back to the
+  // left if there isn't room, and clamp vertically so the panel stays on screen.
+  const computeDueDatePos = useCallback((btn: HTMLElement) => {
+    const POPOVER_W = 280;
+    const POPOVER_H = 340;
+    const MARGIN = 6;
+    const rect = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let left = rect.right + MARGIN;
+    if (left + POPOVER_W > vw - 8) {
+      left = Math.max(8, rect.left - POPOVER_W - MARGIN);
+    }
+
+    let top = rect.top;
+    if (top + POPOVER_H > vh - 8) {
+      top = Math.max(8, vh - POPOVER_H - 8);
+    }
+
+    setDueDatePos({ top, left });
+  }, []);
+
+  // Keep the popover pinned to the trigger while the user scrolls or resizes.
+  useEffect(() => {
+    if (!dueDateEditId) return;
+    const btn = dueDateBtnRefs.current[dueDateEditId];
+    if (!btn) return;
+    const handler = () => computeDueDatePos(btn);
+    window.addEventListener('resize', handler);
+    window.addEventListener('scroll', handler, true); // capture: nested scroll containers also fire
+    return () => {
+      window.removeEventListener('resize', handler);
+      window.removeEventListener('scroll', handler, true);
+    };
+  }, [dueDateEditId, computeDueDatePos]);
+
   // Sorted subtasks: incomplete first by position, then completed by position
   const sortedSubtasks = [...subtasks].sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
@@ -452,10 +490,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                     setDueDateEditId(next);
                     if (next) {
                       const btn = dueDateBtnRefs.current[subtask.id];
-                      if (btn) {
-                        const rect = btn.getBoundingClientRect();
-                        setDueDatePos({ top: rect.bottom + 6, left: rect.right - 280 });
-                      }
+                      if (btn) computeDueDatePos(btn);
                     }
                   }}
                   className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border bg-white transition-colors ${
