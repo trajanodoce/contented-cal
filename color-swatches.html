@@ -391,7 +391,7 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
 <div class="sub">All sources together in a realistic context</div>
 
 <div class="list-mock">
-  <div class="list-header" style="background: #f8fafc;">In Progress &mdash; 5 items</div>
+  <div class="list-header" style="background: #f8fafc;">Research &mdash; 5 items</div>
   <div class="list-row" style="background: #D3CDEC18;">
     <div class="dot" style="background: #D3CDEC;"></div>
     <div class="name">Q3 launch announcement</div>
@@ -422,58 +422,80 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <hr class="sep">
 <h2>Board Column Colors</h2>
-<div class="sub">Seven-stage workflow with colors matched to the design system palette</div>
+<div class="sub">Nine-stage workflow with colors matched to the design system palette</div>
 
-<div style="display: flex; gap: 8px; margin-bottom: 28px;">
-  <!-- Proposed columns -->
-  <div style="flex: 1; background: #94A3B805; border: 1.5px solid #e2e8f0; border-top: 3px solid #94A3B8; border-radius: 10px; overflow: hidden;">
+<div style="display: flex; gap: 6px; margin-bottom: 28px;">
+  <!-- Backlog -->
+  <div style="flex: 1; background: #94A3B805; border: 1px solid #00233930; border-top: 3px solid #94A3B8; border-radius: 10px; overflow: hidden;">
     <div style="background: #94A3B815; padding: 10px 12px; border-bottom: 1px solid #94A3B830; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">Backlog</span>
-      <span style="font-size: 10px; font-weight: 600; background: #94A3B820; color: #64748b; padding: 1px 8px; border-radius: 99px;">4</span>
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Backlog</span>
+      <span style="font-size: 10px; font-weight: 600; background: #94A3B820; color: #64748b; padding: 1px 8px; border-radius: 99px;">3</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#94A3B8</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#94A3B8</div>
   </div>
-  <div style="flex: 1; background: #005D9705; border: 1.5px solid #e2e8f0; border-top: 3px solid #005D97; border-radius: 10px; overflow: hidden;">
+  <!-- Research -->
+  <div style="flex: 1; background: #005D9705; border: 1px solid #00233930; border-top: 3px solid #005D97; border-radius: 10px; overflow: hidden;">
     <div style="background: #005D9715; padding: 10px 12px; border-bottom: 1px solid #005D9730; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">In Progress</span>
-      <span style="font-size: 10px; font-weight: 600; background: #005D9720; color: #005D97; padding: 1px 8px; border-radius: 99px;">3</span>
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Research</span>
+      <span style="font-size: 10px; font-weight: 600; background: #005D9720; color: #005D97; padding: 1px 8px; border-radius: 99px;">4</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#005D97</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#005D97</div>
   </div>
-  <div style="flex: 1; background: #D4729E05; border: 1.5px solid #e2e8f0; border-top: 3px solid #D4729E; border-radius: 10px; overflow: hidden;">
+  <!-- Draft -->
+  <div style="flex: 1; background: #D4729E05; border: 1px solid #00233930; border-top: 3px solid #D4729E; border-radius: 10px; overflow: hidden;">
     <div style="background: #D4729E15; padding: 10px 12px; border-bottom: 1px solid #D4729E30; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">In Review</span>
-      <span style="font-size: 10px; font-weight: 600; background: #D4729E20; color: #D4729E; padding: 1px 8px; border-radius: 99px;">2</span>
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Draft</span>
+      <span style="font-size: 10px; font-weight: 600; background: #D4729E20; color: #D4729E; padding: 1px 8px; border-radius: 99px;">3</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#D4729E</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#D4729E</div>
   </div>
-  <div style="flex: 1; background: #D3CDEC05; border: 1.5px solid #e2e8f0; border-top: 3px solid #D3CDEC; border-radius: 10px; overflow: hidden;">
+  <!-- Review -->
+  <div style="flex: 1; background: #D3CDEC05; border: 1px solid #00233930; border-top: 3px solid #D3CDEC; border-radius: 10px; overflow: hidden;">
     <div style="background: #D3CDEC15; padding: 10px 12px; border-bottom: 1px solid #D3CDEC30; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">Approved</span>
-      <span style="font-size: 10px; font-weight: 600; background: #D3CDEC40; color: #5B4F8A; padding: 1px 8px; border-radius: 99px;">5</span>
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Review</span>
+      <span style="font-size: 10px; font-weight: 600; background: #D3CDEC40; color: #5B4F8A; padding: 1px 8px; border-radius: 99px;">2</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#D3CDEC</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#D3CDEC</div>
   </div>
-  <div style="flex: 1; background: #92D1B205; border: 1.5px solid #e2e8f0; border-top: 3px solid #92D1B2; border-radius: 10px; overflow: hidden;">
-    <div style="background: #92D1B215; padding: 10px 12px; border-bottom: 1px solid #92D1B230; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">Scheduled</span>
-      <span style="font-size: 10px; font-weight: 600; background: #92D1B240; color: #357254; padding: 1px 8px; border-radius: 99px;">1</span>
+  <!-- Blocked -->
+  <div style="flex: 1; background: #EF444405; border: 1px solid #00233930; border-top: 3px solid #EF4444; border-radius: 10px; overflow: hidden;">
+    <div style="background: #EF444415; padding: 10px 12px; border-bottom: 1px solid #EF444430; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Blocked</span>
+      <span style="font-size: 10px; font-weight: 600; background: #EF444420; color: #DC2626; padding: 1px 8px; border-radius: 99px;">0</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#92D1B2</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#EF4444</div>
   </div>
-  <div style="flex: 1; background: #FFC3B805; border: 1.5px solid #e2e8f0; border-top: 3px solid #FFC3B8; border-radius: 10px; overflow: hidden;">
-    <div style="background: #FFC3B815; padding: 10px 12px; border-bottom: 1px solid #FFC3B830; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">Published</span>
-      <span style="font-size: 10px; font-weight: 600; background: #FFC3B840; color: #A05042; padding: 1px 8px; border-radius: 99px;">6</span>
+  <!-- Approved -->
+  <div style="flex: 1; background: #D3CDEC05; border: 1px solid #00233930; border-top: 3px solid #D3CDEC; border-radius: 10px; overflow: hidden;">
+    <div style="background: #D3CDEC15; padding: 10px 12px; border-bottom: 1px solid #D3CDEC30; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Approved</span>
+      <span style="font-size: 10px; font-weight: 600; background: #D3CDEC40; color: #5B4F8A; padding: 1px 8px; border-radius: 99px;">0</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#FFC3B8</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#D3CDEC</div>
   </div>
-  <div style="flex: 1; background: #B7CEEC05; border: 1.5px solid #e2e8f0; border-top: 3px solid #B7CEEC; border-radius: 10px; overflow: hidden;">
+  <!-- Completed -->
+  <div style="flex: 1; background: #B7CEEC05; border: 1px solid #00233930; border-top: 3px solid #B7CEEC; border-radius: 10px; overflow: hidden;">
     <div style="background: #B7CEEC15; padding: 10px 12px; border-bottom: 1px solid #B7CEEC30; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 12px; font-weight: 700; color: #334155;">Completed</span>
-      <span style="font-size: 10px; font-weight: 600; background: #B7CEEC40; color: #4A6FA0; padding: 1px 8px; border-radius: 99px;">8</span>
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Completed</span>
+      <span style="font-size: 10px; font-weight: 600; background: #B7CEEC40; color: #4A6FA0; padding: 1px 8px; border-radius: 99px;">0</span>
     </div>
-    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#B7CEEC</div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#B7CEEC</div>
+  </div>
+  <!-- Scheduled -->
+  <div style="flex: 1; background: #92D1B205; border: 1px solid #00233930; border-top: 3px solid #92D1B2; border-radius: 10px; overflow: hidden;">
+    <div style="background: #92D1B215; padding: 10px 12px; border-bottom: 1px solid #92D1B230; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Scheduled</span>
+      <span style="font-size: 10px; font-weight: 600; background: #92D1B240; color: #357254; padding: 1px 8px; border-radius: 99px;">0</span>
+    </div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#92D1B2</div>
+  </div>
+  <!-- Published -->
+  <div style="flex: 1; background: #FFC3B805; border: 1px solid #00233930; border-top: 3px solid #FFC3B8; border-radius: 10px; overflow: hidden;">
+    <div style="background: #FFC3B815; padding: 10px 12px; border-bottom: 1px solid #FFC3B830; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 11px; font-weight: 700; color: #334155;">Published</span>
+      <span style="font-size: 10px; font-weight: 600; background: #FFC3B840; color: #A05042; padding: 1px 8px; border-radius: 99px;">0</span>
+    </div>
+    <div style="padding: 6px; font-size: 9px; color: #94a3b8; text-align: center;">#FFC3B8</div>
   </div>
 </div>
 
@@ -822,7 +844,7 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
         <div style="flex: 1;">
           <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Status</div>
           <div style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #005D97; font-weight: 600; background: white; display: flex; align-items: center; gap: 6px;">
-            <div style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></div> In Progress
+            <div style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></div> Research
           </div>
         </div>
         <div style="flex: 1;">
@@ -871,12 +893,14 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
     <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">PILL BADGES</div>
     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
       <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #94A3B820; color: #64748b; border: 1px solid #94A3B840;">Backlog</span>
-      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #005D9715; color: #005D97; border: 1px solid #005D9730;">In Progress</span>
-      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #D4729E15; color: #D4729E; border: 1px solid #D4729E30;">In Review</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #005D9715; color: #005D97; border: 1px solid #005D9730;">Research</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #D4729E15; color: #D4729E; border: 1px solid #D4729E30;">Draft</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #D3CDEC20; color: #5B4F8A; border: 1px solid #D3CDEC40;">Review</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #EF444415; color: #DC2626; border: 1px solid #EF444430;">Blocked</span>
       <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #D3CDEC20; color: #5B4F8A; border: 1px solid #D3CDEC40;">Approved</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #B7CEEC20; color: #4A6FA0; border: 1px solid #B7CEEC40;">Completed</span>
       <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #92D1B220; color: #357254; border: 1px solid #92D1B240;">Scheduled</span>
       <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #FFC3B820; color: #A05042; border: 1px solid #FFC3B840;">Published</span>
-      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #B7CEEC20; color: #4A6FA0; border: 1px solid #B7CEEC40;">Completed</span>
     </div>
   </div>
 </div>
@@ -885,12 +909,14 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
     <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">DOT + LABEL (inline)</div>
     <div style="display: flex; flex-wrap: wrap; gap: 16px;">
       <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #64748b;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #94A3B8;"></span> Backlog</span>
-      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #005D97; font-weight: 600;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></span> In Progress</span>
-      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #D4729E;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D4729E;"></span> In Review</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #005D97; font-weight: 600;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></span> Research</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #D4729E;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D4729E;"></span> Draft</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #5B4F8A;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D3CDEC;"></span> Review</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #DC2626;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #EF4444;"></span> Blocked</span>
       <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #5B4F8A;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D3CDEC;"></span> Approved</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #4A6FA0;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #B7CEEC;"></span> Completed</span>
       <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #357254;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #92D1B2;"></span> Scheduled</span>
       <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #A05042;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #FFC3B8;"></span> Published</span>
-      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #4A6FA0;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #B7CEEC;"></span> Completed</span>
     </div>
   </div>
 </div>
@@ -1070,7 +1096,7 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
   </div>
   <!-- Empty board column -->
   <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #e2e8f0; border-top: 3px solid #005D97; border-radius: 10px; padding: 32px 16px; text-align: center;">
-    <div style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px;">In Progress</div>
+    <div style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px;">Research</div>
     <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 16px;">No items here yet</div>
     <div style="border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 20px; color: #94a3b8; font-size: 12px;">
       Drag items here or click + to add
