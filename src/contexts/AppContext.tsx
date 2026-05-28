@@ -178,15 +178,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [workspace, refreshWorkspaceData, refreshContentItems, refreshLinkedItems]);
 
+  const workspaceId = workspace?.id;
   useEffect(() => {
-    if (!workspace) return;
+    if (!workspaceId) return;
     const channel = supabase
-      .channel(`app_content_items:${workspace.id}`)
+      .channel(`app_content_items:${workspaceId}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'content_items',
-        filter: `workspace_id=eq.${workspace.id}`,
+        filter: `workspace_id=eq.${workspaceId}`,
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
           const row = payload.new as ContentItem;
@@ -207,7 +208,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [workspace?.id]);
+  }, [workspaceId]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();

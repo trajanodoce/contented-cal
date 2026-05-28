@@ -103,9 +103,7 @@ export function ListPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canEdit = userRole === 'admin' || userRole === 'editor';
   const { filters, setFilters, isLoaded } = useFilters();
-  const { items: rawItems, loading, error, refetch } = useContentItems({
-    workspaceId: currentWorkspace?.id || null,
-  });
+  const { items: rawItems, loading, error, refetch } = useContentItems();
   const {
     contentTypes,
     boardColumns,
