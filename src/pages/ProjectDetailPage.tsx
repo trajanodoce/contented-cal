@@ -833,7 +833,7 @@ function TeamMembersSection({
             Add
           </button>
           {showPicker && (
-            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-lg shadow-lg border border-slate-200 py-1 z-50 max-h-64 overflow-y-auto">
+            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
               {availableToAdd.length === 0 ? (
                 <p className="text-xs text-slate-400 text-center py-3">All workspace members are on this project</p>
               ) : (
@@ -841,7 +841,7 @@ function TeamMembersSection({
                   <button
                     key={m.id}
                     onClick={() => addMember(m.id)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9708] transition-colors"
                   >
                     <AvatarCircle profile={m} size="sm" />
                     <span className="truncate">{m.full_name || m.email}</span>

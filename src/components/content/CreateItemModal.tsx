@@ -128,7 +128,7 @@ function CustomSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
           {options.map((option) => (
             <button
               key={option.value}
@@ -137,7 +137,7 @@ function CustomSelect({
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
                 option.value === value ? 'bg-brand-50 text-brand-900' : 'text-slate-700'
               }`}
             >
@@ -225,7 +225,7 @@ function AssigneeMultiSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
           {members.length === 0 ? (
             <div className="px-3 py-2 text-sm text-slate-500">No members found</div>
           ) : (
@@ -236,7 +236,7 @@ function AssigneeMultiSelect({
                   key={member.id}
                   type="button"
                   onClick={() => toggleMember(member.id)}
-                  className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-3 ${
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-3 ${
                     isSelected ? 'bg-brand-50' : ''
                   }`}
                 >

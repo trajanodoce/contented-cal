@@ -607,7 +607,7 @@ function InlineStatusEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[150px]">
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[150px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
           {[...boardColumns]
             .sort((a, b) => a.position - b.position)
             .map((column) => (
@@ -617,7 +617,7 @@ function InlineStatusEdit({
                   e.stopPropagation();
                   handleStatusChange(column.id);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
                   column.id === statusId ? 'bg-brand-50' : ''
                 }`}
               >
@@ -704,7 +704,7 @@ function InlinePriorityEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[120px]">
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[120px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
           {Object.entries(priorityConfig).map(([key, config]) => (
             <button
               key={key}
@@ -712,7 +712,7 @@ function InlinePriorityEdit({
                 e.stopPropagation();
                 handlePriorityChange(key);
               }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
                 key === priority ? 'bg-brand-50' : ''
               }`}
             >
@@ -843,7 +843,7 @@ function InlineAssigneeEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[180px] p-2">
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[180px] p-2" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
           {members.map((member) => {
             const isSelected = assigneeIds.includes(member.id);
             return (
@@ -853,7 +853,7 @@ function InlineAssigneeEdit({
                   e.stopPropagation();
                   toggleAssignee(member.id);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-3 rounded ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-3 rounded ${
                   isSelected ? 'bg-brand-50' : ''
                 }`}
               >

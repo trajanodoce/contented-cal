@@ -164,14 +164,14 @@ export function BulkActionsToolbar({
           </button>
 
           {showAssignDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 bg-surface-card border border-slate-200 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto">
+            <div className="absolute bottom-full mb-1 left-0 bg-surface-card rounded-xl shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select member</p>
                 {members.map((member) => (
                   <button
                     key={member.id}
                     onClick={() => handleBulkAssign(member.id)}
-                    className="w-full px-2 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 rounded"
+                    className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 rounded"
                   >
                     {member.avatar_url ? (
                       <img
@@ -204,7 +204,7 @@ export function BulkActionsToolbar({
           </button>
 
           {showStatusDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 bg-surface-card border border-slate-200 rounded-lg shadow-xl min-w-[180px]">
+            <div className="absolute bottom-full mb-1 left-0 bg-surface-card rounded-xl shadow-xl min-w-[180px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select status</p>
                 {[...boardColumns]
@@ -213,7 +213,7 @@ export function BulkActionsToolbar({
                     <button
                       key={column.id}
                       onClick={() => handleBulkStatusChange(column.id)}
-                      className="w-full px-2 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 rounded"
+                      className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 rounded"
                     >
                       <span
                         className="w-2 h-2 rounded-full"

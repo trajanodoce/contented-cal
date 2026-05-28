@@ -261,13 +261,13 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
               Add
             </button>
             {showAddMenu && (
-              <div className="absolute right-0 mt-1 w-44 bg-surface-card rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+              <div className="absolute right-0 mt-1 w-44 bg-surface-card rounded-xl shadow-lg py-1 z-50" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
                 <button
                   onClick={() => {
                     setShowAddMenu(false);
                     fileInputRef.current?.click();
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9708]"
                 >
                   <Upload className="w-4 h-4 text-slate-400" />
                   Upload file
@@ -277,7 +277,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     setShowAddMenu(false);
                     setShowLinkForm(true);
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9708]"
                 >
                   <Link2 className="w-4 h-4 text-slate-400" />
                   Add link
