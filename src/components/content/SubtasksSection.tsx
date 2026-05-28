@@ -268,7 +268,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   };
 
   return (
-    <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+    <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-sm font-medium text-slate-700">Subtasks</span>

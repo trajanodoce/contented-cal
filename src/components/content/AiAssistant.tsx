@@ -160,7 +160,7 @@ function ResponseCard({
   const timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-white border-2 rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
+    <div className="bg-white border rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
       <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-100">
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">{actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}</span>
@@ -320,7 +320,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
 
   return (
     <>
-      <div className="border-2 rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
+      <div className="border rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
         {/* Header toggle */}
         <button
           onClick={() => setOpen(o => !o)}
