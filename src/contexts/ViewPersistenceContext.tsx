@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useWorkspace }  from './WorkspaceContext';
 
 export type ViewType = 'home' | 'list' | 'board' | 'calendar' | 'projects' | 'settings' | 'intake-queue' | 'my-work';
-type CalendarViewType = 'month' | 'week' | 'day' | 'quarter';
+type CalendarViewType = 'month' | 'week' | 'day';
 
 interface ViewPersistenceContextValue {
   lastUsedView: ViewType;
@@ -39,7 +39,7 @@ export function ViewPersistenceProvider({ children }: { children: React.ReactNod
     // Load calendar view type
     const calendarStorageKey = `${CALENDAR_VIEW_STORAGE_KEY_PREFIX}${currentWorkspace.id}`;
     const savedCalendarView = localStorage.getItem(calendarStorageKey);
-    if (savedCalendarView && ['month', 'week', 'day', 'quarter'].includes(savedCalendarView)) {
+    if (savedCalendarView && ['month', 'week', 'day'].includes(savedCalendarView)) {
       setCalendarViewTypeState(savedCalendarView as CalendarViewType);
     }
 

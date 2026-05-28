@@ -63,7 +63,7 @@ import {
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 
-type CalendarView = 'month' | 'week' | 'day' | 'quarter';
+type CalendarView = 'month' | 'week' | 'day';
 type DateMode = 'due' | 'publish';
 
 const priorityColors: Record<string, string> = {
@@ -226,9 +226,8 @@ function SubtaskPill({ subtask }: { subtask: SubtaskWithParent }) {
 // Use minmax(0, 1fr) instead of 1fr to prevent content from inflating column width
 const GRID_COLS_EXPANDED = 'repeat(7, minmax(0, 1fr))';
 const GRID_COLS_COLLAPSED = 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px 40px';
-const GRID_COLS_COLLAPSED_QUARTER = 'minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 20px 20px';
 
-// Shared single-month grid used by both MonthView (full-size) and QuarterView (mini)
+// Single-month grid used by MonthView
 interface SingleMonthGridProps {
   monthDate: Date;
   items: ContentItem[];
@@ -908,231 +907,6 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
   );
 }
 
-// 4-Month View Component (2×2 mini-calendar grid with start-month picker)
-interface QuarterViewProps {
-  currentDate: Date;
-  items: ContentItem[];
-  contentTypes: ContentType[];
-  boardColumns: BoardColumn[];
-  members: Profile[];
-  dateMode: DateMode;
-  subtaskCounts: Map<string, SubtaskCount>;
-  linkCounts: Map<string, LinkInfo>;
-  projects: Project[];
-  subtasks: SubtaskWithParent[];
-  granolaItemIds: Set<string>;
-  weekendsCollapsed: boolean;
-  onToggleWeekends: () => void;
-  onItemClick: (item: ContentItem) => void;
-  onDateClick: (date: Date) => void;
-  onShowMore: (date: Date) => void;
-  onCurrentDateChange: (date: Date) => void;
-}
-
-function QuarterView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick, onShowMore, onCurrentDateChange }: QuarterViewProps) {
-  const months = [currentDate, addMonths(currentDate, 1), addMonths(currentDate, 2), addMonths(currentDate, 3)];
-
-  // Generate 12 months of options for the start-month picker (6 back, current, 5 forward)
-  const startMonthOptions = useMemo(() => {
-    const options: Date[] = [];
-    for (let i = -6; i <= 12; i++) {
-      options.push(addMonths(startOfMonth(new Date()), i));
-    }
-    return options;
-  }, []);
-
-  const getItemsForDate = (date: Date) => {
-    return items.filter((item) => {
-      const dateField = dateMode === 'due' ? item.due_date : item.publish_date;
-      if (!dateField) return false;
-      return isSameDay(parseLocalDate(dateField), date);
-    });
-  };
-
-  const getProjectMarkersForDate = (date: Date) => {
-    const markers: { project: Project; type: 'start' | 'end' }[] = [];
-    for (const p of projects) {
-      if (p.start_date && isSameDay(parseLocalDate(p.start_date), date)) {
-        markers.push({ project: p, type: 'start' });
-      }
-      if (p.end_date && isSameDay(parseLocalDate(p.end_date), date)) {
-        markers.push({ project: p, type: 'end' });
-      }
-    }
-    return markers;
-  };
-
-  const getSubtasksForDate = (date: Date) => {
-    return subtasks.filter((st) => st.due_date && isSameDay(parseLocalDate(st.due_date), date));
-  };
-
-  const weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  const gridColsQ = weekendsCollapsed ? GRID_COLS_COLLAPSED_QUARTER : GRID_COLS_EXPANDED;
-
-  return (
-    <div className="space-y-4">
-      {/* Start-month picker */}
-      <div className="flex items-center gap-2">
-        <label className="text-sm font-medium text-slate-600">Starting from:</label>
-        <select
-          value={format(startOfMonth(currentDate), 'yyyy-MM')}
-          onChange={(e) => {
-            const [year, month] = e.target.value.split('-').map(Number);
-            onCurrentDateChange(new Date(year, month - 1, 1));
-          }}
-          className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white text-slate-700 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        >
-          {startMonthOptions.map((opt) => (
-            <option key={format(opt, 'yyyy-MM')} value={format(opt, 'yyyy-MM')}>
-              {format(opt, 'MMMM yyyy')}
-            </option>
-          ))}
-        </select>
-        <span className="text-sm text-slate-400">
-          → {format(addMonths(currentDate, 3), 'MMMM yyyy')}
-        </span>
-      </div>
-
-      {/* 2×2 grid of mini calendars */}
-      <div className="grid grid-cols-2 gap-4">
-        {months.map((monthDate) => {
-          const mStart = startOfMonth(monthDate);
-          const mEnd = endOfMonth(monthDate);
-          const calStart = startOfWeek(mStart, { weekStartsOn: 1 });
-          const calEnd = endOfWeek(mEnd, { weekStartsOn: 1 });
-          const days = eachDayOfInterval({ start: calStart, end: calEnd });
-
-          return (
-            <div key={monthDate.toISOString()} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-              <div className="px-3 py-2 border-b border-slate-200 bg-slate-50">
-                <h3 className="text-sm font-semibold text-slate-700 text-center">
-                  {format(monthDate, 'MMMM yyyy')}
-                </h3>
-              </div>
-
-              <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridColsQ }}>
-                {weekDays.map((d, i) => (
-                  <div
-                    key={`${d}-${i}`}
-                    className={`px-0.5 py-1 text-center text-[10px] font-semibold text-white uppercase ${
-                      i >= 5 && weekendsCollapsed ? 'cursor-pointer hover:bg-teal-700 transition-colors' : ''
-                    }`}
-                    onClick={i >= 5 && weekendsCollapsed ? onToggleWeekends : undefined}
-                  >
-                    {weekendsCollapsed && i >= 5 ? '' : d}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid" style={{ gridTemplateColumns: gridColsQ }}>
-                {days.map((day, index) => {
-                  const dayItems = getItemsForDate(day);
-                  const dayProjectMarkers = getProjectMarkersForDate(day);
-                  const daySubtasks = getSubtasksForDate(day);
-                  const isCurrentMonth = isSameMonth(day, monthDate);
-                  const isTodayDate = isToday(day);
-                  const totalCount = dayItems.length + dayProjectMarkers.length + daySubtasks.length;
-                  const isWeekend = index % 7 >= 5;
-                  const collapsed = isWeekend && weekendsCollapsed;
-
-                  return (
-                    <DroppableDayCell
-                      key={day.toISOString()}
-                      dateId={format(day, 'yyyy-MM-dd')}
-                      className={`${collapsed ? 'min-h-[40px]' : 'min-h-[72px]'} p-0.5 border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
-                        !isCurrentMonth ? 'bg-slate-50/30' : collapsed ? 'bg-slate-50/80' : 'bg-white'
-                      } ${index % 7 === 6 ? 'border-r-0' : ''}`}
-                      onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
-                    >
-                      {collapsed ? (
-                        <div className="flex flex-col items-center">
-                          <span
-                            className={`text-[8px] font-medium w-4 h-4 flex items-center justify-center rounded-full ${
-                              isTodayDate ? 'bg-blue-600 text-white' : ''
-                            }`}
-                            style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#cbd5e1' } : undefined}
-                          >
-                            {format(day, 'd')}
-                          </span>
-                          {totalCount > 0 && (
-                            <span className="text-[7px] text-slate-400 font-medium">{totalCount}</span>
-                          )}
-                        </div>
-                      ) : (
-                      <>
-                      <div className="flex justify-between items-center">
-                        <span
-                          className={`text-[10px] font-medium w-5 h-5 flex items-center justify-center rounded-full ${
-                            isTodayDate ? 'bg-blue-600 text-white' : ''
-                          }`}
-                          style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#cbd5e1' } : undefined}
-                        >
-                          {format(day, 'd')}
-                        </span>
-                      </div>
-
-                      <div className="space-y-0.5 mt-0.5">
-                        {dayProjectMarkers.slice(0, 1).map((m) => (
-                          <div
-                            key={`proj-${m.type}-${m.project.id}`}
-                            className="h-1.5 rounded-full"
-                            style={{ backgroundColor: m.type === 'start' ? '#3b82f6' : '#f59e0b' }}
-                            title={`${m.project.title} — ${m.type === 'start' ? 'starts' : 'ends'}`}
-                          />
-                        ))}
-                        {dayItems.slice(0, 2).map((item) => {
-                          const isOrdinal = isOrdinalItem(item);
-                          const isLinear = isLinearItem(item);
-                          const ctColor = isOrdinal ? ORDINAL_COLOR : isLinear ? LINEAR_COLOR : (contentTypes.find(ct => ct.id === item.content_type_id)?.color || '#94a3b8');
-                          return (
-                            <div
-                              key={item.id}
-                              className="truncate text-[9px] leading-tight px-0.5 py-px rounded cursor-pointer hover:opacity-80"
-                              style={{ backgroundColor: ctColor + '15', color: ctColor }}
-                              title={item.title}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onItemClick(item);
-                              }}
-                            >
-                              {granolaItemIds.has(item.id) && <Mic className="w-2 h-2 inline-block mr-0.5" style={{ color: '#345A11' }} />}
-                              {item.title}
-                            </div>
-                          );
-                        })}
-                        {daySubtasks.slice(0, 1).map((st) => (
-                          <div
-                            key={`sub-${st.id}`}
-                            className="h-1.5 rounded-full bg-slate-200"
-                            title={`Subtask: ${st.title}`}
-                          />
-                        ))}
-                        {totalCount > 3 && (
-                          <button
-                            className="text-[9px] text-slate-400 hover:text-blue-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onShowMore(day);
-                            }}
-                          >
-                            +{totalCount - 3}
-                          </button>
-                        )}
-                      </div>
-                      </>
-                      )}
-                    </DroppableDayCell>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function CalendarPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
@@ -1243,24 +1017,17 @@ export function CalendarPage() {
 
   const goToToday = () => setCurrentDate(new Date());
   const goToPrevious = () => {
-    if (view === 'quarter') setCurrentDate(subMonths(currentDate, 4));
-    else if (view === 'month') setCurrentDate(subMonths(currentDate, 1));
+    if (view === 'month') setCurrentDate(subMonths(currentDate, 1));
     else if (view === 'week') setCurrentDate(subWeeks(currentDate, 1));
     else setCurrentDate(subDays(currentDate, 1));
   };
   const goToNext = () => {
-    if (view === 'quarter') setCurrentDate(addMonths(currentDate, 4));
-    else if (view === 'month') setCurrentDate(addMonths(currentDate, 1));
+    if (view === 'month') setCurrentDate(addMonths(currentDate, 1));
     else if (view === 'week') setCurrentDate(addWeeks(currentDate, 1));
     else setCurrentDate(addDays(currentDate, 1));
   };
 
   const getHeaderTitle = () => {
-    if (view === 'quarter') {
-      const m1 = currentDate;
-      const m4 = addMonths(currentDate, 3);
-      return `${format(m1, 'MMM')} – ${format(m4, 'MMM yyyy')}`;
-    }
     if (view === 'month') {
       const m3 = addMonths(currentDate, 2);
       return `${format(currentDate, 'MMM')} – ${format(m3, 'MMM yyyy')}`;
@@ -1451,15 +1218,6 @@ export function CalendarPage() {
                 Month
               </button>
               <button
-                onClick={() => handleViewChange('quarter')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-1.5 ${
-                  view === 'quarter' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Columns className="w-4 h-4" />
-                4-Month
-              </button>
-              <button
                 onClick={() => handleViewChange('week')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors flex items-center gap-1.5 ${
                   view === 'week' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
@@ -1482,30 +1240,6 @@ export function CalendarPage() {
         </div>
 
         <div className="flex-1 overflow-auto p-6">
-          {view === 'quarter' && (
-            <QuarterView
-              currentDate={currentDate}
-              items={filteredItems}
-              contentTypes={contentTypes}
-              boardColumns={boardColumns}
-              members={members}
-              dateMode={dateMode}
-              subtaskCounts={subtaskCounts}
-              linkCounts={linkCounts}
-              projects={projects}
-              subtasks={subtasksWithParent}
-              granolaItemIds={granolaItemIds}
-              weekendsCollapsed={weekendsCollapsed}
-              onToggleWeekends={toggleWeekends}
-              onItemClick={(item: ContentItem) => setSelectedItemId(item.id)}
-              onDateClick={handleDateClick}
-              onCurrentDateChange={setCurrentDate}
-              onShowMore={(date) => {
-                setCurrentDate(date);
-                handleViewChange('day');
-              }}
-            />
-          )}
           {view === 'month' && (
             <MonthView
               currentDate={currentDate}
