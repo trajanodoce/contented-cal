@@ -348,12 +348,12 @@ export function ListPage() {
       <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1.5px solid #002339' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-100 border-b-2 border-slate-300">
+            <thead style={{ background: '#005D9712', borderBottom: '2px solid #00233930' }}>
               <tr>
                 <th className="px-4 py-3 w-12">
                   <button
                     onClick={handleSelectAll}
-                    className="p-1 hover:bg-slate-200 rounded transition-colors"
+                    className="p-1 hover:bg-[#005D9710] rounded transition-colors"
                   >
                     {isAllSelected ? (
                       <CheckSquare className="w-5 h-5 text-brand-600" />
@@ -398,7 +398,7 @@ export function ListPage() {
                   <tr
                     key={item.id}
                     onClick={() => handleRowClick(item)}
-                    className={`hover:bg-slate-50 cursor-pointer transition-colors ${
+                    className={`hover:bg-[#005D9708] cursor-pointer transition-colors ${
                       isSelected ? 'bg-brand-50 hover:bg-brand-100' : ''
                     }`}
                     style={{
@@ -409,7 +409,7 @@ export function ListPage() {
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => handleSelectItem(item.id)}
-                        className="p-1 hover:bg-slate-200 rounded transition-colors"
+                        className="p-1 hover:bg-[#005D9710] rounded transition-colors"
                       >
                         {isSelected ? (
                           <CheckSquare className="w-5 h-5 text-brand-600" />
@@ -422,7 +422,7 @@ export function ListPage() {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-slate-900">{item.title}</span>
                         {granolaItemIds.has(item.id) && (
-                          <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#345A11' }} title="Has meeting notes" />
+                          <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
                         )}
                         {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
                           <span className="inline-flex items-center gap-1 text-xs text-slate-400">
@@ -834,7 +834,7 @@ function InlineAssigneeEdit({
               </div>
             ))}
             {selectedMembers.length > 3 && (
-              <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-xs font-medium text-slate-500">
+              <div className="w-8 h-8 rounded-full bg-[#005D9712] border-2 border-white flex items-center justify-center text-xs font-medium text-slate-500">
                 +{selectedMembers.length - 3}
               </div>
             )}

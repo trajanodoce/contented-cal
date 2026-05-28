@@ -455,7 +455,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         {(() => {
           const titleColor = contentType?.color ?? '#64748b';
           return (
-            <div className="border-b border-slate-200">
+            <div style={{ borderBottom: '1px solid #00233930' }}>
               {/* Action buttons row */}
               <div className="flex items-center justify-between px-6 pt-3 pb-0">
                 <div className="flex items-center gap-2">
@@ -484,7 +484,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     className={`p-1.5 rounded-full transition-all ${
                       showSavedCheck
                         ? 'bg-green-100 text-green-600'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-[#005D9708]'
                     }`}
                   >
                     {showSavedCheck ? (
@@ -543,13 +543,13 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             >
               {tab}
               {tab === 'comments' && comments.length > 0 && (
-                <span className="ml-1.5 text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
+                <span className="ml-1.5 text-xs bg-[#005D9712] text-slate-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
               )}
             </button>
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-slate-50">
+        <div className="flex-1 overflow-y-auto bg-surface-nested">
           {activeTab === 'details' && (
             <div className="p-5 space-y-4">
               {/* Assignee — standalone at top */}
@@ -691,7 +691,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   </label>
                   <div className="flex flex-wrap gap-1.5">
                     {item.tags.map(tag => (
-                      <span key={tag} className="text-xs px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full">{tag}</span>
+                      <span key={tag} className="text-xs px-2.5 py-1 bg-[#005D9712] text-slate-600 rounded-full">{tag}</span>
                     ))}
                   </div>
                 </div>
@@ -752,7 +752,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         </button>
                         <button
                           onClick={() => { setEditingDescription(false); setDescription(item.description); }}
-                          className="px-3 py-1.5 text-slate-600 text-xs border border-slate-200 rounded-lg hover:bg-slate-50"
+                          className="px-3 py-1.5 text-slate-600 text-xs rounded-lg hover:bg-[#005D9708]" style={{ border: '1px solid #00233930' }}
                         >
                           Cancel
                         </button>
@@ -760,7 +760,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     </div>
                   ) : (
                     <div
-                      className={`text-sm text-slate-700 whitespace-pre-wrap min-h-[60px] p-3 bg-slate-50 rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-slate-100'}`}
+                      className={`text-sm text-slate-700 whitespace-pre-wrap min-h-[60px] p-3 bg-surface-nested rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-[#005D9710]'}`}
                       onClick={() => !isReadOnly && setEditingDescription(true)}
                     >
                       {item.description || <span className="text-slate-400 italic">{isReadOnly ? 'No description' : 'Click to add description...'}</span>}
@@ -842,13 +842,13 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 );
               })}
 
-              <div className="pt-2 border-t border-slate-100">
+              <div className="pt-2" style={{ borderTop: '1px solid #00233930' }}>
                 <textarea
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
                   placeholder="Add a comment..."
                   rows={3}
-                  className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+                  className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none" style={{ border: '1px solid #00233930' }}
                 />
                 <button
                   onClick={addComment}
@@ -871,7 +871,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               )}
               {activity.map(log => (
                 <div key={log.id} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-[#005D9712] flex items-center justify-center shrink-0 mt-0.5">
                     <Activity className="w-3 h-3 text-slate-400" />
                   </div>
                   <div className="flex-1">
@@ -946,7 +946,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-surface-card hover:bg-[#005D9708] rounded-lg transition-colors" style={{ border: '1px solid #00233930' }}
                 >
                   Cancel
                 </button>
