@@ -67,11 +67,11 @@ body {
 
 /* Detail panel form fields */
 .field-select {
-  border-color: #002339;
+  border-color: #94a3b8;
   background-color: #f8fafc;
 }
 .field-select:focus {
-  border-color: #004671;
+  border-color: #64748b;
 }
 .field-select option {
   background-color: #f8fafc;

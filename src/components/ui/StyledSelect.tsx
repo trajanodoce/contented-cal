@@ -57,7 +57,7 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
       {isOpen && (
         <div
           className="absolute z-50 top-full mt-1 w-full border rounded-lg shadow-lg overflow-y-auto max-h-[240px]"
-          style={{ borderColor: '#002339', backgroundColor: '#fafbfc' }}
+          style={{ borderColor: '#94a3b8', backgroundColor: '#fafbfc' }}
         >
           <div className="p-1 space-y-0.5">
             {options.map((option, idx) => {
