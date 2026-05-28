@@ -45,6 +45,13 @@ function getStatusStyle(status: string): string {
   return STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-500';
 }
 
+interface BoardColumn {
+  id: string;
+  name: string;
+  position: number;
+  color: string | null;
+}
+
 function formatDateRange(start: string | null, end: string | null): string | null {
   if (!start && !end) return null;
   if (start && end) {
@@ -277,11 +284,22 @@ export function ProjectsPage() {
     fetchData();
   }, [fetchData]);
 
-  // Determine the "done" column (highest position)
-  const doneColumnId = useMemo(() => {
-    if (boardColumns.length === 0) return null;
-    return boardColumns.reduce((prev, cur) => (cur.position > prev.position ? cur : prev)).id;
-  }, [boardColumns]);
+  // Build a column lookup map and determine max position for weighted progress
+  const sortedColumns = useMemo(
+    () => [...boardColumns].sort((a, b) => a.position - b.position) as BoardColumn[],
+    [boardColumns]
+  );
+
+  const columnMap = useMemo(() => {
+    const map = new Map<string, BoardColumn>();
+    for (const col of sortedColumns) map.set(col.id, col);
+    return map;
+  }, [sortedColumns]);
+
+  const maxPosition = useMemo(
+    () => sortedColumns.length > 0 ? sortedColumns[sortedColumns.length - 1].position : 0,
+    [sortedColumns]
+  );
 
   // Group content items by project_id
   const itemsByProject = useMemo(() => {
@@ -350,12 +368,26 @@ export function ProjectsPage() {
           {projects.map((project) => {
             const items = itemsByProject.get(project.id) ?? [];
             const totalItems = items.length;
-            const doneItems = doneColumnId
-              ? items.filter((i) => i.status === doneColumnId).length
-              : 0;
-            const progressPct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
             const owner = project.owner_id ? membersMap.get(project.owner_id) : undefined;
             const dateRange = formatDateRange(project.start_date, project.end_date);
+
+            // Count items per column for the multi-segment bar
+            const colCounts = new Map<string, number>();
+            sortedColumns.forEach((col) => colCounts.set(col.id, 0));
+            items.forEach((item) => {
+              if (item.status) colCounts.set(item.status, (colCounts.get(item.status) ?? 0) + 1);
+            });
+
+            // Weighted completeness: each item contributes based on its column position
+            // Backlog (pos 0) = 0%, Published (max pos) = 100%, everything in between scales linearly
+            const weightedPct = totalItems > 0 && maxPosition > 0
+              ? Math.round(
+                  items.reduce((sum, item) => {
+                    const col = item.status ? columnMap.get(item.status) : null;
+                    return sum + (col ? col.position / maxPosition : 0);
+                  }, 0) / totalItems * 100
+                )
+              : 0;
 
             return (
               <button
@@ -390,21 +422,56 @@ export function ProjectsPage() {
                   </div>
                 )}
 
-                {/* Progress */}
+                {/* Multi-segment progress bar */}
                 <div className="mb-1.5">
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
                     <span className="flex items-center gap-1">
                       <BarChart3 className="w-3.5 h-3.5" />
                       {totalItems} {totalItems === 1 ? 'item' : 'items'}
                     </span>
-                    {totalItems > 0 && <span>{progressPct}%</span>}
+                    {totalItems > 0 && (
+                      <span className="font-medium text-slate-700">{weightedPct}% complete</span>
+                    )}
                   </div>
-                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 rounded-full transition-all"
-                      style={{ width: `${progressPct}%` }}
-                    />
+                  <div className="w-full h-2 rounded-full overflow-hidden flex bg-slate-100">
+                    {totalItems > 0 ? (
+                      sortedColumns.map((col) => {
+                        const count = colCounts.get(col.id) ?? 0;
+                        if (count === 0) return null;
+                        const widthPct = (count / totalItems) * 100;
+                        return (
+                          <div
+                            key={col.id}
+                            className="h-full transition-all"
+                            style={{
+                              width: `${widthPct}%`,
+                              backgroundColor: col.color ?? '#94A3B8',
+                            }}
+                            title={`${col.name}: ${count}`}
+                          />
+                        );
+                      })
+                    ) : null}
                   </div>
+                  {/* Legend — only show columns with items, compact */}
+                  {totalItems > 0 && (
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+                      {sortedColumns.map((col) => {
+                        const count = colCounts.get(col.id) ?? 0;
+                        if (count === 0) return null;
+                        return (
+                          <div key={col.id} className="flex items-center gap-1 text-[10px]">
+                            <span
+                              className="w-1.5 h-1.5 rounded-full shrink-0"
+                              style={{ backgroundColor: col.color ?? '#94A3B8' }}
+                            />
+                            <span className="text-slate-500">{col.name}</span>
+                            <span className="font-medium text-slate-700">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </button>
             );

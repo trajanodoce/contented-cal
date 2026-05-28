@@ -81,7 +81,8 @@ async function getSlackUserName(
 
 /** Detect "my tasks" / "what are my tasks" queries. */
 function isMyTasksQuery(text: string): boolean {
-  const normalized = text.toLowerCase().trim();
+  // Strip leading punctuation/dashes (Slack sometimes leaves a "- " after mention removal)
+  const normalized = text.toLowerCase().trim().replace(/^[^a-z]+/, '');
   const patterns = [
     /^(what\s+are\s+)?my\s+tasks\??$/,
     /^show\s+(me\s+)?my\s+tasks\??$/,
