@@ -341,12 +341,12 @@ export function BoardPage() {
     try {
       const [{ data: columnsData }, { data: itemsData }, { data: typesData }] = await Promise.all([
         supabase.from('board_columns').select('*').eq('workspace_id', currentWorkspace.id).order('position'),
-        supabase.from('content_items').select('*').eq('workspace_id', currentWorkspace.id).order('created_at', { ascending: false }),
+        supabase.from('content_items').select('id, title, status, due_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags').eq('workspace_id', currentWorkspace.id).order('created_at', { ascending: false }),
         supabase.from('content_types').select('*').eq('workspace_id', currentWorkspace.id).order('name'),
       ]);
 
       setColumns(columnsData || []);
-      setItems(itemsData || []);
+      setItems((itemsData ?? []) as ContentItem[]);
       setContentTypes(typesData || []);
 
       const uniqueChannels = [...new Set((itemsData || []).map((item) => item.channel).filter(Boolean))];

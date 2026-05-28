@@ -155,8 +155,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const refreshContentItems = useCallback(async () => {
     if (!workspace) return;
     const { data } = await supabase
-      .from('content_items').select('*').eq('workspace_id', workspace.id).eq('archived', false).order('created_at', { ascending: false });
-    if (data) setContentItems(data);
+      .from('content_items')
+      .select('id, title, status, due_date, publish_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags, completed')
+      .eq('workspace_id', workspace.id).eq('archived', false).order('created_at', { ascending: false });
+    if (data) setContentItems(data as ContentItem[]);
   }, [workspace]);
 
   useEffect(() => {

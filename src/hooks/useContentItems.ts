@@ -31,7 +31,7 @@ export function useContentItems({ workspaceId }: UseContentItemsOptions): UseCon
     try {
       const { data, error: queryError } = await supabase
         .from('content_items')
-        .select('*')
+        .select('id, title, status, due_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags')
         .eq('workspace_id', workspaceId)
         .order('created_at', { ascending: false });
 
@@ -39,7 +39,7 @@ export function useContentItems({ workspaceId }: UseContentItemsOptions): UseCon
         throw new Error(queryError.message);
       }
 
-      setItems(data || []);
+      setItems((data ?? []) as ContentItem[]);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch content items'));
     } finally {

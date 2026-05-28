@@ -77,12 +77,12 @@ export function MyWorkPage() {
       // Fetch content items assigned to current user
       const { data: items } = await supabase
         .from('content_items')
-        .select('*')
+        .select('id, title, status, due_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags, completed')
         .eq('workspace_id', currentWorkspace.id)
         .contains('assignee_ids', [user.id])
         .order('due_date', { ascending: true, nullsFirst: false });
 
-      setContentItems(items || []);
+      setContentItems((items ?? []) as ContentItem[]);
 
       // Fetch subtasks assigned to current user (incomplete)
       // We need to join with content_items to get parent title

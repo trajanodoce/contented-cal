@@ -1193,14 +1193,14 @@ export function CalendarPage() {
 
     try {
       const [{ data: itemsData }, { data: typesData }, { data: colsData }, { data: projectsData }, { data: subtasksData }] = await Promise.all([
-        supabase.from('content_items').select('*').eq('workspace_id', currentWorkspace.id).order('created_at', { ascending: false }),
+        supabase.from('content_items').select('id, title, status, due_date, publish_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags').eq('workspace_id', currentWorkspace.id).order('created_at', { ascending: false }),
         supabase.from('content_types').select('*').eq('workspace_id', currentWorkspace.id).order('name'),
         supabase.from('board_columns').select('*').eq('workspace_id', currentWorkspace.id).order('position'),
         supabase.from('projects').select('*').eq('workspace_id', currentWorkspace.id).in('status', ['active']),
         supabase.from('subtasks').select('*, content_items!inner(title, workspace_id)').eq('content_items.workspace_id', currentWorkspace.id).not('due_date', 'is', null),
       ]);
 
-      setItems(itemsData || []);
+      setItems((itemsData ?? []) as ContentItem[]);
       setContentTypes(typesData || []);
       setBoardColumns(colsData || []);
       setProjects(projectsData || []);
