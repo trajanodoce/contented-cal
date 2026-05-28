@@ -481,11 +481,11 @@ export function ListPage() {
                       ) : (
                         status && (() => {
                           const base = status.color ?? '#94a3b8';
-                          const dark = darkenHex(base, 0.55);
+                          const dark = darkenHex(base, 0.45);
                           return (
                           <span
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                            style={{ backgroundColor: `${base}30`, color: dark, border: `0.5px solid ${dark}` }}
+                            style={{ backgroundColor: `${base}40`, color: dark, border: `0.5px solid ${base}` }}
                           >
                             {status.name}
                           </span>
