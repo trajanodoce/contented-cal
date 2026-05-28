@@ -112,7 +112,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+        <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
           <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_GREEN }} />
           Meeting Notes
           <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full font-normal">

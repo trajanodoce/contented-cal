@@ -382,7 +382,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
       )}
 
       <div className="flex items-center justify-between mb-3">
-        <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+        <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
           <Link2 className="w-3.5 h-3.5" />
           Linked Assets {links.length > 0 && `(${links.length})`}
         </label>

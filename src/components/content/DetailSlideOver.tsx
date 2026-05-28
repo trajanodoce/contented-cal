@@ -486,7 +486,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             <div className="p-5 space-y-4">
               {/* Assignee — standalone at top */}
               <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
-                <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1 mb-1.5">
+                <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-1.5">
                   <User className="w-3.5 h-3.5" /> Assignee
                 </label>
                 <StyledSelect
@@ -506,7 +506,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 {/* Status */}
                 <div>
-                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Status</label>
+                  <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Status</label>
                   <StyledSelect
                     value={item.status ?? ''}
                     onChange={val => updateField('status', val || null)}
@@ -522,7 +522,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Priority */}
                 {fieldVisibility.priority && (
                   <div>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Priority</label>
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Priority</label>
                     <StyledSelect
                       value={item.priority ?? 'medium'}
                       onChange={val => updateField('priority', val)}
@@ -539,7 +539,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Due date */}
                 {fieldVisibility.dueDate && (
                   <div>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Due date
                     </label>
                     <input
@@ -555,7 +555,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Publish date */}
                 {fieldVisibility.publishDate && (
                   <div>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Publish date
                     </label>
                     <input
@@ -571,7 +571,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Channel */}
                 {fieldVisibility.channel && (
                   <div>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Channel</label>
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Channel</label>
                     <StyledSelect
                       value={item.channel ?? ''}
                       onChange={val => updateField('channel', val)}
@@ -587,7 +587,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
                 {/* Content type */}
                 <div>
-                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Content type</label>
+                  <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Content type</label>
                   <StyledSelect
                     value={item.content_type_id ?? ''}
                     onChange={val => updateField('content_type_id', val || null)}
@@ -603,7 +603,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Project */}
                 {projects.length > 0 && (
                   <div className="col-span-2">
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Project</label>
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Project</label>
                     <StyledSelect
                       value={item.project_id ?? ''}
                       onChange={val => updateField('project_id', val || null)}
@@ -622,7 +622,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {/* Tags */}
               {fieldVisibility.tags && item.tags && item.tags.length > 0 && (
                 <div>
-                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1 mb-2">
+                  <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-2">
                     <Hash className="w-3 h-3" /> Tags
                   </label>
                   <div className="flex flex-wrap gap-1.5">
@@ -659,7 +659,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {fieldVisibility.description && (
                 <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Description</label>
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Description</label>
                     {!editingDescription && !isReadOnly && (
                       <button
                         onClick={() => setEditingDescription(true)}
@@ -708,7 +708,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {/* Custom fields */}
               {activeCustomFields.length > 0 && (
                 <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
-                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-3 block">Custom fields</label>
+                  <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3 block">Custom fields</label>
                   <CustomFieldsSection
                     fields={activeCustomFields}
                     values={customFieldValues}
