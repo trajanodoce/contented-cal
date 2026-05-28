@@ -60,7 +60,7 @@ function CustomSelect({ options, value, onChange, placeholder }: {
         <ChevronDown className="w-4 h-4 text-slate-400" />
       </button>
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {options.map(opt => (
             <button key={opt.value} type="button" onClick={() => { onChange(opt.value); setIsOpen(false); }}
               className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${opt.value === value ? 'bg-purple-50 text-purple-900' : 'text-slate-700'}`}>
@@ -112,7 +112,7 @@ function AssigneeMultiSelect({ members, value, onChange }: {
         <ChevronDown className="w-4 h-4 text-slate-400" />
       </button>
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {members.map(m => {
             const sel = value.includes(m.id);
             return (
@@ -241,7 +241,7 @@ export function DesignRequestPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <form onSubmit={handleSubmit} className="bg-surface-card rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 space-y-5">
             {/* Title */}
             <div>

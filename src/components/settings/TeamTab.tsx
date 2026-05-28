@@ -196,7 +196,7 @@ export function TeamTab() {
             {pendingInvites.map((invite) => {
               const roleConfig = ROLE_CONFIG[invite.role as Role] ?? ROLE_CONFIG.viewer;
               return (
-                <div key={invite.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2.5 border border-amber-200/60">
+                <div key={invite.id} className="flex items-center justify-between bg-surface-card rounded-lg px-3 py-2.5 border border-amber-200/60">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
                       <Clock className="w-3.5 h-3.5 text-amber-600" />
@@ -231,7 +231,7 @@ export function TeamTab() {
         </div>
       )}
 
-      <div className="border border-slate-200 rounded-lg overflow-hidden">
+      <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -338,7 +338,7 @@ export function TeamTab() {
       {/* Remove Confirmation */}
       {removingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setRemovingId(null)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -392,7 +392,7 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg min-w-[140px]">
+          <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[140px]">
             {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([role, config]) => (
               <button
                 key={role}
@@ -485,7 +485,7 @@ function AddMemberModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-slate-900">Add Existing User</h3>
           <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg">
@@ -682,7 +682,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Invite Team Member</h3>
 
         <div className="space-y-4">

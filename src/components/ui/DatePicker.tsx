@@ -66,7 +66,7 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
         onClick={() => !disabled && setOpen(!open)}
         className={`
           w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-colors text-left
-          ${disabled ? 'bg-slate-50 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-white border-slate-300 hover:border-[#005D97] text-slate-700 cursor-pointer'}
+          ${disabled ? 'bg-slate-50 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-surface-card border-slate-300 hover:border-[#005D97] text-slate-700 cursor-pointer'}
           ${open ? 'border-[#005D97] ring-2 ring-[#005D9725]' : ''}
         `}
       >
@@ -92,7 +92,7 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1.5 bg-white rounded-xl border border-[#002339] shadow-lg shadow-black/8 p-3 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="absolute z-50 mt-1.5 bg-surface-card rounded-xl shadow-lg shadow-black/8 p-3 animate-in fade-in slide-in-from-top-1 duration-150" style={{ border: '1px solid #00233930' }}>
           <DayPicker
             mode="single"
             selected={selected}
@@ -107,10 +107,10 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
             classNames={{
               root: 'cc-datepicker',
               months: '',
-              month_caption: 'flex items-center justify-center font-semibold text-sm text-slate-800 mb-2',
+              month_caption: 'flex items-center justify-center font-semibold text-sm text-slate-800 mb-2 py-2 -mx-3 px-3 rounded-t-xl [background:#005D9712] [border-bottom:1px_solid_#005D9720]',
               nav: 'flex items-center justify-between absolute top-3 left-3 right-3',
-              button_previous: 'p-1 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-colors',
-              button_next: 'p-1 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-700 transition-colors',
+              button_previous: 'p-1 rounded-md hover:bg-[#005D9710] text-slate-500 hover:text-slate-700 transition-colors',
+              button_next: 'p-1 rounded-md hover:bg-[#005D9710] text-slate-500 hover:text-slate-700 transition-colors',
               weekdays: 'grid grid-cols-7 mb-1',
               weekday: 'text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center py-1',
               weeks: '',
@@ -124,14 +124,14 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
               hidden: 'invisible',
             }}
           />
-          <div className="flex items-center justify-between mt-1 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between mt-1 pt-2 border-t border-[#005D9720]">
             <button
               type="button"
               onClick={() => {
                 onChange('');
                 setOpen(false);
               }}
-              className="text-xs font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-slate-50 transition-colors"
+              className="text-xs font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-[#005D9708] transition-colors"
             >
               Clear
             </button>

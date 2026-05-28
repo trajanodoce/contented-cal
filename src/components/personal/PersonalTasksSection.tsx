@@ -102,7 +102,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-lg p-4 space-y-3">
+    <form onSubmit={handleSubmit} className="bg-surface-card border border-slate-200 rounded-lg p-4 space-y-3">
       <div className="flex items-center gap-2">
         <input
           type="text"
@@ -262,7 +262,7 @@ export function PersonalTasksSection({ workspaceId }: Props) {
   if (loading) return null;
 
   return (
-    <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <section className="bg-surface-card border border-slate-200 rounded-xl shadow-sm overflow-hidden">
       {/* Header */}
       <div
         className="flex items-center justify-between px-5 py-4 border-b border-slate-100"

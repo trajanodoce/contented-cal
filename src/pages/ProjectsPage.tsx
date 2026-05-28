@@ -136,7 +136,8 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
 
       <form
         onSubmit={handleSubmit}
-        className="relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 p-6 space-y-4"
+        className="relative bg-surface-card rounded-lg shadow-xl w-full max-w-lg mx-4 p-6 space-y-4"
+        style={{ border: '1.5px solid #002339' }}
       >
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">Create Project</h2>
@@ -218,7 +219,7 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -395,7 +396,8 @@ export function ProjectsPage() {
               <button
                 key={project.id}
                 onClick={() => navigate(`/projects/${project.id}`)}
-                className="bg-white border border-slate-200 rounded-lg p-5 text-left hover:border-slate-300 hover:shadow-sm transition-all"
+                className="bg-surface-card rounded-lg p-5 text-left hover:shadow-sm transition-all"
+                style={{ border: '1px solid #00233930' }}
               >
                 {/* Header row */}
                 <div className="flex items-start justify-between gap-2 mb-3">

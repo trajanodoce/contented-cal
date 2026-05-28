@@ -35,7 +35,7 @@ function FieldRow({ field, onDelete, onToggleRequired, onDragStart, onDragOver, 
       onDragStart={e => onDragStart(e, field.id)}
       onDragOver={e => onDragOver(e, field.id)}
       onDrop={onDrop}
-      className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-colors group
+      className={`flex items-center gap-3 p-3 bg-surface-card rounded-lg border transition-colors group
         ${isDragOver ? 'border-brand-300 bg-mint' : 'border-slate-200'}`}
     >
       <div className="cursor-grab text-slate-300 hover:text-slate-500 shrink-0">
@@ -225,7 +225,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           {/* Left: fields */}
           <div className="col-span-2 space-y-4">
             {/* Field list */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid #00233930' }}>
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Form fields</h3>
               {loading ? (
                 <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-slate-400" /></div>
@@ -253,7 +253,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           {/* Right: settings + add fields */}
           <div className="space-y-4">
             {/* Form settings */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+            <div className="bg-surface-card rounded-xl p-4 space-y-3" style={{ border: '1px solid #00233930' }}>
               <h3 className="text-sm font-semibold text-slate-700">Settings</h3>
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Form name</label>
@@ -307,7 +307,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
             )}
 
             {/* Add standard fields */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid #00233930' }}>
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Standard fields</h3>
               <div className="space-y-1">
                 {STANDARD_FIELDS.map(f => {
@@ -340,7 +340,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
 
 function FormPreview({ form, fields }: { form: IntakeForm; fields: IntakeFormField[] }) {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 max-w-lg mx-auto p-8">
+    <div className="bg-surface-card rounded-xl max-w-lg mx-auto p-8" style={{ border: '1px solid #00233930' }}>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">{form.name}</h1>
         {form.description && <p className="text-slate-500 mt-1 text-sm">{form.description}</p>}
@@ -475,11 +475,11 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
       )}
 
       {intakeForms.length === 0 && !addingForm ? (
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-400">
+        <div className="bg-surface-card rounded-xl p-8 text-center text-slate-400" style={{ border: '1px solid #00233930' }}>
           <p className="text-sm">No intake forms yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+        <div className="bg-surface-card rounded-xl divide-y divide-slate-100" style={{ border: '1px solid #00233930' }}>
           {intakeForms.map(form => {
             const ct = contentTypes.find(c => c.id === form.content_type_id);
             return (

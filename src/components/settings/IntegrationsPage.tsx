@@ -235,7 +235,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <div className="p-5">
         <div className="flex items-start gap-4">
           <PlatformIcon meta={meta} />
@@ -779,7 +779,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
           const isExpanded = expandedPlatform === platform.id;
 
           return (
-            <div key={platform.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+            <div key={platform.id} className="bg-surface-card border border-slate-200 rounded-xl overflow-hidden">
               <div className="p-5">
                 <div className="flex items-start gap-4">
                   <div
@@ -933,7 +933,7 @@ function IntegrationStatusList({ integrations }: { integrations: Integration[] }
         const meta = PLATFORMS.find(p => p.id === int.platform);
         if (!meta) return null;
         return (
-          <div key={int.id} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl">
+          <div key={int.id} className="flex items-center gap-3 p-3 bg-surface-card border border-slate-200 rounded-xl">
             <PlatformIcon meta={meta} size="sm" />
             <span className="text-sm font-medium text-slate-700 flex-1">{meta.name}</span>
             <StatusBadge status={int.status} />

@@ -115,7 +115,7 @@ function InsertModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCancel}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
         <h3 className="text-sm font-semibold text-slate-900 mb-1">Insert into description</h3>
         <p className="text-xs text-slate-500 mb-4">The description already has content. How should this be added?</p>
         <div className="flex flex-col gap-2">
@@ -160,7 +160,7 @@ function ResponseCard({
   const timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-white border rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
+    <div className="bg-surface-card border rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
       <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-100">
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">{actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}</span>

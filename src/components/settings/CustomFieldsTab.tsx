@@ -196,7 +196,7 @@ function FieldTable({
   onDelete: (f: CustomFieldDefinition) => void;
 }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+    <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <table className="w-full">
         <thead className="bg-slate-50 border-b border-slate-200">
           <tr>

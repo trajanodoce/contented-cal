@@ -113,7 +113,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       style={{
         ...style,
         ...(externalBg ? { backgroundColor: externalBg } : {}),
-        borderColor: '#002339',
+        borderColor: '#00233930',
       }}
     >
       {/* Priority indicator */}
@@ -473,7 +473,7 @@ export function BoardPage() {
 
   return (
     <div className="h-full flex flex-col min-h-0 bg-slate-100/50">
-      <div className="px-6 py-4 bg-white border-b border-slate-200 flex-shrink-0">
+      <div className="px-6 py-4 bg-surface-card border-b border-slate-200 flex-shrink-0">
         <FilterBar
           workspaceId={currentWorkspace?.id || null}
           contentTypes={contentTypes}

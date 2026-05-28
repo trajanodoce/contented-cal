@@ -239,7 +239,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
   const linkItems = items.filter(i => i.type === 'link');
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-5">
+    <div className="bg-surface-card rounded-lg border border-slate-200 p-5">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <FolderOpen className="w-4 h-4 text-slate-400" />
@@ -261,7 +261,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
               Add
             </button>
             {showAddMenu && (
-              <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
+              <div className="absolute right-0 mt-1 w-44 bg-surface-card rounded-lg shadow-lg border border-slate-200 py-1 z-50">
                 <button
                   onClick={() => {
                     setShowAddMenu(false);

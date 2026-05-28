@@ -232,7 +232,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
                   {(note.summary_text || note.summary_markdown) && (
                     <div>
                       <p className="text-xs font-medium text-slate-500 mb-1.5">Summary</p>
-                      <div className="text-sm text-slate-700 whitespace-pre-wrap bg-white rounded-lg border border-slate-100 p-3 max-h-[300px] overflow-y-auto leading-relaxed">
+                      <div className="text-sm text-slate-700 whitespace-pre-wrap bg-surface-card rounded-lg border border-slate-100 p-3 max-h-[300px] overflow-y-auto leading-relaxed">
                         {note.summary_text || note.summary_markdown}
                       </div>
                     </div>

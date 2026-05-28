@@ -17,7 +17,7 @@ interface StyledSelectProps {
   className?: string;
 }
 
-const COOL_WASHES = ['#f0f4f8', '#f5f0f8', '#f0f6f5', '#f2f4f8', '#f5f3f0', '#f0f2f6', '#f4f0f5'];
+const COOL_WASHES = ['#f0f4f8', '#edf2f8', '#f0f1f6', '#eef3f7', '#f1f0f6', '#edf1f7', '#f0f2f5'];
 
 export function StyledSelect({ value, onChange, options, placeholder = 'Select...', disabled = false, className = '' }: StyledSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -74,7 +74,7 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         className={`field-select w-full flex items-center justify-between px-3 py-1.5 text-sm font-medium border rounded-lg text-left transition-colors ${
-          disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50'
+          disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer hover:bg-surface-nested'
         }`}
       >
         <div className="flex items-center gap-2 min-w-0">
@@ -97,14 +97,14 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
             left: pos.left,
             width: pos.width,
             zIndex: 9999,
-            borderColor: '#94a3b8',
-            backgroundColor: '#fafbfc',
+            borderColor: '#00233930',
+            background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC',
           }}
         >
           <div className="p-1 space-y-0.5">
             {options.map((option, idx) => {
               const isSelected = option.value === value;
-              const rowBg = isSelected ? '#e8f0fe' : COOL_WASHES[idx % COOL_WASHES.length];
+              const rowBg = isSelected ? '#005D9715' : COOL_WASHES[idx % COOL_WASHES.length];
               return (
                 <button
                   key={option.value}

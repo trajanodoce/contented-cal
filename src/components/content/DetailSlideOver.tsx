@@ -369,9 +369,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={handleClose}>
       <div
-        className="w-full max-w-2xl bg-white h-full flex flex-col border-l-2"
+        className="w-full max-w-2xl bg-surface-card h-full flex flex-col"
         style={{
-          borderColor: isLinearIssue ? '#FFE4D6' : isOrdinalPost ? '#C4B5FD' : '#bfdbfe',
+          borderLeft: '1.5px solid #002339',
           boxShadow: isLinearIssue
             ? '-8px 0 30px -5px rgba(255, 228, 214, 0.4), -2px 0 10px -2px rgba(255, 228, 214, 0.25)'
             : isOrdinalPost
@@ -553,7 +553,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           {activeTab === 'details' && (
             <div className="p-5 space-y-4">
               {/* Assignee — standalone at top */}
-              <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                 <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-1.5">
                   <User className="w-3.5 h-3.5" /> Assignee
                 </label>
@@ -570,7 +570,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               </div>
 
               {/* Key fields card */}
-              <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
               <div className="grid grid-cols-2 gap-4">
                 {/* Status */}
                 <div>
@@ -700,12 +700,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               </div>
 
               {/* Linked Assets */}
-              <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>
 
               {/* Granola Meeting Notes */}
-              <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#345A11' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
               <GranolaNoteSection
                 key={granolaRefreshKey}
                 contentItemId={item.id}
@@ -721,7 +721,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Description */}
               {fieldVisibility.description && (
-                <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+                <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Description</label>
                     {!editingDescription && !isReadOnly && (
@@ -771,7 +771,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Custom fields */}
               {activeCustomFields.length > 0 && (
-                <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+                <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                   <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3 block">Custom fields</label>
                   <CustomFieldsSection
                     fields={activeCustomFields}
@@ -885,7 +885,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         </div>
 
         {/* Sticky footer */}
-        <div className="flex-shrink-0 px-6 py-4 border-t-2 bg-white" style={{ borderColor: isLinearIssue ? '#FFE4D6' : isOrdinalPost ? '#C4B5FD' : '#dbeafe' }}>
+        <div className="flex-shrink-0 px-6 py-4 border-t-2 bg-surface-card" style={{ borderColor: isLinearIssue ? '#FFE4D6' : isOrdinalPost ? '#C4B5FD' : '#dbeafe' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-xs font-medium" style={{ color: '#25476C' }}>
@@ -935,7 +935,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         {/* Delete confirmation modal */}
         {showDeleteConfirm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
-            <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
+            <div className="bg-surface-card rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-100">
                 <Trash2 className="w-6 h-6 text-red-500" />
               </div>

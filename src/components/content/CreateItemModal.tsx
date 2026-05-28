@@ -127,7 +127,7 @@ function CustomSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {options.map((option) => (
             <button
               key={option.value}
@@ -224,7 +224,7 @@ function AssigneeMultiSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {members.length === 0 ? (
             <div className="px-3 py-2 text-sm text-slate-500">No members found</div>
           ) : (
@@ -464,7 +464,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
 
   const modal = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-surface-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col" style={{ border: '1.5px solid #002339' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">

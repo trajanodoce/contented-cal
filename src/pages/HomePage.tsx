@@ -166,7 +166,7 @@ export function HomePage() {
         {/* Left Column: High Priority + Upcoming */}
         <div className="lg:col-span-2 space-y-6">
           {/* High Priority Items */}
-          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Flame className="w-4.5 h-4.5 text-orange-500" />
@@ -228,7 +228,7 @@ export function HomePage() {
           </section>
 
           {/* Upcoming Due */}
-          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4.5 h-4.5 text-brand-500" />
@@ -281,7 +281,7 @@ export function HomePage() {
 
           {/* Projects Overview */}
           {projects.length > 0 && (
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <FolderOpen className="w-4.5 h-4.5 text-violet-500" />
@@ -300,7 +300,7 @@ export function HomePage() {
                   <button
                     key={project.id}
                     onClick={() => navigate(`/projects/${project.id}`)}
-                    className="bg-white p-4 hover:bg-slate-50 transition-colors text-left group"
+                    className="bg-surface-card p-4 hover:bg-slate-50 transition-colors text-left group"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <div
@@ -324,7 +324,7 @@ export function HomePage() {
         {/* Right Column: Status Breakdown + Activity */}
         <div className="space-y-6">
           {/* Status Breakdown */}
-          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4.5 h-4.5 text-slate-500" />
@@ -364,7 +364,7 @@ export function HomePage() {
           </section>
 
           {/* Priority Breakdown */}
-          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4.5 h-4.5 text-slate-500" />
@@ -390,7 +390,7 @@ export function HomePage() {
           </section>
 
           {/* Recent Activity */}
-          <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Activity className="w-4.5 h-4.5 text-slate-500" />
@@ -444,7 +444,8 @@ function StatCard({
   return (
     <button
       onClick={onClick}
-      className="bg-white rounded-xl border border-slate-200 p-5 hover:shadow-md hover:border-slate-300 transition-all text-left group"
+      className="bg-surface-card rounded-xl p-5 hover:shadow-md transition-all text-left group"
+      style={{ border: '1px solid #00233930' }}
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`w-10 h-10 rounded-lg ${bg} flex items-center justify-center ${color}`}>

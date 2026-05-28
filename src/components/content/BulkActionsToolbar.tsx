@@ -144,7 +144,7 @@ export function BulkActionsToolbar({
   return (
     <>
       {/* Floating Bulk Actions Toolbar */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-white border border-slate-200 shadow-xl rounded-xl px-4 py-3">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-surface-card shadow-xl rounded-xl px-4 py-3" style={{ border: '1px solid #00233930' }}>
         <span className="text-sm font-medium text-slate-700">
           {selectedCount} selected
         </span>
@@ -164,7 +164,7 @@ export function BulkActionsToolbar({
           </button>
 
           {showAssignDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 bg-white border border-slate-200 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto">
+            <div className="absolute bottom-full mb-1 left-0 bg-surface-card border border-slate-200 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto">
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select member</p>
                 {members.map((member) => (
@@ -204,7 +204,7 @@ export function BulkActionsToolbar({
           </button>
 
           {showStatusDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 bg-white border border-slate-200 rounded-lg shadow-xl min-w-[180px]">
+            <div className="absolute bottom-full mb-1 left-0 bg-surface-card border border-slate-200 rounded-lg shadow-xl min-w-[180px]">
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select status</p>
                 {[...boardColumns]
@@ -252,7 +252,7 @@ export function BulkActionsToolbar({
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600" />

@@ -79,7 +79,7 @@ export function CreateWorkspacePage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Top bar with user info */}
-      <header className="bg-white border-b border-slate-200 px-6 py-3">
+      <header className="bg-surface-card border-b border-slate-200 px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             {hasWorkspaces && (
@@ -132,7 +132,7 @@ export function CreateWorkspacePage() {
           </div>
 
           {/* Form */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          <div className="bg-surface-card rounded-2xl shadow-sm border border-slate-200 p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1.5">

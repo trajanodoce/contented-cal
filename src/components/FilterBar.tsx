@@ -118,7 +118,7 @@ export function FilterBar({
   }), [filters]);
 
   return (
-    <div className="bg-white border-2 rounded-lg p-4 mb-4" style={{ borderColor: '#002339' }}>
+    <div className="bg-surface-card border-2 rounded-lg p-4 mb-4" style={{ borderColor: '#002339' }}>
       <div className="flex flex-wrap items-center gap-3">
         {/* Search input */}
         <div className="relative flex-shrink-0 min-w-[200px] max-w-[300px]">
@@ -374,7 +374,7 @@ function FilterDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 bg-white border-2 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ borderColor: '#002339' }}>
+        <div className="absolute top-full mt-1 bg-surface-card border-2 rounded-lg shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ borderColor: '#002339' }}>
           <div className="p-2 space-y-1">
             <p className="text-xs font-medium uppercase px-2 py-1" style={{ color: '#002339' }}>{label}</p>
             {options.map((option, idx) => {

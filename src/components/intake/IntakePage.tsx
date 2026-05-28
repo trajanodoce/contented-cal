@@ -136,7 +136,7 @@ export function IntakePage({ slug }: Props) {
           <span className="text-sm font-medium text-slate-500">Content Request</span>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <div className="bg-surface-card rounded-2xl shadow-sm border border-slate-200 p-8">
           <h1 className="text-2xl font-bold text-slate-900 mb-1">{form?.name}</h1>
           {form?.description && (
             <p className="text-slate-500 text-sm mb-6">{form.description}</p>

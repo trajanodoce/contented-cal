@@ -60,7 +60,7 @@ export function LoginPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <img src="/assets/kitsune-logo-transparent.png" alt="ContentedCal" className="w-24 h-24 mx-auto mb-2 object-contain" />
+          <img src="/assets/kitsune-logo-transparent.png" alt="ContentedCal" className="w-36 h-36 mx-auto mb-2 object-contain" />
           <h1 className="text-2xl font-bold font-display text-slate-900">ContentedCal</h1>
           <p className="text-slate-500 text-sm mt-1">Organize your editorial workflow</p>
         </div>

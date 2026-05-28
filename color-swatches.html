@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@font-face {
+  font-family: 'Violet Sans';
+  src: url('./public/fonts/VioletSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Faune-Display_Black';
+  src: url('./public/fonts/FauneDisplay-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Faune-Text_Bold';
+  src: url('./public/fonts/FauneText-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Faune-Text_Regular';
+  src: url('./public/fonts/FauneText-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Violet Sans', -apple-system, system-ui, 'Inter', sans-serif; background: #F4F8FB; padding: 40px; color: #1e293b; }
+h1 { font-family: 'Faune-Display_Black', 'Faune', serif; font-size: 28px; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.01em; }
+h1 + p { color: #64748b; font-size: 14px; margin-bottom: 36px; }
+h2 { font-family: 'Faune-Text_Bold', 'Faune', serif; font-size: 19px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
+h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
+.sep { border: none; border-top: 1px solid #e2e8f0; margin: 44px 0; }
+
+/* ── Swatches ── */
+.swatch-grid { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.sw {
+  width: 52px; height: 52px; border-radius: 10px;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: 5px; font-size: 9px; font-weight: 600;
+  color: white; text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+.sw.light { color: #334155; text-shadow: none; }
+.sw.hero { box-shadow: 0 0 0 3px rgba(0,0,0,.12); }
+.sw-sm { width: 40px; height: 40px; border-radius: 8px; font-size: 8px; }
+
+/* ── Gradient Cards ── */
+.grad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.grad-card {
+  border-radius: 14px; padding: 24px; min-height: 120px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  position: relative; overflow: hidden;
+}
+.grad-card .g-label { font-size: 12px; font-weight: 700; color: white; text-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.grad-card .g-code { font-size: 10px; color: rgba(255,255,255,.7); margin-top: 2px; font-family: monospace; }
+.grad-card.dark-text .g-label { color: #1e293b; text-shadow: none; }
+.grad-card.dark-text .g-code { color: #64748b; }
+
+/* ── Dropdown Options ── */
+.dd-menu {
+  width: 220px; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+}
+.dd-header {
+  padding: 8px 14px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em; color: #002339;
+}
+.dd-item {
+  padding: 8px 14px; font-size: 13px; font-weight: 500; color: #334155;
+  display: flex; align-items: center; gap: 8px; cursor: default;
+  transition: background .1s;
+}
+.dd-item:hover { background: rgba(0,93,151,.06); }
+.dd-item .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dd-item.selected { background: #005D9712; color: #005D97; font-weight: 600; }
+
+/* ── Source colors ── */
+.src-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.src-card { border-radius: 12px; padding: 14px; border: 1.5px solid; background: white; }
+.src-card .s-title { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.src-card .s-hex { font-size: 10px; opacity: .6; margin-bottom: 8px; font-family: monospace; }
+.src-card .s-row {
+  display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+  border-radius: 6px; font-size: 11px; font-weight: 500;
+}
+.src-card .s-badge {
+  font-size: 9px; font-weight: 700; padding: 1px 7px;
+  border-radius: 99px; margin-left: auto; white-space: nowrap;
+}
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn {
+  padding: 9px 20px; border-radius: 8px; font-size: 13px;
+  font-weight: 600; border: none; cursor: default; display: inline-flex;
+  align-items: center; gap: 6px;
+}
+
+/* ── Cards ── */
+.card-row { display: flex; gap: 16px; }
+.demo-card {
+  flex: 1; background: #F7F9FC; border-radius: 12px; padding: 18px;
+  border: 1.5px solid #002339;
+}
+.demo-card h3 { font-family: 'Faune-Text_Bold', 'Faune', serif; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.demo-card .meta { font-size: 11px; color: #64748b; margin-bottom: 12px; }
+.demo-card .bar { height: 6px; border-radius: 3px; }
+
+/* ── Tabs ── */
+.tab-row { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 16px; }
+.tab {
+  padding: 8px 18px; font-size: 13px; font-weight: 600;
+  border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: default;
+  color: #94a3b8;
+}
+.tab.active { border-bottom-color: #005D97; color: #005D97; }
+
+/* ── Input ── */
+.input-demo {
+  padding: 9px 14px; border-radius: 8px; border: 1.5px solid #cbd5e1;
+  font-size: 13px; color: #334155; width: 260px; outline: none;
+}
+.input-focus {
+  border-color: #005D97; box-shadow: 0 0 0 3px #005D9725;
+}
+
+/* ── List mockup ── */
+.list-mock { border: 1.5px solid #002339; border-radius: 12px; overflow: hidden; max-width: 620px; }
+.list-header { font-family: 'Faune-Text_Bold', 'Faune', serif; padding: 10px 16px; border-bottom: 1px solid #e2e8f0; font-size: 14px; font-weight: 700; }
+.list-row {
+  padding: 9px 16px; border-bottom: 1px solid #f1f5f9;
+  display: flex; align-items: center; gap: 10px; font-size: 13px;
+}
+.list-row:last-child { border-bottom: none; }
+.list-row .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.list-row .name { flex: 1; font-weight: 500; }
+.list-row .badge {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px;
+}
+
+/* ── Section header gradient mockup ── */
+.section-header-mock {
+  border-radius: 12px 12px 0 0; padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-header-mock h3 { font-family: 'Faune-Text_Bold', 'Faune', serif; font-size: 16px; font-weight: 700; color: white; letter-spacing: -0.01em; }
+.section-header-mock .count {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.8);
+  background: rgba(255,255,255,.2); padding: 2px 10px; border-radius: 99px;
+}
+.section-header-mock.light-end h3 { color: white; background: linear-gradient(to right, white 0%, #002339 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.section-header-mock.light-end .count { color: #005D97; background: rgba(0,93,151,.12); }
+.section-body-mock {
+  background: #F7F9FC; border: 1.5px solid #002339; border-top: none;
+  border-radius: 0 0 12px 12px; padding: 16px 20px;
+  font-size: 13px; color: #64748b;
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h1>ContentedCal Design System — Visual Preview</h1>
+<p>Primary: #005D97 (Navy) &middot; Secondary/Highlight: #FBE7F1 (Pink) &middot; Border: #002339 &middot; Background: #F4F8FB &middot; Card fill: #F7F9FC &middot; Delete: #BA2C2C &middot; Gray scale: slate</p>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Color Palette</h2>
+<div class="sub">Primary navy scale + pink highlight</div>
+
+<div style="display: flex; gap: 40px; margin-bottom: 24px;">
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px;">PRIMARY — Navy</div>
+    <div class="swatch-grid">
+      <div class="sw" style="background:#002339">900</div>
+      <div class="sw" style="background:#003d66">800</div>
+      <div class="sw" style="background:#004d80">700</div>
+      <div class="sw hero" style="background:#005D97">600</div>
+      <div class="sw" style="background:#0077b6">500</div>
+      <div class="sw" style="background:#0096d4">400</div>
+      <div class="sw" style="background:#33b1e0">300</div>
+      <div class="sw sw-sm light" style="background:#99d8f0">200</div>
+      <div class="sw sw-sm light" style="background:#cce4f0">100</div>
+      <div class="sw sw-sm light" style="background:#e6f2f8">50</div>
+    </div>
+  </div>
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px;">SECONDARY — Pink Highlight</div>
+    <div class="swatch-grid">
+      <div class="sw" style="background:#9B2D5E">900</div>
+      <div class="sw" style="background:#B8447A">700</div>
+      <div class="sw" style="background:#D4729E">500</div>
+      <div class="sw" style="background:#E8A4C2">300</div>
+      <div class="sw sw-sm light" style="background:#F3CDDE">200</div>
+      <div class="sw sw-sm light" style="background:#FBE7F1; border: 1px solid #f0d0e0;">100</div>
+      <div class="sw sw-sm light" style="background:#FDF3F8; border: 1px solid #f5e0ec;">50</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Gradient Examples</h2>
+<div class="sub">Navy + Pink combinations for headers, section bars, and hero elements</div>
+
+<div class="grad-grid">
+  <div class="grad-card" style="background: linear-gradient(135deg, #005D97 0%, #003d66 100%);">
+    <div class="g-label">Navy Deep</div>
+    <div class="g-code">135deg, #005D97 → #003d66</div>
+  </div>
+  <div class="grad-card" style="background: linear-gradient(to right, #005D97 0%, #FBE7F1 100%);">
+    <div class="g-label">Navy → Pink</div>
+    <div class="g-code">to right, #005D97 → #FBE7F1</div>
+  </div>
+  <div class="grad-card" style="background: linear-gradient(135deg, #005D97 0%, #B8447A 100%);">
+    <div class="g-label">Navy → Berry</div>
+    <div class="g-code">135deg, #005D97 → #B8447A</div>
+  </div>
+
+  <div class="grad-card" style="background: linear-gradient(to right, #002339 0%, #005D97 40%, #FBE7F1 100%);">
+    <div class="g-label">Dark Navy → Navy → Pink</div>
+    <div class="g-code">#002339 → #005D97 → #FBE7F1</div>
+  </div>
+  <div class="grad-card dark-text" style="background: linear-gradient(135deg, #FBE7F1 0%, #e6f2f8 100%);">
+    <div class="g-label">Pink → Ice (light sections)</div>
+    <div class="g-code">135deg, #FBE7F1 → #e6f2f8</div>
+  </div>
+  <div class="grad-card" style="background: linear-gradient(160deg, #005D97 0%, #004d80 50%, #9B2D5E 100%);">
+    <div class="g-label">Navy → Plum</div>
+    <div class="g-code">160deg, #005D97 → #004d80 → #9B2D5E</div>
+  </div>
+</div>
+
+<div style="font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 10px; margin-top: 24px;">SECTION HEADERS — Gradient in context</div>
+<div style="display: flex; gap: 16px;">
+  <div style="flex: 1;">
+    <div class="section-header-mock light-end" style="background: linear-gradient(to right, #005D97 0%, #FBE7F1 100%);">
+      <h3>My Tasks</h3>
+      <div class="count">12</div>
+    </div>
+    <div class="section-body-mock">Navy → Pink — text darkens over light wash end</div>
+  </div>
+  <div style="flex: 1;">
+    <div class="section-header-mock" style="background: linear-gradient(135deg, #005D97 0%, #003d66 100%);">
+      <h3>My Subtasks</h3>
+      <div class="count">4</div>
+    </div>
+    <div class="section-body-mock">Navy Deep — more understated, premium feel</div>
+  </div>
+  <div style="flex: 1;">
+    <div class="section-header-mock" style="background: linear-gradient(to right, #002339 0%, #005D97 60%, #D4729E 100%);">
+      <h3>Personal Tasks</h3>
+      <div class="count">8</div>
+    </div>
+    <div class="section-body-mock">Dark Navy → Navy → Rose — richer progression</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Dropdown Menu Style</h2>
+<div class="sub">Navy gradient wash from top-left with subtle alternating rows</div>
+
+<div class="dd-menu" style="border: 1.5px solid #002339; background: linear-gradient(135deg, #e6f2f8 0%, white 35%, white 100%); width: 240px;">
+  <div class="dd-header" style="border-bottom: 1px solid #e2e8f0;">TYPE</div>
+  <div class="dd-item"><div class="dot" style="background:#f97316"></div> Ad Creative</div>
+  <div class="dd-item" style="background: rgba(0,35,57,.03);"><div class="dot" style="background:#64748b"></div> Admin</div>
+  <div class="dd-item selected"><div class="dot" style="background:#3b82f6"></div> Blog Post</div>
+  <div class="dd-item" style="background: rgba(0,35,57,.03);"><div class="dot" style="background:#0ea5e9"></div> Content</div>
+  <div class="dd-item"><div class="dot" style="background:#22c55e"></div> Customer Story</div>
+  <div class="dd-item" style="background: rgba(0,35,57,.03);"><div class="dot" style="background:#a855f7"></div> Design</div>
+  <div class="dd-item"><div class="dot" style="background:#ef4444"></div> Email Campaign</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Source Colors</h2>
+<div class="sub">All five sources with row tint, badge, and border accent</div>
+
+<div class="src-grid">
+  <div class="src-card" style="border-color: #D3CDEC;">
+    <div class="s-title" style="color: #7B6FB0;">Ordinal</div>
+    <div class="s-hex">#D3CDEC</div>
+    <div class="s-row" style="background: #D3CDEC20;">
+      <div class="dot" style="background: #D3CDEC; width:7px; height:7px;"></div>
+      <span style="color: #7B6FB0;">Blog draft</span>
+      <div class="s-badge" style="background: #D3CDEC40; color: #5B4F8A;">Draft</div>
+    </div>
+  </div>
+  <div class="src-card" style="border-color: #FFC3B8;">
+    <div class="s-title" style="color: #C4705F;">Linear</div>
+    <div class="s-hex">#FFC3B8</div>
+    <div class="s-row" style="background: #FFC3B820;">
+      <div class="dot" style="background: #FFC3B8; width:7px; height:7px;"></div>
+      <span style="color: #C4705F;">Feature spec</span>
+      <div class="s-badge" style="background: #FFC3B840; color: #A05042;">Todo</div>
+    </div>
+  </div>
+  <div class="src-card" style="border-color: #92D1B2;">
+    <div class="s-title" style="color: #4A8E6A;">Granola</div>
+    <div class="s-hex">#92D1B2</div>
+    <div class="s-row" style="background: #92D1B220;">
+      <div class="dot" style="background: #92D1B2; width:7px; height:7px;"></div>
+      <span style="color: #4A8E6A;">Meeting notes</span>
+      <div class="s-badge" style="background: #92D1B240; color: #357254;">Linked</div>
+    </div>
+  </div>
+  <div class="src-card" style="border-color: #9B3A3A;">
+    <div class="s-title" style="color: #9B3A3A;">Slack</div>
+    <div class="s-hex">#9B3A3A</div>
+    <div class="s-row" style="background: #9B3A3A0A;">
+      <div class="dot" style="background: #9B3A3A; width:7px; height:7px;"></div>
+      <span style="color: #6d2929;">Request</span>
+      <div class="s-badge" style="background: #9B3A3A15; color: #9B3A3A;">Slack</div>
+    </div>
+  </div>
+  <div class="src-card" style="border-color: #005D97;">
+    <div class="s-title" style="color: #005D97;">Internal</div>
+    <div class="s-hex">#005D97</div>
+    <div class="s-row" style="background: #005D970A;">
+      <div class="dot" style="background: #005D97; width:7px; height:7px;"></div>
+      <span style="color: #003d66;">Task</span>
+      <div class="s-badge" style="background: #005D9715; color: #005D97;">ContentedCal</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>UI Components</h2>
+<div class="sub">Buttons, tabs, inputs, and cards with the unified system</div>
+
+<div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">BUTTONS</div>
+<div class="btn-row" style="margin-bottom: 24px;">
+  <div class="btn" style="background: #005D97; color: white;">Create Project</div>
+  <div class="btn" style="background: #003d66; color: white;">Save Changes</div>
+  <div class="btn" style="background: white; color: #005D97; border: 1.5px solid #005D97;">Cancel</div>
+  <div class="btn" style="background: white; color: #002339; border: 1.5px solid #002339;">Secondary</div>
+  <div class="btn" style="background: #BA2C2C; color: white;">Delete</div>
+  <div class="btn" style="background: linear-gradient(135deg, #005D97, #003d66); color: white;">Gradient CTA</div>
+  <div class="btn" style="background: linear-gradient(to right, #005D97, #9B2D5E); color: white;">Navy→Berry CTA</div>
+</div>
+
+<div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">TABS</div>
+<div class="tab-row">
+  <div class="tab active">Overview</div>
+  <div class="tab">List</div>
+  <div class="tab">Board</div>
+  <div class="tab">Calendar</div>
+</div>
+
+<div style="display: flex; gap: 24px; margin-bottom: 24px;">
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">INPUT — Default</div>
+    <input class="input-demo" value="Project title" readonly>
+  </div>
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">INPUT — Focused</div>
+    <input class="input-demo input-focus" value="Project title" readonly>
+  </div>
+</div>
+
+<div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">CARDS</div>
+<div class="card-row" style="margin-bottom: 24px;">
+  <div class="demo-card">
+    <h3>Q3 Marketing Campaign</h3>
+    <div class="meta">5 items &middot; 62% complete &middot; Due Jul 15</div>
+    <div class="bar" style="background: linear-gradient(to right, #005D97, #FBE7F1); width: 62%;"></div>
+  </div>
+  <div class="demo-card">
+    <h3>Blog Series: AI Tools</h3>
+    <div class="meta">8 items &middot; 25% complete &middot; Due Aug 1</div>
+    <div class="bar" style="background: linear-gradient(to right, #005D97, #FBE7F1); width: 25%;"></div>
+  </div>
+  <div class="demo-card">
+    <h3>Product Launch Assets</h3>
+    <div class="meta">12 items &middot; 91% complete &middot; Due Jun 30</div>
+    <div class="bar" style="background: linear-gradient(to right, #005D97, #22c55e); width: 91%;"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Mixed-Source List View</h2>
+<div class="sub">All sources together in a realistic context</div>
+
+<div class="list-mock">
+  <div class="list-header" style="background: #f8fafc;">In Progress &mdash; 5 items</div>
+  <div class="list-row" style="background: #D3CDEC18;">
+    <div class="dot" style="background: #D3CDEC;"></div>
+    <div class="name">Q3 launch announcement</div>
+    <div class="badge" style="background: #D3CDEC40; color: #5B4F8A;">Ordinal</div>
+  </div>
+  <div class="list-row" style="background: #FFC3B818;">
+    <div class="dot" style="background: #FFC3B8;"></div>
+    <div class="name">Update pricing page copy</div>
+    <div class="badge" style="background: #FFC3B840; color: #A05042;">Linear</div>
+  </div>
+  <div class="list-row" style="background: #92D1B218;">
+    <div class="dot" style="background: #92D1B2;"></div>
+    <div class="name">Brand voice workshop notes</div>
+    <div class="badge" style="background: #92D1B240; color: #357254;">Granola</div>
+  </div>
+  <div class="list-row" style="background: #9B3A3A0A;">
+    <div class="dot" style="background: #9B3A3A;"></div>
+    <div class="name">Blog post about new feature</div>
+    <div class="badge" style="background: #9B3A3A15; color: #9B3A3A;">Slack</div>
+  </div>
+  <div class="list-row">
+    <div class="dot" style="background: #005D97;"></div>
+    <div class="name">Social media calendar for June</div>
+    <div class="badge" style="background: #005D9715; color: #005D97;">Internal</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Board Column Colors</h2>
+<div class="sub">Seven-stage workflow with colors matched to the design system palette</div>
+
+<div style="display: flex; gap: 8px; margin-bottom: 28px;">
+  <!-- Proposed columns -->
+  <div style="flex: 1; background: #94A3B805; border: 1.5px solid #e2e8f0; border-top: 3px solid #94A3B8; border-radius: 10px; overflow: hidden;">
+    <div style="background: #94A3B815; padding: 10px 12px; border-bottom: 1px solid #94A3B830; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">Backlog</span>
+      <span style="font-size: 10px; font-weight: 600; background: #94A3B820; color: #64748b; padding: 1px 8px; border-radius: 99px;">4</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#94A3B8</div>
+  </div>
+  <div style="flex: 1; background: #005D9705; border: 1.5px solid #e2e8f0; border-top: 3px solid #005D97; border-radius: 10px; overflow: hidden;">
+    <div style="background: #005D9715; padding: 10px 12px; border-bottom: 1px solid #005D9730; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">In Progress</span>
+      <span style="font-size: 10px; font-weight: 600; background: #005D9720; color: #005D97; padding: 1px 8px; border-radius: 99px;">3</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#005D97</div>
+  </div>
+  <div style="flex: 1; background: #D4729E05; border: 1.5px solid #e2e8f0; border-top: 3px solid #D4729E; border-radius: 10px; overflow: hidden;">
+    <div style="background: #D4729E15; padding: 10px 12px; border-bottom: 1px solid #D4729E30; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">In Review</span>
+      <span style="font-size: 10px; font-weight: 600; background: #D4729E20; color: #D4729E; padding: 1px 8px; border-radius: 99px;">2</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#D4729E</div>
+  </div>
+  <div style="flex: 1; background: #D3CDEC05; border: 1.5px solid #e2e8f0; border-top: 3px solid #D3CDEC; border-radius: 10px; overflow: hidden;">
+    <div style="background: #D3CDEC15; padding: 10px 12px; border-bottom: 1px solid #D3CDEC30; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">Approved</span>
+      <span style="font-size: 10px; font-weight: 600; background: #D3CDEC40; color: #5B4F8A; padding: 1px 8px; border-radius: 99px;">5</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#D3CDEC</div>
+  </div>
+  <div style="flex: 1; background: #92D1B205; border: 1.5px solid #e2e8f0; border-top: 3px solid #92D1B2; border-radius: 10px; overflow: hidden;">
+    <div style="background: #92D1B215; padding: 10px 12px; border-bottom: 1px solid #92D1B230; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">Scheduled</span>
+      <span style="font-size: 10px; font-weight: 600; background: #92D1B240; color: #357254; padding: 1px 8px; border-radius: 99px;">1</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#92D1B2</div>
+  </div>
+  <div style="flex: 1; background: #FFC3B805; border: 1.5px solid #e2e8f0; border-top: 3px solid #FFC3B8; border-radius: 10px; overflow: hidden;">
+    <div style="background: #FFC3B815; padding: 10px 12px; border-bottom: 1px solid #FFC3B830; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">Published</span>
+      <span style="font-size: 10px; font-weight: 600; background: #FFC3B840; color: #A05042; padding: 1px 8px; border-radius: 99px;">6</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#FFC3B8</div>
+  </div>
+  <div style="flex: 1; background: #B7CEEC05; border: 1.5px solid #e2e8f0; border-top: 3px solid #B7CEEC; border-radius: 10px; overflow: hidden;">
+    <div style="background: #B7CEEC15; padding: 10px 12px; border-bottom: 1px solid #B7CEEC30; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 12px; font-weight: 700; color: #334155;">Completed</span>
+      <span style="font-size: 10px; font-weight: 600; background: #B7CEEC40; color: #4A6FA0; padding: 1px 8px; border-radius: 99px;">8</span>
+    </div>
+    <div style="padding: 8px; font-size: 10px; color: #94a3b8; text-align: center;">#B7CEEC</div>
+  </div>
+</div>
+
+<div style="display: flex; gap: 16px;">
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px;">APP BACKGROUND</div>
+    <div style="display: inline-flex; align-items: center; gap: 12px; background: #F4F8FB; border: 1.5px solid #002339; border-radius: 10px; padding: 12px 20px;">
+      <div style="width: 36px; height: 36px; background: #F4F8FB; border-radius: 6px; border: 1px solid #cbd5e1;"></div>
+      <div>
+        <div style="font-size: 13px; font-weight: 700; color: #334155;">#F4F8FB</div>
+        <div style="font-size: 10px; color: #94a3b8;">Cool blue-white page background</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px;">CARD INTERIOR</div>
+    <div style="display: inline-flex; align-items: center; gap: 12px; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 10px; padding: 12px 20px;">
+      <div style="width: 36px; height: 36px; background: #F7F9FC; border-radius: 6px; border: 1px solid #cbd5e1;"></div>
+      <div>
+        <div style="font-size: 13px; font-weight: 700; color: #334155;">#F7F9FC</div>
+        <div style="font-size: 10px; color: #94a3b8;">Inside framed cards and sections</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px;">NESTED ITEM FILL</div>
+    <div style="display: inline-flex; align-items: center; gap: 12px; background: #F9F7FB; border: 1.5px solid #002339; border-radius: 10px; padding: 12px 20px;">
+      <div style="width: 36px; height: 36px; background: #F9F7FB; border-radius: 6px; border: 1px solid #cbd5e1;"></div>
+      <div>
+        <div style="font-size: 13px; font-weight: 700; color: #334155;">#F9F7FB</div>
+        <div style="font-size: 10px; color: #94a3b8;">Rows and items nested inside cards</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Date Picker</h2>
+<div class="sub">Soft navy-tinted header, navy border, clear/today footer actions</div>
+
+<!-- Trigger -->
+    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; background: white; font-size: 13px; color: #334155; font-weight: 500; width: 200px; cursor: default; margin-bottom: 8px;">
+      <svg width="16" height="16" fill="none" stroke="#005D97" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+      May 28, 2026
+      <span style="margin-left: auto; color: #cbd5e1; font-size: 11px;">✕</span>
+    </div>
+    <!-- Calendar -->
+    <div style="width: 260px; background: white; border: 1.5px solid #002339; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,35,57,.08);">
+      <div style="background: #005D9712; border-bottom: 1px solid #005D9720; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 13px; color: #005D97; font-weight: 600; cursor: default;">‹</span>
+        <span style="font-size: 13px; font-weight: 700; color: #002339;">May 2026</span>
+        <span style="font-size: 13px; color: #005D97; font-weight: 600; cursor: default;">›</span>
+      </div>
+      <div style="padding: 10px 14px 14px;">
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center;">
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">Su</span>
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">Mo</span>
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">Tu</span>
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">We</span>
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">Th</span>
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">Fr</span>
+          <span style="font-size: 10px; font-weight: 700; color: #94a3b8; padding: 4px;">Sa</span>
+          <!-- Week 1 -->
+          <span style="font-size: 12px; color: #cbd5e1; padding: 6px;">26</span>
+          <span style="font-size: 12px; color: #cbd5e1; padding: 6px;">27</span>
+          <span style="font-size: 12px; color: #cbd5e1; padding: 6px;">28</span>
+          <span style="font-size: 12px; color: #cbd5e1; padding: 6px;">29</span>
+          <span style="font-size: 12px; color: #cbd5e1; padding: 6px;">30</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">1</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">2</span>
+          <!-- Week 2 -->
+          <span style="font-size: 12px; color: #334155; padding: 6px;">3</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">4</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">5</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">6</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">7</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">8</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">9</span>
+          <!-- Week 3 -->
+          <span style="font-size: 12px; color: #334155; padding: 6px;">10</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">11</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">12</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">13</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">14</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px; border-radius: 6px; background: #005D9710;">15</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">16</span>
+          <!-- Week 4 -->
+          <span style="font-size: 12px; color: #334155; padding: 6px;">17</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">18</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">19</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">20</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">21</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">22</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">23</span>
+          <!-- Week 5 -->
+          <span style="font-size: 12px; color: #334155; padding: 6px;">24</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">25</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">26</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">27</span>
+          <span style="font-size: 12px; font-weight: 700; color: white; padding: 6px; background: #005D97; border-radius: 8px;">28</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">29</span>
+          <span style="font-size: 12px; color: #334155; padding: 6px;">30</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid #f1f5f9;">
+          <span style="font-size: 11px; color: #94a3b8; cursor: default;">Clear</span>
+          <span style="font-size: 11px; font-weight: 600; color: #005D97; cursor: default;">Today</span>
+        </div>
+      </div>
+    </div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Scrollbar Style</h2>
+<div class="sub">8px wide, navy #005D97 thumb, 2px white inset border creates floating pill effect. Transparent track.</div>
+
+<style>
+  .sb-demo { width: 180px; height: 200px; overflow-y: scroll; border-radius: 10px; border: 1.5px solid #e2e8f0; background: white; }
+  .sb-demo .sb-inner { padding: 10px; }
+  .sb-demo .sb-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 11px; color: #475569; }
+  .sb-demo .sb-card .sb-title { font-weight: 600; color: #1e293b; margin-bottom: 3px; font-size: 12px; }
+
+  /* Navy pill */
+  .sb-final::-webkit-scrollbar { width: 8px; }
+  .sb-final::-webkit-scrollbar-track { background: transparent; }
+  .sb-final::-webkit-scrollbar-thumb { background: #005D97; border-radius: 4px; border: 2px solid white; background-clip: padding-box; }
+  .sb-final::-webkit-scrollbar-thumb:hover { background: #003d66; border: 2px solid white; background-clip: padding-box; }
+</style>
+
+<div style="display: flex; gap: 24px;">
+  <div>
+    <div style="font-size: 10px; color: #94a3b8; margin-bottom: 8px;">8px, no track, navy #005D97 thumb with white inset border</div>
+    <div class="sb-demo sb-final">
+      <div class="sb-inner">
+        <div class="sb-card"><div class="sb-title">Q3 blog post</div>Draft · Due Jun 4</div>
+        <div class="sb-card"><div class="sb-title">Social series</div>In review · Due Jun 8</div>
+        <div class="sb-card"><div class="sb-title">Newsletter</div>Scheduled · Due Jun 12</div>
+        <div class="sb-card"><div class="sb-title">Case study</div>Backlog · No date</div>
+        <div class="sb-card"><div class="sb-title">Landing page</div>In progress · Due Jun 20</div>
+        <div class="sb-card"><div class="sb-title">Ad creative</div>Draft · Due Jun 15</div>
+        <div class="sb-card"><div class="sb-title">Email campaign</div>Approved · Due Jul 1</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Border Hierarchy</h2>
+<div class="sub">Thickest at the page level, titrating down for nested elements. All borders use #002339 (navy).</div>
+
+<div style="display: flex; gap: 32px; margin-bottom: 32px;">
+
+  <!-- Level 1: Page-level cards -->
+  <div style="flex: 1;">
+    <div style="font-size: 10px; font-weight: 700; color: #005D97; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Level 1 — Page Cards</div>
+    <div style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;">1.5px · Main content cards, project cards, section frames</div>
+    <div style="background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; padding: 18px;">
+      <div style="font-family: 'Faune-Text_Bold', serif; font-size: 15px; font-weight: 700; margin-bottom: 4px;">Q3 Marketing Campaign</div>
+      <div style="font-size: 11px; color: #64748b; margin-bottom: 14px;">5 items · 62% complete · Due Jul 15</div>
+      <!-- Nested Level 2 -->
+      <div style="background: #F9F7FB; border: 1px solid #00233930; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+        <div style="font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 3px;">Blog post draft</div>
+        <div style="font-size: 10px; color: #64748b;">In progress · Due Jun 4</div>
+      </div>
+      <div style="background: #F9F7FB; border: 1px solid #00233930; border-radius: 8px; padding: 12px;">
+        <div style="font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 3px;">Social assets</div>
+        <div style="font-size: 10px; color: #64748b;">In review · Due Jun 8</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 2: Nested cards / rows -->
+  <div style="flex: 1;">
+    <div style="font-size: 10px; font-weight: 700; color: #005D97; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Level 2 — Nested Items</div>
+    <div style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;">1px · Content items inside cards, list rows, board cards</div>
+    <div style="background: #F7F9FC; border: 1px solid #00233930; border-radius: 10px; padding: 14px;">
+      <div style="font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 3px;">Update pricing page copy</div>
+      <div style="font-size: 10px; color: #64748b; margin-bottom: 10px;">In progress · Due Jun 20</div>
+      <!-- Nested Level 3 -->
+      <div style="border-left: 2px solid #e2e8f0; padding-left: 10px; margin-top: 8px;">
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <div style="width: 12px; height: 12px; border: 1px solid #cbd5e1; border-radius: 3px;"></div>
+          <span style="font-size: 11px; color: #475569;">Write first draft</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+          <div style="width: 12px; height: 12px; border: 1px solid #cbd5e1; border-radius: 3px;"></div>
+          <span style="font-size: 11px; color: #475569;">Design review</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="width: 12px; height: 12px; border: 1px solid #cbd5e1; border-radius: 3px;"></div>
+          <span style="font-size: 11px; color: #475569;">Final approval</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level 3: Micro elements -->
+  <div style="flex: 1;">
+    <div style="font-size: 10px; font-weight: 700; color: #005D97; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Level 3 — Micro Elements</div>
+    <div style="font-size: 10px; color: #94a3b8; margin-bottom: 10px;">1px · Subtasks, checkboxes, input fields, dividers use slate tones</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; font-size: 13px; color: #334155;">
+        <svg width="16" height="16" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+        May 28, 2026
+      </div>
+      <input readonly value="Project title" style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #334155; background: white; outline: none;">
+      <div style="display: flex; gap: 6px;">
+        <span style="font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; border: 1px solid #D3CDEC60; background: #D3CDEC20; color: #5B4F8A;">Approved</span>
+        <span style="font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; border: 1px solid #FFC3B860; background: #FFC3B820; color: #A05042;">Published</span>
+        <span style="font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; border: 1px solid #92D1B260; background: #92D1B220; color: #357254;">Scheduled</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Summary table -->
+<div style="display: flex; gap: 12px; margin-bottom: 8px;">
+  <div style="flex: 1; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: white; border: 1.5px solid #002339; border-radius: 8px;">
+    <div style="width: 40px; height: 4px; background: #002339; border-radius: 2px;"></div>
+    <div>
+      <div style="font-size: 11px; font-weight: 700; color: #334155;">1.5px · #002339</div>
+      <div style="font-size: 10px; color: #94a3b8;">Page cards, sections, modals, slide-overs</div>
+    </div>
+  </div>
+  <div style="flex: 1; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: white; border: 1px solid #00233930; border-radius: 8px;">
+    <div style="width: 40px; height: 2px; background: #00233930; border-radius: 1px;"></div>
+    <div>
+      <div style="font-size: 11px; font-weight: 700; color: #334155;">1px · #002339 @ 19%</div>
+      <div style="font-size: 10px; color: #94a3b8;">Content items, board cards, list rows, nested cards</div>
+    </div>
+  </div>
+  <div style="flex: 1; display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: white; border: 1px solid #cbd5e1; border-radius: 8px;">
+    <div style="width: 40px; height: 2px; background: #cbd5e1; border-radius: 1px;"></div>
+    <div>
+      <div style="font-size: 11px; font-weight: 700; color: #334155;">1px · #cbd5e1 (slate-300)</div>
+      <div style="font-size: 10px; color: #94a3b8;">Inputs, checkboxes, badges, dividers, subtasks</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>Typography Scale</h2>
+<div class="sub">Three levels — page, section, subsection</div>
+
+<div style="margin-bottom: 24px;">
+  <div style="font-family: 'Faune-Display_Black', serif; font-size: 28px; font-weight: 900; color: #0f172a; margin-bottom: 4px; letter-spacing: -0.01em;">Page Title <span style="font-family: 'Violet Sans', sans-serif; font-size: 12px; font-weight: 400; color: #94a3b8;">Faune Display Black (900) / 28px</span></div>
+  <div style="font-family: 'Faune-Text_Bold', serif; font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 4px; margin-top: 16px;">Section Heading <span style="font-family: 'Violet Sans', sans-serif; font-size: 12px; font-weight: 400; color: #94a3b8;">Faune Text Bold (700) / 20px</span></div>
+  <div style="font-family: 'Faune-Text_Bold', serif; font-size: 16px; font-weight: 700; color: #334155; margin-bottom: 4px; margin-top: 16px;">Card Title / Subsection <span style="font-family: 'Violet Sans', sans-serif; font-size: 12px; font-weight: 400; color: #94a3b8;">Faune Text Bold (700) / 16px</span></div>
+  <div style="font-size: 14px; font-weight: 600; color: #1e293b; margin-bottom: 4px; margin-top: 16px;">Body Text / UI Labels <span style="font-size: 12px; font-weight: 400; color: #94a3b8;">Violet Sans / 14px / semibold</span></div>
+  <div style="font-size: 13px; color: #475569; margin-top: 8px; line-height: 1.6; max-width: 520px;">This is a sample paragraph set in Violet Sans at 13px — the default for descriptions, metadata, and longer-form text throughout the app. It pairs with Faune headings to create contrast between editorial display type and clean geometric body copy.</div>
+  <div style="font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-top: 16px;">FIELD LABEL <span style="font-weight: 400; text-transform: none; letter-spacing: normal; color: #94a3b8;">Violet Sans / 12px / uppercase / slate-500</span></div>
+</div>
+
+<div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px; margin-top: 24px;">FAUNE IN CONTEXT — Page header mockup</div>
+<div style="display: flex; gap: 16px;">
+  <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; padding: 24px;">
+    <div style="font-family: 'Faune-Display_Black', serif; font-size: 26px; font-weight: 900; color: #0f172a; margin-bottom: 4px; letter-spacing: -0.01em;">Projects</div>
+    <div style="font-size: 13px; color: #64748b;">6 active projects &middot; 2 completed</div>
+  </div>
+  <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; padding: 24px;">
+    <div style="font-family: 'Faune-Display_Black', serif; font-size: 26px; font-weight: 900; color: #0f172a; margin-bottom: 4px; letter-spacing: -0.01em;">My Work</div>
+    <div style="font-size: 13px; color: #64748b;">12 tasks assigned &middot; 3 overdue</div>
+  </div>
+  <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; padding: 24px;">
+    <div style="font-family: 'Faune-Display_Black', serif; font-size: 26px; font-weight: 900; color: #0f172a; margin-bottom: 4px; letter-spacing: -0.01em;">Q3 Campaign</div>
+    <div style="font-size: 13px; color: #64748b;">8 items &middot; 42% complete &middot; Due Jul 30</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>1. Sidebar / Navigation</h2>
+<div class="sub">Navy gradient rail with kitsune logo, nav links, and project list</div>
+
+<div style="display: flex; gap: 24px;">
+  <!-- Navy Gradient sidebar -->
+    <div style="width: 220px; height: 480px; background: linear-gradient(180deg, #002339 0%, #003d66 100%); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; overflow: hidden;">
+      <!-- Logo -->
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.1);">
+        <img src="./public/assets/kitsune-logo.png" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; background: white;" />
+        <div>
+          <div style="font-family: 'Faune-Text_Bold', serif; font-size: 13px; font-weight: 700; color: white;">ContentedCal</div>
+          <div style="font-size: 10px; color: rgba(255,255,255,.4);">Content Studio</div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 2px; margin-bottom: 20px;">
+        <div style="padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: white; background: rgba(255,255,255,.12); display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" fill="none" stroke="white" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+          My Work
+        </div>
+        <div style="padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6); display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+          Projects
+        </div>
+        <div style="padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6); display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          Calendar
+        </div>
+        <div style="padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6); display: flex; align-items: center; gap: 8px;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Settings
+        </div>
+      </div>
+      <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: rgba(255,255,255,.35); margin-bottom: 8px; padding: 0 10px;">Projects</div>
+      <div style="display: flex; flex-direction: column; gap: 2px; flex: 1;">
+        <div style="padding: 6px 10px; border-radius: 6px; font-size: 12px; color: rgba(255,255,255,.55); display: flex; align-items: center; gap: 8px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #FFC3B8;"></div> Q3 Campaign
+        </div>
+        <div style="padding: 6px 10px; border-radius: 6px; font-size: 12px; color: rgba(255,255,255,.55); display: flex; align-items: center; gap: 8px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #92D1B2;"></div> Blog Series
+        </div>
+        <div style="padding: 6px 10px; border-radius: 6px; font-size: 12px; color: rgba(255,255,255,.55); display: flex; align-items: center; gap: 8px;">
+          <div style="width: 6px; height: 6px; border-radius: 50%; background: #D3CDEC;"></div> Product Launch
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.1); margin-top: auto;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #005D97, #D4729E); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white;">T</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,.6);">Taylor</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>2. Slide-Over / Modal</h2>
+<div class="sub">Detail panel that opens from the right. Navy-framed with soft interior.</div>
+
+<div style="display: flex; gap: 24px;">
+  <!-- Slide-over -->
+  <div style="width: 360px; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,35,57,.12);">
+    <!-- Header -->
+    <div style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-family: 'Faune-Text_Bold', serif; font-size: 16px; font-weight: 700; color: #002339;">Content Details</div>
+      <div style="width: 28px; height: 28px; border-radius: 6px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #94a3b8; cursor: default;">✕</div>
+    </div>
+    <!-- Body -->
+    <div style="padding: 20px;">
+      <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Title</div>
+      <input readonly value="Q3 launch announcement" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #334155; background: white; outline: none; margin-bottom: 16px;">
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Status</div>
+          <div style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #005D97; font-weight: 600; background: white; display: flex; align-items: center; gap: 6px;">
+            <div style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></div> In Progress
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Due Date</div>
+          <div style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; color: #334155; background: white; display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" fill="none" stroke="#005D97" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            Jun 4, 2026
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Source</div>
+      <div style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; font-size: 13px; color: #334155; margin-bottom: 16px;">
+        <div style="width: 7px; height: 7px; border-radius: 50%; background: #D3CDEC;"></div> Ordinal
+      </div>
+      <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">Description</div>
+      <div style="padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; font-size: 13px; color: #475569; line-height: 1.5; min-height: 60px;">Draft the announcement post for the Q3 product launch...</div>
+    </div>
+    <!-- Footer -->
+    <div style="padding: 12px 20px; border-top: 1px solid #e2e8f0; display: flex; gap: 8px; justify-content: flex-end;">
+      <div class="btn" style="background: white; color: #002339; border: 1.5px solid #002339; padding: 7px 16px; font-size: 12px;">Cancel</div>
+      <div class="btn" style="background: #005D97; color: white; padding: 7px 16px; font-size: 12px;">Save Changes</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div style="width: 400px;">
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">MODAL — Confirmation</div>
+    <div style="background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,35,57,.12); padding: 24px;">
+      <div style="font-family: 'Faune-Text_Bold', serif; font-size: 16px; font-weight: 700; color: #002339; margin-bottom: 6px;">Delete this item?</div>
+      <div style="font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5;">This will permanently remove "Q3 launch announcement" and all its subtasks. This action cannot be undone.</div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <div class="btn" style="background: white; color: #002339; border: 1.5px solid #002339; padding: 7px 16px; font-size: 12px;">Cancel</div>
+        <div class="btn" style="background: #BA2C2C; color: white; padding: 7px 16px; font-size: 12px;">Delete</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>3. Status Badges / Pills</h2>
+<div class="sub">Inline status indicators using board column colors. Pill and dot variants.</div>
+
+<div style="display: flex; gap: 32px; margin-bottom: 16px;">
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">PILL BADGES</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #94A3B820; color: #64748b; border: 1px solid #94A3B840;">Backlog</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #005D9715; color: #005D97; border: 1px solid #005D9730;">In Progress</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #D4729E15; color: #D4729E; border: 1px solid #D4729E30;">In Review</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #D3CDEC20; color: #5B4F8A; border: 1px solid #D3CDEC40;">Approved</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #92D1B220; color: #357254; border: 1px solid #92D1B240;">Scheduled</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #FFC3B820; color: #A05042; border: 1px solid #FFC3B840;">Published</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; background: #B7CEEC20; color: #4A6FA0; border: 1px solid #B7CEEC40;">Completed</span>
+    </div>
+  </div>
+</div>
+<div style="display: flex; gap: 32px;">
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">DOT + LABEL (inline)</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #64748b;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #94A3B8;"></span> Backlog</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #005D97; font-weight: 600;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></span> In Progress</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #D4729E;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D4729E;"></span> In Review</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #5B4F8A;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D3CDEC;"></span> Approved</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #357254;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #92D1B2;"></span> Scheduled</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #A05042;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #FFC3B8;"></span> Published</span>
+      <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #4A6FA0;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #B7CEEC;"></span> Completed</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>4. Hover & Active States</h2>
+<div class="sub">Interactive feedback across list rows, cards, and buttons</div>
+
+<style>
+  .hover-row { padding: 10px 16px; border-radius: 8px; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 10px; transition: background .15s; cursor: default; }
+  .hover-row:hover { background: #005D9708; }
+  .hover-row:active { background: #005D9712; }
+  .hover-card { background: #F7F9FC; border: 1px solid #00233930; border-radius: 10px; padding: 14px; transition: all .15s; cursor: default; }
+  .hover-card:hover { border-color: #005D97; box-shadow: 0 2px 12px rgba(0,93,151,.08); }
+  .hover-btn-primary { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: default; background: #005D97; color: white; transition: background .15s; }
+  .hover-btn-primary:hover { background: #004d80; }
+  .hover-btn-primary:active { background: #003d66; }
+  .hover-btn-secondary { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1.5px solid #002339; cursor: default; background: white; color: #002339; transition: all .15s; }
+  .hover-btn-secondary:hover { background: #F7F9FC; }
+  .hover-btn-delete { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: default; background: #BA2C2C; color: white; transition: background .15s; }
+  .hover-btn-delete:hover { background: #9B2424; }
+</style>
+
+<div style="display: flex; gap: 32px;">
+  <div style="flex: 1;">
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">LIST ROWS — hover to see</div>
+    <div style="background: #F7F9FC; border: 1.5px solid #002339; border-radius: 10px; overflow: hidden;">
+      <div class="hover-row" style="border-bottom: 1px solid #f1f5f9;">
+        <div style="width: 7px; height: 7px; border-radius: 50%; background: #005D97;"></div>
+        <span style="flex: 1; font-weight: 500;">Q3 launch announcement</span>
+        <span style="font-size: 11px; color: #94a3b8;">Jun 4</span>
+      </div>
+      <div class="hover-row" style="border-bottom: 1px solid #f1f5f9;">
+        <div style="width: 7px; height: 7px; border-radius: 50%; background: #D4729E;"></div>
+        <span style="flex: 1; font-weight: 500;">Update pricing page</span>
+        <span style="font-size: 11px; color: #94a3b8;">Jun 8</span>
+      </div>
+      <div class="hover-row">
+        <div style="width: 7px; height: 7px; border-radius: 50%; background: #92D1B2;"></div>
+        <span style="flex: 1; font-weight: 500;">Newsletter draft</span>
+        <span style="font-size: 11px; color: #94a3b8;">Jun 12</span>
+      </div>
+    </div>
+  </div>
+  <div style="flex: 1;">
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">BOARD CARD — hover to see</div>
+    <div class="hover-card" style="margin-bottom: 16px;">
+      <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 3px;">Social media calendar</div>
+      <div style="font-size: 11px; color: #64748b;">Due Jun 20 · Ordinal</div>
+    </div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 8px;">BUTTONS — hover to see</div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <div class="hover-btn-primary">Primary</div>
+      <div class="hover-btn-secondary">Secondary</div>
+      <div class="hover-btn-delete">Delete</div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 16px; display: flex; gap: 12px;">
+  <div style="padding: 8px 16px; background: #F7F9FC; border: 1px solid #00233930; border-radius: 8px; font-size: 11px;">
+    <span style="font-weight: 700; color: #334155;">Row hover:</span> <span style="color: #94a3b8;">#005D97 @ 3%</span>
+  </div>
+  <div style="padding: 8px 16px; background: #F7F9FC; border: 1px solid #00233930; border-radius: 8px; font-size: 11px;">
+    <span style="font-weight: 700; color: #334155;">Row active:</span> <span style="color: #94a3b8;">#005D97 @ 7%</span>
+  </div>
+  <div style="padding: 8px 16px; background: #F7F9FC; border: 1px solid #00233930; border-radius: 8px; font-size: 11px;">
+    <span style="font-weight: 700; color: #334155;">Card hover:</span> <span style="color: #94a3b8;">border → #005D97, subtle shadow</span>
+  </div>
+  <div style="padding: 8px 16px; background: #F7F9FC; border: 1px solid #00233930; border-radius: 8px; font-size: 11px;">
+    <span style="font-weight: 700; color: #334155;">Btn hover:</span> <span style="color: #94a3b8;">one shade darker</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>5. Tooltips</h2>
+<div class="sub">Small contextual hints. Navy background, white text, rounded.</div>
+
+<div style="display: flex; gap: 40px; align-items: flex-start;">
+  <div style="position: relative; display: inline-block;">
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 12px;">TOP TOOLTIP</div>
+    <div style="position: relative;">
+      <div style="background: #002339; color: white; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 6px; white-space: nowrap; margin-bottom: 6px;">
+        Due in 3 days
+        <div style="position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; background: #002339; transform: translateX(-50%) rotate(45deg);"></div>
+      </div>
+      <div style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: white; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" fill="none" stroke="#005D97" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+        Jun 4, 2026
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 12px;">INLINE TOOLTIP</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #005D97, #D4729E); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white;">T</div>
+      <div style="background: #002339; color: white; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 6px; white-space: nowrap; position: relative;">
+        Taylor · Assigned
+        <div style="position: absolute; left: -4px; top: 50%; width: 8px; height: 8px; background: #002339; transform: translateY(-50%) rotate(45deg);"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 12px;">SPEC</div>
+    <div style="font-size: 12px; color: #475569; line-height: 1.8;">
+      Background: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">#002339</code><br>
+      Text: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">white · 12px · 500</code><br>
+      Padding: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">6px 12px</code><br>
+      Radius: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">6px</code><br>
+      Arrow: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">8px rotated square</code>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>6. Toast / Alert Messages</h2>
+<div class="sub">Notifications for success, error, warning, and info states</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; max-width: 420px;">
+  <!-- Success — uses Scheduled green #92D1B2 -->
+  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #F7F9FC; border: 1px solid #00233930; border-left: 3px solid #92D1B2; border-radius: 8px;">
+    <svg width="16" height="16" fill="none" stroke="#357254" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <div style="flex: 1;">
+      <div style="font-size: 13px; font-weight: 600; color: #334155;">Item published</div>
+      <div style="font-size: 11px; color: #64748b;">Successfully moved to Published column</div>
+    </div>
+    <span style="font-size: 12px; color: #94a3b8; cursor: default;">✕</span>
+  </div>
+  <!-- Error — uses Delete red #BA2C2C -->
+  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #F7F9FC; border: 1px solid #00233930; border-left: 3px solid #BA2C2C; border-radius: 8px;">
+    <svg width="16" height="16" fill="none" stroke="#BA2C2C" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+    <div style="flex: 1;">
+      <div style="font-size: 13px; font-weight: 600; color: #334155;">Failed to save</div>
+      <div style="font-size: 11px; color: #64748b;">Network error. Please try again.</div>
+    </div>
+    <span style="font-size: 12px; color: #94a3b8; cursor: default;">✕</span>
+  </div>
+  <!-- Warning — uses Published warm #FFC3B8 -->
+  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #F7F9FC; border: 1px solid #00233930; border-left: 3px solid #FFC3B8; border-radius: 8px;">
+    <svg width="16" height="16" fill="none" stroke="#A05042" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+    <div style="flex: 1;">
+      <div style="font-size: 13px; font-weight: 600; color: #334155;">Due date passed</div>
+      <div style="font-size: 11px; color: #64748b;">This item was due 2 days ago</div>
+    </div>
+    <span style="font-size: 12px; color: #94a3b8; cursor: default;">✕</span>
+  </div>
+  <!-- Info — uses Primary navy #005D97 -->
+  <div style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #F7F9FC; border: 1px solid #00233930; border-left: 3px solid #005D97; border-radius: 8px;">
+    <svg width="16" height="16" fill="none" stroke="#005D97" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+    <div style="flex: 1;">
+      <div style="font-size: 13px; font-weight: 600; color: #334155;">3 items synced from Ordinal</div>
+      <div style="font-size: 11px; color: #64748b;">Last synced 2 minutes ago</div>
+    </div>
+    <span style="font-size: 12px; color: #94a3b8; cursor: default;">✕</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>7. Empty States</h2>
+<div class="sub">What blank sections look like before content exists</div>
+
+<div style="display: flex; gap: 24px;">
+  <!-- Empty project -->
+  <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; padding: 40px 24px; text-align: center;">
+    <div style="width: 48px; height: 48px; background: #005D9710; border-radius: 12px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;">
+      <svg width="24" height="24" fill="none" stroke="#005D97" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+    </div>
+    <div style="font-family: 'Faune-Text_Bold', serif; font-size: 15px; font-weight: 700; color: #002339; margin-bottom: 4px;">No projects yet</div>
+    <div style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">Create your first project to start organizing content.</div>
+    <div class="btn" style="background: #005D97; color: white; display: inline-flex; font-size: 12px; padding: 8px 16px;">+ Create Project</div>
+  </div>
+  <!-- Empty board column -->
+  <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #e2e8f0; border-top: 3px solid #005D97; border-radius: 10px; padding: 32px 16px; text-align: center;">
+    <div style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px;">In Progress</div>
+    <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 16px;">No items here yet</div>
+    <div style="border: 1.5px dashed #cbd5e1; border-radius: 8px; padding: 20px; color: #94a3b8; font-size: 12px;">
+      Drag items here or click + to add
+    </div>
+  </div>
+  <!-- Empty tasks -->
+  <div style="flex: 1; background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; padding: 40px 24px; text-align: center;">
+    <div style="width: 48px; height: 48px; background: #92D1B215; border-radius: 12px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;">
+      <svg width="24" height="24" fill="none" stroke="#357254" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <div style="font-family: 'Faune-Text_Bold', serif; font-size: 15px; font-weight: 700; color: #002339; margin-bottom: 4px;">All caught up!</div>
+    <div style="font-size: 13px; color: #94a3b8;">No tasks assigned to you right now.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>8. Calendar Page View</h2>
+<div class="sub">Full month calendar with content items shown as colored blocks</div>
+
+<div style="background: #F7F9FC; border: 1.5px solid #002339; border-radius: 12px; overflow: hidden; max-width: 700px;">
+  <!-- Calendar header -->
+  <div style="background: linear-gradient(to right, #005D97 0%, #FBE7F1 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 15px; color: rgba(255,255,255,.8); font-weight: 600; cursor: default;">‹</span>
+      <span style="font-family: 'Faune-Text_Bold', serif; font-size: 16px; font-weight: 700; color: white;">June 2026</span>
+      <span style="font-size: 15px; color: rgba(255,255,255,.8); font-weight: 600; cursor: default;">›</span>
+    </div>
+    <div style="display: flex; gap: 4px;">
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,.25); color: white;">Month</span>
+      <span style="font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; color: #002339;">Week</span>
+    </div>
+  </div>
+  <!-- Day headers -->
+  <div style="display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid #e2e8f0;">
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Sun</div>
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Mon</div>
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Tue</div>
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Wed</div>
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Thu</div>
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Fri</div>
+    <div style="padding: 8px; text-align: center; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .03em;">Sat</div>
+  </div>
+  <!-- Week 1 -->
+  <div style="display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid #f1f5f9;">
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #cbd5e1; margin-bottom: 4px;">31</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">1</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">2</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">3</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">4</div>
+      <div style="background: #005D9715; border-left: 2px solid #005D97; border-radius: 3px; padding: 2px 5px; font-size: 10px; color: #005D97; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Blog post draft</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">5</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">6</div>
+    </div>
+  </div>
+  <!-- Week 2 -->
+  <div style="display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid #f1f5f9;">
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">7</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">8</div>
+      <div style="background: #D4729E15; border-left: 2px solid #D4729E; border-radius: 3px; padding: 2px 5px; font-size: 10px; color: #D4729E; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Social assets</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">9</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">10</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">11</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px; border-right: 1px solid #f1f5f9;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">12</div>
+      <div style="background: #92D1B215; border-left: 2px solid #92D1B2; border-radius: 3px; padding: 2px 5px; font-size: 10px; color: #357254; font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Newsletter</div>
+      <div style="background: #D3CDEC15; border-left: 2px solid #D3CDEC; border-radius: 3px; padding: 2px 5px; font-size: 10px; color: #5B4F8A; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Case study</div>
+    </div>
+    <div style="padding: 6px 6px 24px; min-height: 80px;">
+      <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">13</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<hr class="sep">
+<h2>9. Checkbox & Toggle</h2>
+<div class="sub">Subtask checkboxes and toggle switches using the system palette</div>
+
+<div style="display: flex; gap: 48px;">
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">CHECKBOXES</div>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <!-- Unchecked -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 18px; height: 18px; border: 1.5px solid #cbd5e1; border-radius: 4px; background: white; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: #334155;">Unchecked — default</span>
+      </div>
+      <!-- Hover -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 18px; height: 18px; border: 1.5px solid #005D97; border-radius: 4px; background: #005D9708; flex-shrink: 0;"></div>
+        <span style="font-size: 13px; color: #334155;">Hover state</span>
+      </div>
+      <!-- Checked -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 18px; height: 18px; border: 1.5px solid #005D97; border-radius: 4px; background: #005D97; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+          <svg width="12" height="12" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <span style="font-size: 13px; color: #334155;">Checked — navy fill</span>
+      </div>
+      <!-- Checked + strikethrough -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 18px; height: 18px; border: 1.5px solid #005D97; border-radius: 4px; background: #005D97; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+          <svg width="12" height="12" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <span style="font-size: 13px; color: #94a3b8; text-decoration: line-through;">Completed subtask</span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">TOGGLES</div>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Off -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 36px; height: 20px; border-radius: 10px; background: #cbd5e1; position: relative; flex-shrink: 0;">
+          <div style="width: 16px; height: 16px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.1);"></div>
+        </div>
+        <span style="font-size: 13px; color: #64748b;">Off</span>
+      </div>
+      <!-- On -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div style="width: 36px; height: 20px; border-radius: 10px; background: #005D97; position: relative; flex-shrink: 0;">
+          <div style="width: 16px; height: 16px; border-radius: 50%; background: white; position: absolute; top: 2px; right: 2px; box-shadow: 0 1px 3px rgba(0,0,0,.1);"></div>
+        </div>
+        <span style="font-size: 13px; color: #334155; font-weight: 500;">On</span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 10px;">SPEC</div>
+    <div style="font-size: 12px; color: #475569; line-height: 1.8;">
+      Checkbox: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">18px · 4px radius</code><br>
+      Border off: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">1.5px #cbd5e1</code><br>
+      Border hover: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">1.5px #005D97</code><br>
+      Fill checked: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">#005D97</code><br>
+      Toggle track: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">36×20px · 10px radius</code><br>
+      Toggle off: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">#cbd5e1</code><br>
+      Toggle on: <code style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-size: 11px;">#005D97</code>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

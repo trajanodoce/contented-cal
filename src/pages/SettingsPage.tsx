@@ -61,7 +61,7 @@ export function SettingsPage() {
         </nav>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-lg p-6">
+      <div className="bg-surface-card rounded-lg p-6" style={{ border: '1px solid #00233930' }}>
         {activeTab === 'general' && <GeneralTab workspace={currentWorkspace} />}
         {activeTab === 'team' && <TeamTab />}
         {activeTab === 'content-types' && <ContentTypeEditor workspaceId={currentWorkspace?.id || null} />}
@@ -566,7 +566,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
       {/* Create/Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowForm(false)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-900 mb-4">
               {editingColumn ? 'Edit Column' : 'Create Column'}
             </h3>
@@ -622,7 +622,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowDeleteConfirm(null)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600" />

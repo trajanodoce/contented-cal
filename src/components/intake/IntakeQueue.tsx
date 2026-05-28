@@ -115,7 +115,7 @@ export function IntakeQueue({ addToast }: Props) {
   return (
     <div className="flex h-full">
       {/* List panel */}
-      <div className="w-80 shrink-0 border-r border-slate-200 bg-white flex flex-col">
+      <div className="w-80 shrink-0 border-r border-slate-200 bg-surface-card flex flex-col">
         <div className="px-4 py-4 border-b border-slate-100">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-900">
@@ -192,7 +192,7 @@ export function IntakeQueue({ addToast }: Props) {
       <div className="flex-1 overflow-y-auto bg-slate-50">
         {!selected ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-4 shadow-sm">
+            <div className="w-14 h-14 rounded-2xl bg-surface-card border border-slate-200 flex items-center justify-center mb-4 shadow-sm">
               <Inbox className="w-7 h-7 text-slate-400" />
             </div>
             <h3 className="text-base font-semibold text-slate-700 mb-1">Select a submission</h3>
@@ -237,7 +237,7 @@ function SubmissionDetail({
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100">
           <div className="flex items-start justify-between gap-4">
@@ -285,7 +285,7 @@ function SubmissionDetail({
             <button
               onClick={onReject}
               disabled={converting}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-white transition-colors"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-surface-card transition-colors"
             >
               <X className="w-4 h-4" />
               Reject

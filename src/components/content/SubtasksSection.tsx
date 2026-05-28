@@ -281,7 +281,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   };
 
   return (
-    <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+    <div className="bg-surface-card border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-sm font-medium text-slate-700">Subtasks</span>
@@ -404,7 +404,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                 {assigneePopoverId === subtask.id && createPortal(
                   <div
                     ref={assigneePopoverRef}
-                    className="fixed bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[180px] max-h-[240px] overflow-y-auto"
+                    className="fixed bg-surface-card border border-slate-200 rounded-lg shadow-lg py-1 min-w-[180px] max-h-[240px] overflow-y-auto"
                     style={{
                       top: Math.min(popoverPos.top, window.innerHeight - 260),
                       left: popoverPos.left,
@@ -469,7 +469,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                 {dueDateEditId === subtask.id && createPortal(
                   <div
                     ref={dueDateRef}
-                    className="fixed bg-white border border-slate-200 rounded-lg shadow-lg p-2 flex flex-col gap-1"
+                    className="fixed bg-surface-card border border-slate-200 rounded-lg shadow-lg p-2 flex flex-col gap-1"
                     style={{ top: dueDatePos.top, left: dueDatePos.left, zIndex: 9999 }}
                   >
                     <input

@@ -303,9 +303,10 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
           {contentTypes.map((type) => (
             <div
               key={type.id}
-              className={`border rounded-lg overflow-hidden transition-all ${
-                expandedType === type.id ? 'border-brand-300 ring-1 ring-brand-300' : 'border-slate-200'
+              className={`rounded-lg overflow-hidden transition-all ${
+                expandedType === type.id ? 'border border-brand-300 ring-1 ring-brand-300' : ''
               }`}
+              style={expandedType !== type.id ? { border: '1px solid #00233930' } : undefined}
             >
               {/* Header - Always visible */}
               <div
@@ -348,7 +349,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
 
               {/* Expanded Content */}
               {expandedType === type.id && (
-                <div className="p-4 border-t border-slate-200 bg-white">
+                <div className="p-4 border-t border-slate-200 bg-surface-card">
                   {/* Basic Info Section */}
                   <div className="mb-6">
                     <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-3">
@@ -512,7 +513,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
       {/* Create Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowCreateModal(false)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Create Content Type</h3>
 
             <div className="space-y-4">
@@ -579,7 +580,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowDeleteConfirm(null)}>
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-red-600" />

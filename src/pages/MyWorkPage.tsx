@@ -278,7 +278,7 @@ export function MyWorkPage() {
 
       {/* My Tasks */}
       {sortedItems.length > 0 && (
-            <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
               <div
                 className="flex items-center gap-2 px-5 py-4 border-b border-slate-100"
                 style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
@@ -421,7 +421,7 @@ export function MyWorkPage() {
 
           {/* My Subtasks */}
           {subtasks.length > 0 && (
-            <section className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
               <div
                 className="flex items-center gap-2 px-5 py-4 border-b border-slate-100"
                 style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}

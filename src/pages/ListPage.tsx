@@ -345,7 +345,7 @@ export function ListPage() {
       )}
 
       {/* Table */}
-      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
+      <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1.5px solid #002339' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-100 border-b-2 border-slate-300">
@@ -607,7 +607,7 @@ function InlineStatusEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg min-w-[150px]">
+        <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[150px]">
           {[...boardColumns]
             .sort((a, b) => a.position - b.position)
             .map((column) => (
@@ -704,7 +704,7 @@ function InlinePriorityEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg min-w-[120px]">
+        <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[120px]">
           {Object.entries(priorityConfig).map(([key, config]) => (
             <button
               key={key}
@@ -843,7 +843,7 @@ function InlineAssigneeEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg min-w-[180px] p-2">
+        <div className="absolute z-50 mt-1 bg-surface-card border border-slate-200 rounded-lg shadow-lg min-w-[180px] p-2">
           {members.map((member) => {
             const isSelected = assigneeIds.includes(member.id);
             return (
