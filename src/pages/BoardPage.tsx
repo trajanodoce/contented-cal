@@ -489,7 +489,7 @@ export function BoardPage() {
         />
       </div>
 
-      <div className="flex-1 min-h-0 overflow-x-scroll overflow-y-hidden">
+      <div className="flex-1 min-h-0" style={{ overflowX: 'scroll', overflowY: 'hidden' }}>
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}
