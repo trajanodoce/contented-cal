@@ -312,7 +312,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
               key={subtask.id}
               className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-slate-50 rounded-lg transition-colors ${
                 subtask.completed ? 'opacity-60' : ''
-              } ${dragOverId === subtask.id ? 'bg-blue-50' : ''}`}
+              } ${dragOverId === subtask.id ? 'bg-brand-50' : ''}`}
               draggable
               onDragStart={() => handleDragStart(subtask.id)}
               onDragOver={e => handleDragOver(e, subtask.id)}
@@ -349,7 +349,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                     }}
                     onBlur={() => saveTitle(subtask.id)}
                     autoFocus
-                    className="w-full text-sm px-1 py-0 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full text-sm px-1 py-0 border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-brand-500"
                   />
                 ) : (
                   <span
@@ -392,7 +392,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                         className="w-4 h-4 rounded-full object-cover"
                       />
                     ) : (
-                      <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[8px] font-medium flex items-center justify-center">
+                      <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-[8px] font-medium flex items-center justify-center">
                         {getInitials(member.full_name ?? '')}
                       </span>
                     )
@@ -430,7 +430,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                             className="w-4 h-4 rounded-full object-cover"
                           />
                         ) : (
-                          <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[8px] font-medium flex items-center justify-center">
+                          <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-[8px] font-medium flex items-center justify-center">
                             {getInitials(m.full_name ?? '')}
                           </span>
                         )}
@@ -477,7 +477,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       value={subtask.due_date ?? ''}
                       onChange={e => updateDueDate(subtask.id, e.target.value || null)}
                       autoFocus
-                      className="text-xs border border-slate-300 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="text-xs border border-slate-300 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-brand-500"
                     />
                     {subtask.due_date && (
                       <button
@@ -515,12 +515,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
             if (e.key === 'Enter') addSubtask();
           }}
           placeholder="Add a subtask..."
-          className="flex-1 text-sm px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="flex-1 text-sm px-2 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
         />
         <button
           onClick={addSubtask}
           disabled={!newTitle.trim()}
-          className="p-1.5 text-slate-400 hover:text-blue-500 disabled:opacity-30 transition-colors"
+          className="p-1.5 text-slate-400 hover:text-brand-500 disabled:opacity-30 transition-colors"
         >
           <Plus className="w-4 h-4" />
         </button>

@@ -6,8 +6,8 @@ export function IntakeFormPage() {
 
   if (!slug) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Invalid form link.</p>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <p className="text-slate-500">Invalid form link.</p>
       </div>
     );
   }

@@ -97,7 +97,7 @@ const priorityConfig = {
   urgent: { color: 'bg-red-500', label: 'Urgent', dotColor: 'bg-red-500' },
   high: { color: 'bg-orange-500', label: 'High', dotColor: 'bg-orange-500' },
   medium: { color: 'bg-yellow-500', label: 'Medium', dotColor: 'bg-yellow-500' },
-  low: { color: 'bg-gray-400', label: 'Low', dotColor: 'bg-gray-400' },
+  low: { color: 'bg-slate-400', label: 'Low', dotColor: 'bg-slate-400' },
 };
 
 export function ListPage() {
@@ -235,7 +235,7 @@ export function ListPage() {
     return (
       <div className="p-8">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
         </div>
       </div>
     );
@@ -247,11 +247,11 @@ export function ListPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">Error loading content</h3>
-            <p className="text-gray-500 mt-1">{error.message}</p>
+            <h3 className="text-lg font-medium text-slate-900">Error loading content</h3>
+            <p className="text-slate-500 mt-1">{error.message}</p>
             <button
               onClick={refetch}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="mt-4 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
             >
               Retry
             </button>
@@ -274,7 +274,7 @@ export function ListPage() {
             </p>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Create your first item
@@ -356,9 +356,9 @@ export function ListPage() {
                     className="p-1 hover:bg-slate-200 rounded transition-colors"
                   >
                     {isAllSelected ? (
-                      <CheckSquare className="w-5 h-5 text-blue-600" />
+                      <CheckSquare className="w-5 h-5 text-brand-600" />
                     ) : isIndeterminate ? (
-                      <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
+                      <div className="w-5 h-5 bg-brand-600 rounded flex items-center justify-center">
                         <div className="w-3 h-0.5 bg-white" />
                       </div>
                     ) : (
@@ -399,7 +399,7 @@ export function ListPage() {
                     key={item.id}
                     onClick={() => handleRowClick(item)}
                     className={`hover:bg-slate-50 cursor-pointer transition-colors ${
-                      isSelected ? 'bg-blue-50 hover:bg-blue-100' : ''
+                      isSelected ? 'bg-brand-50 hover:bg-brand-100' : ''
                     }`}
                     style={{
                       ...(rowBg && !isSelected ? { backgroundColor: rowBg } : {}),
@@ -412,7 +412,7 @@ export function ListPage() {
                         className="p-1 hover:bg-slate-200 rounded transition-colors"
                       >
                         {isSelected ? (
-                          <CheckSquare className="w-5 h-5 text-blue-600" />
+                          <CheckSquare className="w-5 h-5 text-brand-600" />
                         ) : (
                           <Square className="w-5 h-5 text-slate-400" />
                         )}
@@ -618,17 +618,17 @@ function InlineStatusEdit({
                   handleStatusChange(column.id);
                 }}
                 className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
-                  column.id === statusId ? 'bg-blue-50' : ''
+                  column.id === statusId ? 'bg-brand-50' : ''
                 }`}
               >
                 <span
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: column.color ?? undefined }}
                 />
-                <span className={column.id === statusId ? 'text-blue-900 font-medium' : 'text-slate-700'}>
+                <span className={column.id === statusId ? 'text-brand-900 font-medium' : 'text-slate-700'}>
                   {column.name}
                 </span>
-                {column.id === statusId && <Check className="w-4 h-4 ml-auto text-blue-600" />}
+                {column.id === statusId && <Check className="w-4 h-4 ml-auto text-brand-600" />}
               </button>
             ))}
         </div>
@@ -713,14 +713,14 @@ function InlinePriorityEdit({
                 handlePriorityChange(key);
               }}
               className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
-                key === priority ? 'bg-blue-50' : ''
+                key === priority ? 'bg-brand-50' : ''
               }`}
             >
               <span className={`w-2 h-2 rounded-full ${config.dotColor}`} />
-              <span className={key === priority ? 'text-blue-900 font-medium' : 'text-slate-700'}>
+              <span className={key === priority ? 'text-brand-900 font-medium' : 'text-slate-700'}>
                 {config.label}
               </span>
-              {key === priority && <Check className="w-4 h-4 ml-auto text-blue-600" />}
+              {key === priority && <Check className="w-4 h-4 ml-auto text-brand-600" />}
             </button>
           ))}
         </div>
@@ -854,12 +854,12 @@ function InlineAssigneeEdit({
                   toggleAssignee(member.id);
                 }}
                 className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-3 rounded ${
-                  isSelected ? 'bg-blue-50' : ''
+                  isSelected ? 'bg-brand-50' : ''
                 }`}
               >
                 <div
                   className={`w-5 h-5 rounded border flex items-center justify-center ${
-                    isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'
+                    isSelected ? 'bg-brand-600 border-brand-600' : 'border-slate-300'
                   }`}
                 >
                   {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -875,7 +875,7 @@ function InlineAssigneeEdit({
                     <User className="w-3 h-3 text-slate-500" />
                   </div>
                 )}
-                <span className={isSelected ? 'text-blue-900' : 'text-slate-700'}>
+                <span className={isSelected ? 'text-brand-900' : 'text-slate-700'}>
                   {member.full_name || member.email || 'Unknown'}
                 </span>
               </button>

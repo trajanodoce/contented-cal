@@ -119,10 +119,10 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
                   {option.color && (
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: option.color }} />
                   )}
-                  <span className={`flex-1 text-left truncate ${isSelected ? 'text-blue-900 font-semibold' : 'text-slate-800'}`}>
+                  <span className={`flex-1 text-left truncate ${isSelected ? 'text-brand-900 font-semibold' : 'text-slate-800'}`}>
                     {option.label}
                   </span>
-                  {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+                  {isSelected && <Check className="w-3.5 h-3.5 text-brand-600 shrink-0" />}
                 </button>
               );
             })}

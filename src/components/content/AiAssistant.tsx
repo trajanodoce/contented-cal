@@ -200,7 +200,7 @@ function ActiveContext({ persona, voice }: { persona?: string; voice?: string })
         </span>
       )}
       {persona && (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded-full">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200 rounded-full">
           👤 {persona.split(' / ')[0]}
         </span>
       )}

@@ -128,7 +128,7 @@ export function FilterBar({
             placeholder="Search items..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="w-full pl-10 pr-9 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-9 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             style={{ borderColor: '#002339' }}
           />
           {searchValue && (
@@ -272,7 +272,7 @@ export function FilterBar({
       {/* Results count */}
       <div className="mt-3 text-xs text-slate-500">
         Showing {filteredCount} of {totalCount} items
-        {hasActiveFilters && <span className="ml-1 text-blue-600">(filtered)</span>}
+        {hasActiveFilters && <span className="ml-1 text-brand-600">(filtered)</span>}
       </div>
     </div>
   );
@@ -348,7 +348,7 @@ function FilterDropdown({
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
           count > 1
-            ? 'text-blue-700 bg-blue-50 hover:bg-blue-100'
+            ? 'text-brand-700 bg-brand-50 hover:bg-brand-100'
             : count === 1
               ? indicatorColor
                 ? 'hover:bg-slate-50'
@@ -411,10 +411,10 @@ function FilterDropdown({
                       style={{ backgroundColor: option.color }}
                     />
                   ) : null}
-                  <span className={isSelected ? 'text-blue-900 font-medium' : 'text-slate-700'}>
+                  <span className={isSelected ? 'text-brand-900 font-medium' : 'text-slate-700'}>
                     {option.label || 'Unknown'}
                   </span>
-                  {isSelected && <Check className="w-4 h-4 ml-auto text-blue-600" />}
+                  {isSelected && <Check className="w-4 h-4 ml-auto text-brand-600" />}
                 </button>
               );
             })}

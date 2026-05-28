@@ -91,7 +91,7 @@ export function IntakePage({ slug }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
       </div>
     );
@@ -99,13 +99,13 @@ export function IntakePage({ slug }: Props) {
 
   if (error && !form) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-7 h-7 text-red-500" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-800">Form not found</h1>
-          <p className="text-gray-500 text-sm mt-1">{error}</p>
+          <h1 className="text-xl font-semibold text-slate-800">Form not found</h1>
+          <p className="text-slate-500 text-sm mt-1">{error}</p>
         </div>
       </div>
     );
@@ -113,33 +113,33 @@ export function IntakePage({ slug }: Props) {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-500" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Submitted!</h1>
-          <p className="text-gray-500">Thank you for your submission. Your request has been received and will be reviewed by the team.</p>
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Submitted!</h1>
+          <p className="text-slate-500">Thank you for your submission. Your request has been received and will be reviewed by the team.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center">
             <Calendar className="w-5 h-5 text-white" />
           </div>
-          <span className="text-sm font-medium text-gray-500">Content Request</span>
+          <span className="text-sm font-medium text-slate-500">Content Request</span>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">{form?.name}</h1>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+          <h1 className="text-2xl font-bold text-slate-900 mb-1">{form?.name}</h1>
           {form?.description && (
-            <p className="text-gray-500 text-sm mb-6">{form.description}</p>
+            <p className="text-slate-500 text-sm mb-6">{form.description}</p>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -174,7 +174,7 @@ export function IntakePage({ slug }: Props) {
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-6">Powered by ContentCal</p>
+        <p className="text-center text-xs text-slate-400 mt-6">Powered by ContentCal</p>
       </div>
     </div>
   );

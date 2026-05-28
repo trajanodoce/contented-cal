@@ -252,7 +252,7 @@ export function MyWorkPage() {
   if (loading || contentItemsLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
       </div>
     );
   }
@@ -448,7 +448,7 @@ export function MyWorkPage() {
                       {/* Checkbox */}
                       <button
                         onClick={() => toggleSubtask(subtask)}
-                        className="p-0.5 text-slate-400 hover:text-blue-600 transition-colors flex-shrink-0"
+                        className="p-0.5 text-slate-400 hover:text-brand-600 transition-colors flex-shrink-0"
                       >
                         <Square className="w-4.5 h-4.5" />
                       </button>
@@ -459,7 +459,7 @@ export function MyWorkPage() {
                       {/* Parent item link */}
                       <button
                         onClick={() => setSelectedItemId(subtask.parent_id)}
-                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium flex-shrink-0"
+                        className="flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700 font-medium flex-shrink-0"
                         title="Open parent item"
                       >
                         <ExternalLink className="w-3 h-3" />

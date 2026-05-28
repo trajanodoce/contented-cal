@@ -99,11 +99,11 @@ export function OrdinalProfileChip({ name, handle, platform }: OrdinalProfileChi
     : `@${displayHandle}`;
 
   return (
-    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-50 border border-gray-200">
+    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-50 border border-slate-200">
       <PlatformIcon platform={platformLabel} size="sm" />
       <div className="flex flex-col">
-        <span className="text-xs font-medium text-gray-900">{displayName}</span>
-        <span className="text-[10px] text-gray-500">{normalizedHandle}</span>
+        <span className="text-xs font-medium text-slate-900">{displayName}</span>
+        <span className="text-[10px] text-slate-500">{normalizedHandle}</span>
       </div>
     </div>
   );
@@ -131,8 +131,8 @@ export function OrdinalProfileRow({ item }: OrdinalProfileRowProps) {
         <PlatformIcon platform={platform} size="sm" />
       )}
       {profile && (
-        <span className="text-xs text-gray-500">
-          <span className="text-gray-400">@</span>
+        <span className="text-xs text-slate-500">
+          <span className="text-slate-400">@</span>
           {normalizedHandle.replace('@', '')}
         </span>
       )}

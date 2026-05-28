@@ -231,7 +231,7 @@ export function HomePage() {
           <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <CalendarClock className="w-4.5 h-4.5 text-blue-500" />
+                <CalendarClock className="w-4.5 h-4.5 text-brand-500" />
                 <h2 className="font-semibold text-slate-900">Due This Week</h2>
               </div>
               <button
@@ -259,7 +259,7 @@ export function HomePage() {
                       className="w-full flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors text-left group"
                     >
                       <div className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
-                        isDueToday ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                        isDueToday ? 'bg-brand-100 text-brand-700' : 'bg-slate-100 text-slate-600'
                       }`}>
                         {formatDate(item.due_date)}
                       </div>

@@ -77,9 +77,9 @@ export function CreateWorkspacePage() {
   const isBusy = loading || contextLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Top bar with user info */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3">
+      <header className="bg-white border-b border-slate-200 px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             {hasWorkspaces && (
@@ -99,18 +99,18 @@ export function CreateWorkspacePage() {
               {userAvatar ? (
                 <img src={userAvatar} alt={userName} className="w-8 h-8 rounded-full object-cover" />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                  <User className="w-4 h-4 text-gray-500" />
+                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
+                  <User className="w-4 h-4 text-slate-500" />
                 </div>
               )}
               <div className="text-sm">
-                <p className="font-medium text-gray-900">{userName}</p>
-                <p className="text-gray-500">{user?.email}</p>
+                <p className="font-medium text-slate-900">{userName}</p>
+                <p className="text-slate-500">{user?.email}</p>
               </div>
             </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Sign out
@@ -125,17 +125,17 @@ export function CreateWorkspacePage() {
           {/* Header */}
           <div className="text-center mb-8">
             <img src="/assets/logo.png" alt="ContentedCal" className="w-16 h-16 mx-auto mb-2 object-contain" />
-            <h1 className="text-2xl font-bold text-gray-900">Create your workspace</h1>
-            <p className="text-gray-500 text-sm mt-1">
+            <h1 className="text-2xl font-bold text-slate-900">Create your workspace</h1>
+            <p className="text-slate-500 text-sm mt-1">
               Workspaces help you organize your content with your team.
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1.5">
                   Workspace name
                 </label>
                 <input
@@ -144,18 +144,18 @@ export function CreateWorkspacePage() {
                   value={name}
                   onChange={handleNameChange}
                   placeholder="Acme Marketing"
-                  className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-colors"
                   required
                   autoFocus
                 />
               </div>
 
               <div>
-                <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="slug" className="block text-sm font-medium text-slate-700 mb-1.5">
                   URL slug
                 </label>
                 <div className="flex items-center">
-                  <span className="text-gray-500 text-sm px-3 py-2.5 bg-gray-50 border-y border-l border-gray-200 rounded-l-lg">
+                  <span className="text-slate-500 text-sm px-3 py-2.5 bg-slate-50 border-y border-l border-slate-200 rounded-l-lg">
                     /w/
                   </span>
                   <input
@@ -164,13 +164,13 @@ export function CreateWorkspacePage() {
                     value={slug}
                     onChange={handleSlugChange}
                     placeholder="acme-marketing"
-                    className="flex-1 px-3 py-2.5 text-sm border border-gray-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent focus:z-10 transition-colors"
+                    className="flex-1 px-3 py-2.5 text-sm border border-slate-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent focus:z-10 transition-colors"
                     required
                     pattern="[a-z0-9-]+"
                     title="Only lowercase letters, numbers, and hyphens"
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Only lowercase letters, numbers, and hyphens. Auto-generated from name.
                 </p>
               </div>

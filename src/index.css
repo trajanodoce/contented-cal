@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Fonts ── */
+@font-face {
+  font-family: 'Violet Sans';
+  src: url('/fonts/VioletSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Faune-Display_Black';
+  src: url('/fonts/FauneDisplay-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Faune-Text_Bold';
+  src: url('/fonts/FauneText-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Faune-Text_Regular';
+  src: url('/fonts/FauneText-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -39,41 +69,41 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  font-family: 'Violet Sans', -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Global scrollbar styling */
+/* ── Navy Pill Scrollbar ── */
 *::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 *::-webkit-scrollbar-track {
-  background: #e2e8f0;
-  border-radius: 5px;
+  background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: #004671;
-  border-radius: 5px;
+  background: #005D97;
+  border-radius: 999px;
+  border: 2px solid white;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #003557;
+  background: #003d66;
 }
 /* Firefox */
 * {
-  scrollbar-width: auto;
-  scrollbar-color: #004671 #e2e8f0;
+  scrollbar-width: thin;
+  scrollbar-color: #005D97 transparent;
 }
 
 /* Detail panel form fields */
 .field-select {
   border-color: #94a3b8;
-  background-color: #f8fafc;
+  background-color: #F7F9FC;
 }
 .field-select:focus {
-  border-color: #64748b;
+  border-color: #005D97;
 }
 .field-select option {
-  background-color: #f8fafc;
+  background-color: #F7F9FC;
   color: #1e293b;
 }

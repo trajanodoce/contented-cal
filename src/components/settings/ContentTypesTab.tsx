@@ -264,7 +264,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -279,7 +279,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
         </div>
         <button
           onClick={openCreateForm}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Content Type
@@ -293,7 +293,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
           <p className="text-slate-500 mb-4">No content types yet</p>
           <button
             onClick={openCreateForm}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+            className="text-brand-600 hover:text-brand-700 font-medium text-sm"
           >
             Create your first content type
           </button>
@@ -304,7 +304,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
             <div
               key={type.id}
               className={`border rounded-lg overflow-hidden transition-all ${
-                expandedType === type.id ? 'border-blue-300 ring-1 ring-blue-300' : 'border-slate-200'
+                expandedType === type.id ? 'border-brand-300 ring-1 ring-brand-300' : 'border-slate-200'
               }`}
             >
               {/* Header - Always visible */}
@@ -362,7 +362,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
                         />
                       </div>
                       <div>
@@ -370,7 +370,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                         <select
                           value={formData.icon}
                           onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
                         >
                           {ICON_OPTIONS.map((icon) => (
                             <option key={icon.value} value={icon.value}>{icon.label}</option>
@@ -418,7 +418,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                             onClick={() => toggleField(field.key)}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                               formData.defaultWorkflow.fields?.[field.key]
-                                ? 'bg-blue-600'
+                                ? 'bg-brand-600'
                                 : 'bg-slate-300'
                             }`}
                           >
@@ -451,14 +451,14 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                           <label
                             key={column.id}
                             className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                              isSelected ? 'bg-blue-50 border border-blue-200' : 'bg-slate-50 border border-transparent'
+                              isSelected ? 'bg-brand-50 border border-brand-200' : 'bg-slate-50 border border-transparent'
                             }`}
                           >
                             <input
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => toggleColumn(column.id)}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              className="w-4 h-4 text-brand-600 rounded focus:ring-brand-500"
                             />
                             <span
                               className="w-3 h-3 rounded-full"
@@ -496,7 +496,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                     <button
                       onClick={handleSave}
                       disabled={isSaving || !formData.name.trim()}
-                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors disabled:opacity-50"
                     >
                       <Save className="w-4 h-4" />
                       {isSaving ? 'Saving...' : 'Save Changes'}
@@ -522,7 +522,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g., Blog Post"
                 />
               </div>
@@ -532,7 +532,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                 <select
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   {ICON_OPTIONS.map((icon) => (
                     <option key={icon.value} value={icon.value}>{icon.label}</option>
@@ -567,7 +567,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
               <button
                 onClick={handleSave}
                 disabled={isSaving || !formData.name.trim()}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors disabled:opacity-50"
               >
                 {isSaving ? 'Creating...' : 'Create'}
               </button>
@@ -715,7 +715,7 @@ function CustomFieldsManager({
       )}
 
       {adding ? (
-        <div className="border border-blue-200 rounded-lg p-4 bg-blue-50/30 space-y-3">
+        <div className="border border-brand-200 rounded-lg p-4 bg-brand-50/30 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">Field Name</label>
@@ -723,7 +723,7 @@ function CustomFieldsManager({
                 type="text"
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                 placeholder="e.g., Word Count"
               />
             </div>
@@ -735,7 +735,7 @@ function CustomFieldsManager({
                   setNewType(e.target.value as CustomFieldType);
                   setNewOptions([]);
                 }}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
               >
                 {FIELD_TYPES.map(ft => (
                   <option key={ft.value} value={ft.value}>{ft.label}</option>
@@ -763,7 +763,7 @@ function CustomFieldsManager({
                   value={optionInput}
                   onChange={e => setOptionInput(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addOption(); } }}
-                  className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="Option label"
                 />
                 <button onClick={addOption} className="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 rounded-lg">Add</button>
@@ -786,7 +786,7 @@ function CustomFieldsManager({
             <button
               onClick={handleAdd}
               disabled={saving || !newName.trim() || (needsOptions && newOptions.length === 0)}
-              className="px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+              className="px-3 py-1.5 text-sm text-white bg-brand-600 hover:bg-brand-700 rounded-lg disabled:opacity-50"
             >
               {saving ? 'Adding...' : 'Add Field'}
             </button>
@@ -795,7 +795,7 @@ function CustomFieldsManager({
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+          className="flex items-center gap-1.5 text-sm text-brand-600 hover:text-brand-700 font-medium"
         >
           <Plus className="w-4 h-4" />
           Add Custom Field

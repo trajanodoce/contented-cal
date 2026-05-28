@@ -93,7 +93,7 @@ export function CustomFieldsTab({ workspaceId }: Props) {
         </div>
         <button
           onClick={() => { setShowCreate(true); setEditingId(null); }}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Field
@@ -173,7 +173,7 @@ export function CustomFieldsTab({ workspaceId }: Props) {
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
           >
             <Plus className="w-4 h-4" />
             Create your first field
@@ -247,7 +247,7 @@ function FieldTable({
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => onEdit(field)}
-                      className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded transition-colors"
                       title="Edit field"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -350,7 +350,7 @@ function FieldForm({
   };
 
   return (
-    <div className="border border-blue-200 rounded-lg p-5 bg-blue-50/30 space-y-4">
+    <div className="border border-brand-200 rounded-lg p-5 bg-brand-50/30 space-y-4">
       <h4 className="text-sm font-semibold text-slate-900">
         {editing ? 'Edit Field' : 'New Custom Field'}
       </h4>
@@ -362,7 +362,7 @@ function FieldForm({
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
             placeholder="e.g., Word Count, Campaign, Review Link"
             autoFocus
           />
@@ -377,7 +377,7 @@ function FieldForm({
                 setOptions([]);
               }
             }}
-            className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
           >
             {FIELD_TYPES.map(ft => (
               <option key={ft.value} value={ft.value}>{ft.label} — {ft.description}</option>
@@ -391,7 +391,7 @@ function FieldForm({
         <select
           value={contentTypeId}
           onChange={e => setContentTypeId(e.target.value)}
-          className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
         >
           <option value="">All content types (global)</option>
           {contentTypes.map(ct => (
@@ -429,7 +429,7 @@ function FieldForm({
               value={optionInput}
               onChange={e => setOptionInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addOption(); } }}
-              className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
               placeholder="Type an option and press Enter"
             />
             <button
@@ -448,7 +448,7 @@ function FieldForm({
           type="checkbox"
           checked={required}
           onChange={e => setRequired(e.target.checked)}
-          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          className="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
         />
         <span className="text-sm text-slate-700">Required field</span>
       </label>
@@ -463,7 +463,7 @@ function FieldForm({
         <button
           onClick={handleSubmit}
           disabled={saving || !name.trim() || (needsOptions && options.length === 0)}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg disabled:opacity-50 transition-colors"
         >
           <Save className="w-4 h-4" />
           {saving ? 'Saving...' : editing ? 'Save Changes' : 'Create Field'}

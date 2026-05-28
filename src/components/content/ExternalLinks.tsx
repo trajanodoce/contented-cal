@@ -127,7 +127,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
           target="_blank"
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
-          className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline line-clamp-1 leading-snug transition-colors"
+          className="text-sm font-medium text-brand-600 hover:text-brand-800 hover:underline line-clamp-1 leading-snug transition-colors"
         >
           {isFile ? fileName : (link.title || 'Untitled')}
         </a>
@@ -374,10 +374,10 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
     >
       {/* Full-section drag overlay */}
       {isDragging && (
-        <div className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/80 flex flex-col items-center justify-center pointer-events-none">
-          <Upload className="w-8 h-8 text-blue-500 mb-2" />
-          <p className="text-sm font-semibold text-blue-600">Drop files to upload</p>
-          <p className="text-xs text-blue-400 mt-0.5">Release to add to linked assets</p>
+        <div className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-brand-400 bg-brand-50/80 flex flex-col items-center justify-center pointer-events-none">
+          <Upload className="w-8 h-8 text-brand-500 mb-2" />
+          <p className="text-sm font-semibold text-brand-600">Drop files to upload</p>
+          <p className="text-xs text-brand-400 mt-0.5">Release to add to linked assets</p>
         </div>
       )}
 
@@ -456,19 +456,19 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full flex flex-col items-center justify-center py-8 text-center border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group"
+          className="w-full flex flex-col items-center justify-center py-8 text-center border-2 border-dashed border-slate-200 rounded-xl hover:border-brand-300 hover:bg-brand-50/30 transition-all cursor-pointer group"
         >
           {uploading ? (
             <>
-              <Loader2 className="w-7 h-7 text-blue-500 mb-2 animate-spin" />
-              <p className="text-sm font-medium text-blue-600">Uploading...</p>
+              <Loader2 className="w-7 h-7 text-brand-500 mb-2 animate-spin" />
+              <p className="text-sm font-medium text-brand-600">Uploading...</p>
             </>
           ) : (
             <>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center mb-2 transition-colors">
-                <Upload className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+              <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-brand-100 flex items-center justify-center mb-2 transition-colors">
+                <Upload className="w-5 h-5 text-slate-400 group-hover:text-brand-500 transition-colors" />
               </div>
-              <p className="text-sm font-medium text-slate-600 group-hover:text-blue-600 transition-colors">
+              <p className="text-sm font-medium text-slate-600 group-hover:text-brand-600 transition-colors">
                 Drop files here or click to upload
               </p>
               <p className="text-xs text-slate-400 mt-0.5">or paste a link using "Add link" above</p>
@@ -538,7 +538,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
-                        className="flex-1 min-w-0 text-sm text-blue-600 hover:text-blue-800 hover:underline truncate transition-colors"
+                        className="flex-1 min-w-0 text-sm text-brand-600 hover:text-brand-800 hover:underline truncate transition-colors"
                         title={link.url}
                       >
                         {link.title || link.url}
@@ -548,7 +548,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                         <>
                           <button
                             onClick={() => startEditLink(link)}
-                            className="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                            className="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-brand-500 opacity-0 group-hover:opacity-100 transition-all shrink-0"
                             title="Edit link"
                           >
                             <Edit2 className="w-3 h-3" />
@@ -589,17 +589,17 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer group"
+              className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 rounded-xl hover:border-brand-300 hover:bg-brand-50/30 transition-all cursor-pointer group"
             >
               {uploading ? (
                 <>
-                  <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
-                  <span className="text-xs font-medium text-blue-600">Uploading...</span>
+                  <Loader2 className="w-4 h-4 text-brand-500 animate-spin" />
+                  <span className="text-xs font-medium text-brand-600">Uploading...</span>
                 </>
               ) : (
                 <>
-                  <Upload className="w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
-                  <span className="text-xs font-medium text-slate-500 group-hover:text-blue-600 transition-colors">
+                  <Upload className="w-4 h-4 text-slate-400 group-hover:text-brand-500 transition-colors" />
+                  <span className="text-xs font-medium text-slate-500 group-hover:text-brand-600 transition-colors">
                     Drop files or click to upload more
                   </span>
                 </>

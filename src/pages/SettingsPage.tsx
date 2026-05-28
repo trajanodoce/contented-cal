@@ -79,7 +79,7 @@ function TabBtn({ active, onClick, icon: Icon, label }: { active: boolean; onCli
     <button
       onClick={onClick}
       className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-        active ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+        active ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
       }`}
     >
       <Icon className="w-4 h-4" />
@@ -270,7 +270,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
           placeholder="My Workspace"
         />
       </div>
@@ -281,7 +281,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
           type="text"
           value={slug}
           onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
           placeholder="my-workspace"
         />
         <p className="mt-1 text-xs text-slate-500">Lowercase letters, numbers, and hyphens only. Used in URLs.</p>
@@ -291,7 +291,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
           {isSaving ? 'Saving...' : 'Save Changes'}
@@ -449,7 +449,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -464,7 +464,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
             setFormData({ name: '', color: COLOR_PALETTE[0], position: columns.length });
             setShowForm(true);
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Column
@@ -481,7 +481,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
           <p className="text-slate-500 mb-4">No board columns yet</p>
           <button
             onClick={() => setShowForm(true)}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+            className="text-brand-600 hover:text-brand-700 font-medium text-sm"
           >
             Create your first column
           </button>
@@ -506,7 +506,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
-                  className={`hover:bg-slate-50 ${dragOverIndex === index ? 'bg-blue-50' : ''} ${draggedItem?.id === column.id ? 'opacity-50' : ''}`}
+                  className={`hover:bg-slate-50 ${dragOverIndex === index ? 'bg-brand-50' : ''} ${draggedItem?.id === column.id ? 'opacity-50' : ''}`}
                 >
                   <td className="px-2 py-3">
                     <div className="cursor-move text-slate-400">
@@ -544,7 +544,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                           setFormData({ name: column.name, color: column.color ?? COLOR_PALETTE[0], position: column.position });
                           setShowForm(true);
                         }}
-                        className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded ml-2"
+                        className="p-1 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded ml-2"
                       >
                         <Save className="w-4 h-4" />
                       </button>
@@ -578,7 +578,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g., In Progress"
                 />
               </div>
@@ -610,7 +610,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
               <button
                 onClick={handleSave}
                 disabled={isSaving || !formData.name.trim()}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors disabled:opacity-50"
               >
                 {isSaving ? 'Saving...' : editingColumn ? 'Save Changes' : 'Create'}
               </button>

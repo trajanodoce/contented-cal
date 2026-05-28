@@ -474,7 +474,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       const url = `${window.location.origin}${window.location.pathname}?item=${item.id}`;
                       navigator.clipboard.writeText(url).then(() => addToast('Link copied to clipboard'));
                     }}
-                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                    className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-colors"
                     title="Copy link"
                   >
                     <Link2 className="w-4 h-4" />
@@ -827,7 +827,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         className="w-8 h-8 rounded-full object-cover shrink-0"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-medium shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-medium shrink-0">
                         {authorInitial}
                       </div>
                     )}
@@ -915,7 +915,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             </div>
             <button
               onClick={handleClose}
-              className="px-5 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-1.5"
+              className="px-5 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition-colors shadow-sm flex items-center gap-1.5"
             >
               {showSavedCheck ? (
                 <>

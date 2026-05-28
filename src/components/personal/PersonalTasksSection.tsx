@@ -109,7 +109,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What do you need to do?"
-          className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none"
+          className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-200 focus:border-brand-400 outline-none"
           autoFocus
         />
         <button
@@ -124,7 +124,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-blue-200 outline-none"
+          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
         >
           {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
             <option key={key} value={key}>{cat.label}</option>
@@ -133,7 +133,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-blue-200 outline-none"
+          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
         >
           {Object.entries(priorityLabels).map(([key, label]) => (
             <option key={key} value={key}>{label}</option>
@@ -461,7 +461,7 @@ function TaskRow({
 
   if (isEditing) {
     return (
-      <div className="px-4 py-3 bg-blue-50/50 border-l-2 border-blue-400">
+      <div className="px-4 py-3 bg-brand-50/50 border-l-2 border-brand-400">
         {/* Row 1: Title + close/saved indicator */}
         <div className="flex items-center gap-2 mb-3">
           <input
@@ -473,7 +473,7 @@ function TaskRow({
               if (e.key === 'Enter') saveChanges();
               if (e.key === 'Escape') handleClose();
             }}
-            className="flex-1 text-sm border border-slate-200 rounded-md px-2.5 py-1.5 focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none bg-white"
+            className="flex-1 text-sm border border-slate-200 rounded-md px-2.5 py-1.5 focus:ring-2 focus:ring-brand-200 focus:border-brand-400 outline-none bg-white"
             placeholder="Task title"
           />
           <button
@@ -498,7 +498,7 @@ function TaskRow({
           <select
             value={editCategory}
             onChange={(e) => setEditCategory(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-white"
           >
             {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
               <option key={key} value={key}>{cat.label}</option>
@@ -507,7 +507,7 @@ function TaskRow({
           <select
             value={editPriority}
             onChange={(e) => setEditPriority(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-blue-200 outline-none bg-white"
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-white"
           >
             {Object.entries(priorityLabels).map(([key, label]) => (
               <option key={key} value={key}>{label}</option>
@@ -521,11 +521,11 @@ function TaskRow({
         </div>
 
         {/* Row 3: Save button at bottom */}
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-blue-100">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-brand-100">
           <button
             onClick={() => saveChanges()}
             disabled={!editTitle.trim() || saving}
-            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-sm"
+            className="px-4 py-2 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors shadow-sm"
           >
             {saving ? (
               <span className="flex items-center gap-1.5">
@@ -558,7 +558,7 @@ function TaskRow({
         className={`flex-shrink-0 transition-colors ${
           task.completed
             ? 'text-green-500 hover:text-green-600'
-            : 'text-slate-300 hover:text-blue-500'
+            : 'text-slate-300 hover:text-brand-500'
         }`}
       >
         {task.completed ? <Check className="w-4.5 h-4.5" /> : <Square className="w-4.5 h-4.5" />}

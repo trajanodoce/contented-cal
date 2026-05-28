@@ -92,7 +92,7 @@ function StatusBadge({ status }: { status: string | null }) {
   const map: Record<string, { icon: typeof CheckCircle2; label: string; cls: string }> = {
     connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-green-700 bg-green-50 border-green-200' },
     error: { icon: AlertCircle, label: 'Error', cls: 'text-red-700 bg-red-50 border-red-200' },
-    disconnected: { icon: Clock, label: 'Disconnected', cls: 'text-gray-600 bg-gray-50 border-gray-200' },
+    disconnected: { icon: Clock, label: 'Disconnected', cls: 'text-slate-600 bg-slate-50 border-slate-200' },
   };
   const { icon: Icon, label, cls } = map[status] ?? map.disconnected;
   return (
@@ -134,31 +134,31 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
   const isValid = (meta.fields ?? []).every(f => f.secret ? values[f.key] : values[f.key]?.trim());
 
   return (
-    <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-      <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Configure {meta.name}</p>
+    <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+      <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Configure {meta.name}</p>
 
       {meta.setupNote && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-          <p className="text-xs text-blue-700 leading-relaxed">{meta.setupNote}</p>
+        <div className="bg-brand-50 border border-brand-200 rounded-lg p-3">
+          <p className="text-xs text-brand-700 leading-relaxed">{meta.setupNote}</p>
         </div>
       )}
 
       {(meta.fields ?? []).map(field => (
         <div key={field.key}>
-          <label className="block text-xs font-medium text-gray-700 mb-1">{field.label}</label>
+          <label className="block text-xs font-medium text-slate-700 mb-1">{field.label}</label>
           <div className="relative">
             <input
               type={field.secret && !showSecrets[field.key] ? 'password' : 'text'}
               value={values[field.key] ?? ''}
               onChange={e => set(field.key, e.target.value)}
               placeholder={field.placeholder}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
             />
             {field.secret && (
               <button
                 type="button"
                 onClick={() => setShowSecrets(prev => ({ ...prev, [field.key]: !prev[field.key] }))}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
               >
                 {showSecrets[field.key] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
@@ -189,7 +189,7 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
         </button>
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
         >
           Cancel
         </button>
@@ -235,17 +235,17 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <div className="p-5">
         <div className="flex items-start gap-4">
           <PlatformIcon meta={meta} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm font-semibold text-gray-900">{meta.name}</h3>
-              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{meta.category}</span>
+              <h3 className="text-sm font-semibold text-slate-900">{meta.name}</h3>
+              <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{meta.category}</span>
               {integration && <StatusBadge status={integration.status} />}
             </div>
-            <p className="text-xs text-gray-500 mt-1 leading-relaxed">{meta.description}</p>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">{meta.description}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {connected && onSync && (
@@ -263,7 +263,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               <button
                 onClick={onTest}
                 disabled={testing}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
                 title="Test connection"
               >
                 {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
@@ -274,7 +274,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               onClick={handleConnectClick}
               className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
                 ${connected
-                  ? 'text-gray-700 border border-gray-200 hover:bg-gray-50'
+                  ? 'text-slate-700 border border-slate-200 hover:bg-slate-50'
                   : 'bg-brand-600 text-white hover:bg-brand-500'}`}
             >
               {connected ? (
@@ -305,11 +305,11 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
 
         {/* OAuth manage panel (for connected OAuth integrations) */}
         {expanded && isOAuth && connected && integration && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-            <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Manage {meta.name}</p>
+          <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Manage {meta.name}</p>
             {meta.setupNote && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-xs text-blue-700 leading-relaxed">{meta.setupNote}</p>
+              <div className="bg-brand-50 border border-brand-200 rounded-lg p-3">
+                <p className="text-xs text-brand-700 leading-relaxed">{meta.setupNote}</p>
               </div>
             )}
             <div className="flex items-center gap-2 pt-1">
@@ -321,7 +321,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               </button>
               <button
                 onClick={() => setExpanded(false)}
-                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Cancel
               </button>
@@ -337,7 +337,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
 
         {/* Connected config summary */}
         {connected && !expanded && integration && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
+          <div className="mt-3 pt-3 border-t border-slate-100">
             <ConnectedSummary meta={meta} integration={integration} />
           </div>
         )}
@@ -351,7 +351,7 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
   const connectedAt = new Date(integration.connected_at).toLocaleDateString();
 
   return (
-    <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
+    <div className="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
       <span>Connected {connectedAt}</span>
       {meta.id === 'ordinal' && (
         <>
@@ -363,7 +363,7 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
         <>
           <span className="flex items-center gap-1">
             <MessageSquare className="w-3 h-3" />
-            Workspace: <span className="text-gray-700 font-medium">{config.slack_team_name}</span>
+            Workspace: <span className="text-slate-700 font-medium">{config.slack_team_name}</span>
           </span>
           <span>@mention the bot to create items</span>
         </>
@@ -491,7 +491,7 @@ export function IntegrationsPage({ addToast }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+        <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
       </div>
     );
   }
@@ -499,8 +499,8 @@ export function IntegrationsPage({ addToast }: Props) {
   if (!isAdmin) {
     return (
       <div className="max-w-2xl">
-        <h2 className="text-xl font-semibold text-gray-900 mb-1">Integrations</h2>
-        <p className="text-sm text-gray-500 mb-6">Connect external tools to your workspace.</p>
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">Integrations</h2>
+        <p className="text-sm text-slate-500 mb-6">Connect external tools to your workspace.</p>
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
@@ -521,18 +521,18 @@ export function IntegrationsPage({ addToast }: Props) {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-1">
-        <h2 className="text-xl font-semibold text-gray-900">Integrations</h2>
-        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
+        <h2 className="text-xl font-semibold text-slate-900">Integrations</h2>
+        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
           {integrations.filter(i => i.status === 'connected').length} connected
         </span>
       </div>
-      <p className="text-sm text-gray-500 mb-6">Connect your tools to supercharge your content workflow.</p>
+      <p className="text-sm text-slate-500 mb-6">Connect your tools to supercharge your content workflow.</p>
 
       {categories.map(cat => (
         <div key={cat} className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <Zap className="w-3.5 h-3.5 text-gray-400" />
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{cat}</h3>
+            <Zap className="w-3.5 h-3.5 text-slate-400" />
+            <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{cat}</h3>
           </div>
           <div className="space-y-3">
             {PLATFORMS.filter(p => p.category === cat).map(meta => (
@@ -768,8 +768,8 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
   return (
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-3">
-        <CircleUser className="w-3.5 h-3.5 text-gray-400" />
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Personal</h3>
+        <CircleUser className="w-3.5 h-3.5 text-slate-400" />
+        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Personal</h3>
       </div>
 
       <div className="space-y-3">
@@ -779,7 +779,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
           const isExpanded = expandedPlatform === platform.id;
 
           return (
-            <div key={platform.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div key={platform.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
               <div className="p-5">
                 <div className="flex items-start gap-4">
                   <div
@@ -790,8 +790,8 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm font-semibold text-gray-900">{platform.name}</h3>
-                      <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{platform.tag}</span>
+                      <h3 className="text-sm font-semibold text-slate-900">{platform.name}</h3>
+                      <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">{platform.tag}</span>
                       {isConnected && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-green-700 bg-green-50 border-green-200">
                           <CheckCircle2 className="w-3 h-3" />
@@ -799,7 +799,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{platform.description}</p>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{platform.description}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {isConnected && platform.id === 'linear' && (
@@ -816,7 +816,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       onClick={() => setExpandedPlatform(isExpanded ? null : platform.id)}
                       className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
                         ${isConnected
-                          ? 'text-gray-700 border border-gray-200 hover:bg-gray-50'
+                          ? 'text-slate-700 border border-slate-200 hover:bg-slate-50'
                           : 'bg-brand-600 text-white hover:bg-brand-500'}`}
                     >
                       {isConnected ? (
@@ -829,29 +829,29 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                 </div>
 
                 {isExpanded && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">Your {platform.name} Connection</p>
+                  <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <p className="text-xs font-medium text-slate-600 uppercase tracking-wide">Your {platform.name} Connection</p>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                      <p className="text-xs text-blue-700 leading-relaxed">
+                    <div className="bg-brand-50 border border-brand-200 rounded-lg p-3">
+                      <p className="text-xs text-brand-700 leading-relaxed">
                         This is a personal connection — your API key is not shared with other workspace members.
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">{platform.name} API Key</label>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">{platform.name} API Key</label>
                       <div className="relative">
                         <input
                           type={showKeys[platform.id] ? 'text' : 'password'}
                           value={apiKeys[platform.id] ?? ''}
                           onChange={e => setApiKeys(prev => ({ ...prev, [platform.id]: e.target.value }))}
                           placeholder={platform.placeholder}
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
+                          className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 pr-8"
                         />
                         <button
                           type="button"
                           onClick={() => setShowKeys(prev => ({ ...prev, [platform.id]: !prev[platform.id] }))}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                         >
                           {showKeys[platform.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                         </button>
@@ -878,7 +878,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       </button>
                       <button
                         onClick={() => setExpandedPlatform(null)}
-                        className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
                       >
                         Cancel
                       </button>
@@ -896,14 +896,14 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
 
                 {/* Connected summary */}
                 {isConnected && !isExpanded && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
+                  <div className="mt-3 pt-3 border-t border-slate-100">
+                    <div className="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
                       {platform.id === 'linear' && linearInfo && (
                         <>
                           <span className="text-[#5E6AD2] font-medium">{linearInfo.name}</span>
-                          {linearInfo.teams && <span className="truncate max-w-[200px]" title={linearInfo.teams}>Teams: <span className="text-gray-700 font-medium">{linearInfo.teams}</span></span>}
-                          {linearInfo.issuesCount != null && <span><span className="text-gray-700 font-medium">{linearInfo.issuesCount}</span> issues synced</span>}
-                          {linearInfo.lastSynced && <span>Last sync: <span className="text-gray-700 font-medium">{new Date(linearInfo.lastSynced).toLocaleString()}</span></span>}
+                          {linearInfo.teams && <span className="truncate max-w-[200px]" title={linearInfo.teams}>Teams: <span className="text-slate-700 font-medium">{linearInfo.teams}</span></span>}
+                          {linearInfo.issuesCount != null && <span><span className="text-slate-700 font-medium">{linearInfo.issuesCount}</span> issues synced</span>}
+                          {linearInfo.lastSynced && <span>Last sync: <span className="text-slate-700 font-medium">{new Date(linearInfo.lastSynced).toLocaleString()}</span></span>}
                         </>
                       )}
                       {platform.id === 'granola' && (
@@ -933,9 +933,9 @@ function IntegrationStatusList({ integrations }: { integrations: Integration[] }
         const meta = PLATFORMS.find(p => p.id === int.platform);
         if (!meta) return null;
         return (
-          <div key={int.id} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-xl">
+          <div key={int.id} className="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl">
             <PlatformIcon meta={meta} size="sm" />
-            <span className="text-sm font-medium text-gray-700 flex-1">{meta.name}</span>
+            <span className="text-sm font-medium text-slate-700 flex-1">{meta.name}</span>
             <StatusBadge status={int.status} />
           </div>
         );

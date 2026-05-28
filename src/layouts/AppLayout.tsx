@@ -151,31 +151,35 @@ export function AppLayout() {
   const userAvatar = user?.user_metadata?.avatar_url;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-slate-800 flex flex-col flex-shrink-0">
-        {/* Workspace selector */}
-        <div className="p-4 border-b border-slate-700">
+    <div className="flex h-screen overflow-hidden bg-surface-page">
+      {/* Sidebar — Navy Gradient (Option B) */}
+      <aside className="w-64 flex flex-col flex-shrink-0" style={{ background: 'linear-gradient(to bottom, #002339, #003d66)' }}>
+        {/* Logo + Workspace selector */}
+        <div className="p-4 border-b border-white/10">
+          <div className="flex items-center gap-2.5 mb-3 px-1">
+            <img src="/assets/kitsune-logo.png" alt="ContentedCal" className="w-8 h-8 rounded-lg object-contain" />
+            <span className="font-heading text-white text-sm tracking-wide">ContentedCal</span>
+          </div>
           <button
             onClick={() => setShowWorkspacePicker(!showWorkspacePicker)}
-            className="w-full flex items-center gap-2.5 text-white hover:bg-slate-700 rounded-lg px-3 py-2 transition-colors"
+            className="w-full flex items-center gap-2.5 text-white hover:bg-white/10 rounded-lg px-3 py-2 transition-colors"
           >
             {currentWorkspace?.logo_url ? (
               <img src={currentWorkspace.logo_url} alt="" className="w-6 h-6 rounded shrink-0 object-cover" />
             ) : (
-              <div className="w-6 h-6 rounded bg-slate-600 flex items-center justify-center shrink-0">
+              <div className="w-6 h-6 rounded bg-white/15 flex items-center justify-center shrink-0">
                 <span className="text-xs font-bold text-white">{currentWorkspace?.name?.charAt(0)?.toUpperCase() ?? 'W'}</span>
               </div>
             )}
-            <span className="font-medium truncate flex-1 text-left">{currentWorkspace?.name || 'Select Workspace'}</span>
+            <span className="font-medium truncate flex-1 text-left text-sm">{currentWorkspace?.name || 'Select Workspace'}</span>
             <ChevronDown
-              className={`w-4 h-4 flex-shrink-0 transition-transform ${showWorkspacePicker ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 flex-shrink-0 transition-transform opacity-60 ${showWorkspacePicker ? 'rotate-180' : ''}`}
             />
           </button>
 
           {/* Workspace dropdown */}
           {showWorkspacePicker && workspaces.length > 1 && (
-            <div className="mt-2 py-2 bg-slate-700 rounded-lg">
+            <div className="mt-2 py-2 bg-white/10 rounded-lg backdrop-blur-sm">
               {workspaces.map((ws) => (
                 <button
                   key={ws.id}
@@ -185,14 +189,14 @@ export function AppLayout() {
                   }}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm ${
                     currentWorkspace?.id === ws.id
-                      ? 'text-white bg-slate-600'
-                      : 'text-slate-300 hover:bg-slate-600 hover:text-white'
+                      ? 'text-white bg-white/15'
+                      : 'text-white/70 hover:bg-white/10 hover:text-white'
                   } transition-colors`}
                 >
                   {ws.logo_url ? (
                     <img src={ws.logo_url} alt="" className="w-5 h-5 rounded shrink-0 object-cover" />
                   ) : (
-                    <div className="w-5 h-5 rounded bg-slate-500 flex items-center justify-center shrink-0">
+                    <div className="w-5 h-5 rounded bg-white/15 flex items-center justify-center shrink-0">
                       <span className="text-[10px] font-bold text-white">{ws.name?.charAt(0)?.toUpperCase()}</span>
                     </div>
                   )}
@@ -213,17 +217,17 @@ export function AppLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'text-white border-l-2 border-pink-300'
-                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    ? 'text-white'
+                    : 'text-white/60 hover:bg-white/10 hover:text-white'
                 }`
               }
               style={({ isActive }) =>
                 isActive
-                  ? { background: 'linear-gradient(135deg, rgba(250,228,229,0.5) 0%, rgba(250,228,229,0.25) 100%)' }
+                  ? { background: 'linear-gradient(135deg, rgba(251,231,241,0.25) 0%, rgba(251,231,241,0.08) 100%)', borderLeft: '2px solid #FBE7F1' }
                   : undefined
               }
             >
-              <span className="text-slate-400">{item.icon}</span>
+              <span className={`opacity-70`}>{item.icon}</span>
               <span>{item.label}</span>
             </NavLink>
           ))}
@@ -238,24 +242,24 @@ export function AppLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'text-white border-l-2 border-pink-300'
-                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    ? 'text-white'
+                    : 'text-white/60 hover:bg-white/10 hover:text-white'
                 }`
               }
               style={({ isActive }) =>
                 isActive
-                  ? { background: 'linear-gradient(135deg, rgba(250,228,229,0.5) 0%, rgba(250,228,229,0.25) 100%)' }
+                  ? { background: 'linear-gradient(135deg, rgba(251,231,241,0.25) 0%, rgba(251,231,241,0.08) 100%)', borderLeft: '2px solid #FBE7F1' }
                   : undefined
               }
             >
-              <Settings className="w-5 h-5 text-slate-400" />
+              <Settings className="w-5 h-5 opacity-70" />
               <span>Settings</span>
             </NavLink>
           </div>
         )}
 
         {/* Divider */}
-        <div className="mx-4 border-t border-slate-700" />
+        <div className="mx-4 border-t border-white/10" />
 
         {/* User section */}
         <div className="p-4">
@@ -267,18 +271,18 @@ export function AppLayout() {
                 className="w-8 h-8 rounded-full object-cover"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white text-sm font-medium">
                 {userName.charAt(0).toUpperCase()}
               </div>
             )}
             <div className="flex-1 min-w-1">
               <p className="text-sm font-medium text-white truncate">{userName}</p>
-              <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+              <p className="text-xs text-white/50 truncate">{user?.email}</p>
             </div>
           </div>
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sign out
@@ -287,39 +291,39 @@ export function AppLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col min-w-1 bg-slate-50 overflow-hidden relative">
+      <main className="flex-1 flex flex-col min-w-1 bg-surface-page overflow-hidden relative">
         {/* Header */}
         <header
-          className="h-16 border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0"
-          style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
+          className="h-16 flex items-center justify-between px-6 flex-shrink-0"
+          style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)', borderBottom: '1.5px solid #002339' }}
         >
-          <h1 className="text-lg font-semibold text-white">
+          <h1 className="text-lg font-heading text-white">
             {getPageTitle(location.pathname)}
           </h1>
           {canCreate && (
             <div className="relative" ref={createMenuRef}>
               <button
                 onClick={() => setShowCreateMenu(v => !v)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-xl hover:bg-brand-500 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 New
                 <ChevronDown className="w-3.5 h-3.5 opacity-70" />
               </button>
               {showCreateMenu && (
-                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-50">
+                <div className="absolute right-0 mt-2 w-52 bg-surface-card rounded-xl shadow-lg py-1.5 z-50" style={{ border: '1px solid #00233930' }}>
                   <button
                     onClick={() => { setShowCreateMenu(false); setModalTags([]); setIsModalOpen(true); }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-surface-nested transition-colors"
                   >
-                    <FileText className="w-4 h-4 text-blue-500" />
+                    <FileText className="w-4 h-4 text-brand-600" />
                     Content Item
                   </button>
                   <button
                     onClick={() => { setShowCreateMenu(false); setModalTags(['design-request']); setIsModalOpen(true); }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-surface-nested transition-colors"
                   >
-                    <Palette className="w-4 h-4 text-purple-500" />
+                    <Palette className="w-4 h-4 text-accent-lavender" />
                     Design Request
                   </button>
                 </div>
@@ -350,26 +354,26 @@ export function AppLayout() {
         {canCreate && !selectedItemId && (
           <div className="fixed bottom-6 right-6 z-50" ref={fabMenuRef}>
             {showFabMenu && (
-              <div className="absolute bottom-16 right-0 w-52 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 mb-2">
+              <div className="absolute bottom-16 right-0 w-52 bg-surface-card rounded-xl shadow-lg py-1.5 mb-2" style={{ border: '1px solid #00233930' }}>
                 <button
                   onClick={() => { setShowFabMenu(false); setModalTags([]); setIsModalOpen(true); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-surface-nested transition-colors"
                 >
-                  <FileText className="w-4 h-4 text-blue-500" />
+                  <FileText className="w-4 h-4 text-brand-600" />
                   Content Item
                 </button>
                 <button
                   onClick={() => { setShowFabMenu(false); setModalTags(['design-request']); setIsModalOpen(true); }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-surface-nested transition-colors"
                 >
-                  <Palette className="w-4 h-4 text-purple-500" />
+                  <Palette className="w-4 h-4 text-accent-lavender" />
                   Design Request
                 </button>
               </div>
             )}
             <button
               onClick={() => setShowFabMenu(v => !v)}
-              className={`w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 ${showFabMenu ? 'rotate-45' : ''}`}
+              className={`w-14 h-14 bg-brand-600 hover:bg-brand-500 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-105 active:scale-95 ${showFabMenu ? 'rotate-45' : ''}`}
               aria-label="Create new item"
               title="Create new item"
             >

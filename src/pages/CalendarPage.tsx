@@ -84,7 +84,7 @@ function DroppableDayCell({ dateId, children, className, onClick }: {
   return (
     <div
       ref={setNodeRef}
-      className={`overflow-hidden min-w-0 ${className || ''} ${isOver ? 'ring-2 ring-inset ring-blue-400 !bg-blue-50/60' : ''}`}
+      className={`overflow-hidden min-w-0 ${className || ''} ${isOver ? 'ring-2 ring-inset ring-brand-400 !bg-brand-50/60' : ''}`}
       onClick={onClick}
     >
       {children}
@@ -323,7 +323,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                 <div className="flex flex-col items-center gap-0.5">
                   <span
                     className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
-                      isTodayDate ? 'bg-blue-600 text-white' : ''
+                      isTodayDate ? 'bg-brand-600 text-white' : ''
                     }`}
                     style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#94a3b8' } : undefined}
                   >
@@ -340,7 +340,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                   <div className="flex justify-between items-center mb-1">
                     <span
                       className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                        isTodayDate ? 'bg-blue-600 text-white' : ''
+                        isTodayDate ? 'bg-brand-600 text-white' : ''
                       }`}
                       style={!isTodayDate ? { color: isCurrentMonth ? '#0B4463' : '#94a3b8' } : undefined}
                     >
@@ -377,7 +377,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                     ))}
                     {dayItems.length > 3 && (
                       <button
-                        className="text-xs text-slate-500 hover:text-blue-600 px-1 py-0.5"
+                        className="text-xs text-slate-500 hover:text-brand-600 px-1 py-0.5"
                         onClick={(e) => {
                           e.stopPropagation();
                           onShowMore(day);
@@ -576,7 +576,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
               className={`${collapsed ? 'p-1' : 'p-2'} border-r border-slate-100 last:border-r-0 border-b border-slate-100 min-h-[100px] ${
-                isTodayDate ? 'bg-blue-50/30' : collapsed ? 'bg-slate-50/80' : ''
+                isTodayDate ? 'bg-brand-50/30' : collapsed ? 'bg-slate-50/80' : ''
               }`}
               onClick={() => collapsed ? onToggleWeekends() : onDateClick(day)}
             >
@@ -735,7 +735,7 @@ function DayView({ currentDate, items, contentTypes, boardColumns, members, date
         </div>
         <button
           onClick={() => onDateClick(currentDate)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Item
@@ -748,7 +748,7 @@ function DayView({ currentDate, items, contentTypes, boardColumns, members, date
           <p>No items scheduled for this day</p>
           <button
             onClick={() => onDateClick(currentDate)}
-            className="text-blue-600 hover:text-blue-700 font-medium mt-2"
+            className="text-brand-600 hover:text-brand-700 font-medium mt-2"
           >
             Schedule an item
           </button>
@@ -1099,7 +1099,7 @@ export function CalendarPage() {
   if (loading || contentItemsLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -1199,7 +1199,7 @@ export function CalendarPage() {
                 className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
                   weekendsCollapsed
                     ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                    : 'border-blue-200 bg-blue-50 text-blue-700'
+                    : 'border-brand-200 bg-brand-50 text-brand-700'
                 }`}
                 title={weekendsCollapsed ? 'Show weekends' : 'Collapse weekends'}
               >

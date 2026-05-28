@@ -50,7 +50,7 @@ function getFileIcon(mimeType: string | null) {
     return <FileSpreadsheet className="w-5 h-5 text-green-500" />;
   if (mimeType.includes('pdf')) return <FileText className="w-5 h-5 text-red-500" />;
   if (mimeType.includes('document') || mimeType.includes('word'))
-    return <FileText className="w-5 h-5 text-blue-500" />;
+    return <FileText className="w-5 h-5 text-brand-500" />;
   return <File className="w-5 h-5 text-slate-400" />;
 }
 
@@ -255,7 +255,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
           <div className="relative" ref={addMenuRef}>
             <button
               onClick={() => setShowAddMenu(v => !v)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               Add
@@ -299,7 +299,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
 
       {/* Uploading indicator */}
       {uploading && (
-        <div className="flex items-center gap-2 text-sm text-blue-600 mb-3 px-1">
+        <div className="flex items-center gap-2 text-sm text-brand-600 mb-3 px-1">
           <Loader2 className="w-4 h-4 animate-spin" />
           Uploading...
         </div>
@@ -322,7 +322,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
             placeholder="Title (e.g., Brand Guidelines)"
             value={linkTitle}
             onChange={e => setLinkTitle(e.target.value)}
-            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <input
             type="url"
@@ -330,12 +330,12 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
             value={linkUrl}
             onChange={e => setLinkUrl(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') addLink(); }}
-            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <button
             onClick={addLink}
             disabled={saving || !linkTitle.trim() || !linkUrl.trim()}
-            className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50 flex items-center gap-1.5"
+            className="px-3 py-1.5 text-xs font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg disabled:opacity-50 flex items-center gap-1.5"
           >
             {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />}
             Add Link
@@ -384,14 +384,14 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                             if (e.key === 'Escape') cancelEdit();
                           }}
                           onBlur={() => saveEdit(item)}
-                          className="w-full text-sm font-medium text-slate-800 border-b border-blue-400 outline-none bg-transparent"
+                          className="w-full text-sm font-medium text-slate-800 border-b border-brand-400 outline-none bg-transparent"
                         />
                       ) : (
                         <a
                           href={item.url ?? '#'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                          className="text-sm font-medium text-slate-800 hover:text-brand-600 truncate block"
                         >
                           {item.title}
                         </a>
@@ -426,7 +426,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                             href={item.url ?? '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1 text-slate-400 hover:text-blue-500 rounded"
+                            className="p-1 text-slate-400 hover:text-brand-500 rounded"
                             title="Open"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
@@ -461,7 +461,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     key={item.id}
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
                   >
-                    <Link2 className="w-5 h-5 text-blue-400 shrink-0" />
+                    <Link2 className="w-5 h-5 text-brand-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       {editingId === item.id ? (
                         <div className="space-y-1.5">
@@ -473,7 +473,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                               if (e.key === 'Escape') cancelEdit();
                             }}
                             placeholder="Title"
-                            className="w-full text-sm font-medium text-slate-800 border-b border-blue-400 outline-none bg-transparent"
+                            className="w-full text-sm font-medium text-slate-800 border-b border-brand-400 outline-none bg-transparent"
                           />
                           <input
                             value={editUrl}
@@ -491,7 +491,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                           href={item.url ?? '#'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                          className="text-sm font-medium text-slate-800 hover:text-brand-600 truncate block"
                         >
                           {item.title}
                         </a>
@@ -530,7 +530,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                             href={item.url ?? '#'}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1 text-slate-400 hover:text-blue-500 rounded"
+                            className="p-1 text-slate-400 hover:text-brand-500 rounded"
                             title="Open"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />

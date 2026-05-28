@@ -35,7 +35,7 @@ interface TeamMember {
 
 const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon: typeof Shield }> = {
   admin: { label: 'Admin', color: 'text-purple-700', bg: 'bg-purple-100', icon: ShieldCheck },
-  editor: { label: 'Editor', color: 'text-blue-700', bg: 'bg-blue-100', icon: Shield },
+  editor: { label: 'Editor', color: 'text-brand-700', bg: 'bg-brand-100', icon: Shield },
   viewer: { label: 'Viewer', color: 'text-slate-600', bg: 'bg-slate-100', icon: Eye },
 };
 
@@ -153,7 +153,7 @@ export function TeamTab() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -176,7 +176,7 @@ export function TeamTab() {
             </button>
             <button
               onClick={() => setShowInviteModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
               Invite Member
@@ -251,7 +251,7 @@ export function TeamTab() {
               return (
                 <tr
                   key={member.user_id}
-                  className={`${isCurrentUser ? 'bg-blue-50/50' : 'hover:bg-slate-50'} transition-colors`}
+                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-slate-50'} transition-colors`}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ export function TeamTab() {
                         <p className="text-sm font-medium text-slate-900">
                           {member.profile.full_name || 'Unnamed'}
                           {isCurrentUser && (
-                            <span className="ml-2 text-xs text-blue-600 font-normal">(you)</span>
+                            <span className="ml-2 text-xs text-brand-600 font-normal">(you)</span>
                           )}
                         </p>
                         <p className="text-xs text-slate-500">{member.profile.email}</p>
@@ -401,14 +401,14 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
                   if (role !== currentRole) onChange(role);
                 }}
                 className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
-                  role === currentRole ? 'bg-blue-50' : ''
+                  role === currentRole ? 'bg-brand-50' : ''
                 }`}
               >
                 <config.icon className="w-3.5 h-3.5 text-slate-500" />
-                <span className={role === currentRole ? 'text-blue-900 font-medium' : 'text-slate-700'}>
+                <span className={role === currentRole ? 'text-brand-900 font-medium' : 'text-slate-700'}>
                   {config.label}
                 </span>
-                {role === currentRole && <Check className="w-4 h-4 ml-auto text-blue-600" />}
+                {role === currentRole && <Check className="w-4 h-4 ml-auto text-brand-600" />}
               </button>
             ))}
           </div>
@@ -692,7 +692,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
               placeholder="colleague@company.com"
               autoFocus
             />
@@ -703,7 +703,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as Role)}
-              className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="editor">Editor — can create, edit, and manage content</option>
               <option value="admin">Admin — full access including settings</option>
@@ -736,7 +736,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
           <button
             onClick={handleInvite}
             disabled={sending || !email.trim()}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors disabled:opacity-50"
           >
             {sending && <Loader2 className="w-4 h-4 animate-spin" />}
             {sending ? 'Sending...' : 'Send Invite'}

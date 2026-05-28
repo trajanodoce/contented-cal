@@ -110,7 +110,7 @@ function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between min-h-[42px]"
+        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 flex items-center justify-between min-h-[42px]"
       >
         <div className="flex items-center gap-2">
           {selectedOption?.color && (
@@ -137,7 +137,7 @@ function CustomSelect({
                 setIsOpen(false);
               }}
               className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-2 ${
-                option.value === value ? 'bg-blue-50 text-blue-900' : 'text-slate-700'
+                option.value === value ? 'bg-brand-50 text-brand-900' : 'text-slate-700'
               }`}
             >
               {option.color && (
@@ -194,7 +194,7 @@ function AssigneeMultiSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center justify-between min-h-[42px]"
+        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 flex items-center justify-between min-h-[42px]"
       >
         <div className="flex items-center gap-2 flex-wrap">
           {selectedMembers.length === 0 ? (
@@ -236,12 +236,12 @@ function AssigneeMultiSelect({
                   type="button"
                   onClick={() => toggleMember(member.id)}
                   className={`w-full px-3 py-2 text-left text-sm hover:bg-slate-50 flex items-center gap-3 ${
-                    isSelected ? 'bg-blue-50' : ''
+                    isSelected ? 'bg-brand-50' : ''
                   }`}
                 >
                   <div
                     className={`w-5 h-5 rounded border flex items-center justify-center ${
-                      isSelected ? 'bg-blue-600 border-blue-600' : 'border-slate-300'
+                      isSelected ? 'bg-brand-600 border-brand-600' : 'border-slate-300'
                     }`}
                   >
                     {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -257,7 +257,7 @@ function AssigneeMultiSelect({
                       <User className="w-3 h-3 text-slate-500" />
                     </div>
                   )}
-                  <span className={isSelected ? 'text-blue-900' : 'text-slate-700'}>
+                  <span className={isSelected ? 'text-brand-900' : 'text-slate-700'}>
                     {member.full_name || member.email}
                   </span>
                 </button>
@@ -494,7 +494,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter content title..."
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               autoFocus
               required
             />
@@ -561,7 +561,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                   />
                   <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
@@ -587,7 +587,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
               <select
                 value={channel}
                 onChange={(e) => setChannel(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white"
               >
                 <option value="">Select a channel...</option>
                 {['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Media/External', 'Other'].map(c => (
@@ -606,7 +606,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add any additional details..."
                 rows={4}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-none"
               />
             </div>
           )}
@@ -639,7 +639,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
             type="submit"
             onClick={handleSubmit}
             disabled={isSubmitting || !title.trim()}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSubmitting ? (
               <>

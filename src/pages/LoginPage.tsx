@@ -56,25 +56,25 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-surface-page flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <img src="/assets/logo.png" alt="ContentedCal" className="w-16 h-16 mx-auto mb-2 object-contain" />
-          <h1 className="text-2xl font-bold text-gray-900">ContentedCal</h1>
-          <p className="text-gray-500 text-sm mt-1">Organize your editorial workflow</p>
+          <img src="/assets/kitsune-logo-transparent.png" alt="ContentedCal" className="w-24 h-24 mx-auto mb-2 object-contain" />
+          <h1 className="text-2xl font-bold font-display text-slate-900">ContentedCal</h1>
+          <p className="text-slate-500 text-sm mt-1">Organize your editorial workflow</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="bg-surface-card rounded-2xl shadow-sm p-8" style={{ border: '1.5px solid #002339' }}>
           {/* Mode Toggle */}
-          <div className="flex rounded-lg bg-gray-50 p-1 mb-6">
+          <div className="flex rounded-lg bg-surface-nested p-1 mb-6">
             <button
               onClick={() => setMode('login')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
                 mode === 'login'
-                  ? 'bg-white shadow-sm text-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-surface-card shadow-sm text-slate-900'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               Sign in
@@ -83,8 +83,8 @@ export function LoginPage() {
               onClick={() => setMode('signup')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
                 mode === 'signup'
-                  ? 'bg-white shadow-sm text-gray-900'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'bg-surface-card shadow-sm text-slate-900'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               Sign up
@@ -96,7 +96,7 @@ export function LoginPage() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-60 transition-colors shadow-sm"
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 bg-surface-card border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-surface-nested hover:border-slate-400 disabled:opacity-60 transition-colors shadow-sm"
           >
             {googleLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -109,10 +109,10 @@ export function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-gray-400">or continue with email</span>
+              <span className="bg-surface-card px-3 text-slate-400">or continue with email</span>
             </div>
           </div>
 
@@ -120,16 +120,16 @@ export function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                <label className="block text-xs font-medium text-slate-700 mb-1.5">
                   Full name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
+                    className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                     placeholder="Jane Smith"
                     required
                   />
@@ -138,16 +138,16 @@ export function LoginPage() {
             )}
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                   placeholder="you@company.com"
                   required
                 />
@@ -155,16 +155,16 @@ export function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-9 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
+                  className="w-full pl-9 pr-10 py-2.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent"
                   placeholder="••••••••"
                   required
                   minLength={6}
@@ -172,7 +172,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />

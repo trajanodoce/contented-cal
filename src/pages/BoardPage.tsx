@@ -253,7 +253,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
     <div
       ref={setNodeRef}
       className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl border-2 transition-all ${
-        isOver ? 'border-blue-400' : 'border-slate-200'
+        isOver ? 'border-brand-400' : 'border-slate-200'
       }`}
       style={{ backgroundColor: isOver ? `${colColor}0C` : `${colColor}05` }}
     >
@@ -299,8 +299,8 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
           ))
         )}
         {isOver && (
-          <div className="h-24 border-2 border-dashed border-blue-300 rounded-lg bg-blue-50/50 flex items-center justify-center">
-            <p className="text-sm text-blue-500 font-medium">Drop here</p>
+          <div className="h-24 border-2 border-dashed border-brand-300 rounded-lg bg-brand-50/50 flex items-center justify-center">
+            <p className="text-sm text-brand-500 font-medium">Drop here</p>
           </div>
         )}
       </div>
@@ -466,7 +466,7 @@ export function BoardPage() {
   if (loading || contentItemsLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
+        <div className="animate-spin w-8 h-8 border-2 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
   }

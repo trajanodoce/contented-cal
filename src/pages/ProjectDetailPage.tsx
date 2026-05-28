@@ -272,10 +272,10 @@ export function ProjectDetailPage() {
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
       active: 'bg-green-100 text-green-700',
-      completed: 'bg-blue-100 text-blue-700',
-      archived: 'bg-gray-100 text-gray-500',
+      completed: 'bg-brand-100 text-brand-700',
+      archived: 'bg-slate-100 text-slate-500',
     };
-    return map[status] ?? 'bg-gray-100 text-gray-500';
+    return map[status] ?? 'bg-slate-100 text-slate-500';
   };
 
   if (loading) {
@@ -346,12 +346,12 @@ export function ProjectDetailPage() {
                 }
               }}
               onBlur={saveTitle}
-              className="text-xl font-semibold text-slate-900 border-b-2 border-blue-500 outline-none bg-transparent flex-1"
+              className="text-xl font-semibold text-slate-900 border-b-2 border-brand-500 outline-none bg-transparent flex-1"
             />
           ) : (
             <h1
               onClick={() => setEditingTitle(true)}
-              className="text-xl font-semibold text-slate-900 cursor-pointer hover:text-blue-600 transition-colors"
+              className="text-xl font-semibold text-slate-900 cursor-pointer hover:text-brand-600 transition-colors"
             >
               {project.title}
             </h1>
@@ -367,7 +367,7 @@ export function ProjectDetailPage() {
                 const url = `${window.location.origin}/projects/${projectId}`;
                 navigator.clipboard.writeText(url).then(() => toast.success('Project link copied'));
               }}
-              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+              className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-colors"
               title="Copy project link"
             >
               <Link2 className="w-4 h-4" />
@@ -383,13 +383,13 @@ export function ProjectDetailPage() {
               value={descDraft}
               onChange={(e) => setDescDraft(e.target.value)}
               rows={2}
-              className="w-full text-sm text-slate-600 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full text-sm text-slate-600 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
               placeholder="Project description..."
             />
             <div className="flex gap-2 mt-1">
               <button
                 onClick={saveDesc}
-                className="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-500"
+                className="px-3 py-1 text-xs font-medium bg-brand-600 text-white rounded-lg hover:bg-brand-500"
               >
                 Save
               </button>
@@ -423,7 +423,7 @@ export function ProjectDetailPage() {
               onChange={(e) =>
                 updateProject({ owner_id: e.target.value || null })
               }
-              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (
@@ -445,7 +445,7 @@ export function ProjectDetailPage() {
               onChange={(e) =>
                 updateProject({ start_date: e.target.value || null })
               }
-              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -458,7 +458,7 @@ export function ProjectDetailPage() {
               onChange={(e) =>
                 updateProject({ end_date: e.target.value || null })
               }
-              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -470,7 +470,7 @@ export function ProjectDetailPage() {
             <select
               value={project.status}
               onChange={(e) => updateProject({ status: e.target.value as 'active' | 'completed' | 'archived' })}
-              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="active">Active</option>
               <option value="completed">Completed</option>
@@ -487,7 +487,7 @@ export function ProjectDetailPage() {
               onClick={() => setActiveTab(t.id)}
               className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium border-b-2 transition-colors mr-1 ${
                 activeTab === t.id
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-brand-500 text-brand-600'
                   : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
@@ -712,7 +712,7 @@ function OverviewTab({
           value={overdueCount}
         />
         <StatCard
-          icon={<Users className="w-4 h-4 text-blue-500" />}
+          icon={<Users className="w-4 h-4 text-brand-500" />}
           label="Team members"
           value={uniqueAssignees.length}
         />
@@ -827,7 +827,7 @@ function TeamMembersSection({
         <div className="relative" ref={pickerRef}>
           <button
             onClick={() => setShowPicker(v => !v)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
             title="Add team member"
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -1185,7 +1185,7 @@ function ProjectBoardColumn({
     <div
       ref={setNodeRef}
       className={`w-72 flex-shrink-0 rounded-xl border-2 transition-all ${
-        isOver ? 'border-blue-400' : 'border-slate-200'
+        isOver ? 'border-brand-400' : 'border-slate-200'
       }`}
       style={{ backgroundColor: isOver ? `${colColor}0C` : `${colColor}05` }}
     >
@@ -1226,8 +1226,8 @@ function ProjectBoardColumn({
           </p>
         )}
         {isOver && (
-          <div className="h-16 border-2 border-dashed border-blue-300 rounded-lg bg-blue-50/50 flex items-center justify-center">
-            <p className="text-xs text-blue-500 font-medium">Drop here</p>
+          <div className="h-16 border-2 border-dashed border-brand-300 rounded-lg bg-brand-50/50 flex items-center justify-center">
+            <p className="text-xs text-brand-500 font-medium">Drop here</p>
           </div>
         )}
       </div>
@@ -1461,7 +1461,7 @@ function ProjectMonthGrid({
                 <div className="flex flex-col items-center gap-0.5">
                   <span
                     className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
-                      today ? 'bg-blue-600 text-white' : ''
+                      today ? 'bg-brand-600 text-white' : ''
                     }`}
                     style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
                   >
@@ -1478,7 +1478,7 @@ function ProjectMonthGrid({
                   <div className="flex justify-between items-center mb-1">
                     <span
                       className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                        today ? 'bg-blue-600 text-white' : ''
+                        today ? 'bg-brand-600 text-white' : ''
                       }`}
                       style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
                     >
@@ -1513,7 +1513,7 @@ function ProjectMonthGrid({
                     })}
                     {dayItems.length > 3 && (
                       <button
-                        className="text-xs text-slate-500 hover:text-blue-600 px-1 py-0.5"
+                        className="text-xs text-slate-500 hover:text-brand-600 px-1 py-0.5"
                         onClick={(e) => {
                           e.stopPropagation();
                         }}
@@ -1578,7 +1578,7 @@ function CalendarTab({
             className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
               weekendsCollapsed
                 ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
-                : 'border-blue-200 bg-blue-50 text-blue-700'
+                : 'border-brand-200 bg-brand-50 text-brand-700'
             }`}
           >
             {weekendsCollapsed ? 'Show Weekends' : 'Hide Weekends'}

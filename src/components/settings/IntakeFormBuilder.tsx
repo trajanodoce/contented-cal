@@ -36,29 +36,29 @@ function FieldRow({ field, onDelete, onToggleRequired, onDragStart, onDragOver, 
       onDragOver={e => onDragOver(e, field.id)}
       onDrop={onDrop}
       className={`flex items-center gap-3 p-3 bg-white rounded-lg border transition-colors group
-        ${isDragOver ? 'border-brand-300 bg-mint' : 'border-gray-200'}`}
+        ${isDragOver ? 'border-brand-300 bg-mint' : 'border-slate-200'}`}
     >
-      <div className="cursor-grab text-gray-300 hover:text-gray-500 shrink-0">
+      <div className="cursor-grab text-slate-300 hover:text-slate-500 shrink-0">
         <GripVertical className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-800 truncate">{field.label}</span>
+          <span className="text-sm font-medium text-slate-800 truncate">{field.label}</span>
           {field.required && (
             <span className="text-xs text-red-500 bg-red-50 px-1.5 py-0.5 rounded shrink-0">Required</span>
           )}
         </div>
-        <span className="text-xs text-gray-400 capitalize">{field.field_type.replace('_', ' ')} · {field.field_key}</span>
+        <span className="text-xs text-slate-400 capitalize">{field.field_type.replace('_', ' ')} · {field.field_key}</span>
       </div>
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onToggleRequired}
-          className="text-xs px-2 py-1 rounded border transition-colors text-gray-500 border-gray-200 hover:bg-gray-50"
+          className="text-xs px-2 py-1 rounded border transition-colors text-slate-500 border-slate-200 hover:bg-slate-50"
           title={field.required ? 'Make optional' : 'Make required'}
         >
           {field.required ? 'Required' : 'Optional'}
         </button>
-        <button onClick={onDelete} className="p-1.5 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -203,14 +203,14 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
 
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">{form.name}</h2>
-          <p className="text-sm text-gray-400 mt-0.5">Form builder</p>
+          <h2 className="text-xl font-semibold text-slate-900">{form.name}</h2>
+          <p className="text-sm text-slate-400 mt-0.5">Form builder</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setPreviewMode(!previewMode)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors
-              ${previewMode ? 'bg-gray-800 text-white border-gray-800' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+              ${previewMode ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
           >
             {previewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             {previewMode ? 'Edit' : 'Preview'}
@@ -225,12 +225,12 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           {/* Left: fields */}
           <div className="col-span-2 space-y-4">
             {/* Field list */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Form fields</h3>
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <h3 className="text-sm font-semibold text-slate-700 mb-3">Form fields</h3>
               {loading ? (
-                <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
+                <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-slate-400" /></div>
               ) : sortedFields.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">No fields yet. Add from the panel →</p>
+                <p className="text-sm text-slate-400 text-center py-4">No fields yet. Add from the panel →</p>
               ) : (
                 <div className="space-y-2">
                   {sortedFields.map(field => (
@@ -253,34 +253,34 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           {/* Right: settings + add fields */}
           <div className="space-y-4">
             {/* Form settings */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-              <h3 className="text-sm font-semibold text-gray-700">Settings</h3>
+            <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-slate-700">Settings</h3>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Form name</label>
+                <label className="block text-xs text-slate-500 mb-1">Form name</label>
                 <input
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-2.5 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Description</label>
+                <label className="block text-xs text-slate-500 mb-1">Description</label>
                 <textarea
                   value={description ?? ''}
                   onChange={e => setDescription(e.target.value)}
                   rows={2}
-                  className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+                  className="w-full px-2.5 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-medium text-gray-700">Public access</p>
-                  <p className="text-xs text-gray-400">Anyone with the link can submit</p>
+                  <p className="text-xs font-medium text-slate-700">Public access</p>
+                  <p className="text-xs text-slate-400">Anyone with the link can submit</p>
                 </div>
                 <button onClick={() => setIsPublic(!isPublic)}>
                   {isPublic
                     ? <ToggleRight className="w-8 h-8 text-brand-500" />
-                    : <ToggleLeft className="w-8 h-8 text-gray-400" />}
+                    : <ToggleLeft className="w-8 h-8 text-slate-400" />}
                 </button>
               </div>
               <button onClick={saveSettings} disabled={saving} className="w-full py-1.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-60 flex items-center justify-center gap-1.5">
@@ -307,8 +307,8 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
             )}
 
             {/* Add standard fields */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Standard fields</h3>
+            <div className="bg-white rounded-xl border border-slate-200 p-4">
+              <h3 className="text-sm font-semibold text-slate-700 mb-3">Standard fields</h3>
               <div className="space-y-1">
                 {STANDARD_FIELDS.map(f => {
                   const added = existingKeys.has(f.key);
@@ -318,13 +318,13 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
                       onClick={() => !added && addField(f.key, f.label, f.type, (f as any).options)}
                       disabled={added}
                       className={`w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-lg transition-colors
-                        ${added ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-50 cursor-pointer'}`}
+                        ${added ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-slate-50 cursor-pointer'}`}
                     >
                       <span>{f.label}</span>
                       {added ? (
                         <Check className="w-3.5 h-3.5 text-green-500" />
                       ) : (
-                        <Plus className="w-3.5 h-3.5 text-gray-400" />
+                        <Plus className="w-3.5 h-3.5 text-slate-400" />
                       )}
                     </button>
                   );
@@ -340,31 +340,31 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
 
 function FormPreview({ form, fields }: { form: IntakeForm; fields: IntakeFormField[] }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 max-w-lg mx-auto p-8">
+    <div className="bg-white rounded-xl border border-slate-200 max-w-lg mx-auto p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{form.name}</h1>
-        {form.description && <p className="text-gray-500 mt-1 text-sm">{form.description}</p>}
+        <h1 className="text-2xl font-bold text-slate-900">{form.name}</h1>
+        {form.description && <p className="text-slate-500 mt-1 text-sm">{form.description}</p>}
       </div>
       <div className="space-y-4">
         {fields.map(field => (
           <div key={field.id}>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
               {field.label}
               {field.required && <span className="text-red-500 ml-0.5">*</span>}
             </label>
             {field.field_type === 'long_text' ? (
-              <textarea rows={3} className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none" placeholder={field.label} disabled />
+              <textarea rows={3} className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg resize-none" placeholder={field.label} disabled />
             ) : field.field_type === 'date' ? (
-              <input type="date" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" disabled />
+              <input type="date" className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg" disabled />
             ) : field.field_type === 'single_select' ? (
-              <select className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white" disabled>
+              <select className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white" disabled>
                 <option value="">Select...</option>
                 {((field.options as { value: string; label: string }[]) ?? []).map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             ) : (
-              <input type="text" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg" placeholder={field.label} disabled />
+              <input type="text" className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg" placeholder={field.label} disabled />
             )}
           </div>
         ))}
@@ -429,7 +429,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-xl font-semibold text-gray-900">Intake Forms</h2>
+        <h2 className="text-xl font-semibold text-slate-900">Intake Forms</h2>
         {isAdmin && (
           <button
             onClick={() => setAddingForm(true)}
@@ -439,23 +439,23 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
           </button>
         )}
       </div>
-      <p className="text-sm text-gray-500 mb-6">Create shareable forms to collect content requests from external contributors.</p>
+      <p className="text-sm text-slate-500 mb-6">Create shareable forms to collect content requests from external contributors.</p>
 
       {addingForm && (
         <div className="bg-mint border border-brand-100 rounded-xl p-4 mb-4 space-y-3">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Form name</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Form name</label>
             <input
               autoFocus
               value={newFormName}
               onChange={e => setNewFormName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && createForm()}
               placeholder="e.g. Blog post request"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Content type (optional)</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Content type (optional)</label>
             <select
               value={newFormTypeId}
               onChange={e => setNewFormTypeId(e.target.value)}
@@ -469,30 +469,30 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
             <button onClick={createForm} disabled={!newFormName.trim() || creating} className="px-4 py-1.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-60 flex items-center gap-1.5">
               {creating && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Create
             </button>
-            <button onClick={() => setAddingForm(false)} className="px-3 py-1.5 text-gray-600 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">Cancel</button>
+            <button onClick={() => setAddingForm(false)} className="px-3 py-1.5 text-slate-600 text-sm border border-slate-200 rounded-lg hover:bg-slate-50">Cancel</button>
           </div>
         </div>
       )}
 
       {intakeForms.length === 0 && !addingForm ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">
+        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-400">
           <p className="text-sm">No intake forms yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+        <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
           {intakeForms.map(form => {
             const ct = contentTypes.find(c => c.id === form.content_type_id);
             return (
               <div key={form.id} className="flex items-center gap-4 px-4 py-3 group">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-800">{form.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${form.is_public ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className="text-sm font-medium text-slate-800">{form.name}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${form.is_public ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
                       {form.is_public ? 'Public' : 'Private'}
                     </span>
                   </div>
                   {ct && (
-                    <span className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                    <span className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                       <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ct.color ?? undefined }} />
                       {ct.name}
                     </span>
@@ -501,12 +501,12 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setEditingForm(form)}
-                    className="px-3 py-1 text-xs text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    className="px-3 py-1 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
                   >
                     Edit
                   </button>
                   {isAdmin && (
-                    <button onClick={() => deleteForm(form.id)} className="p-1.5 text-gray-400 hover:text-red-500">
+                    <button onClick={() => deleteForm(form.id)} className="p-1.5 text-slate-400 hover:text-red-500">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
