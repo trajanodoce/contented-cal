@@ -321,7 +321,7 @@ export function ProjectDetailPage() {
   return (
     <div className="h-full flex flex-col overflow-hidden bg-slate-50">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4 shrink-0">
+      <div className="bg-surface-card border-b border-slate-200 px-6 py-4 shrink-0">
         <button
           onClick={() => navigate('/projects')}
           className="flex items-center gap-1.5 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity mb-3"
@@ -556,7 +556,7 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors"
@@ -648,7 +648,7 @@ function OverviewTab({
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* Progress bar by board column */}
-      <div className="bg-white rounded-lg border border-slate-200 p-5">
+      <div className="bg-surface-card rounded-lg p-5" style={{ border: '1px solid #00233930' }}>
         <h3 className="text-sm font-semibold text-slate-700 mb-4">Progress</h3>
         {totalItems > 0 ? (
           <>
@@ -819,7 +819,7 @@ function TeamMembersSection({
   const isTaskAssignee = (userId: string) => taskAssigneeIds.includes(userId);
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-5">
+    <div className="bg-surface-card rounded-lg p-5" style={{ border: '1px solid #00233930' }}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-slate-700">
           Team Members
@@ -834,7 +834,7 @@ function TeamMembersSection({
             Add
           </button>
           {showPicker && (
-            <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50 max-h-64 overflow-y-auto">
+            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-lg shadow-lg border border-slate-200 py-1 z-50 max-h-64 overflow-y-auto">
               {availableToAdd.length === 0 ? (
                 <p className="text-xs text-slate-400 text-center py-3">All workspace members are on this project</p>
               ) : (
@@ -898,7 +898,7 @@ function StatCard({
   value: number;
 }) {
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-4">
+    <div className="bg-surface-card rounded-lg p-4" style={{ border: '1px solid #00233930' }}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
         <span className="text-xs text-slate-500">{label}</span>
@@ -960,7 +960,7 @@ function ListTab({
           No content items match the current filters.
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+        <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
           <table className="w-full">
             <thead className="bg-slate-100 border-b-2 border-slate-300">
               <tr>
@@ -1131,7 +1131,7 @@ function ProjectBoardCard({
       } ${!cardBg ? 'bg-slate-50' : ''}`}
       style={{
         ...style,
-        borderColor: '#002339',
+        borderColor: '#00233930',
         ...(cardBg ? { backgroundColor: cardBg } : {}),
       }}
     >
@@ -1378,7 +1378,7 @@ function BoardTab({
 // Grid columns for Sun-start layout: indices 0 (Sun) and 6 (Sat) are weekends
 // Use minmax(0, 1fr) to prevent content from inflating column width
 const PROJECT_GRID_EXPANDED = 'repeat(7, minmax(0, 1fr))';
-const PROJECT_GRID_COLLAPSED = '40px minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 40px';
+const PROJECT_GRID_COLLAPSED = 'repeat(5, minmax(0, 1fr))';
 
 // Single-month grid used by the stacked CalendarTab view
 function ProjectMonthGrid({
@@ -1414,116 +1414,93 @@ function ProjectMonthGrid({
     return map;
   }, [items]);
 
+  const allWeekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekDays = weekendsCollapsed
+    ? allWeekDays.filter((_, i) => i !== 0 && i !== 6)
+    : allWeekDays;
+  const visibleDays = weekendsCollapsed
+    ? days.filter((_, i) => i % 7 !== 0 && i % 7 !== 6)
+    : days;
+  const numCols = weekendsCollapsed ? 5 : 7;
   const gridCols = weekendsCollapsed ? PROJECT_GRID_COLLAPSED : PROJECT_GRID_EXPANDED;
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
     <>
       {/* Weekday headers */}
       <div className="grid" style={{ backgroundColor: '#115e59', gridTemplateColumns: gridCols }}>
-        {weekDays.map((d, i) => {
-          const isWeekend = i === 0 || i === 6;
-          const collapsed = isWeekend && weekendsCollapsed;
-          return (
-            <div
-              key={d}
-              className={`px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide ${
-                collapsed ? 'cursor-pointer hover:bg-teal-700 transition-colors' : ''
-              }`}
-              onClick={collapsed ? onToggleWeekends : undefined}
-              title={collapsed ? 'Click to expand weekends' : undefined}
-            >
-              {collapsed ? d.charAt(0) : d}
-            </div>
-          );
-        })}
+        {weekDays.map((d) => (
+          <div
+            key={d}
+            className="px-2 py-2 text-center text-xs font-semibold text-white uppercase tracking-wide"
+          >
+            {d}
+          </div>
+        ))}
       </div>
 
       {/* Day cells */}
       <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(120px, auto)' }}>
-        {days.map((day, index) => {
+        {visibleDays.map((day, index) => {
           const dateKey = format(day, 'yyyy-MM-dd');
           const dayItems = itemsByDate.get(dateKey) ?? [];
           const inMonth = isSameMonth(day, monthDate);
           const today = isToday(day);
-          const isWeekend = index % 7 === 0 || index % 7 === 6;
-          const collapsed = isWeekend && weekendsCollapsed;
+          const isLastCol = (index + 1) % numCols === 0;
 
           return (
             <div
               key={dateKey}
-              className={`${collapsed ? 'min-h-[120px] p-1' : 'min-h-[120px] p-2'} border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
-                !inMonth ? 'bg-slate-50/50' : collapsed ? 'bg-slate-50/80' : 'bg-white'
-              } ${collapsed ? 'cursor-pointer' : ''} ${index % 7 === 6 ? 'border-r-0' : ''}`}
-              onClick={collapsed ? onToggleWeekends : undefined}
+              className={`min-h-[120px] p-2 border-b-[1.5px] border-r-[1.5px] border-slate-300 ${
+                !inMonth ? 'bg-slate-50/50' : 'bg-surface-card'
+              } ${isLastCol ? 'border-r-0' : ''}`}
             >
-              {collapsed ? (
-                <div className="flex flex-col items-center gap-0.5">
-                  <span
-                    className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${
-                      today ? 'bg-brand-600 text-white' : ''
-                    }`}
-                    style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
-                  >
-                    {format(day, 'd')}
-                  </span>
-                  {dayItems.length > 0 && (
-                    <span className="text-[10px] text-slate-500 font-medium bg-slate-200 rounded-full w-4 h-4 flex items-center justify-center">
-                      {dayItems.length}
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="flex justify-between items-center mb-1">
-                    <span
-                      className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
-                        today ? 'bg-brand-600 text-white' : ''
-                      }`}
-                      style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
+              <div className="flex justify-between items-center mb-1">
+                <span
+                  className={`text-sm font-medium w-7 h-7 flex items-center justify-center rounded-full ${
+                    today ? 'bg-brand-600 text-white' : ''
+                  }`}
+                  style={!today ? { color: inMonth ? '#0B4463' : '#94a3b8' } : undefined}
+                >
+                  {format(day, 'd')}
+                </span>
+                {dayItems.length > 0 && (
+                  <span className="text-xs text-slate-400">{dayItems.length}</span>
+                )}
+              </div>
+              <div className="space-y-1 min-w-0 overflow-hidden">
+                {dayItems.slice(0, 3).map((item) => {
+                  const ct = contentTypes.find(
+                    (c) => c.id === item.content_type_id
+                  );
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => onItemClick(item.id)}
+                      className="text-xs px-1.5 py-0.5 rounded cursor-pointer truncate hover:opacity-80 transition-opacity"
+                      style={{
+                        backgroundColor: ct
+                          ? `${ct.color}15`
+                          : '#f1f5f9',
+                        borderLeft: `2px solid ${ct?.color ?? '#94a3b8'}`,
+                        color: ct?.color ?? '#475569',
+                      }}
+                      title={item.title}
                     >
-                      {format(day, 'd')}
-                    </span>
-                    {dayItems.length > 0 && (
-                      <span className="text-xs text-slate-400">{dayItems.length}</span>
-                    )}
-                  </div>
-                  <div className="space-y-1 min-w-0 overflow-hidden">
-                    {dayItems.slice(0, 3).map((item) => {
-                      const ct = contentTypes.find(
-                        (c) => c.id === item.content_type_id
-                      );
-                      return (
-                        <div
-                          key={item.id}
-                          onClick={() => onItemClick(item.id)}
-                          className="text-xs px-1.5 py-0.5 rounded cursor-pointer truncate hover:opacity-80 transition-opacity"
-                          style={{
-                            backgroundColor: ct
-                              ? `${ct.color}15`
-                              : '#f1f5f9',
-                            borderLeft: `2px solid ${ct?.color ?? '#94a3b8'}`,
-                            color: ct?.color ?? '#475569',
-                          }}
-                          title={item.title}
-                        >
-                          {item.title}
-                        </div>
-                      );
-                    })}
-                    {dayItems.length > 3 && (
-                      <button
-                        className="text-xs text-slate-500 hover:text-brand-600 px-1 py-0.5"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        +{dayItems.length - 3} more
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
+                      {item.title}
+                    </div>
+                  );
+                })}
+                {dayItems.length > 3 && (
+                  <button
+                    className="text-xs text-slate-500 hover:text-brand-600 px-1 py-0.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    +{dayItems.length - 3} more
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
@@ -1609,7 +1586,7 @@ function CalendarTab({
         {months.map((monthDate, idx) => (
           <div
             key={monthDate.toISOString()}
-            className="bg-white rounded-lg border border-slate-200 overflow-hidden"
+            className="bg-surface-card rounded-lg border border-slate-200 overflow-hidden"
             style={{ marginTop: idx > 0 ? '-1px' : 0 }}
           >
             {/* Month header bar */}
@@ -1639,7 +1616,7 @@ function CalendarTab({
         <div className="flex justify-center pt-4">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
           >
             {expanded ? (
               <>
