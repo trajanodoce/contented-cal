@@ -319,9 +319,9 @@ export function ProjectDetailPage() {
   ];
 
   return (
-    <div className="h-full flex flex-col overflow-hidden bg-slate-50">
+    <div className="h-full flex flex-col overflow-hidden bg-surface-page">
       {/* Header */}
-      <div className="bg-surface-card border-b border-slate-200 px-6 py-4 shrink-0">
+      <div className="bg-surface-card px-6 py-4 shrink-0" style={{ borderBottom: '1px solid #00233930' }}>
         <button
           onClick={() => navigate('/projects')}
           className="flex items-center gap-1.5 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity mb-3"
@@ -1126,9 +1126,9 @@ function ProjectBoardCard({
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`rounded-lg border p-3 shadow-md cursor-grab active:cursor-grabbing hover:shadow-lg transition-all ${
+      className={`rounded-xl border p-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
         isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
-      } ${!cardBg ? 'bg-slate-50' : ''}`}
+      } ${!cardBg ? 'bg-surface-card' : ''}`}
       style={{
         ...style,
         borderColor: '#00233930',
@@ -1184,10 +1184,11 @@ function ProjectBoardColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`w-72 flex-shrink-0 rounded-xl border-2 transition-all ${
-        isOver ? 'border-brand-400' : 'border-slate-200'
-      }`}
-      style={{ backgroundColor: isOver ? `${colColor}0C` : `${colColor}05` }}
+      className={`w-72 flex-shrink-0 rounded-xl transition-all`}
+      style={{
+        backgroundColor: isOver ? `${colColor}0C` : `${colColor}05`,
+        border: isOver ? `2px solid ${colColor}` : '1px solid #00233930',
+      }}
     >
       {/* Column header */}
       <div
@@ -1198,7 +1199,7 @@ function ProjectBoardColumn({
           backgroundColor: `${colColor}15`,
         }}
       >
-        <span className="text-sm font-semibold text-slate-900">
+        <span className="text-sm font-heading text-slate-900">
           {column.name}
         </span>
         <span
