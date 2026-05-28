@@ -174,6 +174,7 @@ export type Database = {
       }
       content_items: {
         Row: {
+          archived: boolean
           assignee_ids: string[] | null
           channel: string | null
           completed: boolean
@@ -196,6 +197,7 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          archived?: boolean
           assignee_ids?: string[] | null
           channel?: string | null
           completed?: boolean
@@ -218,6 +220,7 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          archived?: boolean
           assignee_ids?: string[] | null
           channel?: string | null
           completed?: boolean
