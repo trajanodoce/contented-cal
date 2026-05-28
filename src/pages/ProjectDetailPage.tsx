@@ -69,6 +69,7 @@ import {
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { ContentLibrary } from '../components/projects/ContentLibrary';
+import DatePicker from '../components/ui/DatePicker';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
 
@@ -439,27 +440,25 @@ export function ProjectDetailPage() {
           {/* Start Date */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">Start</span>
-            <input
-              type="date"
-              value={project.start_date ?? ''}
-              onChange={(e) =>
-                updateProject({ start_date: e.target.value || null })
-              }
-              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
+            <div className="w-44">
+              <DatePicker
+                value={project.start_date ?? ''}
+                onChange={(v) => updateProject({ start_date: v || null })}
+                placeholder="Set start"
+              />
+            </div>
           </div>
 
           {/* End Date */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">End</span>
-            <input
-              type="date"
-              value={project.end_date ?? ''}
-              onChange={(e) =>
-                updateProject({ end_date: e.target.value || null })
-              }
-              className="text-sm border border-slate-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
+            <div className="w-44">
+              <DatePicker
+                value={project.end_date ?? ''}
+                onChange={(v) => updateProject({ end_date: v || null })}
+                placeholder="Set end"
+              />
+            </div>
           </div>
 
           <div className="h-5 w-px bg-slate-200" />

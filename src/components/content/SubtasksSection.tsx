@@ -4,6 +4,7 @@ import { GripVertical, Check, Plus, X, Calendar, User } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
 import type { Subtask, Profile } from '../../lib/database.types';
+import { DatePickerPanel, datePickerPopoverClass, datePickerPopoverStyle } from '../ui/DatePicker';
 
 interface SubtasksSectionProps {
   contentItemId: string;
@@ -453,7 +454,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       const btn = dueDateBtnRefs.current[subtask.id];
                       if (btn) {
                         const rect = btn.getBoundingClientRect();
-                        setDueDatePos({ top: rect.bottom + window.scrollY + 4, left: rect.right + window.scrollX - 160 });
+                        setDueDatePos({ top: rect.bottom + 6, left: rect.right - 280 });
                       }
                     }
                   }}
@@ -469,24 +470,14 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                 {dueDateEditId === subtask.id && createPortal(
                   <div
                     ref={dueDateRef}
-                    className="fixed bg-surface-card border border-slate-200 rounded-lg shadow-lg p-2 flex flex-col gap-1"
-                    style={{ top: dueDatePos.top, left: dueDatePos.left, zIndex: 9999 }}
+                    className={datePickerPopoverClass}
+                    style={{ ...datePickerPopoverStyle, top: dueDatePos.top, left: dueDatePos.left }}
                   >
-                    <input
-                      type="date"
+                    <DatePickerPanel
                       value={subtask.due_date ?? ''}
-                      onChange={e => updateDueDate(subtask.id, e.target.value || null)}
-                      autoFocus
-                      className="text-xs border border-slate-300 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                      onChange={v => updateDueDate(subtask.id, v || null)}
+                      onClose={() => setDueDateEditId(null)}
                     />
-                    {subtask.due_date && (
-                      <button
-                        onClick={() => updateDueDate(subtask.id, null)}
-                        className="text-xs text-red-500 hover:text-red-600 transition-colors"
-                      >
-                        Clear
-                      </button>
-                    )}
                   </div>,
                   document.body
                 )}

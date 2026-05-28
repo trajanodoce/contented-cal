@@ -1,4 +1,5 @@
 import type { CustomFieldDefinition, SelectOption, Profile } from '../../lib/database.types';
+import DatePicker from '../ui/DatePicker';
 
 interface Props {
   fields: CustomFieldDefinition[];
@@ -78,11 +79,9 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
 
     case 'date':
       return (
-        <input
-          type="date"
+        <DatePicker
           value={(value as string) ?? ''}
-          onChange={e => onChange(e.target.value || null)}
-          className={cls}
+          onChange={v => onChange(v || null)}
         />
       );
 
