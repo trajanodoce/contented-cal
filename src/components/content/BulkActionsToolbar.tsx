@@ -90,8 +90,17 @@ export function BulkActionsToolbar({
       const { data: { user } } = await supabase.auth.getUser();
       const status = boardColumns.find((bc) => bc.id === statusId);
 
+      // Sync completed boolean when bulk-moving to/from done columns
+      const statusName = status?.name?.toLowerCase();
+      const isDone = statusName === 'published' || statusName === 'completed';
+      const payload: Record<string, unknown> = { status: statusId };
+      if (isDone) {
+        payload.completed = true;
+        payload.completed_at = new Date().toISOString();
+      }
+
       const updates = selectedIds.map(async (id) => {
-        await supabase.from('content_items').update({ status: statusId }).eq('id', id);
+        await supabase.from('content_items').update(payload).eq('id', id);
 
         await supabase.from('activity_log').insert({
           content_item_id: id,

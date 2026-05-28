@@ -235,9 +235,18 @@ export function ProjectDetailPage() {
     return sorted[sorted.length - 1].id;
   }, [boardColumns]);
 
+  const doneColumnIds = useMemo(() => {
+    const ids = new Set<string>();
+    boardColumns.forEach(c => {
+      const name = c.name.toLowerCase();
+      if (name === 'published' || name === 'completed') ids.add(c.id);
+    });
+    return ids;
+  }, [boardColumns]);
+
   const completedCount = useMemo(
-    () => items.filter((i) => i.status === lastColumnId).length,
-    [items, lastColumnId]
+    () => items.filter((i) => i.status != null && doneColumnIds.has(i.status)).length,
+    [items, doneColumnIds]
   );
 
   const overdueCount = useMemo(
@@ -1283,9 +1292,25 @@ function BoardTab({
     if (!item || !targetColumn) return;
     if (item.status === targetColumnId) return;
 
+    // Sync completed boolean when moving to/from done columns
+    const targetName = targetColumn.name.toLowerCase();
+    const isDoneColumn = targetName === 'published' || targetName === 'completed';
+    const updatePayload: Record<string, unknown> = { status: targetColumnId };
+    if (isDoneColumn) {
+      updatePayload.completed = true;
+      updatePayload.completed_at = new Date().toISOString();
+    } else {
+      const prevCol = boardColumns.find(c => c.id === item.status);
+      const prevName = prevCol?.name?.toLowerCase();
+      if (prevName === 'published' || prevName === 'completed') {
+        updatePayload.completed = false;
+        updatePayload.completed_at = null;
+      }
+    }
+
     const { error } = await supabase
       .from('content_items')
-      .update({ status: targetColumnId })
+      .update(updatePayload)
       .eq('id', itemId);
 
     if (error) {

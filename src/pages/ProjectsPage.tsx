@@ -379,12 +379,15 @@ export function ProjectsPage() {
             });
 
             // Weighted completeness: each item contributes based on its column position
-            // Backlog (pos 0) = 0%, Published (max pos) = 100%, everything in between scales linearly
+            // Backlog (pos 0) = 0%, Published or Completed = 100%, everything in between scales linearly
             const weightedPct = totalItems > 0 && maxPosition > 0
               ? Math.round(
                   items.reduce((sum, item) => {
                     const col = item.status ? columnMap.get(item.status) : null;
-                    return sum + (col ? col.position / maxPosition : 0);
+                    if (!col) return sum;
+                    const colName = col.name.toLowerCase();
+                    const isDone = colName === 'published' || colName === 'completed';
+                    return sum + (isDone ? 1 : col.position / maxPosition);
                   }, 0) / totalItems * 100
                 )
               : 0;

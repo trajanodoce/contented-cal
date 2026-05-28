@@ -406,9 +406,26 @@ export function BoardPage() {
     if (!item || !targetColumn) return;
     if (item.status === targetColumnId) return;
 
+    // Sync completed boolean when moving to/from done columns
+    const targetName = targetColumn.name.toLowerCase();
+    const isDoneColumn = targetName === 'published' || targetName === 'completed';
+    const updatePayload: Record<string, unknown> = { status: targetColumnId };
+    if (isDoneColumn) {
+      updatePayload.completed = true;
+      updatePayload.completed_at = new Date().toISOString();
+    } else {
+      // Moving out of a done column — mark incomplete
+      const prevCol = columns.find(c => c.id === item.status);
+      const prevName = prevCol?.name?.toLowerCase();
+      if (prevName === 'published' || prevName === 'completed') {
+        updatePayload.completed = false;
+        updatePayload.completed_at = null;
+      }
+    }
+
     const { error } = await supabase
       .from('content_items')
-      .update({ status: targetColumnId })
+      .update(updatePayload)
       .eq('id', itemId);
 
     if (error) {
@@ -425,7 +442,7 @@ export function BoardPage() {
     });
 
     toast.success(`Moved "${item.title}" to ${targetColumn.name}`);
-    patchContentItem(itemId, { status: targetColumnId });
+    patchContentItem(itemId, { status: targetColumnId, ...updatePayload });
   };
 
   const dropAnimation: DropAnimation = {

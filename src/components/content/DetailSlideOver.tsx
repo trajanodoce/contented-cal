@@ -176,9 +176,29 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   async function updateField(field: string, value: unknown) {
     setSavingField(field);
     try {
+      const payload: Record<string, unknown> = { [field]: value };
+
+      // Sync completed boolean when status changes to/from done columns
+      if (field === 'status' && value) {
+        const targetCol = boardColumns.find(c => c.id === value);
+        const targetName = targetCol?.name?.toLowerCase();
+        const isDone = targetName === 'published' || targetName === 'completed';
+        if (isDone) {
+          payload.completed = true;
+          payload.completed_at = new Date().toISOString();
+        } else {
+          const prevCol = boardColumns.find(c => c.id === item.status);
+          const prevName = prevCol?.name?.toLowerCase();
+          if (prevName === 'published' || prevName === 'completed') {
+            payload.completed = false;
+            payload.completed_at = null;
+          }
+        }
+      }
+
       const { error } = await supabase
         .from('content_items')
-        .update({ [field]: value } as Record<string, unknown>)
+        .update(payload)
         .eq('id', item.id);
       if (error) throw error;
 
