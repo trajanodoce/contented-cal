@@ -160,8 +160,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setContentItemsLoading(true);
     const { data } = await supabase
       .from('content_items')
-      .select('id, title, status, due_date, publish_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags, completed')
-      .eq('workspace_id', workspace.id).eq('archived', false).order('created_at', { ascending: false });
+      .select('id, title, status, due_date, publish_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags, completed, needs_triage')
+      .eq('workspace_id', workspace.id).eq('archived', false).eq('needs_triage', false).order('created_at', { ascending: false });
     if (data) setContentItems(data as ContentItem[]);
     setContentItemsLoading(false);
   }, [workspace]);
@@ -191,12 +191,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
           const row = payload.new as ContentItem;
-          if (row.archived) return;
+          if (row.archived || row.needs_triage) return;
           setContentItems((prev) => [row, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
           const row = payload.new as ContentItem;
           setContentItems((prev) => {
-            if (row.archived) return prev.filter((i) => i.id !== row.id);
+            if (row.archived || row.needs_triage) return prev.filter((i) => i.id !== row.id);
             const exists = prev.some((i) => i.id === row.id);
             return exists
               ? prev.map((i) => (i.id === row.id ? row : i))

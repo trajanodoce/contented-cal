@@ -187,6 +187,7 @@ export type Database = {
           due_date: string | null
           fts: unknown
           id: string
+          needs_triage: boolean
           priority: Database["public"]["Enums"]["priority_level"] | null
           project_id: string | null
           publish_date: string | null
@@ -210,6 +211,7 @@ export type Database = {
           due_date?: string | null
           fts?: unknown
           id?: string
+          needs_triage?: boolean
           priority?: Database["public"]["Enums"]["priority_level"] | null
           project_id?: string | null
           publish_date?: string | null
@@ -233,6 +235,7 @@ export type Database = {
           due_date?: string | null
           fts?: unknown
           id?: string
+          needs_triage?: boolean
           priority?: Database["public"]["Enums"]["priority_level"] | null
           project_id?: string | null
           publish_date?: string | null

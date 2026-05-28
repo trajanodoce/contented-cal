@@ -206,6 +206,7 @@ Deno.serve(async (req) => {
         title,
         description,
         status: defaultStatus,
+        needs_triage: true,
         tags: ["slack-request"],
         custom_fields: {
           _source: "slack",
@@ -214,6 +215,7 @@ Deno.serve(async (req) => {
           _slack_user_name: userName,
           _slack_team_id: teamId,
           _slack_via: "slash_command",
+          _slack_permalink: `https://slack.com/app_redirect?channel=${channelId}&team=${teamId}`,
         },
       })
       .select("id")
@@ -230,7 +232,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
+    const itemUrl = `${APP_URL}/intake-queue?item=${newItem.id}`;
 
     if (responseUrl) {
       await fetch(responseUrl, {
@@ -238,7 +240,7 @@ Deno.serve(async (req) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           response_type: "in_channel",
-          text: `📋 *Content request added* by ${userName ?? "someone"}:\n*${title}*\n<${itemUrl}|View in ContentedCal>`,
+          text: `📋 *Content request submitted for review* by ${userName ?? "someone"}:\n*${title}*`,
         }),
       });
     }
@@ -246,7 +248,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         response_type: "ephemeral",
-        text: `Content request created: *${title}*\n<${itemUrl}|View in ContentedCal>`,
+        text: `:eyes: Submitted for review: *${title}*. You'll see it on the calendar once approved.\n<${itemUrl}|View status>`,
       }),
       { headers: { "Content-Type": "application/json" } }
     );

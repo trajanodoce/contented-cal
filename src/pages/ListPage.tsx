@@ -425,9 +425,9 @@ export function ListPage() {
                         )}
                       </button>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 max-w-[400px]">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-900">{item.title}</span>
+                        <span className="font-medium text-slate-900 truncate max-w-[320px]">{item.title}</span>
                         {granolaItemIds.has(item.id) && (
                           <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
                         )}
@@ -473,7 +473,7 @@ export function ListPage() {
                           const dark = pillTextColor(base);
                           return (
                           <span
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                            className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold"
                             style={{ backgroundColor: `${base}55`, color: dark, border: `0.5px solid ${dark}` }}
                           >
                             {status.name}
@@ -607,7 +607,7 @@ function InlineStatusEdit({
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity"
+        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold hover:opacity-80 transition-opacity"
         style={{
           backgroundColor: currentColumn?.color ? `${currentColumn.color}55` : '#f1f5f9',
           color: currentColumn?.color ? pillTextColor(currentColumn.color) : '#64748b',
