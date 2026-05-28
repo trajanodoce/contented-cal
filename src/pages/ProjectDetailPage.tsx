@@ -16,7 +16,7 @@ import type {
   ActivityLog,
 } from '../lib/database.types';
 import { parseLocalDate } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import {
   format,
   startOfMonth,
