@@ -292,11 +292,58 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     }
   }
 
-  // Member profiles for subtasks section
+  // Member profiles for general use
   const memberProfiles = useMemo(
     () => members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null })),
     [members]
   );
+
+  // Subtask-eligible members: only people assigned to content items or on the project
+  const [subtaskEligibleIds, setSubtaskEligibleIds] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    async function fetchEligible() {
+      const eligibleIds = new Set<string>();
+
+      // 1. All users who are assignees on any content item in this workspace
+      const { data: items } = await supabase
+        .from('content_items')
+        .select('assignee_ids')
+        .eq('workspace_id', item.workspace_id);
+
+      if (items) {
+        for (const ci of items) {
+          if (ci.assignee_ids && Array.isArray(ci.assignee_ids)) {
+            for (const id of ci.assignee_ids) eligibleIds.add(id);
+          }
+        }
+      }
+
+      // 2. All members of the item's project (if it belongs to one)
+      if (item.project_id) {
+        const { data: projMembers } = await supabase
+          .from('project_members')
+          .select('user_id')
+          .eq('project_id', item.project_id);
+
+        if (projMembers) {
+          for (const pm of projMembers) eligibleIds.add(pm.user_id);
+        }
+      }
+
+      // 3. Always include the current user
+      if (user?.id) eligibleIds.add(user.id);
+
+      setSubtaskEligibleIds(eligibleIds);
+    }
+
+    fetchEligible();
+  }, [item.workspace_id, item.project_id, user?.id]);
+
+  const subtaskMembers = useMemo(() => {
+    if (!subtaskEligibleIds) return memberProfiles; // show all while loading
+    return memberProfiles.filter(m => subtaskEligibleIds.has(m.id));
+  }, [memberProfiles, subtaskEligibleIds]);
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end" onClick={handleClose}>
@@ -723,7 +770,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               <SubtasksSection
                 contentItemId={item.id}
                 userId={user?.id ?? null}
-                members={memberProfiles}
+                members={subtaskMembers}
                 addToast={addToast}
               />
 

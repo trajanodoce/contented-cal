@@ -404,8 +404,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                 {assigneePopoverId === subtask.id && createPortal(
                   <div
                     ref={assigneePopoverRef}
-                    className="fixed bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px]"
-                    style={{ top: popoverPos.top, left: popoverPos.left, zIndex: 9999 }}
+                    className="fixed bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[180px] max-h-[240px] overflow-y-auto"
+                    style={{
+                      top: Math.min(popoverPos.top, window.innerHeight - 260),
+                      left: popoverPos.left,
+                      zIndex: 9999,
+                    }}
                   >
                     <button
                       onClick={() => updateAssignee(subtask.id, null)}
