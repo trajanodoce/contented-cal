@@ -230,7 +230,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-2">Workspace Logo</label>
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 overflow-hidden shrink-0">
+          <div className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-surface-nested overflow-hidden shrink-0">
             {logoUrl ? (
               <img src={logoUrl} alt="Logo" className="w-full h-full object-cover rounded-xl" />
             ) : (
@@ -476,7 +476,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
       </p>
 
       {columns.length === 0 ? (
-        <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+        <div className="text-center py-12 bg-surface-nested rounded-lg border border-dashed border-slate-300">
           <Layout className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 mb-4">No board columns yet</p>
           <button
@@ -603,7 +603,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -643,7 +643,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
               >
                 Cancel
               </button>

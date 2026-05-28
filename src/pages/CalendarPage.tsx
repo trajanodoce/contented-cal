@@ -292,7 +292,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
   return (
     <>
       {/* Weekday header — quiet slate-400 row inside the card */}
-      <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: gridCols }}>
+      <div className="grid border-b border-slate-300" style={{ gridTemplateColumns: gridCols }}>
         {weekDays.map((day) => (
           <div
             key={day}
@@ -317,7 +317,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-200 ${
+              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-300 ${
                 isTodayDate ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
               onClick={() => onDateClick(day)}
@@ -406,7 +406,7 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
   return (
     <div className="space-y-0">
       {months.map((monthDate, idx) => (
-        <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '-1px' : 0 }}>
+        <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '16px' : 0 }}>
           {/* Month header bar — navy → pink gradient per design system */}
           <div
             className="px-5 py-3.5 border-b border-[#002339]"
@@ -441,7 +441,7 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
       <div className="flex justify-center pt-4">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-300 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
         >
           {expanded ? (
             <>
@@ -549,7 +549,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`p-2 border-r border-slate-200 last:border-r-0 border-b border-slate-200 min-h-[100px] ${
+              className={`p-2 border-r border-slate-300 last:border-r-0 border-b border-slate-300 min-h-[100px] ${
                 isTodayDate ? 'bg-[#005D970A]' : ''
               }`}
               onClick={() => onDateClick(day)}
@@ -822,7 +822,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
       onClick={onClick}
       className={`rounded-lg border p-4 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing ${
         isExternal ? '' : 'bg-slate-50'
-      } ${isOverdue ? 'border-red-300' : 'border-slate-200'
+      } ${isOverdue ? 'border-red-300' : 'border-slate-300'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -1071,7 +1071,7 @@ export function CalendarPage() {
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="h-full flex flex-col bg-slate-50">
-        <div className="px-6 py-4 bg-surface-card border-b border-slate-200 flex-shrink-0">
+        <div className="px-6 py-4 bg-surface-card border-b border-slate-300 flex-shrink-0">
           <FilterBar
             workspaceId={currentWorkspace?.id || null}
             contentTypes={contentTypes}
@@ -1086,7 +1086,7 @@ export function CalendarPage() {
           />
         </div>
 
-        <div className="px-6 py-3 bg-surface-card border-b border-slate-200 flex items-center justify-between flex-shrink-0">
+        <div className="px-6 py-3 bg-surface-card border-b border-slate-300 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-4">
             <h2 className="text-xl font-semibold text-slate-900 min-w-[200px]">{getHeaderTitle()}</h2>
             <div className="flex items-center gap-1">
@@ -1105,7 +1105,7 @@ export function CalendarPage() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsNotePickerOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
             >
               <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
               From Meeting
@@ -1162,7 +1162,7 @@ export function CalendarPage() {
                 onClick={toggleWeekends}
                 className={`px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
                   weekendsCollapsed
-                    ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    ? 'border-slate-300 text-slate-600 hover:bg-slate-50'
                     : 'border-brand-200 bg-brand-50 text-brand-700'
                 }`}
                 title={weekendsCollapsed ? 'Show weekends' : 'Collapse weekends'}

@@ -110,7 +110,7 @@ export function CreateWorkspacePage() {
             </div>
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-[#005D9710] rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Sign out
@@ -155,7 +155,7 @@ export function CreateWorkspacePage() {
                   URL slug
                 </label>
                 <div className="flex items-center">
-                  <span className="text-slate-500 text-sm px-3 py-2.5 bg-slate-50 border-y border-l border-slate-200 rounded-l-lg">
+                  <span className="text-slate-500 text-sm px-3 py-2.5 bg-surface-nested border-y border-l border-slate-200 rounded-l-lg">
                     /w/
                   </span>
                   <input

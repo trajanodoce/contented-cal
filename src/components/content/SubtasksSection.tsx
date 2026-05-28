@@ -325,7 +325,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
       <div className="flex items-center gap-2 mb-2">
         <span className="text-sm font-medium text-slate-700">Subtasks</span>
         {totalCount > 0 && (
-          <span className="text-xs font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+          <span className="text-xs font-medium text-slate-500 bg-[#005D9712] px-1.5 py-0.5 rounded">
             {completedCount}/{totalCount}
           </span>
         )}

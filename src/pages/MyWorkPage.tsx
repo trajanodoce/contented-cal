@@ -291,7 +291,7 @@ export function MyWorkPage() {
 
               <div className="overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-slate-50 border-b border-slate-200">
+                  <thead className="bg-[#005D9712] border-b border-slate-200">
                     <tr>
                       <th
                         className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"

@@ -274,9 +274,9 @@ export function ProjectDetailPage() {
     const map: Record<string, string> = {
       active: 'bg-green-100 text-green-700',
       completed: 'bg-brand-100 text-brand-700',
-      archived: 'bg-slate-100 text-slate-500',
+      archived: 'bg-[#005D9712] text-slate-500',
     };
-    return map[status] ?? 'bg-slate-100 text-slate-500';
+    return map[status] ?? 'bg-[#005D9712] text-slate-500';
   };
 
   if (loading) {
@@ -399,7 +399,7 @@ export function ProjectDetailPage() {
                   setDescDraft(project.description ?? '');
                   setEditingDesc(false);
                 }}
-                className="px-3 py-1 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+                className="px-3 py-1 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
               >
                 Cancel
               </button>
@@ -424,7 +424,7 @@ export function ProjectDetailPage() {
               onChange={(e) =>
                 updateProject({ owner_id: e.target.value || null })
               }
-              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="text-sm text-slate-700 border border-slate-300 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="">Unassigned</option>
               {members.map((m) => (
@@ -469,7 +469,7 @@ export function ProjectDetailPage() {
             <select
               value={project.status}
               onChange={(e) => updateProject({ status: e.target.value as 'active' | 'completed' | 'archived' })}
-              className="text-sm text-slate-700 border border-slate-200 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="text-sm text-slate-700 border border-slate-300 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="active">Active</option>
               <option value="completed">Completed</option>
@@ -564,7 +564,7 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
           <Clock className="w-4 h-4 text-slate-400" />
           Recent Activity
           {activityLogs.length > 0 && (
-            <span className="text-xs font-normal text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">{activityLogs.length}</span>
+            <span className="text-xs font-normal text-slate-400 bg-[#005D9712] px-1.5 py-0.5 rounded-full">{activityLogs.length}</span>
           )}
         </h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
@@ -961,7 +961,7 @@ function ListTab({
       ) : (
         <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
           <table className="w-full">
-            <thead className="bg-slate-100 border-b-2 border-slate-300">
+            <thead className="bg-[#005D9712] border-b-2 border-slate-300">
               <tr>
                 <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Title
@@ -1110,7 +1110,7 @@ function ProjectBoardCard({
       <div
         ref={setNodeRef}
         style={style}
-        className="bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg p-3 h-20"
+        className="bg-[#005D9712] border-2 border-dashed border-slate-300 rounded-lg p-3 h-20"
       />
     );
   }
@@ -1427,7 +1427,7 @@ function ProjectMonthGrid({
   return (
     <>
       {/* Weekday header — quiet slate-400 row inside the card */}
-      <div className="grid border-b border-slate-200" style={{ gridTemplateColumns: gridCols }}>
+      <div className="grid border-b border-slate-300" style={{ gridTemplateColumns: gridCols }}>
         {weekDays.map((d) => (
           <div
             key={d}
@@ -1450,7 +1450,7 @@ function ProjectMonthGrid({
           return (
             <div
               key={dateKey}
-              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-200 ${
+              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-300 ${
                 today ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
             >
@@ -1554,7 +1554,7 @@ function CalendarTab({
             onClick={toggleWeekends}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
               weekendsCollapsed
-                ? 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                ? 'border-slate-300 text-slate-600 hover:bg-[#005D9708]'
                 : 'border-brand-200 bg-brand-50 text-brand-700'
             }`}
           >
@@ -1562,19 +1562,19 @@ function CalendarTab({
           </button>
           <button
             onClick={goToday}
-            className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
           >
             Today
           </button>
           <button
             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -1587,7 +1587,7 @@ function CalendarTab({
           <div
             key={monthDate.toISOString()}
             className="bg-[#F7F9FC] rounded-xl overflow-hidden"
-            style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '-1px' : 0 }}
+            style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '16px' : 0 }}
           >
             {/* Month header bar — navy → pink gradient per design system */}
             <div
@@ -1616,7 +1616,7 @@ function CalendarTab({
         <div className="flex justify-center pt-4">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9708] hover:text-slate-900 transition-colors shadow-sm"
           >
             {expanded ? (
               <>

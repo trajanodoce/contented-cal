@@ -39,11 +39,11 @@ interface ContentItemStub {
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-green-100 text-green-700',
   completed: 'bg-brand-100 text-brand-700',
-  archived: 'bg-slate-100 text-slate-500',
+  archived: 'bg-[#005D9712] text-slate-500',
 };
 
 function getStatusStyle(status: string): string {
-  return STATUS_STYLES[status] ?? 'bg-slate-100 text-slate-500';
+  return STATUS_STYLES[status] ?? 'bg-[#005D9712] text-slate-500';
 }
 
 interface BoardColumn {
@@ -144,7 +144,7 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+            className="p-1 rounded hover:bg-[#005D9710] text-slate-400 hover:text-slate-600"
           >
             <X className="w-5 h-5" />
           </button>
@@ -219,7 +219,7 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-slate-50"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-[#005D9708]"
           >
             Cancel
           </button>

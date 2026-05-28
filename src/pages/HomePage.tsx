@@ -37,7 +37,7 @@ const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string
   urgent: { label: 'Urgent', color: 'text-red-700', bg: 'bg-red-50 border-red-200', icon: Flame },
   high: { label: 'High', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200', icon: AlertTriangle },
   medium: { label: 'Medium', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200', icon: AlertCircle },
-  low: { label: 'Low', color: 'text-slate-600', bg: 'bg-slate-50 border-slate-200', icon: CheckCircle2 },
+  low: { label: 'Low', color: 'text-slate-600', bg: 'bg-[#005D9712] border-slate-200', icon: CheckCircle2 },
 };
 
 export function HomePage() {
@@ -259,7 +259,7 @@ export function HomePage() {
                       className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors text-left group"
                     >
                       <div className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
-                        isDueToday ? 'bg-brand-100 text-brand-700' : 'bg-slate-100 text-slate-600'
+                        isDueToday ? 'bg-brand-100 text-brand-700' : 'bg-[#005D9712] text-slate-600'
                       }`}>
                         {formatDate(item.due_date)}
                       </div>

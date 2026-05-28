@@ -377,7 +377,7 @@ export function DesignRequestPage() {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-surface-nested">
             <button type="button" onClick={() => navigate(-1)} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition-opacity" style={{ backgroundColor: '#0B2763' }}>
               Cancel
             </button>

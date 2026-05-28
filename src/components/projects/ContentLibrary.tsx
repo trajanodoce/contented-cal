@@ -245,7 +245,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
           <FolderOpen className="w-4 h-4 text-slate-400" />
           <h3 className="text-sm font-semibold text-slate-700">Content Library</h3>
           {items.length > 0 && (
-            <span className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full">
+            <span className="text-xs text-slate-400 bg-[#005D9712] px-1.5 py-0.5 rounded-full">
               {items.length}
             </span>
           )}
@@ -307,7 +307,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
 
       {/* Add link form */}
       {showLinkForm && (
-        <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+        <div className="mb-4 p-3 bg-surface-nested rounded-lg border border-slate-200">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-slate-600">Add external link</span>
             <button

@@ -36,7 +36,7 @@ interface TeamMember {
 const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon: typeof Shield }> = {
   admin: { label: 'Admin', color: 'text-purple-700', bg: 'bg-purple-100', icon: ShieldCheck },
   editor: { label: 'Editor', color: 'text-brand-700', bg: 'bg-brand-100', icon: Shield },
-  viewer: { label: 'Viewer', color: 'text-slate-600', bg: 'bg-slate-100', icon: Eye },
+  viewer: { label: 'Viewer', color: 'text-slate-600', bg: 'bg-[#005D9712]', icon: Eye },
 };
 
 export function TeamTab() {
