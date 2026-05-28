@@ -212,10 +212,10 @@ function ProjectMarker({ project, type }: { project: Project; type: 'start' | 'e
 function SubtaskPill({ subtask }: { subtask: SubtaskWithParent }) {
   return (
     <div
-      className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] truncate ${
+      className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] truncate border-[0.5px] ${
         subtask.completed
-          ? 'bg-green-50 text-green-600 line-through'
-          : 'bg-slate-100 text-slate-500'
+          ? 'bg-green-50 text-green-600 line-through border-green-300'
+          : 'bg-slate-100 text-slate-500 border-slate-300'
       }`}
       title={`Subtask: ${subtask.title}${subtask.parentTitle ? ` (${subtask.parentTitle})` : ''}`}
     >

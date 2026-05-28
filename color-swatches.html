@@ -1189,7 +1189,17 @@ h2 + .sub { color: #64748b; font-size: 13px; margin-bottom: 20px; }
     </div>
     <div style="padding: 6px 6px 24px; min-height: 100px;">
       <div style="font-size: 11px; color: #334155; font-weight: 600; margin-bottom: 4px;">13</div>
+      <!-- Subtask pills — 0.5px tinted border, separates them visually from event pills -->
+      <div style="display: inline-flex; align-items: center; gap: 4px; background: #f1f5f9; border: 0.5px solid #cbd5e1; border-radius: 3px; padding: 1px 5px; font-size: 10px; color: #64748b; margin-bottom: 3px; white-space: nowrap;">
+        <span style="font-size: 9px;">☐</span> Write outline
+      </div>
+      <div style="display: inline-flex; align-items: center; gap: 4px; background: #f0fdf4; border: 0.5px solid #86efac; border-radius: 3px; padding: 1px 5px; font-size: 10px; color: #16a34a; text-decoration: line-through; white-space: nowrap;">
+        <span style="font-size: 9px;">☑</span> Research notes
+      </div>
     </div>
+  </div>
+  <div style="margin-top: 14px; padding: 10px 14px; background: white; border: 1px solid #00233930; border-radius: 8px; font-size: 11px; color: #64748b;">
+    <span style="font-weight: 700; color: #334155;">Subtask pills:</span> 0.5px tinted border (slate-300 for active, green-300 for completed) over a light fill — distinct from event pills, slimmer outline so the cell hierarchy reads as Project marker → Event pill → Subtask pill.
   </div>
 </div>
 
