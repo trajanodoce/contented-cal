@@ -590,7 +590,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
                 className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
               >
                 <option value="">Select a channel...</option>
-                {['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Other'].map(c => (
+                {['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Media/External', 'Other'].map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
