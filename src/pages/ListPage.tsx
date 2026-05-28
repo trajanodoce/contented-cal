@@ -127,7 +127,7 @@ export function ListPage() {
   });
   const [showGranola, setShowGranola] = useState(() => {
     const saved = localStorage.getItem('cc-show-granola');
-    return saved !== null ? saved === 'true' : true;
+    return saved !== null ? saved === 'true' : false;
   });
 
   // Extract unique channels from items
@@ -142,7 +142,7 @@ export function ListPage() {
   const items = useMemo(() => {
     let result = isLoaded ? applyFilters(rawItems, filters, linkCounts) : rawItems;
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
-    if (!showGranola) result = result.filter(i => !granolaItemIds.has(i.id));
+    if (showGranola) result = result.filter(i => granolaItemIds.has(i.id));
     return result;
   }, [rawItems, filters, isLoaded, linkCounts, showOrdinal, showGranola, granolaItemIds]);
 
