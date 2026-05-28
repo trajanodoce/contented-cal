@@ -33,9 +33,9 @@ const PLATFORMS: PlatformMeta[] = [
     id: 'ordinal',
     name: 'Ordinal Social',
     description: 'Sync social media posts from Ordinal. View and track social content alongside your other content calendar items.',
-    iconBg: '#F3F0FF',
+    iconBg: '#D3CDEC40',
     iconText: '⚡',
-    iconColor: '#7E61FF',
+    iconColor: '#5B4F8A',
     category: 'Social Media',
     setupType: 'api_key',
     fields: [
@@ -355,7 +355,7 @@ function ConnectedSummary({ meta, integration }: { meta: PlatformMeta; integrati
       <span>Connected {connectedAt}</span>
       {meta.id === 'ordinal' && (
         <>
-          <span className="text-[#7E61FF] font-medium">● Connected</span>
+          <span className="text-[#5B4F8A] font-medium">● Connected</span>
           <span>Social posts sync enabled</span>
         </>
       )}
@@ -731,9 +731,9 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       id: 'linear',
       name: 'Linear',
       description: 'Sync your assigned Linear issues into ContentedCal. Each person connects their own Linear key.',
-      iconBg: '#EFF6FF',
+      iconBg: '#FFC3B840',
       iconText: 'L',
-      iconColor: '#5E6AD2',
+      iconColor: '#A05042',
       tag: 'Engineering',
       placeholder: 'lin_api_...',
       docsUrl: 'https://linear.app/settings/api',
@@ -755,9 +755,9 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       id: 'granola',
       name: 'Granola',
       description: 'Link your meeting notes to content items. Each person connects their own Granola account — your notes stay private to you.',
-      iconBg: '#F0FDF4',
+      iconBg: '#92D1B240',
       iconText: '🎙️',
-      iconColor: '#345A11',
+      iconColor: '#357254',
       tag: 'Meetings',
       placeholder: 'gra_...',
       docsUrl: 'https://granola.ai/settings',
@@ -900,7 +900,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                     <div className="flex items-center gap-4 text-xs text-slate-500 flex-wrap">
                       {platform.id === 'linear' && linearInfo && (
                         <>
-                          <span className="text-[#5E6AD2] font-medium">{linearInfo.name}</span>
+                          <span className="text-[#A05042] font-medium">{linearInfo.name}</span>
                           {linearInfo.teams && <span className="truncate max-w-[200px]" title={linearInfo.teams}>Teams: <span className="text-slate-700 font-medium">{linearInfo.teams}</span></span>}
                           {linearInfo.issuesCount != null && <span><span className="text-slate-700 font-medium">{linearInfo.issuesCount}</span> issues synced</span>}
                           {linearInfo.lastSynced && <span>Last sync: <span className="text-slate-700 font-medium">{new Date(linearInfo.lastSynced).toLocaleString()}</span></span>}
@@ -908,7 +908,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       )}
                       {platform.id === 'granola' && (
                         <>
-                          <span className="text-[#345A11] font-medium">● Connected</span>
+                          <span className="text-[#357254] font-medium">● Connected</span>
                           {integration?.connected_at && <span>Connected {new Date(integration.connected_at).toLocaleDateString()}</span>}
                           <span>Meeting notes linking enabled</span>
                         </>

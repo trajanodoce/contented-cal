@@ -4,8 +4,7 @@ import { supabase } from '../../lib/supabase';
 import type { GranolaNoteLink, Json } from '../../lib/database.types';
 import { format } from 'date-fns';
 import { parseLocalDate } from '../../lib/utils';
-
-const GRANOLA_GREEN = '#345A11';
+import { GRANOLA_TEXT as GRANOLA_GREEN } from '../../lib/ordinal';
 
 interface Props {
   contentItemId: string;

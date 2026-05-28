@@ -12,15 +12,15 @@ interface Props {
 
 // Platform metadata for display
 const PLATFORM_META: Record<ExternalLinkPlatform, { label: string; bgColor: string; textColor: string; icon: string }> = {
-  ordinal:      { label: 'Ordinal',      bgColor: '#FFF7ED', textColor: '#C2410C', icon: '⬡' },
+  ordinal:      { label: 'Ordinal',      bgColor: '#D3CDEC40', textColor: '#5B4F8A', icon: '⬡' },
   figma:        { label: 'Figma',        bgColor: '#F5F3FF', textColor: '#7C3AED', icon: 'F' },
   canva:        { label: 'Canva',        bgColor: '#EFF6FF', textColor: '#2563EB', icon: 'C' },
   miro:         { label: 'Miro',         bgColor: '#FFFBEB', textColor: '#D97706', icon: 'M' },
   google_docs:  { label: 'Google Docs',  bgColor: '#F0FDF4', textColor: '#15803D', icon: 'G' },
   google_drive: { label: 'Google Drive', bgColor: '#F0FDF4', textColor: '#15803D', icon: 'G' },
   notion:       { label: 'Notion',       bgColor: '#F9FAFB', textColor: '#374151', icon: 'N' },
-  linear:       { label: 'Linear',       bgColor: '#EFF6FF', textColor: '#1D4ED8', icon: 'L' },
-  granola:      { label: 'Granola',      bgColor: '#345A11', textColor: '#FFFFFF', icon: '🎙️' },
+  linear:       { label: 'Linear',       bgColor: '#FFC3B840', textColor: '#A05042', icon: 'L' },
+  granola:      { label: 'Granola',      bgColor: '#92D1B240', textColor: '#357254', icon: '🎙️' },
   file:         { label: 'File',         bgColor: '#F0F9FF', textColor: '#0369A1', icon: '📎' },
   other:        { label: 'Link',         bgColor: '#F9FAFB', textColor: '#4B5563', icon: '↗' },
 };

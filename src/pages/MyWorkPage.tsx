@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import type { ContentItem, Subtask } from '../lib/database.types';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { PersonalTasksSection } from '../components/personal/PersonalTasksSection';
@@ -361,7 +361,7 @@ export function MyWorkPage() {
                                 {item.title}
                               </span>
                               {granolaItemIds.has(item.id) && (
-                                <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#345A11' }} title="Has meeting notes" />
+                                <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
                               )}
                             </div>
                           </td>

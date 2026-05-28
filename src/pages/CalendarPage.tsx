@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, Profile, BoardColumn, Project, Subtask } from '../lib/database.types';
 import { parseLocalDate } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
@@ -164,7 +164,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       )}
       {hasGranolaNotes && (
         <span title="Has meeting notes">
-          <Mic className="w-3 h-3 flex-shrink-0" style={{ color: '#345A11' }} />
+          <Mic className="w-3 h-3 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
         </span>
       )}
       {itemMembers[0] && (
@@ -619,7 +619,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                         })()}
                         {granolaItemIds.has(item.id) && (
                           <span title="Has meeting notes">
-                            <Mic className="w-3 h-3 flex-shrink-0" style={{ color: '#345A11' }} />
+                            <Mic className="w-3 h-3 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
                           </span>
                         )}
                       </div>
@@ -838,7 +838,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
           <div className="flex items-center gap-1.5 mb-1">
             <h4 className="font-medium text-slate-900 truncate">{item.title}</h4>
             {hasGranolaNotes && (
-              <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#345A11' }} title="Has meeting notes" />
+              <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
             )}
           </div>
 
@@ -1110,7 +1110,7 @@ export function CalendarPage() {
               onClick={() => setIsNotePickerOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              <Mic className="w-3.5 h-3.5" style={{ color: '#345A11' }} />
+              <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
               From Meeting
             </button>
             <div className="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
@@ -1144,13 +1144,13 @@ export function CalendarPage() {
               style={{
                 borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
                 backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
-                color: showOrdinal ? '#7E61FF' : '#64748b',
+                color: showOrdinal ? ORDINAL_TEXT : '#64748b',
               }}
               title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
             >
               <div
                 className="relative w-8 h-[18px] rounded-full transition-colors"
-                style={{ backgroundColor: showOrdinal ? '#7E61FF' : '#CBD5E1' }}
+                style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : '#CBD5E1' }}
               >
                 <div
                   className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"

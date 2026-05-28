@@ -994,7 +994,7 @@ function ListTab({
                 );
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
-                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
+                const rowBg = isOrdinal ? `${ORDINAL_COLOR}18` : isLinear ? `${LINEAR_COLOR}18` : undefined;
                 const colName = col?.name?.toLowerCase();
                 const isDone = colName === 'published' || colName === 'completed';
                 const isBlocked = colName === 'blocked';
@@ -1117,7 +1117,7 @@ function ProjectBoardCard({
 
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
-  const cardBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
+  const cardBg = isOrdinal ? `${ORDINAL_COLOR}18` : isLinear ? `${LINEAR_COLOR}18` : undefined;
 
   return (
     <div

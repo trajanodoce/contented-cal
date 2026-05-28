@@ -1,16 +1,31 @@
 import type { ContentItem } from './database.types';
 
-// Ordinal brand color
-export const ORDINAL_COLOR = '#7E61FF';
+// ── Source colors (per the ContentedCal design system) ──────────────────────
+// Each source has a tint color (used for backgrounds / row washes) and a
+// matched darker tone used for icons and badge text where readable contrast
+// is needed. The bg tints get an alpha suffix (e.g. ${ORDINAL_COLOR}18) at
+// the call site to soften them for row backgrounds.
+
+export const ORDINAL_COLOR = '#D3CDEC';   // purple — Ordinal posts
+export const ORDINAL_TEXT  = '#5B4F8A';   // deeper purple for icons/text
+
+export const LINEAR_COLOR  = '#FFC3B8';   // coral — Linear issues
+export const LINEAR_TEXT   = '#A05042';   // rust for icons/text
+
+export const GRANOLA_COLOR = '#92D1B2';   // mint — Granola notes
+export const GRANOLA_TEXT  = '#357254';   // deep green for icons/text
+
+export const SLACK_COLOR   = '#9B3A3A';   // red — Slack requests
+export const SLACK_TEXT    = '#9B3A3A';   // same — base is already dark enough
+
+export const INTERNAL_COLOR = '#005D97';  // navy — native ContentedCal items
+export const INTERNAL_TEXT  = '#003d66';  // deeper navy for icons/text
 
 // Check if an item is from Ordinal (synced)
 export function isOrdinalItem(item: ContentItem): boolean {
   const customFields = (item.custom_fields as Record<string, unknown>) ?? {};
   return customFields._source === 'ordinal' || (item.tags?.includes('ordinal-sync') ?? false);
 }
-
-// Linear brand color
-export const LINEAR_COLOR = '#5E6AD2';
 
 // Check if an item is from Linear (synced)
 export function isLinearItem(item: ContentItem): boolean {
@@ -92,14 +107,14 @@ export const PLATFORM_META: Record<string, PlatformMeta> = {
   },
   ordinal: {
     icon: '⚡',
-    color: '#7E61FF',
-    bgColor: '#F3F0FF',
+    color: ORDINAL_TEXT,
+    bgColor: `${ORDINAL_COLOR}40`,
     label: 'Ordinal',
   },
   linear: {
     icon: 'L',
-    color: '#5E6AD2',
-    bgColor: '#EFF6FF',
+    color: LINEAR_TEXT,
+    bgColor: `${LINEAR_COLOR}40`,
     label: 'Linear',
   },
 };

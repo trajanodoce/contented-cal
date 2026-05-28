@@ -10,7 +10,7 @@ import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json,
 import { formatDateFull } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import { SubtasksSection } from './SubtasksSection';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, LINEAR_TEXT, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
 import { useOrdinalPost } from '../../hooks/useOrdinalPost';
 import { ExternalLinksSection } from './ExternalLinks';
 import { GranolaNoteSection } from './GranolaNoteSection';
@@ -382,12 +382,18 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
       >
         {/* External source banner — Ordinal or Linear */}
         {isExternalSource && (
-          <div className="px-6 py-3 border-b" style={{ backgroundColor: isOrdinalPost ? '#F3F0FF' : '#FFF3E0', borderColor: isOrdinalPost ? '#7E61FF' : '#E65100' }}>
+          <div
+            className="px-6 py-3 border-b"
+            style={{
+              backgroundColor: isOrdinalPost ? `${ORDINAL_COLOR}30` : `${LINEAR_COLOR}30`,
+              borderColor: isOrdinalPost ? ORDINAL_TEXT : LINEAR_TEXT,
+            }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <div
                   className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: isOrdinalPost ? '#7E61FF' : '#E65100', color: 'white' }}
+                  style={{ backgroundColor: isOrdinalPost ? ORDINAL_TEXT : LINEAR_TEXT, color: 'white' }}
                 >
                   {isOrdinalPost ? (
                     <Zap className="w-3.5 h-3.5" />
@@ -396,10 +402,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold" style={{ color: isOrdinalPost ? '#5B45B0' : '#BF360C' }}>
+                  <p className="text-sm font-semibold" style={{ color: isOrdinalPost ? ORDINAL_TEXT : LINEAR_TEXT }}>
                     Sourced from {isOrdinalPost ? 'Ordinal' : 'Linear'} — {isOrdinalPost ? 'read-only' : 'edits here are local only'}
                   </p>
-                  <p className="text-xs" style={{ color: isOrdinalPost ? '#7E61FF' : '#E65100' }}>
+                  <p className="text-xs" style={{ color: isOrdinalPost ? ORDINAL_TEXT : LINEAR_TEXT }}>
                     {isOrdinalPost ? 'This item is managed in Ordinal and cannot be edited here' : `Changes made in ContentedCal will not sync back to Linear`}
                     {isLinearIssue && linearInfo ? ` · ${linearInfo.identifier} · ${linearInfo.team}${linearInfo.project ? ` · ${linearInfo.project}` : ''}` : ''}
                   </p>
@@ -428,7 +434,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{ color: '#BF360C', borderColor: '#E6510040', backgroundColor: 'white' }}
+                    style={{ color: ORDINAL_TEXT, borderColor: `${ORDINAL_COLOR}60`, backgroundColor: 'white' }}
                   >
                     <span>Open in Ordinal</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -440,7 +446,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{ color: '#BF360C', borderColor: '#E6510040', backgroundColor: 'white' }}
+                    style={{ color: LINEAR_TEXT, borderColor: `${LINEAR_COLOR}60`, backgroundColor: 'white' }}
                   >
                     <span>Open in Linear</span>
                     <ExternalLink className="w-3.5 h-3.5" />

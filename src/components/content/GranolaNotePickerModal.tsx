@@ -3,8 +3,7 @@ import { X, Mic, Search, Loader2, Plus, Link, ChevronRight, AlertCircle } from '
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useGranolaSync, GranolaNoteSummary } from '../../hooks/useGranolaSync';
 import { format } from 'date-fns';
-
-const GRANOLA_GREEN = '#345A11';
+import { GRANOLA_TEXT as GRANOLA_GREEN } from '../../lib/ordinal';
 
 interface Props {
   isOpen: boolean;

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import {
   DndContext,
@@ -44,14 +44,14 @@ const priorityColors: Record<string, string> = {
 };
 
 const LINK_PLATFORM_META: Record<string, { label: string; bg: string; color: string; icon: string }> = {
-  ordinal:      { label: 'Ordinal',      bg: '#FFF7ED', color: '#C2410C', icon: '⬡' },
+  ordinal:      { label: 'Ordinal',      bg: '#D3CDEC40', color: '#5B4F8A', icon: '⬡' },
   figma:        { label: 'Figma',        bg: '#F5F3FF', color: '#7C3AED', icon: 'F' },
   canva:        { label: 'Canva',        bg: '#EFF6FF', color: '#2563EB', icon: 'C' },
   miro:         { label: 'Miro',         bg: '#FFFBEB', color: '#D97706', icon: 'M' },
   google_docs:  { label: 'Google Docs',  bg: '#F0FDF4', color: '#15803D', icon: 'G' },
   google_drive: { label: 'Google Drive', bg: '#F0FDF4', color: '#15803D', icon: 'G' },
   notion:       { label: 'Notion',       bg: '#F9FAFB', color: '#374151', icon: 'N' },
-  linear:       { label: 'Linear',       bg: '#EFF6FF', color: '#1D4ED8', icon: 'L' },
+  linear:       { label: 'Linear',       bg: '#FFC3B840', color: '#A05042', icon: 'L' },
   other:        { label: 'Link',         bg: '#F9FAFB', color: '#4B5563', icon: '↗' },
 };
 
@@ -88,7 +88,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
   const isExternal = isOrdinal || isLinear;
-  const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : undefined;
+  const externalBg = isOrdinal ? `${ORDINAL_COLOR}18` : isLinear ? `${LINEAR_COLOR}18` : undefined;
 
   if (isDragging && !isOverlay) {
     return (
@@ -129,7 +129,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
             {item.title}
           </h4>
           {hasGranolaNotes && (
-            <Mic className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: '#345A11' }} title="Has meeting notes" />
+            <Mic className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
           )}
         </div>
 
