@@ -8,6 +8,7 @@ import type { Profile, WorkspaceInvite } from '../../lib/database.types';
 import {
   User,
   UserPlus,
+  UserCheck,
   ChevronDown,
   Check,
   Trash2,
@@ -19,6 +20,7 @@ import {
   Mail,
   X,
   Clock,
+  Search,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -45,6 +47,7 @@ export function TeamTab() {
   const [pendingInvites, setPendingInvites] = useState<WorkspaceInvite[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
   const [cancellingInviteId, setCancellingInviteId] = useState<string | null>(null);
@@ -163,13 +166,22 @@ export function TeamTab() {
           <p className="text-sm text-slate-500 mt-1">{members.length} member{members.length !== 1 ? 's' : ''} in this workspace</p>
         </div>
         {isAdmin && (
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <UserPlus className="w-4 h-4" />
-            Invite Member
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAddMemberModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <UserCheck className="w-4 h-4" />
+              Add Member
+            </button>
+            <button
+              onClick={() => setShowInviteModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <UserPlus className="w-4 h-4" />
+              Invite Member
+            </button>
+          </div>
         )}
       </div>
 
@@ -304,6 +316,16 @@ export function TeamTab() {
         </table>
       </div>
 
+      {/* Add Member Modal */}
+      {showAddMemberModal && currentWorkspace && (
+        <AddMemberModal
+          workspaceId={currentWorkspace.id}
+          existingMemberIds={members.map(m => m.user_id)}
+          onClose={() => setShowAddMemberModal(false)}
+          onAdded={fetchMembers}
+        />
+      )}
+
       {/* Invite Modal */}
       {showInviteModal && currentWorkspace && (
         <InviteModal
@@ -392,6 +414,172 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function AddMemberModal({
+  workspaceId,
+  existingMemberIds,
+  onClose,
+  onAdded,
+}: {
+  workspaceId: string;
+  existingMemberIds: string[];
+  onClose: () => void;
+  onAdded: () => void;
+}) {
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [availableUsers, setAvailableUsers] = useState<Profile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role>('editor');
+
+  useEffect(() => {
+    async function fetchUsers() {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('full_name');
+
+      if (!error && data) {
+        // Filter out users who are already members
+        const filtered = data.filter(
+          (p) => !existingMemberIds.includes(p.id) && p.id !== user?.id
+        );
+        setAvailableUsers(filtered);
+      }
+      setLoading(false);
+    }
+    fetchUsers();
+  }, [existingMemberIds, user?.id]);
+
+  const filteredUsers = availableUsers.filter((p) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (p.full_name || '').toLowerCase().includes(q) ||
+      (p.email || '').toLowerCase().includes(q)
+    );
+  });
+
+  const handleAdd = async (profile: Profile) => {
+    setAddingId(profile.id);
+
+    const { error } = await supabase
+      .from('workspace_members')
+      .insert({ workspace_id: workspaceId, user_id: profile.id, role: selectedRole });
+
+    if (error) {
+      toast.error('Failed to add member: ' + error.message);
+    } else {
+      toast.success(`${profile.full_name || profile.email} added as ${selectedRole}`);
+      // Remove from list
+      setAvailableUsers((prev) => prev.filter((p) => p.id !== profile.id));
+      onAdded();
+    }
+    setAddingId(null);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900">Add Existing User</h3>
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <p className="text-sm text-slate-500 mb-4">
+          Add users who have already signed up to your workspace.
+        </p>
+
+        {/* Role selector */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-slate-700 mb-1">Add as role</label>
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value as Role)}
+            className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="editor">Editor — can create, edit, and manage content</option>
+            <option value="admin">Admin — full access including settings</option>
+            <option value="viewer">Viewer — read-only access, can comment</option>
+          </select>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder="Search by name or email..."
+            autoFocus
+          />
+        </div>
+
+        {/* User list */}
+        <div className="border border-slate-200 rounded-lg overflow-hidden max-h-[300px] overflow-y-auto">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="py-8 text-center text-sm text-slate-400">
+              {availableUsers.length === 0
+                ? 'No users available to add'
+                : 'No users match your search'}
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {filteredUsers.map((profile) => (
+                <div
+                  key={profile.id}
+                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {profile.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt={profile.full_name || ''}
+                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-slate-500" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-900 truncate">
+                        {profile.full_name || 'Unnamed'}
+                      </p>
+                      <p className="text-xs text-slate-500 truncate">{profile.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleAdd(profile)}
+                    disabled={addingId === profile.id}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0 ml-3"
+                  >
+                    {addingId === profile.id ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <UserPlus className="w-3.5 h-3.5" />
+                    )}
+                    Add
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
