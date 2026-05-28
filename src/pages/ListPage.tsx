@@ -13,7 +13,7 @@ import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
@@ -315,13 +315,13 @@ export function ListPage() {
           style={{
             borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
             backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
-            color: showOrdinal ? '#7E61FF' : '#64748b',
+            color: showOrdinal ? ORDINAL_TEXT : '#64748b',
           }}
           title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
         >
           <div
             className="relative w-8 h-[18px] rounded-full transition-colors"
-            style={{ backgroundColor: showOrdinal ? '#7E61FF' : '#CBD5E1' }}
+            style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : '#CBD5E1' }}
           >
             <div
               className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -390,7 +390,14 @@ export function ListPage() {
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
                 const hasGranola = granolaItemIds.has(item.id);
-                const rowBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? '#FFF7F2' : hasGranola ? '#F0FDF4' : undefined;
+                // Source-tinted row backgrounds — light alpha so the rows still read clearly.
+                const rowBg = isOrdinal
+                  ? `${ORDINAL_COLOR}18`
+                  : isLinear
+                    ? `${LINEAR_COLOR}18`
+                    : hasGranola
+                      ? `${GRANOLA_COLOR}18`
+                      : undefined;
                 const isBlocked = statusName === 'blocked';
                 const isUrgentRow = isBlocked || (dueDate.isOverdue && !isDone);
 
