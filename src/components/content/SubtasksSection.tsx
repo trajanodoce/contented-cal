@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { GripVertical, Check, Plus, X, Calendar, User } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
@@ -23,7 +24,11 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   const dragIdRef = useRef<string | null>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
   const assigneePopoverRef = useRef<HTMLDivElement>(null);
+  const assigneeBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const dueDateRef = useRef<HTMLDivElement>(null);
+  const dueDateBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const [dueDatePos, setDueDatePos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
   // Fetch subtasks
   const fetchSubtasks = useCallback(async () => {
@@ -47,16 +52,24 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   // Click outside handlers
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (assigneePopoverRef.current && !assigneePopoverRef.current.contains(e.target as Node)) {
-        setAssigneePopoverId(null);
+      const target = e.target as Node;
+      if (assigneePopoverId && assigneePopoverRef.current && !assigneePopoverRef.current.contains(target)) {
+        // Also check if click was on the toggle button itself
+        const btn = assigneeBtnRefs.current[assigneePopoverId];
+        if (!btn || !btn.contains(target)) {
+          setAssigneePopoverId(null);
+        }
       }
-      if (dueDateRef.current && !dueDateRef.current.contains(e.target as Node)) {
-        setDueDateEditId(null);
+      if (dueDateEditId && dueDateRef.current && !dueDateRef.current.contains(target)) {
+        const btn = dueDateBtnRefs.current[dueDateEditId];
+        if (!btn || !btn.contains(target)) {
+          setDueDateEditId(null);
+        }
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [assigneePopoverId, dueDateEditId]);
 
   // Sorted subtasks: incomplete first by position, then completed by position
   const sortedSubtasks = [...subtasks].sort((a, b) => {
@@ -356,9 +369,18 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
               {/* Assignee */}
               <div className="relative flex-shrink-0">
                 <button
-                  onClick={() =>
-                    setAssigneePopoverId(assigneePopoverId === subtask.id ? null : subtask.id)
-                  }
+                  ref={el => { assigneeBtnRefs.current[subtask.id] = el; }}
+                  onClick={() => {
+                    const next = assigneePopoverId === subtask.id ? null : subtask.id;
+                    setAssigneePopoverId(next);
+                    if (next) {
+                      const btn = assigneeBtnRefs.current[subtask.id];
+                      if (btn) {
+                        const rect = btn.getBoundingClientRect();
+                        setPopoverPos({ top: rect.bottom + window.scrollY + 4, left: rect.right + window.scrollX - 160 });
+                      }
+                    }
+                  }}
                   className="w-4 h-4 rounded-full flex items-center justify-center overflow-hidden"
                   title={member ? member.full_name ?? undefined : 'Assign'}
                 >
@@ -379,10 +401,11 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                   )}
                 </button>
 
-                {assigneePopoverId === subtask.id && (
+                {assigneePopoverId === subtask.id && createPortal(
                   <div
                     ref={assigneePopoverRef}
-                    className="absolute right-0 top-6 z-50 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px]"
+                    className="fixed bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px]"
+                    style={{ top: popoverPos.top, left: popoverPos.left, zIndex: 9999 }}
                   >
                     <button
                       onClick={() => updateAssignee(subtask.id, null)}
@@ -410,14 +433,41 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                         {m.full_name}
                       </button>
                     ))}
-                  </div>
+                  </div>,
+                  document.body
                 )}
               </div>
 
               {/* Due date */}
               <div className="relative flex-shrink-0">
-                {dueDateEditId === subtask.id ? (
-                  <div ref={dueDateRef} className="absolute right-0 top-6 z-50 bg-white border border-slate-200 rounded-lg shadow-lg p-2 flex flex-col gap-1">
+                <button
+                  ref={el => { dueDateBtnRefs.current[subtask.id] = el; }}
+                  onClick={() => {
+                    const next = dueDateEditId === subtask.id ? null : subtask.id;
+                    setDueDateEditId(next);
+                    if (next) {
+                      const btn = dueDateBtnRefs.current[subtask.id];
+                      if (btn) {
+                        const rect = btn.getBoundingClientRect();
+                        setDueDatePos({ top: rect.bottom + window.scrollY + 4, left: rect.right + window.scrollX - 160 });
+                      }
+                    }
+                  }}
+                  className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                  title={subtask.due_date ? formatDate(subtask.due_date) : 'Set due date'}
+                >
+                  {subtask.due_date ? (
+                    <span className="text-slate-500">{formatDate(subtask.due_date)}</span>
+                  ) : (
+                    <Calendar className="w-3.5 h-3.5" />
+                  )}
+                </button>
+                {dueDateEditId === subtask.id && createPortal(
+                  <div
+                    ref={dueDateRef}
+                    className="fixed bg-white border border-slate-200 rounded-lg shadow-lg p-2 flex flex-col gap-1"
+                    style={{ top: dueDatePos.top, left: dueDatePos.left, zIndex: 9999 }}
+                  >
                     <input
                       type="date"
                       value={subtask.due_date ?? ''}
@@ -433,21 +483,9 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                         Clear
                       </button>
                     )}
-                  </div>
-                ) : null}
-                <button
-                  onClick={() =>
-                    setDueDateEditId(dueDateEditId === subtask.id ? null : subtask.id)
-                  }
-                  className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
-                  title={subtask.due_date ? formatDate(subtask.due_date) : 'Set due date'}
-                >
-                  {subtask.due_date ? (
-                    <span className="text-slate-500">{formatDate(subtask.due_date)}</span>
-                  ) : (
-                    <Calendar className="w-3.5 h-3.5" />
-                  )}
-                </button>
+                  </div>,
+                  document.body
+                )}
               </div>
 
               {/* Delete button */}
