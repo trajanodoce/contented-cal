@@ -262,7 +262,7 @@ export function PersonalTasksSection({ workspaceId }: Props) {
   if (loading) return null;
 
   return (
-    <section className="bg-surface-card border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+    <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
       {/* Header */}
       <div
         className="flex items-center justify-between px-5 py-4 border-b border-slate-100"
@@ -591,7 +591,7 @@ function TaskRow({
       {task.due_date && !task.completed && (
         <span
           className={`flex items-center gap-1 text-xs flex-shrink-0 ${
-            isOverdue ? 'text-red-600 font-medium' : 'text-slate-500'
+            isOverdue ? 'text-accent-crimson font-medium' : 'text-slate-500'
           }`}
         >
           {isOverdue && <AlertCircle className="w-3 h-3" />}
@@ -606,7 +606,7 @@ function TaskRow({
           e.stopPropagation();
           onDelete();
         }}
-        className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-red-500 transition-all flex-shrink-0"
+        className="opacity-0 group-hover:opacity-100 p-1 text-slate-300 hover:text-accent-crimson transition-all flex-shrink-0"
         title="Delete task"
       >
         <Trash2 className="w-3.5 h-3.5" />

@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, Subtask } from '../lib/database.types';
 import { isPast, isToday } from 'date-fns';
-import { parseLocalDate, formatDate, pillTextColor } from '../lib/utils';
+import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -26,12 +26,7 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 
-const priorityColors: Record<string, string> = {
-  urgent: 'bg-red-500',
-  high: 'bg-orange-500',
-  medium: 'bg-yellow-500',
-  low: 'bg-slate-300',
-};
+// Priority colors now sourced from PRIORITY_STYLES in lib/utils
 
 const priorityLabels: Record<string, string> = {
   urgent: 'Urgent',
@@ -283,7 +278,7 @@ export function MyWorkPage() {
                 className="flex items-center gap-2 px-5 py-4 border-b border-slate-100"
                 style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
               >
-                <h2 className="text-lg font-semibold text-white">My Tasks</h2>
+                <h2 className="text-lg font-heading text-white">My Tasks</h2>
                 <span className="text-xs font-medium text-white/80 bg-white/20 px-2 py-0.5 rounded-full">
                   {sortedItems.length}
                 </span>
@@ -394,7 +389,7 @@ export function MyWorkPage() {
                             {item.due_date ? (
                               <span
                                 className={`flex items-center gap-1 text-sm ${
-                                  isOverdue ? 'text-red-600 font-medium' : done ? 'text-slate-400' : 'text-slate-600'
+                                  isOverdue ? 'text-accent-crimson font-medium' : done ? 'text-slate-400' : 'text-slate-600'
                                 }`}
                               >
                                 {isOverdue && <AlertCircle className="w-3.5 h-3.5" />}
@@ -407,7 +402,7 @@ export function MyWorkPage() {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1.5">
-                              <span className={`w-2 h-2 rounded-full ${priorityColors[item.priority ?? 'medium']}`} />
+                              <span className={`w-2 h-2 rounded-full ${PRIORITY_STYLES[item.priority ?? 'medium']?.dot}`} />
                               <span className={`text-sm ${done ? 'text-slate-400' : 'text-slate-600'}`}>{priorityLabels[item.priority ?? 'medium']}</span>
                             </div>
                           </td>
@@ -428,7 +423,7 @@ export function MyWorkPage() {
                 style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
               >
                 <ListChecks className="w-5 h-5 text-white/80" />
-                <h2 className="text-lg font-semibold text-white">My Subtasks</h2>
+                <h2 className="text-lg font-heading text-white">My Subtasks</h2>
                 <span className="text-xs font-medium text-white/80 bg-white/20 px-2 py-0.5 rounded-full">
                   {subtasks.length}
                 </span>
@@ -471,7 +466,7 @@ export function MyWorkPage() {
                       {subtask.due_date && (
                         <span
                           className={`flex items-center gap-1 text-xs flex-shrink-0 ${
-                            isOverdue ? 'text-red-600 font-medium' : 'text-slate-500'
+                            isOverdue ? 'text-accent-crimson font-medium' : 'text-slate-500'
                           }`}
                         >
                           {isOverdue && <AlertCircle className="w-3 h-3" />}

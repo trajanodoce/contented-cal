@@ -214,7 +214,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
           {item.due_date && (
             <div
               className={`flex items-center gap-1 text-xs ${
-                isOverdue ? 'text-red-600 font-medium' : 'text-slate-500'
+                isOverdue ? 'text-accent-crimson font-medium' : 'text-slate-500'
               }`}
             >
               {isOverdue && <AlertCircle className="w-3 h-3" />}

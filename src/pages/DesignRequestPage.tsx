@@ -335,7 +335,7 @@ export function DesignRequestPage() {
                       className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                     />
                     {assetLinks.length > 1 && (
-                      <button type="button" onClick={() => removeLink(i)} className="text-slate-400 hover:text-red-500 transition-colors">
+                      <button type="button" onClick={() => removeLink(i)} className="text-slate-400 hover:text-accent-crimson transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     )}
@@ -366,7 +366,7 @@ export function DesignRequestPage() {
                       className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
                     />
                     {subtasks.length > 1 && (
-                      <button type="button" onClick={() => removeSubtask(i)} className="text-slate-400 hover:text-red-500 transition-colors">
+                      <button type="button" onClick={() => removeSubtask(i)} className="text-slate-400 hover:text-accent-crimson transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     )}

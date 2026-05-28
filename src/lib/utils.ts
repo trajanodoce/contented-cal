@@ -38,14 +38,48 @@ export function isOverdue(dateStr: string | null | undefined): boolean {
 }
 
 export function getPriorityColor(priority: string): string {
-  switch (priority) {
-    case 'urgent': return 'text-red-600 bg-red-50 border-red-200';
-    case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
-    case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    case 'low': return 'text-gray-500 bg-gray-50 border-gray-200';
-    default: return 'text-gray-500 bg-gray-50 border-gray-200';
-  }
+  return PRIORITY_STYLES[priority]?.pill ?? PRIORITY_STYLES.low.pill;
 }
+
+// ── Centralized priority palette ────────────────────────────────────────────
+// Single source of truth — every page imports from here.
+
+export const PRIORITY_STYLES: Record<string, {
+  label: string;
+  dot: string;       // small colored dot (bg class)
+  text: string;      // text color class
+  pill: string;      // text + bg + border for pill badges
+  hex: string;       // raw hex for select option dots
+}> = {
+  urgent: {
+    label: 'Urgent',
+    dot: 'bg-accent-crimson',
+    text: 'text-accent-crimson',
+    pill: 'text-accent-crimson bg-[#BA2C2C08] border-[#BA2C2C30]',
+    hex: '#BA2C2C',
+  },
+  high: {
+    label: 'High',
+    dot: 'bg-orange-500',
+    text: 'text-orange-700',
+    pill: 'text-orange-700 bg-orange-50 border-orange-200',
+    hex: '#f97316',
+  },
+  medium: {
+    label: 'Medium',
+    dot: 'bg-yellow-500',
+    text: 'text-yellow-700',
+    pill: 'text-yellow-700 bg-yellow-50 border-yellow-200',
+    hex: '#fbbf24',
+  },
+  low: {
+    label: 'Low',
+    dot: 'bg-slate-400',
+    text: 'text-slate-600',
+    pill: 'text-slate-600 bg-[#005D9712] border-slate-200',
+    hex: '#94a3b8',
+  },
+};
 
 /**
  * Convert any hex color into a vivid, dark variant for pill text/borders.
@@ -82,13 +116,7 @@ export function pillTextColor(hex: string): string {
 }
 
 export function getPriorityDot(priority: string): string {
-  switch (priority) {
-    case 'urgent': return 'bg-red-500';
-    case 'high': return 'bg-orange-500';
-    case 'medium': return 'bg-yellow-500';
-    case 'low': return 'bg-gray-400';
-    default: return 'bg-gray-400';
-  }
+  return PRIORITY_STYLES[priority]?.dot ?? PRIORITY_STYLES.low.dot;
 }
 
 export function getUserInitials(email?: string, fullName?: string): string {

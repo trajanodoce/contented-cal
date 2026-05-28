@@ -335,7 +335,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                       e.stopPropagation();
                       setShowDeleteConfirm(type.id);
                     }}
-                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -512,7 +512,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowCreateModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowCreateModal(false)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Create Content Type</h3>
 
@@ -579,11 +579,11 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowDeleteConfirm(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowDeleteConfirm(null)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-full bg-[#BA2C2C12] flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-accent-crimson" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900">Delete Content Type?</h3>
             </div>
@@ -599,7 +599,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
               </button>
               <button
                 onClick={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white bg-accent-crimson hover:bg-[#a02525] rounded-lg transition-colors"
               >
                 Delete
               </button>
@@ -706,7 +706,7 @@ function CustomFieldsManager({
               </div>
               <button
                 onClick={() => handleDelete(field.id)}
-                className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                className="p-1 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -752,7 +752,7 @@ function CustomFieldsManager({
                 {newOptions.map((opt, i) => (
                   <span key={i} className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-slate-200 rounded-full">
                     {opt.label}
-                    <button onClick={() => setNewOptions(prev => prev.filter((_, j) => j !== i))} className="hover:text-red-600">
+                    <button onClick={() => setNewOptions(prev => prev.filter((_, j) => j !== i))} className="hover:text-accent-crimson">
                       <X className="w-3 h-3" />
                     </button>
                   </span>

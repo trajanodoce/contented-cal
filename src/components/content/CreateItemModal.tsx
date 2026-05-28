@@ -464,8 +464,8 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
   }
 
   const modal = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="bg-surface-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col" style={{ border: '1.5px solid #002339' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]">
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col" style={{ border: '1px solid #00233930' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">

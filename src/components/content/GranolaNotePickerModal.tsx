@@ -88,8 +88,8 @@ export function GranolaNotePickerModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-surface-card rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden" style={{ border: '1.5px solid #002339' }}>
+    <div className="fixed inset-0 bg-[#00233960] flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden" style={{ border: '1px solid #00233930' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export function GranolaNotePickerModal({
         {/* Notes list */}
         <div className="flex-1 overflow-y-auto">
           {error && (
-            <div className="flex items-center gap-2 px-5 py-3 bg-red-50 text-red-700 text-sm">
+            <div className="flex items-center gap-2 px-5 py-3 bg-[#BA2C2C08] text-accent-crimson text-sm">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>

@@ -169,7 +169,7 @@ export function TeamTab() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowAddMemberModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-500 transition-colors"
             >
               <UserCheck className="w-4 h-4" />
               Add Member
@@ -214,7 +214,7 @@ export function TeamTab() {
                     <button
                       onClick={() => handleCancelInvite(invite.id)}
                       disabled={cancellingInviteId === invite.id}
-                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors"
                       title="Cancel invite"
                     >
                       {cancellingInviteId === invite.id ? (
@@ -301,7 +301,7 @@ export function TeamTab() {
                       {!isCurrentUser && (
                         <button
                           onClick={() => setRemovingId(member.user_id)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors"
                           title="Remove member"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -337,11 +337,11 @@ export function TeamTab() {
 
       {/* Remove Confirmation */}
       {removingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setRemovingId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setRemovingId(null)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-full bg-[#BA2C2C12] flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-accent-crimson" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900">Remove Team Member?</h3>
             </div>
@@ -357,7 +357,7 @@ export function TeamTab() {
               </button>
               <button
                 onClick={() => removingId && handleRemoveMember(removingId)}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-white bg-accent-crimson hover:bg-[#a02525] rounded-lg transition-colors"
               >
                 Remove Member
               </button>
@@ -484,7 +484,7 @@ function AddMemberModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={onClose}>
       <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-slate-900">Add Existing User</h3>
@@ -565,7 +565,7 @@ function AddMemberModal({
                   <button
                     onClick={() => handleAdd(profile)}
                     disabled={addingId === profile.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0 ml-3"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-brand-600 hover:bg-brand-500 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0 ml-3"
                   >
                     {addingId === profile.id ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -681,7 +681,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={onClose}>
       <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Invite Team Member</h3>
 
@@ -715,10 +715,10 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
             <div
               className={`p-3 rounded-lg text-sm ${
                 message.type === 'error'
-                  ? 'bg-red-50 text-red-700 border border-red-200'
+                  ? 'bg-[#BA2C2C08] text-accent-crimson border border-[#BA2C2C30]'
                   : message.type === 'info'
                   ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                  : 'bg-green-50 text-green-700 border border-green-200'
+                  : 'bg-[#92D1B218] text-[#2F8889] border border-[#92D1B240]'
               }`}
             >
               {message.text}

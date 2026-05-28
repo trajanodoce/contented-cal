@@ -272,7 +272,7 @@ export function ProjectDetailPage() {
   // Status badge colors
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      active: 'bg-green-100 text-green-700',
+      active: 'bg-[#92D1B218] text-[#2F8889]',
       completed: 'bg-brand-100 text-brand-700',
       archived: 'bg-[#005D9712] text-slate-500',
     };
@@ -352,7 +352,7 @@ export function ProjectDetailPage() {
           ) : (
             <h1
               onClick={() => setEditingTitle(true)}
-              className="text-xl font-semibold text-slate-900 cursor-pointer hover:text-brand-600 transition-colors"
+              className="text-xl font-display text-slate-900 cursor-pointer hover:text-brand-600 transition-colors"
             >
               {project.title}
             </h1>
@@ -555,7 +555,7 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#005D9708] transition-colors"
@@ -647,7 +647,7 @@ function OverviewTab({
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* Progress bar by board column */}
-      <div className="bg-surface-card rounded-lg p-5" style={{ border: '1px solid #00233930' }}>
+      <div className="bg-surface-card rounded-xl p-5" style={{ border: '1px solid #00233930' }}>
         <h3 className="text-sm font-semibold text-slate-700 mb-4">Progress</h3>
         {totalItems > 0 ? (
           <>
@@ -818,7 +818,7 @@ function TeamMembersSection({
   const isTaskAssignee = (userId: string) => taskAssigneeIds.includes(userId);
 
   return (
-    <div className="bg-surface-card rounded-lg p-5" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl p-5" style={{ border: '1px solid #00233930' }}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-slate-700">
           Team Members
@@ -868,7 +868,7 @@ function TeamMembersSection({
               {isManualMember(m.id) && !isTaskAssignee(m.id) && (
                 <button
                   onClick={() => removeMember(m.id)}
-                  className="p-0.5 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all rounded"
+                  className="p-0.5 text-slate-300 hover:text-accent-crimson opacity-0 group-hover:opacity-100 transition-all rounded"
                   title="Remove from project"
                 >
                   <X className="w-3 h-3" />
@@ -897,7 +897,7 @@ function StatCard({
   value: number;
 }) {
   return (
-    <div className="bg-surface-card rounded-lg p-4" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid #00233930' }}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
         <span className="text-xs text-slate-500">{label}</span>
@@ -959,9 +959,9 @@ function ListTab({
           No content items match the current filters.
         </div>
       ) : (
-        <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
+        <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
           <table className="w-full">
-            <thead className="bg-[#005D9712] border-b-2 border-slate-300">
+            <thead className="bg-[#005D9712] border-b border-slate-200">
               <tr>
                 <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Title
@@ -983,7 +983,7 @@ function ListTab({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-300">
+            <tbody className="divide-y divide-slate-100">
               {filteredItems.map((item) => {
                 const ct = contentTypes.find(
                   (c) => c.id === item.content_type_id

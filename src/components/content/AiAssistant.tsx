@@ -114,7 +114,7 @@ function InsertModal({
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onCancel}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={onCancel}>
       <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
         <h3 className="text-sm font-semibold text-slate-900 mb-1">Insert into description</h3>
         <p className="text-xs text-slate-500 mb-4">The description already has content. How should this be added?</p>

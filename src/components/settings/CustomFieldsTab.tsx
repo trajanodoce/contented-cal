@@ -254,7 +254,7 @@ function FieldTable({
                     </button>
                     <button
                       onClick={() => onDelete(field)}
-                      className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
                       title="Delete field"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -415,7 +415,7 @@ function FieldForm({
                   <button
                     type="button"
                     onClick={() => setOptions(prev => prev.filter((_, j) => j !== i))}
-                    className="hover:text-red-600"
+                    className="hover:text-accent-crimson"
                   >
                     <X className="w-3 h-3" />
                   </button>

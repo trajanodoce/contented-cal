@@ -58,7 +58,7 @@ function FieldRow({ field, onDelete, onToggleRequired, onDragStart, onDragOver, 
         >
           {field.required ? 'Required' : 'Optional'}
         </button>
-        <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button onClick={onDelete} className="p-1.5 text-slate-400 hover:text-accent-crimson opacity-0 group-hover:opacity-100 transition-opacity">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -506,7 +506,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
                     Edit
                   </button>
                   {isAdmin && (
-                    <button onClick={() => deleteForm(form.id)} className="p-1.5 text-slate-400 hover:text-red-500">
+                    <button onClick={() => deleteForm(form.id)} className="p-1.5 text-slate-400 hover:text-accent-crimson">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}

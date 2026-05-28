@@ -249,22 +249,16 @@ export function FilterBar({
           />
         )}
 
-        {/* Clear all filters — chalkboard eraser style */}
+        {/* Clear all filters */}
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="relative flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded transition-all hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-            style={{
-              background: 'linear-gradient(to bottom, #4a4a4a 0%, #2d2d2d 60%, #1a1a1a 100%)',
-              color: '#e8e0d0',
-              border: '2px solid #5c4a3a',
-              borderBottom: '5px solid #8b7355',
-              letterSpacing: '0.08em',
-            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all hover:scale-105 active:scale-95 text-accent-crimson hover:bg-[#BA2C2C08]"
+            style={{ border: '1px solid #BA2C2C30' }}
             title="Clear all filters"
           >
-            <span style={{ fontSize: '14px', lineHeight: 1 }}>🧽</span>
-            Erase All
+            <X className="w-3.5 h-3.5" />
+            Clear
           </button>
         )}
       </div>

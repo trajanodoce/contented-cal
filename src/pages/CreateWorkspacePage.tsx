@@ -132,7 +132,7 @@ export function CreateWorkspacePage() {
           </div>
 
           {/* Form */}
-          <div className="bg-surface-card rounded-2xl shadow-sm border border-slate-200 p-8">
+          <div className="bg-surface-card rounded-2xl shadow-sm p-8" style={{ border: '1px solid #00233930' }}>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1.5">

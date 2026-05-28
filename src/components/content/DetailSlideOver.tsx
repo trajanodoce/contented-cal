@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json, Profile } from '../../lib/database.types';
-import { formatDateFull } from '../../lib/utils';
+import { formatDateFull, PRIORITY_STYLES } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import { SubtasksSection } from './SubtasksSection';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, LINEAR_TEXT, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
@@ -94,7 +94,7 @@ function TitleInput({ title, onSave }: { title: string; onSave: (val: string) =>
         if (e.key === 'Enter') e.currentTarget.blur();
         if (e.key === 'Escape') { setDraft(savedRef.current); e.currentTarget.blur(); }
       }}
-      className="w-full text-xl font-bold text-slate-900 outline-none bg-transparent border-b-2 border-transparent focus:border-brand-400 transition-colors"
+      className="w-full text-xl font-display text-slate-900 outline-none bg-transparent border-b-2 border-transparent focus:border-brand-400 transition-colors"
     />
   );
 }
@@ -438,7 +438,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{ color: ORDINAL_TEXT, borderColor: `${ORDINAL_COLOR}60`, backgroundColor: 'white' }}
+                    style={{ color: ORDINAL_TEXT, borderColor: `${ORDINAL_COLOR}60`, backgroundColor: '#F7F9FC' }}
                   >
                     <span>Open in Ordinal</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -450,7 +450,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{ color: LINEAR_TEXT, borderColor: `${LINEAR_COLOR}60`, backgroundColor: 'white' }}
+                    style={{ color: LINEAR_TEXT, borderColor: `${LINEAR_COLOR}60`, backgroundColor: '#F7F9FC' }}
                   >
                     <span>Open in Linear</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -495,7 +495,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                  style={{ color: '#005D97', borderColor: '#005D9740', backgroundColor: 'white' }}
+                  style={{ color: '#005D97', borderColor: '#005D9740', backgroundColor: '#F7F9FC' }}
                 >
                   <span>View in Slack</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -652,7 +652,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       options={PRIORITIES.map(p => ({
                         value: p,
                         label: p.charAt(0).toUpperCase() + p.slice(1),
-                        color: p === 'urgent' ? '#ef4444' : p === 'high' ? '#f97316' : p === 'medium' ? '#fbbf24' : '#9ca3af',
+                        color: PRIORITY_STYLES[p]?.hex ?? '#94a3b8',
                       }))}
                     />
                   </div>
@@ -988,10 +988,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
         {/* Delete confirmation modal */}
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowDeleteConfirm(false)}>
-            <div className="bg-surface-card rounded-2xl shadow-xl max-w-sm w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-red-100">
-                <Trash2 className="w-6 h-6 text-red-500" />
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00233960]" onClick={() => setShowDeleteConfirm(false)}>
+            <div className="bg-surface-card rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-[#BA2C2C12]">
+                <Trash2 className="w-6 h-6 text-accent-crimson" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900 text-center">Are you sure?</h3>
               <p className="mt-2 text-sm text-slate-500 text-center">
@@ -1007,7 +1007,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 <button
                   onClick={deleteItem}
                   disabled={deleting}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-accent-crimson hover:bg-[#a02525] rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                   Delete forever

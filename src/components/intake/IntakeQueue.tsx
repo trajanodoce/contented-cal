@@ -431,7 +431,7 @@ function RejectReasonPicker({ onSelect, onCancel, disabled }: {
           key={reason}
           onClick={() => onSelect(reason)}
           disabled={disabled}
-          className="px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 disabled:opacity-60 transition-colors"
+          className="px-3 py-1.5 text-sm font-medium text-accent-crimson bg-[#BA2C2C08] border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C15] disabled:opacity-60 transition-colors"
         >
           {reason}
         </button>
@@ -483,7 +483,7 @@ function BulkTriageToolbar({ count, processing, showReject, onApprove, onStartRe
           <button
             onClick={onStartReject}
             disabled={processing}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors disabled:opacity-50"
           >
             <X className="w-4 h-4" />
             Reject
@@ -707,8 +707,8 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700',
-    converted: 'bg-green-100 text-green-700',
-    rejected: 'bg-red-100 text-red-600',
+    converted: 'bg-[#92D1B218] text-[#2F8889]',
+    rejected: 'bg-[#BA2C2C12] text-accent-crimson',
   };
   return (
     <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${map[status] ?? 'bg-[#005D9712] text-slate-500'}`}>
@@ -786,13 +786,13 @@ function SubmissionDetail({
           </div>
         )}
         {sub.status === 'converted' && (
-          <div className="px-6 py-4 bg-green-50 border-t border-green-100 flex items-center gap-2 text-sm text-green-700">
+          <div className="px-6 py-4 bg-[#92D1B218] border-t border-[#92D1B230] flex items-center gap-2 text-sm text-[#2F8889]">
             <Check className="w-4 h-4" />
             Converted to a content item
           </div>
         )}
         {sub.status === 'rejected' && (
-          <div className="px-6 py-4 bg-red-50 border-t border-red-100 flex items-center gap-2 text-sm text-red-600">
+          <div className="px-6 py-4 bg-[#BA2C2C08] border-t border-[#BA2C2C15] flex items-center gap-2 text-sm text-accent-crimson">
             <X className="w-4 h-4" />
             Submission rejected
           </div>

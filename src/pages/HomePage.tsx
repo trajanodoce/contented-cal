@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { supabase } from '../lib/supabase';
 import type { ContentItem, Project } from '../lib/database.types';
-import { parseLocalDate, formatDate } from '../lib/utils';
+import { parseLocalDate, formatDate, PRIORITY_STYLES } from '../lib/utils';
 import { isPast, isToday, formatDistanceToNow } from 'date-fns';
 import {
   LayoutDashboard,
@@ -33,11 +33,11 @@ interface WorkspaceStats {
   recent_activity: { id: string; action: string; user_name: string | null; created_at: string }[] | null;
 }
 
-const PRIORITY_CONFIG: Record<string, { label: string; color: string; bg: string; icon: typeof Flame }> = {
-  urgent: { label: 'Urgent', color: 'text-red-700', bg: 'bg-red-50 border-red-200', icon: Flame },
-  high: { label: 'High', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200', icon: AlertTriangle },
-  medium: { label: 'Medium', color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200', icon: AlertCircle },
-  low: { label: 'Low', color: 'text-slate-600', bg: 'bg-[#005D9712] border-slate-200', icon: CheckCircle2 },
+const PRIORITY_ICONS: Record<string, typeof Flame> = {
+  urgent: Flame,
+  high: AlertTriangle,
+  medium: AlertCircle,
+  low: CheckCircle2,
 };
 
 export function HomePage() {
@@ -115,7 +115,7 @@ export function HomePage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-display text-slate-900">
           {greeting}, {userName}
         </h1>
         <p className="text-slate-500 mt-1">
@@ -137,8 +137,8 @@ export function HomePage() {
           label="Overdue"
           value={stats?.overdue_items ?? 0}
           icon={<AlertTriangle className="w-5 h-5" />}
-          color="text-red-600"
-          bg="bg-red-50"
+          color="text-accent-crimson"
+          bg="bg-[#BA2C2C12]"
           alert={!!stats?.overdue_items}
           onClick={() => navigate('/list')}
         />
@@ -155,8 +155,8 @@ export function HomePage() {
           label="Active Projects"
           value={projects.length}
           icon={<FolderOpen className="w-5 h-5" />}
-          color="text-violet-600"
-          bg="bg-violet-50"
+          color="text-brand-600"
+          bg="bg-brand-50"
           onClick={() => navigate('/projects')}
         />
       </div>
@@ -170,7 +170,7 @@ export function HomePage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Flame className="w-4.5 h-4.5 text-orange-500" />
-                <h2 className="font-semibold text-slate-900">High Priority Items</h2>
+                <h2 className="font-heading text-slate-900">High Priority Items</h2>
                 {highPriorityItems.length > 0 && (
                   <span className="text-xs font-medium text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
                     {highPriorityItems.length}
@@ -187,7 +187,7 @@ export function HomePage() {
 
             {highPriorityItems.length === 0 ? (
               <div className="px-5 py-10 text-center text-slate-400">
-                <CheckCircle2 className="w-10 h-10 mx-auto mb-2 text-green-400" />
+                <CheckCircle2 className="w-10 h-10 mx-auto mb-2 text-[#92D1B2]" />
                 <p className="font-medium text-slate-600">All clear!</p>
                 <p className="text-sm">No urgent or high-priority items right now.</p>
               </div>
@@ -195,24 +195,24 @@ export function HomePage() {
               <div className="divide-y divide-slate-100">
                 {highPriorityItems.map(item => {
                   const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date));
-                  const priorityCfg = PRIORITY_CONFIG[item.priority ?? 'low'];
+                  const pStyle = PRIORITY_STYLES[item.priority ?? 'low'];
                   return (
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
                       className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors text-left group"
                     >
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${item.priority === 'urgent' ? 'bg-red-500' : 'bg-orange-400'}`} />
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${pStyle.dot}`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-slate-900 truncate group-hover:text-brand-600 transition-colors">
                           {item.title}
                         </p>
                         <div className="flex items-center gap-3 mt-0.5">
-                          <span className={`text-xs font-medium ${priorityCfg.color}`}>
-                            {priorityCfg.label}
+                          <span className={`text-xs font-medium ${pStyle.text}`}>
+                            {pStyle.label}
                           </span>
                           {item.due_date && (
-                            <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-600 font-medium' : 'text-slate-400'}`}>
+                            <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-accent-crimson font-medium' : 'text-slate-400'}`}>
                               <CalendarClock className="w-3 h-3" />
                               {formatDate(item.due_date)}
                             </span>
@@ -232,7 +232,7 @@ export function HomePage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4.5 h-4.5 text-brand-500" />
-                <h2 className="font-semibold text-slate-900">Due This Week</h2>
+                <h2 className="font-heading text-slate-900">Due This Week</h2>
               </div>
               <button
                 onClick={() => navigate('/calendar')}
@@ -267,8 +267,8 @@ export function HomePage() {
                         {item.title}
                       </p>
                       {item.priority && item.priority !== 'low' && (
-                        <span className={`text-xs font-medium ${PRIORITY_CONFIG[item.priority]?.color ?? 'text-slate-500'}`}>
-                          {PRIORITY_CONFIG[item.priority]?.label}
+                        <span className={`text-xs font-medium ${PRIORITY_STYLES[item.priority]?.text ?? 'text-slate-500'}`}>
+                          {PRIORITY_STYLES[item.priority]?.label}
                         </span>
                       )}
                       <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500 shrink-0" />
@@ -284,8 +284,8 @@ export function HomePage() {
             <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <FolderOpen className="w-4.5 h-4.5 text-violet-500" />
-                  <h2 className="font-semibold text-slate-900">Active Projects</h2>
+                  <FolderOpen className="w-4.5 h-4.5 text-brand-500" />
+                  <h2 className="font-heading text-slate-900">Active Projects</h2>
                 </div>
                 <button
                   onClick={() => navigate('/projects')}
@@ -328,7 +328,7 @@ export function HomePage() {
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4.5 h-4.5 text-slate-500" />
-                <h2 className="font-semibold text-slate-900">By Status</h2>
+                <h2 className="font-heading text-slate-900">By Status</h2>
               </div>
             </div>
 
@@ -368,20 +368,20 @@ export function HomePage() {
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4.5 h-4.5 text-slate-500" />
-                <h2 className="font-semibold text-slate-900">By Priority</h2>
+                <h2 className="font-heading text-slate-900">By Priority</h2>
               </div>
             </div>
             <div className="p-4 grid grid-cols-2 gap-2">
               {['urgent', 'high', 'medium', 'low'].map(priority => {
-                const cfg = PRIORITY_CONFIG[priority];
+                const ps = PRIORITY_STYLES[priority];
                 const count = stats?.items_by_priority?.find(p => p.priority === priority)?.count ?? 0;
-                const Icon = cfg.icon;
+                const Icon = PRIORITY_ICONS[priority];
                 return (
-                  <div key={priority} className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border ${cfg.bg}`}>
-                    <Icon className={`w-4 h-4 ${cfg.color}`} />
+                  <div key={priority} className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border ${ps.pill}`}>
+                    <Icon className={`w-4 h-4 ${ps.text}`} />
                     <div>
                       <p className="text-lg font-semibold text-slate-900 leading-none">{count}</p>
-                      <p className={`text-xs ${cfg.color} mt-0.5`}>{cfg.label}</p>
+                      <p className={`text-xs ${ps.text} mt-0.5`}>{ps.label}</p>
                     </div>
                   </div>
                 );
@@ -394,7 +394,7 @@ export function HomePage() {
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Activity className="w-4.5 h-4.5 text-slate-500" />
-                <h2 className="font-semibold text-slate-900">Recent Activity</h2>
+                <h2 className="font-heading text-slate-900">Recent Activity</h2>
               </div>
             </div>
 
@@ -452,7 +452,7 @@ function StatCard({
           {icon}
         </div>
         {alert && value > 0 && (
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-accent-crimson animate-pulse" />
         )}
       </div>
       <p className="text-2xl font-bold text-slate-900">{value}</p>

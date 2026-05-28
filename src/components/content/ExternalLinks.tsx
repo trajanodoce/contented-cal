@@ -113,7 +113,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
         {!readOnly && (
           <button
             onClick={onDelete}
-            className="absolute top-2 right-2 w-6 h-6 bg-white/90 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+            className="absolute top-2 right-2 w-6 h-6 bg-surface-card/90 rounded-full flex items-center justify-center text-slate-400 hover:text-accent-crimson opacity-0 group-hover:opacity-100 transition-all shadow-sm"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -555,7 +555,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                           </button>
                           <button
                             onClick={() => handleDelete(link)}
-                            className="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                            className="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-accent-crimson opacity-0 group-hover:opacity-100 transition-all shrink-0"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>

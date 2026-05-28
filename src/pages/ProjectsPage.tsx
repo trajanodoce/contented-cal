@@ -37,7 +37,7 @@ interface ContentItemStub {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-green-100 text-green-700',
+  active: 'bg-[#92D1B218] text-[#2F8889]',
   completed: 'bg-brand-100 text-brand-700',
   archived: 'bg-[#005D9712] text-slate-500',
 };
@@ -132,12 +132,12 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* backdrop */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#00233960]" onClick={onClose} />
 
       <form
         onSubmit={handleSubmit}
-        className="relative bg-surface-card rounded-lg shadow-xl w-full max-w-lg mx-4 p-6 space-y-4"
-        style={{ border: '1.5px solid #002339' }}
+        className="relative bg-surface-card rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 space-y-4"
+        style={{ border: '1px solid #00233930' }}
       >
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">Create Project</h2>
@@ -337,7 +337,7 @@ export function ProjectsPage() {
     <div className="p-8">
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Projects</h1>
+        <h1 className="text-2xl font-display text-slate-900">Projects</h1>
         <button
           onClick={() => setShowCreate(true)}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700"
@@ -396,7 +396,7 @@ export function ProjectsPage() {
               <button
                 key={project.id}
                 onClick={() => navigate(`/projects/${project.id}`)}
-                className="bg-surface-card rounded-lg p-5 text-left hover:shadow-sm transition-all"
+                className="bg-surface-card rounded-xl p-5 text-left hover:shadow-md transition-all"
                 style={{ border: '1px solid #00233930' }}
               >
                 {/* Header row */}

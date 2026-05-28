@@ -434,7 +434,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                           {!readOnly && (
                             <button
                               onClick={() => deleteItem(item)}
-                              className="p-1 text-slate-400 hover:text-red-500 rounded"
+                              className="p-1 text-slate-400 hover:text-accent-crimson rounded"
                               title="Remove"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -538,7 +538,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                           {!readOnly && (
                             <button
                               onClick={() => deleteItem(item)}
-                              className="p-1 text-slate-400 hover:text-red-500 rounded"
+                              className="p-1 text-slate-400 hover:text-accent-crimson rounded"
                               title="Remove"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

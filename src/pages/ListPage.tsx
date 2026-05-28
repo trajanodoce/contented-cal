@@ -4,7 +4,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 // UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
-import { parseLocalDate, formatDate, pillTextColor } from '../lib/utils';
+import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES } from '../lib/utils';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
 import { CreateItemModal } from '../components/content/CreateItemModal';
@@ -93,12 +93,7 @@ function formatDueDateWithStatus(date: string | null): { text: string; isOverdue
 }
 
 // Priority configuration
-const priorityConfig = {
-  urgent: { color: 'bg-red-500', label: 'Urgent', dotColor: 'bg-red-500' },
-  high: { color: 'bg-orange-500', label: 'High', dotColor: 'bg-orange-500' },
-  medium: { color: 'bg-yellow-500', label: 'Medium', dotColor: 'bg-yellow-500' },
-  low: { color: 'bg-slate-400', label: 'Low', dotColor: 'bg-slate-400' },
-};
+// Priority config now sourced from PRIORITY_STYLES in lib/utils
 
 export function ListPage() {
   const { currentWorkspace, userRole } = useWorkspace();
@@ -314,7 +309,7 @@ export function ListPage() {
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
           style={{
             borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
-            backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
+            backgroundColor: showOrdinal ? '#F5F3FF' : '#F7F9FC',
             color: showOrdinal ? ORDINAL_TEXT : '#64748b',
           }}
           title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
@@ -375,7 +370,7 @@ export function ListPage() {
                 <SortHeader label="Channel" field="channel" sort={sort} onSort={handleSort} />
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-300">
+            <tbody className="divide-y divide-slate-100">
               {sortedItems.map((item) => {
                 const isSelected = selectedItems.has(item.id);
                 const contentType = getContentType(item.content_type_id, contentTypes);
@@ -385,7 +380,7 @@ export function ListPage() {
                 const assignees = getAssignees(item.assignee_ids || [], members);
                 const dueDate = formatDueDateWithStatus(item.due_date);
                 if (isDone) dueDate.isOverdue = false;
-                const priority = priorityConfig[(item.priority ?? 'medium') as keyof typeof priorityConfig] || priorityConfig.medium;
+                const priority = PRIORITY_STYLES[item.priority ?? 'medium'] ?? PRIORITY_STYLES.medium;
 
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
@@ -513,7 +508,7 @@ export function ListPage() {
                           onUpdate={handleItemUpdated}
                         />
                       ) : (
-                        <span className={`text-sm ${dueDate.isOverdue ? 'text-red-600 font-medium' : dueDate.isSoon ? 'text-amber-600' : 'text-slate-600'}`}>
+                        <span className={`text-sm ${dueDate.isOverdue ? 'text-accent-crimson font-medium' : dueDate.isSoon ? 'text-amber-600' : 'text-slate-600'}`}>
                           {dueDate.text}
                         </span>
                       )}
@@ -527,7 +522,7 @@ export function ListPage() {
                         />
                       ) : (
                         <div className="flex items-center gap-1.5">
-                          <span className={`w-2.5 h-2.5 rounded-full ${priority.dotColor}`} />
+                          <span className={`w-2.5 h-2.5 rounded-full ${priority.dot}`} />
                           <span className="text-sm text-slate-700">{priority.label}</span>
                         </div>
                       )}
@@ -661,7 +656,7 @@ function InlinePriorityEdit({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const currentPriority = priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig.medium;
+  const currentPriority = PRIORITY_STYLES[priority] ?? PRIORITY_STYLES.medium;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -689,7 +684,7 @@ function InlinePriorityEdit({
 
     // Log activity
     const { data: { user } } = await supabase.auth.getUser();
-    const priorityLabel = priorityConfig[newPriority as keyof typeof priorityConfig]?.label || newPriority;
+    const priorityLabel = PRIORITY_STYLES[newPriority]?.label || newPriority;
     await supabase.from('activity_log').insert({
       content_item_id: contentItemId,
       user_id: user?.id || null,
@@ -710,14 +705,14 @@ function InlinePriorityEdit({
         }}
         className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
       >
-        <span className={`w-2.5 h-2.5 rounded-full ${currentPriority.dotColor}`} />
+        <span className={`w-2.5 h-2.5 rounded-full ${currentPriority.dot}`} />
         <span className="text-sm text-slate-700">{currentPriority.label}</span>
         <ChevronDown className="w-3 h-3 text-slate-400" />
       </button>
 
       {isOpen && (
         <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[120px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
-          {Object.entries(priorityConfig).map(([key, config]) => (
+          {Object.entries(PRIORITY_STYLES).map(([key, ps]) => (
             <button
               key={key}
               onClick={(e) => {
@@ -728,9 +723,9 @@ function InlinePriorityEdit({
                 key === priority ? 'bg-brand-50' : ''
               }`}
             >
-              <span className={`w-2 h-2 rounded-full ${config.dotColor}`} />
+              <span className={`w-2 h-2 rounded-full ${ps.dot}`} />
               <span className={key === priority ? 'text-brand-900 font-medium' : 'text-slate-700'}>
-                {config.label}
+                {ps.label}
               </span>
               {key === priority && <Check className="w-4 h-4 ml-auto text-brand-600" />}
             </button>

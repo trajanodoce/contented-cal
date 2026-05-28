@@ -90,8 +90,8 @@ function PlatformIcon({ meta, size = 'md' }: { meta: PlatformMeta; size?: 'sm' |
 function StatusBadge({ status }: { status: string | null }) {
   if (!status) return null;
   const map: Record<string, { icon: typeof CheckCircle2; label: string; cls: string }> = {
-    connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-green-700 bg-green-50 border-green-200' },
-    error: { icon: AlertCircle, label: 'Error', cls: 'text-red-700 bg-red-50 border-red-200' },
+    connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-[#2F8889] bg-[#92D1B218] border-[#92D1B240]' },
+    error: { icon: AlertCircle, label: 'Error', cls: 'text-accent-crimson bg-[#BA2C2C08] border-[#BA2C2C30]' },
     disconnected: { icon: Clock, label: 'Disconnected', cls: 'text-slate-600 bg-surface-nested border-slate-200' },
   };
   const { icon: Icon, label, cls } = map[status] ?? map.disconnected;
@@ -196,7 +196,7 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
         {existing && (
           <button
             onClick={onDisconnect}
-            className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+            className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C08] transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" /> Disconnect
           </button>
@@ -278,7 +278,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
                   : 'bg-brand-600 text-white hover:bg-brand-500'}`}
             >
               {connected ? (
-                <><Check className="w-3.5 h-3.5 text-green-500" /> Manage</>
+                <><Check className="w-3.5 h-3.5 text-[#2F8889]" /> Manage</>
               ) : (
                 <><Plug className="w-3.5 h-3.5" /> Connect</>
               )}
@@ -327,7 +327,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               </button>
               <button
                 onClick={async () => { await onDisconnect(); setExpanded(false); }}
-                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C08] transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Disconnect
               </button>
@@ -779,7 +779,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
           const isExpanded = expandedPlatform === platform.id;
 
           return (
-            <div key={platform.id} className="bg-surface-card border border-slate-200 rounded-xl overflow-hidden">
+            <div key={platform.id} className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
               <div className="p-5">
                 <div className="flex items-start gap-4">
                   <div
@@ -793,7 +793,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       <h3 className="text-sm font-semibold text-slate-900">{platform.name}</h3>
                       <span className="text-xs text-slate-400 bg-[#005D9712] px-2 py-0.5 rounded-full">{platform.tag}</span>
                       {isConnected && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-green-700 bg-green-50 border-green-200">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-[#2F8889] bg-[#92D1B218] border-[#92D1B240]">
                           <CheckCircle2 className="w-3 h-3" />
                           Connected
                         </span>
@@ -820,7 +820,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                           : 'bg-brand-600 text-white hover:bg-brand-500'}`}
                     >
                       {isConnected ? (
-                        <><Check className="w-3.5 h-3.5 text-green-500" /> Manage</>
+                        <><Check className="w-3.5 h-3.5 text-[#2F8889]" /> Manage</>
                       ) : (
                         <><Plug className="w-3.5 h-3.5" /> Connect</>
                       )}
@@ -885,7 +885,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       {isConnected && (
                         <button
                           onClick={() => disconnectPersonal(platform.id)}
-                          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C08] transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" /> Disconnect
                         </button>
@@ -933,7 +933,7 @@ function IntegrationStatusList({ integrations }: { integrations: Integration[] }
         const meta = PLATFORMS.find(p => p.id === int.platform);
         if (!meta) return null;
         return (
-          <div key={int.id} className="flex items-center gap-3 p-3 bg-surface-card border border-slate-200 rounded-xl">
+          <div key={int.id} className="flex items-center gap-3 p-3 bg-surface-card rounded-xl" style={{ border: '1px solid #00233930' }}>
             <PlatformIcon meta={meta} size="sm" />
             <span className="text-sm font-medium text-slate-700 flex-1">{meta.name}</span>
             <StatusBadge status={int.status} />

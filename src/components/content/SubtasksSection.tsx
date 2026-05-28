@@ -526,7 +526,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
               {/* Delete button */}
               <button
                 onClick={() => deleteSubtask(subtask.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-red-500 flex-shrink-0"
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-accent-crimson flex-shrink-0"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

@@ -45,7 +45,7 @@ export function SettingsPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Settings</h1>
+        <h1 className="text-2xl font-display text-slate-900">Settings</h1>
         <p className="text-slate-500 mt-1">Manage your workspace configuration</p>
       </div>
 
@@ -253,7 +253,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
               <button
                 onClick={handleRemoveLogo}
                 disabled={isUploading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
                 Remove
@@ -487,7 +487,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
           </button>
         </div>
       ) : (
-        <div className="border border-slate-200 rounded-lg overflow-hidden">
+        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
           <table className="w-full">
             <thead className="bg-[#005D9712]">
               <tr>
@@ -550,7 +550,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                       </button>
                       <button
                         onClick={() => setShowDeleteConfirm(column.id)}
-                        className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded"
+                        className="p-1 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -565,7 +565,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
 
       {/* Create/Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowForm(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowForm(false)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-900 mb-4">
               {editingColumn ? 'Edit Column' : 'Create Column'}
@@ -621,11 +621,11 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowDeleteConfirm(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowDeleteConfirm(null)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-full bg-[#BA2C2C12] flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-accent-crimson" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900">Delete Column?</h3>
             </div>
@@ -650,7 +650,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
               <button
                 onClick={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
                 disabled={columns.length <= 1}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-accent-crimson hover:bg-[#a02525] rounded-lg transition-colors disabled:opacity-50"
               >
                 Delete
               </button>
