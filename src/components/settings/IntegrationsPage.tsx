@@ -33,7 +33,7 @@ const PLATFORMS: PlatformMeta[] = [
     id: 'ordinal',
     name: 'Ordinal Social',
     description: 'Sync social media posts from Ordinal. View and track social content alongside your other content calendar items.',
-    iconBg: '#D3CDEC40',
+    iconBg: '#C4B5D940',
     iconText: '⚡',
     iconColor: '#5B4F8A',
     category: 'Social Media',

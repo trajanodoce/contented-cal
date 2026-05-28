@@ -6,7 +6,7 @@ import type { ContentItem } from './database.types';
 // is needed. The bg tints get an alpha suffix (e.g. ${ORDINAL_COLOR}18) at
 // the call site to soften them for row backgrounds.
 
-export const ORDINAL_COLOR = '#D3CDEC';   // purple — Ordinal posts
+export const ORDINAL_COLOR = '#C4B5D9';   // purple — Ordinal posts
 export const ORDINAL_TEXT  = '#5B4F8A';   // deeper purple for icons/text
 
 export const LINEAR_COLOR  = '#FFC3B8';   // coral — Linear issues

@@ -44,7 +44,7 @@ const priorityColors: Record<string, string> = {
 };
 
 const LINK_PLATFORM_META: Record<string, { label: string; bg: string; color: string; icon: string }> = {
-  ordinal:      { label: 'Ordinal',      bg: '#D3CDEC40', color: '#5B4F8A', icon: '⬡' },
+  ordinal:      { label: 'Ordinal',      bg: '#C4B5D940', color: '#5B4F8A', icon: '⬡' },
   figma:        { label: 'Figma',        bg: '#F5F3FF', color: '#7C3AED', icon: 'F' },
   canva:        { label: 'Canva',        bg: '#EFF6FF', color: '#2563EB', icon: 'C' },
   miro:         { label: 'Miro',         bg: '#FFFBEB', color: '#D97706', icon: 'M' },
