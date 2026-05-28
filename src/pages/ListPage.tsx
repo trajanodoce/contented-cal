@@ -125,10 +125,7 @@ export function ListPage() {
     const saved = localStorage.getItem('cc-show-ordinal');
     return saved !== null ? saved === 'true' : true;
   });
-  const [showGranola, setShowGranola] = useState(() => {
-    const saved = localStorage.getItem('cc-show-granola');
-    return saved !== null ? saved === 'true' : false;
-  });
+  const [showGranola, setShowGranola] = useState(false);
 
   // Extract unique channels from items
   useEffect(() => {
