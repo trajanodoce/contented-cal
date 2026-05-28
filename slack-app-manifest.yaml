@@ -1,0 +1,77 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ContentedCal — Slack App Manifest
+# ─────────────────────────────────────────────────────────────────────────────
+# Import this file at https://api.slack.com/apps → "Create New App" →
+# "From an app manifest" to configure or update the Slack app.
+#
+# Replace {{SUPABASE_URL}} with your Supabase project URL, e.g.:
+#   https://riizkhddtaacmcymbeqo.supabase.co
+# ─────────────────────────────────────────────────────────────────────────────
+
+display_information:
+  name: ContentedCal
+  description: Content calendar bot — create content items, projects, and check your tasks from Slack.
+  background_color: "#005D97"
+  long_description: |
+    ContentedCal connects your Slack workspace to your content calendar.
+
+    • @mention the bot to create content items or projects
+    • Use the /content-request slash command
+    • Right-click any message to add it to your calendar
+    • Ask "what are my tasks" to see your assigned work with due dates and priorities
+
+features:
+  bot_user:
+    display_name: ContentedCal
+    always_online: true
+
+  slash_commands:
+    - command: /content-request
+      url: "{{SUPABASE_URL}}/functions/v1/slack-content-request"
+      description: Create a content item or project in ContentedCal
+      usage_hint: "[title] or [project: title]"
+      should_escape: false
+
+    - command: /my-tasks
+      url: "{{SUPABASE_URL}}/functions/v1/slack-my-tasks"
+      description: See your assigned ContentedCal tasks with due dates and priorities
+      should_escape: false
+
+  shortcuts:
+    - name: Add to Content Calendar
+      type: message
+      callback_id: message_to_content_request
+      description: Add this message as a content item in ContentedCal
+
+    - name: Add as Project
+      type: message
+      callback_id: message_to_project
+      description: Create a ContentedCal project from this message
+
+oauth_config:
+  redirect_urls:
+    - "{{SUPABASE_URL}}/functions/v1/slack-oauth-callback"
+  scopes:
+    bot:
+      - app_mentions:read
+      - channels:history
+      - groups:history
+      - chat:write
+      - chat:write.public
+      - commands
+      - users:read
+      - users:read.email
+
+settings:
+  event_subscriptions:
+    request_url: "{{SUPABASE_URL}}/functions/v1/slack-contentcal-bot"
+    bot_events:
+      - app_mention
+
+  interactivity:
+    is_enabled: true
+    request_url: "{{SUPABASE_URL}}/functions/v1/slack-interactions"
+
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

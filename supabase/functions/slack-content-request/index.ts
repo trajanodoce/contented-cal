@@ -87,7 +87,8 @@ Deno.serve(async (req) => {
         text: "Please provide a title.\n" +
           "Usage:\n" +
           "• `/content-request Blog post about our new feature` — creates a content item\n" +
-          "• `/content-request project: Q3 marketing campaign` — creates a project",
+          "• `/content-request project: Q3 marketing campaign` — creates a project\n" +
+          "• `/my-tasks` — see your assigned tasks",
       }),
       { headers: { "Content-Type": "application/json" } }
     );

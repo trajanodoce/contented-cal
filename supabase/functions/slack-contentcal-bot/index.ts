@@ -51,19 +51,171 @@ function parseProjectPrefix(text: string): { isProject: boolean; cleanText: stri
   return { isProject: false, cleanText: text };
 }
 
-async function getSlackUserName(
+async function getSlackUserInfo(
   botToken: string,
   userId: string
-): Promise<string | null> {
+): Promise<{ name: string | null; email: string | null }> {
   try {
     const res = await fetch(`https://slack.com/api/users.info?user=${userId}`, {
       headers: { Authorization: `Bearer ${botToken}` },
     });
     const data = await res.json();
-    return data.ok ? data.user?.real_name || data.user?.name || null : null;
+    if (!data.ok) return { name: null, email: null };
+    return {
+      name: data.user?.real_name || data.user?.name || null,
+      email: data.user?.profile?.email || null,
+    };
   } catch {
-    return null;
+    return { name: null, email: null };
   }
+}
+
+/** Backward-compat wrapper */
+async function getSlackUserName(
+  botToken: string,
+  userId: string
+): Promise<string | null> {
+  const { name } = await getSlackUserInfo(botToken, userId);
+  return name;
+}
+
+/** Detect "my tasks" / "what are my tasks" queries. */
+function isMyTasksQuery(text: string): boolean {
+  const normalized = text.toLowerCase().trim();
+  const patterns = [
+    /^(what\s+are\s+)?my\s+tasks\??$/,
+    /^show\s+(me\s+)?my\s+tasks\??$/,
+    /^my\s+work\??$/,
+    /^tasks\??$/,
+    /^what('s|s)?\s+(on\s+)?my\s+(plate|list|agenda)\??$/,
+    /^what\s+do\s+i\s+have\??$/,
+    /^what('s|s)?\s+assigned\s+to\s+me\??$/,
+  ];
+  return patterns.some((p) => p.test(normalized));
+}
+
+/** Format a due date for Slack display. */
+function formatDueDate(dateStr: string | null): string {
+  if (!dateStr) return "";
+  const d = new Date(dateStr + "T00:00:00");
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const diff = Math.round((d.getTime() - now.getTime()) / 86400000);
+  const formatted = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  if (diff < 0) return ` — :warning: *overdue* (${formatted})`;
+  if (diff === 0) return ` — :rotating_light: *due today*`;
+  if (diff === 1) return ` — due tomorrow`;
+  if (diff <= 7) return ` — due ${formatted}`;
+  return ` — ${formatted}`;
+}
+
+/** Handle the "my tasks" query and reply in Slack. */
+async function handleMyTasks(
+  supabase: ReturnType<typeof createClient>,
+  botToken: string,
+  channel: string,
+  replyTs: string,
+  slackUserId: string,
+  workspaceId: string
+): Promise<void> {
+  // 1. Get the Slack user's email
+  const { name: slackName, email: slackEmail } = await getSlackUserInfo(botToken, slackUserId);
+
+  if (!slackEmail) {
+    await postSlackMessage(
+      botToken, channel, replyTs,
+      "I couldn't find an email address for your Slack account. Make sure your email is visible in your Slack profile."
+    );
+    return;
+  }
+
+  // 2. Look up their ContentedCal profile by email
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("email", slackEmail)
+    .maybeSingle();
+
+  if (!profile) {
+    await postSlackMessage(
+      botToken, channel, replyTs,
+      `I couldn't find a ContentedCal account for *${slackEmail}*. Make sure you're signed up with the same email you use in Slack.`
+    );
+    return;
+  }
+
+  // 3. Query content items assigned to this user
+  const { data: items, error } = await supabase
+    .from("content_items")
+    .select("id, title, status, due_date, priority")
+    .eq("workspace_id", workspaceId)
+    .eq("archived", false)
+    .contains("assignee_ids", [profile.id])
+    .order("due_date", { ascending: true, nullsFirst: false });
+
+  if (error) {
+    console.error("Error querying tasks:", error);
+    await postSlackMessage(
+      botToken, channel, replyTs,
+      "Sorry, something went wrong looking up your tasks. Please try again."
+    );
+    return;
+  }
+
+  if (!items || items.length === 0) {
+    await postSlackMessage(
+      botToken, channel, replyTs,
+      `No tasks assigned to you right now${slackName ? `, ${slackName}` : ""}. :tada:`
+    );
+    return;
+  }
+
+  // 4. Get column names for status display
+  const { data: columns } = await supabase
+    .from("board_columns")
+    .select("id, name")
+    .eq("workspace_id", workspaceId);
+
+  const columnMap: Record<string, string> = {};
+  for (const col of columns ?? []) {
+    columnMap[col.id] = col.name;
+  }
+
+  // 5. Format the response
+  const priorityEmoji: Record<string, string> = {
+    urgent: ":red_circle:",
+    high: ":large_orange_circle:",
+    medium: ":large_yellow_circle:",
+    low: ":white_circle:",
+  };
+
+  const taskLines = items.map((item, i) => {
+    const num = `${i + 1}.`;
+    const pEmoji = priorityEmoji[item.priority] ?? "";
+    const statusName = columnMap[item.status] ?? "";
+    const statusTag = statusName ? ` \`${statusName}\`` : "";
+    const due = formatDueDate(item.due_date);
+    const link = `<${APP_URL}/list?item=${item.id}|${item.title}>`;
+    return `${num} ${pEmoji} ${link}${statusTag}${due}`;
+  });
+
+  const overdue = items.filter((i) => {
+    if (!i.due_date) return false;
+    return new Date(i.due_date + "T00:00:00") < new Date(new Date().toDateString());
+  }).length;
+
+  const header = slackName
+    ? `Here are your tasks, ${slackName}:`
+    : "Here are your tasks:";
+
+  const summary = overdue > 0
+    ? `\n\n:warning: *${overdue} overdue* out of ${items.length} total`
+    : `\n${items.length} task${items.length !== 1 ? "s" : ""} total`;
+
+  await postSlackMessage(
+    botToken, channel, replyTs,
+    `${header}\n\n${taskLines.join("\n")}${summary}\n\n<${APP_URL}/my-work|Open My Work in ContentedCal>`
+  );
 }
 
 async function postSlackMessage(
@@ -207,6 +359,19 @@ Deno.serve(async (req) => {
 
     // Parse the mention text
     const rawText = stripMention(event.text ?? "", botUserId);
+
+    // ── "My tasks" query ──────────────────────────────────────────────────
+    if (isMyTasksQuery(rawText)) {
+      await handleMyTasks(
+        supabase,
+        botToken,
+        event.channel,
+        replyTs,
+        event.user,
+        integration.workspace_id
+      );
+      return new Response("OK", { status: 200 });
+    }
 
     // Check for "project:" prefix
     const { isProject, cleanText } = parseProjectPrefix(rawText);
