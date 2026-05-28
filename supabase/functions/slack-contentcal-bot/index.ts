@@ -323,12 +323,14 @@ Deno.serve(async (req) => {
   if (payload.type === "event_callback") {
     const event = payload.event;
 
-    if (event?.type !== "app_mention") {
+    // Handle app_mention (channels) and message (DMs)
+    const isDM = event?.type === "message" && event?.channel_type === "im";
+    if (event?.type !== "app_mention" && !isDM) {
       return new Response("OK", { status: 200 });
     }
 
     // Ignore bot messages to prevent loops
-    if (event.bot_id) {
+    if (event.bot_id || event.subtype) {
       return new Response("OK", { status: 200 });
     }
 
@@ -451,6 +453,7 @@ Deno.serve(async (req) => {
           title,
           description,
           status: defaultStatus,
+          needs_triage: true,
           tags: ["slack-request"],
           custom_fields: {
             _source: "slack",
@@ -461,6 +464,8 @@ Deno.serve(async (req) => {
             _slack_user_name: slackUserName,
             _slack_team_id: teamId,
             _slack_is_thread: isThread,
+            _slack_via: isDM ? "dm" : "mention",
+            _slack_permalink: `https://slack.com/app_redirect?channel=${event.channel}&team=${teamId}`,
           },
         })
         .select("id")
@@ -477,14 +482,13 @@ Deno.serve(async (req) => {
         return new Response("OK", { status: 200 });
       }
 
-      const itemUrl = `${APP_URL}/list?item=${newItem.id}`;
-      const fromLine = slackUserName ? ` from ${slackUserName}` : "";
+      const itemUrl = `${APP_URL}/intake-queue?item=${newItem.id}`;
       const threadNote = isThread ? " (thread captured)" : "";
       await postSlackMessage(
         botToken,
         event.channel,
         replyTs,
-        `Got it! Created *${title}*${fromLine}${threadNote}.\n<${itemUrl}|View in ContentedCal>`
+        `:eyes: Submitted for review: *${title}*${threadNote}. You'll see it on the calendar once approved.\n<${itemUrl}|View status>`
       );
     }
 
