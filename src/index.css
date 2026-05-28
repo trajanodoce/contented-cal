@@ -79,21 +79,19 @@ body {
   height: 8px;
 }
 *::-webkit-scrollbar-track {
-  background: transparent;
+  background: #e2e8f0;
+  border-radius: 999px;
 }
 *::-webkit-scrollbar-thumb {
   background: #005D97;
   border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+  border: 2px solid #e2e8f0;
 }
 *::-webkit-scrollbar-thumb:hover {
   background: #003d66;
-  border: 2px solid transparent;
-  background-clip: padding-box;
 }
 *::-webkit-scrollbar-corner {
-  background: transparent;
+  background: #e2e8f0;
 }
 /* Firefox */
 * {
