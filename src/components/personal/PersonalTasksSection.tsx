@@ -92,7 +92,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-sm font-medium text-white hover:text-white/80 transition-colors"
+        className="flex items-center gap-1.5 text-sm font-medium text-white bg-slate-700 hover:bg-slate-800 px-3 py-1.5 rounded-lg transition-colors"
       >
         <Plus className="w-4 h-4" />
         Add Task
@@ -147,7 +147,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <button
           type="submit"
           disabled={!title.trim() || saving}
-          className="ml-auto px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="ml-auto px-3 py-1.5 text-xs font-medium text-white bg-slate-700 rounded-md hover:bg-slate-800 disabled:opacity-50 transition-colors"
         >
           {saving ? 'Adding...' : 'Add'}
         </button>
