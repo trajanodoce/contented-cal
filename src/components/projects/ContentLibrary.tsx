@@ -487,19 +487,14 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                           />
                         </div>
                       ) : (
-                        <>
-                          <a
-                            href={item.url ?? '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
-                          >
-                            {item.title}
-                          </a>
-                          <span className="text-xs text-slate-400 truncate block">
-                            {item.url}
-                          </span>
-                        </>
+                        <a
+                          href={item.url ?? '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-slate-800 hover:text-blue-600 truncate block"
+                        >
+                          {item.title}
+                        </a>
                       )}
                     </div>
                     <div className={`flex items-center gap-1 shrink-0 transition-opacity ${editingId === item.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
