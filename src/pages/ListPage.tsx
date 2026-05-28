@@ -489,7 +489,8 @@ export function ListPage() {
                           >
                             {status.name}
                           </span>
-                        )
+                          );
+                        })()
                       )}
                     </td>
                     <td className="px-4 py-3">
