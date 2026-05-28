@@ -52,15 +52,37 @@ interface SortState {
   direction: SortDirection;
 }
 
-// Darken a hex color for text readability — pastel column colors need
-// their text/border tint pulled toward black so every pill reads at the
-// same visual weight.
-function darkenHex(hex: string, amount = 0.35): string {
+// Return a dark, saturated variant of any hex color for pill text/borders.
+// Pastels need heavy treatment — we convert to HSL, force high saturation,
+// and pull lightness down so every status reads at the same weight.
+function pillTextColor(hex: string): string {
   const h = hex.replace('#', '');
-  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - amount));
-  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - amount));
-  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - amount));
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  let r = parseInt(h.substring(0, 2), 16) / 255;
+  let g = parseInt(h.substring(2, 4), 16) / 255;
+  let b = parseInt(h.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const d = max - min;
+  let hue = 0;
+  if (d !== 0) {
+    if (max === r) hue = ((g - b) / d + 6) % 6;
+    else if (max === g) hue = (b - r) / d + 2;
+    else hue = (r - g) / d + 4;
+    hue *= 60;
+  }
+  // Force: high saturation (65%) + low lightness (32%) → vivid dark tone
+  const sat = 0.65, lit = 0.32;
+  const c = (1 - Math.abs(2 * lit - 1)) * sat;
+  const x = c * (1 - Math.abs((hue / 60) % 2 - 1));
+  const m = lit - c / 2;
+  let r1 = 0, g1 = 0, b1 = 0;
+  if (hue < 60) { r1 = c; g1 = x; }
+  else if (hue < 120) { r1 = x; g1 = c; }
+  else if (hue < 180) { g1 = c; b1 = x; }
+  else if (hue < 240) { g1 = x; b1 = c; }
+  else if (hue < 300) { r1 = x; b1 = c; }
+  else { r1 = c; b1 = x; }
+  const toHex = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r1)}${toHex(g1)}${toHex(b1)}`;
 }
 
 // Helper to get content type info
@@ -481,11 +503,11 @@ export function ListPage() {
                       ) : (
                         status && (() => {
                           const base = status.color ?? '#94a3b8';
-                          const dark = darkenHex(base, 0.45);
+                          const dark = pillTextColor(base);
                           return (
                           <span
                             className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
-                            style={{ backgroundColor: `${base}40`, color: dark, border: `0.5px solid ${base}` }}
+                            style={{ backgroundColor: `${base}25`, color: dark, border: `0.5px solid ${dark}50` }}
                           >
                             {status.name}
                           </span>
