@@ -73,7 +73,8 @@ export function DatePickerPanel({
           week: 'grid grid-cols-7',
           day: 'text-center',
           day_button: 'w-8 h-8 text-[12px] rounded-lg transition-colors hover:bg-[#005D9710] text-slate-700 font-medium',
-          selected: '!bg-[#005D97] !text-white !font-semibold hover:!bg-[#004d80]',
+          // Framed, soft-edged square — not a solid blue fill.
+          selected: '!bg-transparent !text-[#005D97] !font-bold !ring-2 !ring-inset !ring-[#005D97] hover:!bg-[#005D9710]',
           today: 'bg-[#005D9710] rounded-lg font-semibold',
           outside: '!text-slate-300',
           disabled: '!text-slate-200 !cursor-not-allowed',
