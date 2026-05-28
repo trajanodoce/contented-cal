@@ -16,6 +16,8 @@ interface AppContextValue {
   contentTypes: ContentType[];
   boardColumns: BoardColumn[];
   contentItems: ContentItem[];
+  contentItemsLoading: boolean;
+  patchContentItem: (id: string, fields: Partial<ContentItem>) => void;
   projects: Project[];
   customFieldDefs: CustomFieldDefinition[];
   intakeForms: IntakeForm[];
@@ -42,6 +44,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
+  const [contentItemsLoading, setContentItemsLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [customFieldDefs, setCustomFieldDefs] = useState<CustomFieldDefinition[]>([]);
   const [intakeForms, setIntakeForms] = useState<IntakeForm[]>([]);
@@ -154,12 +157,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const refreshContentItems = useCallback(async () => {
     if (!workspace) return;
+    setContentItemsLoading(true);
     const { data } = await supabase
       .from('content_items')
       .select('id, title, status, due_date, publish_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags, completed')
       .eq('workspace_id', workspace.id).eq('archived', false).order('created_at', { ascending: false });
     if (data) setContentItems(data as ContentItem[]);
+    setContentItemsLoading(false);
   }, [workspace]);
+
+  const patchContentItem = useCallback((id: string, fields: Partial<ContentItem>) => {
+    setContentItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...fields } : i)));
+  }, []);
 
   useEffect(() => {
     if (workspace) {
@@ -168,6 +177,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       refreshLinkedItems();
     }
   }, [workspace, refreshWorkspaceData, refreshContentItems, refreshLinkedItems]);
+
+  useEffect(() => {
+    if (!workspace) return;
+    const channel = supabase
+      .channel(`app_content_items:${workspace.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'content_items',
+        filter: `workspace_id=eq.${workspace.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const row = payload.new as ContentItem;
+          if (row.archived) return;
+          setContentItems((prev) => [row, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          const row = payload.new as ContentItem;
+          setContentItems((prev) => {
+            if (row.archived) return prev.filter((i) => i.id !== row.id);
+            const exists = prev.some((i) => i.id === row.id);
+            return exists
+              ? prev.map((i) => (i.id === row.id ? row : i))
+              : [row, ...prev];
+          });
+        } else if (payload.eventType === 'DELETE') {
+          setContentItems((prev) => prev.filter((i) => i.id !== payload.old.id));
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [workspace?.id]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
@@ -187,9 +227,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   return (
     <AppContext.Provider value={{
       user, loading, workspace, workspaces, userRole,
-      contentTypes, boardColumns, contentItems, projects,
+      contentTypes, boardColumns, contentItems, contentItemsLoading, projects,
       customFieldDefs, intakeForms, members, linkedItemIds,
-      setWorkspace, refreshWorkspaces, refreshContentItems, refreshWorkspaceData, refreshIntakeForms, refreshProjects, refreshLinkedItems, signOut,
+      setWorkspace, refreshWorkspaces, refreshContentItems, patchContentItem, refreshWorkspaceData, refreshIntakeForms, refreshProjects, refreshLinkedItems, signOut,
     }}>
       {children}
     </AppContext.Provider>

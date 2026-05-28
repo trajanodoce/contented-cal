@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
+import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
@@ -312,8 +313,8 @@ export function BoardPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
   const { filters, setFilters, isLoaded } = useFilters();
+  const { contentItems, contentItemsLoading, patchContentItem } = useApp();
   const [columns, setColumns] = useState<BoardColumn[]>([]);
-  const [items, setItems] = useState<ContentItem[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [members, setMembers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -327,7 +328,10 @@ export function BoardPage() {
   }, [setSelectedItemId]);
 
   const [activeDragItem, setActiveDragItem] = useState<ContentItem | null>(null);
-  const [channels, setChannels] = useState<string[]>([]);
+  const channels = useMemo(
+    () => [...new Set(contentItems.map((item) => item.channel).filter(Boolean))] as string[],
+    [contentItems],
+  );
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
@@ -339,18 +343,13 @@ export function BoardPage() {
     setLoading(true);
 
     try {
-      const [{ data: columnsData }, { data: itemsData }, { data: typesData }] = await Promise.all([
+      const [{ data: columnsData }, { data: typesData }] = await Promise.all([
         supabase.from('board_columns').select('*').eq('workspace_id', currentWorkspace.id).order('position'),
-        supabase.from('content_items').select('id, title, status, due_date, priority, content_type_id, assignee_ids, channel, project_id, custom_fields, tags').eq('workspace_id', currentWorkspace.id).order('created_at', { ascending: false }),
         supabase.from('content_types').select('*').eq('workspace_id', currentWorkspace.id).order('name'),
       ]);
 
       setColumns(columnsData || []);
-      setItems((itemsData ?? []) as ContentItem[]);
       setContentTypes(typesData || []);
-
-      const uniqueChannels = [...new Set((itemsData || []).map((item) => item.channel).filter(Boolean))];
-      setChannels(uniqueChannels as string[]);
 
       const { data: membersData } = await supabase
         .from('workspace_members')
@@ -370,33 +369,10 @@ export function BoardPage() {
     fetchData();
   }, [fetchData]);
 
-  // Realtime subscription for live updates
-  useEffect(() => {
-    if (!currentWorkspace) return;
-    const channel = supabase
-      .channel('board_items_changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'content_items',
-        filter: `workspace_id=eq.${currentWorkspace.id}`,
-      }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setItems((prev) => [payload.new as ContentItem, ...prev]);
-        } else if (payload.eventType === 'UPDATE') {
-          setItems((prev) => prev.map((item) => item.id === payload.new.id ? (payload.new as ContentItem) : item));
-        } else if (payload.eventType === 'DELETE') {
-          setItems((prev) => prev.filter((item) => item.id !== payload.old.id));
-        }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [currentWorkspace]);
-
   const filteredItems = useMemo(() => {
-    if (!isLoaded) return items;
-    return applyFilters(items, filters, linkCounts);
-  }, [items, filters, isLoaded, linkCounts]);
+    if (!isLoaded) return contentItems;
+    return applyFilters(contentItems, filters, linkCounts);
+  }, [contentItems, filters, isLoaded, linkCounts]);
 
   const itemsByColumn = useMemo(() => {
     const grouped: Record<string, ContentItem[]> = {};
@@ -409,7 +385,7 @@ export function BoardPage() {
   const handleDragStart = (event: DragStartEvent) => {
     if (!canDrag) return;
     const { active } = event;
-    const item = items.find((i) => i.id === active.id);
+    const item = contentItems.find((i) => i.id === active.id);
     if (item) {
       setActiveDragItem(item);
     }
@@ -424,7 +400,7 @@ export function BoardPage() {
     const itemId = active.id as string;
     const targetColumnId = over.id as string;
 
-    const item = items.find((i) => i.id === itemId);
+    const item = contentItems.find((i) => i.id === itemId);
     const targetColumn = columns.find((c) => c.id === targetColumnId);
 
     if (!item || !targetColumn) return;
@@ -449,7 +425,7 @@ export function BoardPage() {
     });
 
     toast.success(`Moved "${item.title}" to ${targetColumn.name}`);
-    setItems((prev) => prev.map((i) => (i.id === itemId ? { ...i, status: targetColumnId } : i)));
+    patchContentItem(itemId, { status: targetColumnId });
   };
 
   const dropAnimation: DropAnimation = {
@@ -470,7 +446,7 @@ export function BoardPage() {
     );
   }
 
-  if (loading) {
+  if (loading || contentItemsLoading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="animate-spin w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full" />
@@ -479,7 +455,7 @@ export function BoardPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-100/50">
+    <div className="h-full flex flex-col min-h-0 bg-slate-100/50">
       <div className="px-6 py-4 bg-white border-b border-slate-200 flex-shrink-0">
         <FilterBar
           workspaceId={currentWorkspace?.id || null}
@@ -490,12 +466,12 @@ export function BoardPage() {
           linkCounts={linkCounts}
           filters={filters}
           onFiltersChange={setFilters}
-          totalCount={items.length}
+          totalCount={contentItems.length}
           filteredCount={filteredItems.length}
         />
       </div>
 
-      <div className="flex-1 overflow-x-scroll overflow-y-hidden">
+      <div className="flex-1 min-h-0 overflow-x-scroll overflow-y-hidden">
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}

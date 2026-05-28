@@ -339,7 +339,7 @@ export function AppLayout() {
         </header>
 
         {/* Page content with fade transition */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 min-h-0 overflow-auto">
           <Outlet />
         </div>
 
