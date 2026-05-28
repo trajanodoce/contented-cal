@@ -1442,10 +1442,22 @@ function ProjectMonthGrid({
       <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(140px, auto)' }}>
         {visibleDays.map((day, index) => {
           const dateKey = format(day, 'yyyy-MM-dd');
-          const dayItems = itemsByDate.get(dateKey) ?? [];
           const inMonth = isSameMonth(day, monthDate);
           const today = isToday(day);
           const isLastCol = (index + 1) % numCols === 0;
+
+          // Months are stacked, so don't duplicate days that belong to the
+          // neighboring month — render those slots as blank placeholders.
+          if (!inMonth) {
+            return (
+              <div
+                key={dateKey}
+                className={`min-h-[140px] border-b border-r border-slate-300 ${isLastCol ? 'border-r-0' : ''}`}
+              />
+            );
+          }
+
+          const dayItems = itemsByDate.get(dateKey) ?? [];
 
           return (
             <div
@@ -1456,8 +1468,7 @@ function ProjectMonthGrid({
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-[11px] ${today ? 'font-bold text-[#005D97]' : 'font-semibold'}`}
-                  style={!today ? { color: inMonth ? '#334155' : '#cbd5e1' } : undefined}
+                  className={`text-[11px] ${today ? 'font-bold text-[#005D97]' : 'font-semibold text-[#334155]'}`}
                 >
                   {format(day, 'd')}
                 </span>

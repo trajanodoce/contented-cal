@@ -305,13 +305,26 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
 
       <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(140px, auto)' }}>
         {visibleDays.map((day, index) => {
+          const isCurrentMonth = isSameMonth(day, monthDate);
+          const isLastCol = (index + 1) % numCols === 0;
+
+          // Months are stacked, so days that belong to the prior/next month would
+          // duplicate cells in the neighboring month card. Render those slots as
+          // empty placeholders to preserve weekday-column alignment.
+          if (!isCurrentMonth) {
+            return (
+              <div
+                key={day.toISOString()}
+                className={`min-h-[140px] border-b border-r border-slate-300 ${isLastCol ? 'border-r-0' : ''}`}
+              />
+            );
+          }
+
           const dayItems = getItemsForDate(day);
           const dayProjectMarkers = getProjectMarkersForDate(day);
           const daySubtasks = getSubtasksForDate(day);
-          const isCurrentMonth = isSameMonth(day, monthDate);
           const isTodayDate = isToday(day);
           const totalSlots = dayItems.length + dayProjectMarkers.length + daySubtasks.length;
-          const isLastCol = (index + 1) % numCols === 0;
 
           return (
             <DroppableDayCell
@@ -324,8 +337,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-[11px] ${isTodayDate ? 'font-bold text-[#005D97]' : 'font-semibold'}`}
-                  style={!isTodayDate ? { color: isCurrentMonth ? '#334155' : '#cbd5e1' } : undefined}
+                  className={`text-[11px] ${isTodayDate ? 'font-bold text-[#005D97]' : 'font-semibold text-[#334155]'}`}
                 >
                   {format(day, 'd')}
                 </span>
