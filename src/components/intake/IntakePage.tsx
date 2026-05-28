@@ -91,7 +91,7 @@ export function IntakePage({ slug }: Props) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-page flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
       </div>
     );
@@ -99,7 +99,7 @@ export function IntakePage({ slug }: Props) {
 
   if (error && !form) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-surface-page flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-7 h-7 text-red-500" />
@@ -113,7 +113,7 @@ export function IntakePage({ slug }: Props) {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-surface-page flex items-center justify-center p-4">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-500" />
@@ -126,7 +126,7 @@ export function IntakePage({ slug }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
+    <div className="min-h-screen bg-surface-page py-12 px-4">
       <div className="max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
@@ -185,7 +185,7 @@ function FieldInput({ field, value, onChange }: {
   value: string;
   onChange: (v: string) => void;
 }) {
-  const cls = "w-full px-3 py-2.5 text-sm text-slate-700 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-colors";
+  const cls = "w-full px-3 py-2.5 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-colors";
 
   if (field.field_type === 'long_text') {
     return (
@@ -212,7 +212,7 @@ function FieldInput({ field, value, onChange }: {
   if (field.field_type === 'single_select') {
     const options = (field.options as { value: string; label: string }[]) ?? [];
     return (
-      <select value={value} onChange={e => onChange(e.target.value)} className={`${cls} bg-white`}>
+      <select value={value} onChange={e => onChange(e.target.value)} className={`${cls} bg-surface-card`}>
         <option value="">Select...</option>
         {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
       </select>

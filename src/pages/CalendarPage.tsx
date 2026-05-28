@@ -133,7 +133,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className="flex items-center gap-1 px-1.5 py-0.5 rounded-[3px] text-[10px] cursor-pointer hover:opacity-80 transition-opacity mb-[3px] overflow-hidden min-w-0 leading-tight"
+      className="flex items-center gap-1 px-1.5 py-1 rounded-[3px] text-[11.5px] cursor-pointer hover:opacity-80 transition-opacity mb-[3px] overflow-hidden min-w-0 leading-tight"
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
@@ -303,7 +303,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
         ))}
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(110px, auto)' }}>
+      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(140px, auto)' }}>
         {visibleDays.map((day, index) => {
           const dayItems = getItemsForDate(day);
           const dayProjectMarkers = getProjectMarkersForDate(day);
@@ -317,7 +317,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             <DroppableDayCell
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
-              className={`min-h-[110px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
+              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
                 isTodayDate ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
               onClick={() => onDateClick(day)}

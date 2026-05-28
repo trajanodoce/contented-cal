@@ -493,7 +493,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       if (btn) computeDueDatePos(btn);
                     }
                   }}
-                  className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border bg-white transition-colors ${
+                  className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border bg-surface-card transition-colors ${
                     dueDateEditId === subtask.id
                       ? 'border-[#005D97] ring-2 ring-[#005D9725]'
                       : 'border-slate-300 hover:border-[#005D97]'

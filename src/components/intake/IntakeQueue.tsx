@@ -134,7 +134,7 @@ export function IntakeQueue({ addToast }: Props) {
                 key={f}
                 onClick={() => setStatusFilter(f)}
                 className={`px-2 py-1 text-xs rounded-md capitalize transition-colors
-                  ${statusFilter === f ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}
+                  ${statusFilter === f ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-[#005D9710]'}`}
               >
                 {f}
               </button>
@@ -149,7 +149,7 @@ export function IntakeQueue({ addToast }: Props) {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-[#005D9712] flex items-center justify-center mb-3">
                 <Inbox className="w-5 h-5 text-slate-400" />
               </div>
               <p className="text-sm font-medium text-slate-600">No submissions</p>
@@ -166,7 +166,7 @@ export function IntakeQueue({ addToast }: Props) {
                   <button
                     key={sub.id}
                     onClick={() => setSelected(sub)}
-                    className={`w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors
+                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9708] transition-colors
                       ${selected?.id === sub.id ? 'bg-mint border-l-2 border-brand-400' : ''}`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -189,7 +189,7 @@ export function IntakeQueue({ addToast }: Props) {
       </div>
 
       {/* Detail panel */}
-      <div className="flex-1 overflow-y-auto bg-slate-50">
+      <div className="flex-1 overflow-y-auto bg-surface-nested">
         {!selected ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
             <div className="w-14 h-14 rounded-2xl bg-surface-card border border-slate-200 flex items-center justify-center mb-4 shadow-sm">
@@ -218,7 +218,7 @@ function StatusBadge({ status }: { status: string }) {
     rejected: 'bg-red-100 text-red-600',
   };
   return (
-    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${map[status] ?? 'bg-slate-100 text-slate-500'}`}>
+    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${map[status] ?? 'bg-[#005D9712] text-slate-500'}`}>
       {status}
     </span>
   );
@@ -273,7 +273,7 @@ function SubmissionDetail({
 
         {/* Actions */}
         {isPending && (
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
+          <div className="px-6 py-4 bg-surface-nested border-t border-slate-100 flex items-center gap-3">
             <button
               onClick={onConvert}
               disabled={converting}

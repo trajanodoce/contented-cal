@@ -1439,7 +1439,7 @@ function ProjectMonthGrid({
       </div>
 
       {/* Day cells */}
-      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(110px, auto)' }}>
+      <div className="grid" style={{ gridTemplateColumns: gridCols, gridAutoRows: 'minmax(140px, auto)' }}>
         {visibleDays.map((day, index) => {
           const dateKey = format(day, 'yyyy-MM-dd');
           const dayItems = itemsByDate.get(dateKey) ?? [];
@@ -1450,7 +1450,7 @@ function ProjectMonthGrid({
           return (
             <div
               key={dateKey}
-              className={`min-h-[110px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
+              className={`min-h-[140px] px-1.5 pt-1.5 pb-2 border-b border-r border-slate-100 ${
                 today ? 'bg-[#005D970A]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
             >
@@ -1474,7 +1474,7 @@ function ProjectMonthGrid({
                     <div
                       key={item.id}
                       onClick={() => onItemClick(item.id)}
-                      className="text-[10px] font-medium leading-tight px-1.5 py-0.5 rounded-[3px] cursor-pointer truncate hover:opacity-80 transition-opacity"
+                      className="text-[11.5px] font-medium leading-tight px-1.5 py-1 rounded-[3px] cursor-pointer truncate hover:opacity-80 transition-opacity"
                       style={{
                         backgroundColor: ct
                           ? `${ct.color}15`

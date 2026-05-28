@@ -370,7 +370,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                 {fileItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9708] group transition-colors"
                   >
                     {getFileIcon(item.file_type)}
                     <div className="flex-1 min-w-0">
@@ -459,7 +459,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                 {linkItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 group transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9708] group transition-colors"
                   >
                     <Link2 className="w-5 h-5 text-brand-400 shrink-0" />
                     <div className="flex-1 min-w-0">
