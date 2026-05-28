@@ -483,17 +483,37 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         <div className="flex-1 overflow-y-auto bg-slate-50">
           {activeTab === 'details' && (
             <div className="p-5 space-y-4">
+              {/* Assignee — standalone at top */}
+              <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+                <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                  <User className="w-3.5 h-3.5" /> Assignee
+                </label>
+                <select
+                  value={item.assignee_ids?.[0] ?? ''}
+                  onChange={e => updateField('assignee_ids', e.target.value ? [e.target.value] : [])}
+                  disabled={isReadOnly}
+                  className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
+                  <option value="">Unassigned</option>
+                  {members.map(m => (
+                    <option key={m.user_id} value={m.user_id}>
+                      {m.full_name || m.email || 'Unknown member'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Key fields card */}
-              <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
+              <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
               <div className="grid grid-cols-2 gap-4">
                 {/* Status */}
                 <div>
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Status</label>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Status</label>
                   <select
                     value={item.status ?? ''}
                     onChange={e => updateField('status', e.target.value || null)}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {allowedStatuses.map(col => (
@@ -505,12 +525,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Priority */}
                 {fieldVisibility.priority && (
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Priority</label>
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Priority</label>
                     <select
                       value={item.priority ?? undefined}
                       onChange={e => updateField('priority', e.target.value)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       {PRIORITIES.map(p => (
                         <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
@@ -522,7 +542,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Due date */}
                 {fieldVisibility.dueDate && (
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Due date
                     </label>
                     <input
@@ -530,7 +550,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.due_date ?? ''}
                       onChange={e => updateField('due_date', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -538,7 +558,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Publish date */}
                 {fieldVisibility.publishDate && (
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1">
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Publish date
                     </label>
                     <input
@@ -546,7 +566,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       value={item.publish_date ?? ''}
                       onChange={e => updateField('publish_date', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 )}
@@ -554,12 +574,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Channel */}
                 {fieldVisibility.channel && (
                   <div>
-                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Channel</label>
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Channel</label>
                     <select
                       value={item.channel ?? ''}
                       onChange={e => updateField('channel', e.target.value)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">None</option>
                       {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -569,12 +589,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
                 {/* Content type */}
                 <div>
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Content type</label>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Content type</label>
                   <select
                     value={item.content_type_id ?? ''}
                     onChange={e => updateField('content_type_id', e.target.value || null)}
                     disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                    className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     <option value="">None</option>
                     {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
@@ -584,12 +604,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Project */}
                 {projects.length > 0 && (
                   <div className="col-span-2">
-                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Project</label>
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Project</label>
                     <select
                       value={item.project_id ?? ''}
                       onChange={e => updateField('project_id', e.target.value || null)}
                       disabled={isReadOnly}
-                      className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <option value="">No project</option>
                       {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
@@ -597,31 +617,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   </div>
                 )}
 
-                {/* Assignee */}
-                <div className="col-span-2">
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1">
-                    <User className="w-3 h-3" /> Assignee
-                  </label>
-                  <select
-                    value={item.assignee_ids?.[0] ?? ''}
-                    onChange={e => updateField('assignee_ids', e.target.value ? [e.target.value] : [])}
-                    disabled={isReadOnly}
-                    className={`mt-1.5 w-full px-3 py-1.5 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 bg-white ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  >
-                    <option value="">Unassigned</option>
-                    {members.map(m => (
-                      <option key={m.user_id} value={m.user_id}>
-                        {m.full_name || m.email || 'Unknown member'}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
 
               {/* Tags */}
               {fieldVisibility.tags && item.tags && item.tags.length > 0 && (
                 <div>
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1 mb-2">
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1 mb-2">
                     <Hash className="w-3 h-3" /> Tags
                   </label>
                   <div className="flex flex-wrap gap-1.5">
@@ -635,16 +636,18 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               </div>
 
               {/* Linked Assets */}
-              <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
+              <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>
 
               {/* Granola Meeting Notes */}
+              <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#345A11' }}>
               <GranolaNoteSection
                 key={granolaRefreshKey}
                 contentItemId={item.id}
                 onLinkNote={() => setGranolaPickerOpen(true)}
               />
+              </div>
               <GranolaNotePickerModal
                 isOpen={granolaPickerOpen}
                 onClose={() => setGranolaPickerOpen(false)}
@@ -654,9 +657,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Description */}
               {fieldVisibility.description && (
-                <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
+                <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-medium text-slate-500 uppercase tracking-wide">Description</label>
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Description</label>
                     {!editingDescription && !isReadOnly && (
                       <button
                         onClick={() => setEditingDescription(true)}
@@ -704,8 +707,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* Custom fields */}
               {activeCustomFields.length > 0 && (
-                <div className="bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden p-4">
-                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3 block">Custom fields</label>
+                <div className="bg-white border-2 rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-3 block">Custom fields</label>
                   <CustomFieldsSection
                     fields={activeCustomFields}
                     values={customFieldValues}

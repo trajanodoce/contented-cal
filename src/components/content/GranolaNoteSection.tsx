@@ -97,7 +97,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
 
   if (notes.length === 0) {
     return onLinkNote ? (
-      <div className="border-t border-slate-100 pt-5">
+      <div>
         <button
           onClick={onLinkNote}
           className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-dashed border-slate-200 text-slate-500 hover:border-green-300 hover:text-green-700 transition-colors w-full justify-center"
@@ -110,7 +110,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
   }
 
   return (
-    <div className="border-t border-slate-100 pt-5">
+    <div>
       <div className="flex items-center justify-between mb-3">
         <label className="text-xs font-medium text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
           <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_GREEN }} />

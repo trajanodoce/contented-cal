@@ -64,3 +64,16 @@ body {
   scrollbar-width: auto;
   scrollbar-color: #004671 #e2e8f0;
 }
+
+/* Detail panel form fields */
+.field-select {
+  border-color: #002339;
+  background-color: #f8fafc;
+}
+.field-select:focus {
+  border-color: #004671;
+}
+.field-select option {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
