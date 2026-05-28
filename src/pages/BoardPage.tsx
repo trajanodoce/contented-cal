@@ -106,8 +106,8 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`rounded-lg p-4 shadow-md border cursor-grab active:cursor-grabbing hover:shadow-lg transition-all relative overflow-hidden ${
-        isExternal ? '' : 'bg-slate-50'
+      className={`rounded-xl p-4 shadow-sm border cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden ${
+        isExternal ? '' : 'bg-surface-card'
       } ${isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
       }`}
       style={{
@@ -156,7 +156,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
                 className="h-full rounded-full transition-all"
                 style={{
                   width: `${(subtaskCount.completed / subtaskCount.total) * 100}%`,
-                  backgroundColor: subtaskCount.completed === subtaskCount.total ? '#22c55e' : '#3b82f6',
+                  backgroundColor: subtaskCount.completed === subtaskCount.total ? '#92D1B2' : '#005D97',
                 }}
               />
             </div>
@@ -252,10 +252,11 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
   return (
     <div
       ref={setNodeRef}
-      className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl border-2 transition-all ${
-        isOver ? 'border-brand-400' : 'border-slate-200'
-      }`}
-      style={{ backgroundColor: isOver ? `${colColor}0C` : `${colColor}05` }}
+      className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl transition-all`}
+      style={{
+        backgroundColor: isOver ? `${colColor}0C` : `${colColor}05`,
+        border: isOver ? `2px solid ${colColor}` : '1px solid #00233930',
+      }}
     >
       {/* Column Header */}
       <div
@@ -267,7 +268,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
         }}
       >
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-slate-900">{column.name}</h3>
+          <h3 className="font-heading text-sm text-slate-900">{column.name}</h3>
           <span
             className="text-xs font-medium px-2 py-1 rounded-full"
             style={{ backgroundColor: `${colColor}20`, color: colColor }}
@@ -472,8 +473,8 @@ export function BoardPage() {
   }
 
   return (
-    <div className="h-full flex flex-col min-h-0 bg-slate-100/50">
-      <div className="px-6 py-4 bg-surface-card border-b border-slate-200 flex-shrink-0">
+    <div className="h-full flex flex-col min-h-0 bg-surface-page">
+      <div className="px-6 py-4 bg-surface-card flex-shrink-0" style={{ borderBottom: '1px solid #00233930' }}>
         <FilterBar
           workspaceId={currentWorkspace?.id || null}
           contentTypes={contentTypes}
