@@ -16,6 +16,7 @@ import { ExternalLinksSection } from './ExternalLinks';
 import { GranolaNoteSection } from './GranolaNoteSection';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
+import { StyledSelect } from '../ui/StyledSelect';
 
 interface Props {
   item: ContentItem;
@@ -485,22 +486,19 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             <div className="p-5 space-y-4">
               {/* Assignee — standalone at top */}
               <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
-                <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1">
+                <label className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1 mb-1.5">
                   <User className="w-3.5 h-3.5" /> Assignee
                 </label>
-                <select
+                <StyledSelect
                   value={item.assignee_ids?.[0] ?? ''}
-                  onChange={e => updateField('assignee_ids', e.target.value ? [e.target.value] : [])}
+                  onChange={val => updateField('assignee_ids', val ? [val] : [])}
                   disabled={isReadOnly}
-                  className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                >
-                  <option value="">Unassigned</option>
-                  {members.map(m => (
-                    <option key={m.user_id} value={m.user_id}>
-                      {m.full_name || m.email || 'Unknown member'}
-                    </option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: 'Unassigned' },
+                    ...members.map(m => ({ value: m.user_id, label: m.full_name || m.email || 'Unknown member' })),
+                  ]}
+                  placeholder="Unassigned"
+                />
               </div>
 
               {/* Key fields card */}
@@ -508,34 +506,33 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 {/* Status */}
                 <div>
-                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Status</label>
-                  <select
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Status</label>
+                  <StyledSelect
                     value={item.status ?? ''}
-                    onChange={e => updateField('status', e.target.value || null)}
+                    onChange={val => updateField('status', val || null)}
                     disabled={isReadOnly}
-                    className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  >
-                    <option value="">None</option>
-                    {allowedStatuses.map(col => (
-                      <option key={col.id} value={col.id}>{col.name}</option>
-                    ))}
-                  </select>
+                    options={[
+                      { value: '', label: 'None' },
+                      ...allowedStatuses.map(col => ({ value: col.id, label: col.name, color: col.color ?? undefined })),
+                    ]}
+                    placeholder="None"
+                  />
                 </div>
 
                 {/* Priority */}
                 {fieldVisibility.priority && (
                   <div>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Priority</label>
-                    <select
-                      value={item.priority ?? undefined}
-                      onChange={e => updateField('priority', e.target.value)}
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Priority</label>
+                    <StyledSelect
+                      value={item.priority ?? 'medium'}
+                      onChange={val => updateField('priority', val)}
                       disabled={isReadOnly}
-                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    >
-                      {PRIORITIES.map(p => (
-                        <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>
-                      ))}
-                    </select>
+                      options={PRIORITIES.map(p => ({
+                        value: p,
+                        label: p.charAt(0).toUpperCase() + p.slice(1),
+                        color: p === 'urgent' ? '#ef4444' : p === 'high' ? '#f97316' : p === 'medium' ? '#fbbf24' : '#9ca3af',
+                      }))}
+                    />
                   </div>
                 )}
 
@@ -574,46 +571,49 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {/* Channel */}
                 {fieldVisibility.channel && (
                   <div>
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Channel</label>
-                    <select
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Channel</label>
+                    <StyledSelect
                       value={item.channel ?? ''}
-                      onChange={e => updateField('channel', e.target.value)}
+                      onChange={val => updateField('channel', val)}
                       disabled={isReadOnly}
-                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    >
-                      <option value="">None</option>
-                      {CHANNELS.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
+                      options={[
+                        { value: '', label: 'None' },
+                        ...CHANNELS.map(c => ({ value: c, label: c })),
+                      ]}
+                      placeholder="None"
+                    />
                   </div>
                 )}
 
                 {/* Content type */}
                 <div>
-                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Content type</label>
-                  <select
+                  <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Content type</label>
+                  <StyledSelect
                     value={item.content_type_id ?? ''}
-                    onChange={e => updateField('content_type_id', e.target.value || null)}
+                    onChange={val => updateField('content_type_id', val || null)}
                     disabled={isReadOnly}
-                    className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  >
-                    <option value="">None</option>
-                    {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
-                  </select>
+                    options={[
+                      { value: '', label: 'None' },
+                      ...contentTypes.map(ct => ({ value: ct.id, label: ct.name, color: ct.color ?? undefined })),
+                    ]}
+                    placeholder="None"
+                  />
                 </div>
 
                 {/* Project */}
                 {projects.length > 0 && (
                   <div className="col-span-2">
-                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide">Project</label>
-                    <select
+                    <label className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-1.5 block">Project</label>
+                    <StyledSelect
                       value={item.project_id ?? ''}
-                      onChange={e => updateField('project_id', e.target.value || null)}
+                      onChange={val => updateField('project_id', val || null)}
                       disabled={isReadOnly}
-                      className={`field-select mt-1.5 w-full px-3 py-1.5 text-sm text-slate-800 font-medium border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${isReadOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-                    >
-                      <option value="">No project</option>
-                      {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                    </select>
+                      options={[
+                        { value: '', label: 'No project' },
+                        ...projects.map(p => ({ value: p.id, label: p.title })),
+                      ]}
+                      placeholder="No project"
+                    />
                   </div>
                 )}
 
