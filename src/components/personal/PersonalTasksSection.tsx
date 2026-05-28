@@ -124,7 +124,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
+          className="text-xs text-slate-700 bg-surface-card border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
         >
           {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
             <option key={key} value={key}>{cat.label}</option>
@@ -133,7 +133,7 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="text-xs text-slate-700 bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
+          className="text-xs text-slate-700 bg-surface-card border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
         >
           {Object.entries(priorityLabels).map(([key, label]) => (
             <option key={key} value={key}>{label}</option>
@@ -302,7 +302,7 @@ export function PersonalTasksSection({ workspaceId }: Props) {
                 <div key={catKey} className="border border-slate-200 rounded-lg overflow-hidden">
                   <button
                     onClick={() => toggleCategory(catKey)}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-slate-50 transition-colors"
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-[#005D9708] transition-colors"
                   >
                     {isCollapsed ? (
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
@@ -473,7 +473,7 @@ function TaskRow({
               if (e.key === 'Enter') saveChanges();
               if (e.key === 'Escape') handleClose();
             }}
-            className="flex-1 text-sm border border-slate-200 rounded-md px-2.5 py-1.5 focus:ring-2 focus:ring-brand-200 focus:border-brand-400 outline-none bg-white"
+            className="flex-1 text-sm border border-slate-200 rounded-md px-2.5 py-1.5 focus:ring-2 focus:ring-brand-200 focus:border-brand-400 outline-none bg-surface-card"
             placeholder="Task title"
           />
           <button
@@ -481,7 +481,7 @@ function TaskRow({
             className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
               showSavedCheck
                 ? 'bg-green-100 text-green-600'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                : 'text-slate-400 hover:text-slate-600 hover:bg-[#005D9710]'
             }`}
             title="Close (auto-saves)"
           >
@@ -498,7 +498,7 @@ function TaskRow({
           <select
             value={editCategory}
             onChange={(e) => setEditCategory(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-white"
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-surface-card"
           >
             {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
               <option key={key} value={key}>{cat.label}</option>
@@ -507,7 +507,7 @@ function TaskRow({
           <select
             value={editPriority}
             onChange={(e) => setEditPriority(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-white"
+            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-surface-card"
           >
             {Object.entries(priorityLabels).map(([key, label]) => (
               <option key={key} value={key}>{label}</option>
@@ -546,7 +546,7 @@ function TaskRow({
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors group cursor-pointer"
+      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#005D9708] transition-colors group cursor-pointer"
       onClick={() => !task.completed && onStartEdit()}
     >
       {/* Checkbox */}

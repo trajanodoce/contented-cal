@@ -198,7 +198,7 @@ function FieldTable({
   return (
     <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <table className="w-full">
-        <thead className="bg-slate-50 border-b border-slate-200">
+        <thead className="bg-[#005D9712] border-b border-slate-200">
           <tr>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Name</th>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Type</th>
@@ -211,7 +211,7 @@ function FieldTable({
           {fields.map(field => {
             const opts = parseOptions(field.options);
             return (
-              <tr key={field.id} className="hover:bg-slate-50 transition-colors">
+              <tr key={field.id} className="hover:bg-[#005D9708] transition-colors">
                 <td className="px-4 py-3">
                   <span className="text-sm font-medium text-slate-900">{field.name}</span>
                 </td>
@@ -377,7 +377,7 @@ function FieldForm({
                 setOptions([]);
               }
             }}
-            className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+            className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface-card"
           >
             {FIELD_TYPES.map(ft => (
               <option key={ft.value} value={ft.value}>{ft.label} — {ft.description}</option>

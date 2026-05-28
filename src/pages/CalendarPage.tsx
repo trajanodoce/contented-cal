@@ -137,6 +137,8 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       style={{
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 1 : 1,
+        // Slim 1px tinted outline + 2px solid left border for emphasis.
+        border: `1px solid ${isLinear ? LINEAR_COLOR : borderColor}30`,
         borderLeft: `2px solid ${isLinear ? LINEAR_COLOR : borderColor}`,
         backgroundColor: itemBg,
       }}

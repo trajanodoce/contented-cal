@@ -111,7 +111,7 @@ function CustomSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 flex items-center justify-between min-h-[42px]"
+        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 flex items-center justify-between min-h-[42px]"
       >
         <div className="flex items-center gap-2">
           {selectedOption?.color && (
@@ -195,7 +195,7 @@ function AssigneeMultiSelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 text-left bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 flex items-center justify-between min-h-[42px]"
+        className="w-full px-3 py-2 text-left bg-surface-card border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 flex items-center justify-between min-h-[42px]"
       >
         <div className="flex items-center gap-2 flex-wrap">
           {selectedMembers.length === 0 ? (
@@ -580,7 +580,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
               <select
                 value={channel}
                 onChange={(e) => setChannel(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-white"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-surface-card"
               >
                 <option value="">Select a channel...</option>
                 {['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Media/External', 'Other'].map(c => (

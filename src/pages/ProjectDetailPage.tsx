@@ -1479,6 +1479,8 @@ function ProjectMonthGrid({
                         backgroundColor: ct
                           ? `${ct.color}15`
                           : '#f1f5f9',
+                        // Slim 1px tinted outline + 2px solid left border for emphasis.
+                        border: `1px solid ${ct?.color ?? '#94a3b8'}30`,
                         borderLeft: `2px solid ${ct?.color ?? '#94a3b8'}`,
                         color: ct?.color ?? '#475569',
                       }}

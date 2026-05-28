@@ -93,7 +93,7 @@ export function AuthCallback() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-surface-page">
         <div className="text-center bg-surface-card p-8 rounded-xl shadow-sm border border-slate-200">
           <p className="text-sm text-red-600 mb-2 font-medium">Authentication failed</p>
           <p className="text-xs text-slate-500">{error}</p>
@@ -104,7 +104,7 @@ export function AuthCallback() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+    <div className="min-h-screen flex items-center justify-center bg-surface-page">
       <div className="text-center">
         <Loader2 className="w-8 h-8 animate-spin text-brand-500 mx-auto mb-3" />
         <p className="text-sm text-slate-500">Completing sign in...</p>

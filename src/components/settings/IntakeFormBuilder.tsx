@@ -357,7 +357,7 @@ function FormPreview({ form, fields }: { form: IntakeForm; fields: IntakeFormFie
             ) : field.field_type === 'date' ? (
               <input type="date" className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg" disabled />
             ) : field.field_type === 'single_select' ? (
-              <select className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white" disabled>
+              <select className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-surface-card" disabled>
                 <option value="">Select...</option>
                 {((field.options as { value: string; label: string }[]) ?? []).map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -459,7 +459,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
             <select
               value={newFormTypeId}
               onChange={e => setNewFormTypeId(e.target.value)}
-              className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+              className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="">Any type</option>
               {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}

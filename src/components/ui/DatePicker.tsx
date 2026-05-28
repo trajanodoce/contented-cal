@@ -88,7 +88,7 @@ export function DatePickerPanel({
             onChange('');
             onClose?.();
           }}
-          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-slate-50 transition-colors"
+          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-[#005D9708] transition-colors"
         >
           Clear
         </button>
@@ -116,7 +116,7 @@ export const datePickerPopoverStyle: React.CSSProperties = {
   boxShadow: '0 4px 20px rgba(0,35,57,.08)',
 };
 
-export const datePickerPopoverClass = 'bg-white rounded-xl p-3 animate-in fade-in slide-in-from-top-1 duration-150';
+export const datePickerPopoverClass = 'bg-surface-card rounded-xl p-3 animate-in fade-in slide-in-from-top-1 duration-150';
 
 export default function DatePicker({ value, onChange, disabled, placeholder = 'Pick a date', className = '' }: DatePickerProps) {
   const [open, setOpen] = useState(false);
@@ -211,7 +211,7 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
         onClick={() => !disabled && setOpen(!open)}
         className={`
           w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-colors text-left
-          ${disabled ? 'bg-slate-50 text-slate-400 cursor-not-allowed border-slate-200' : 'bg-white border-slate-300 hover:border-[#005D97] text-slate-700 cursor-pointer'}
+          ${disabled ? 'bg-surface-nested text-slate-400 cursor-not-allowed border-slate-200' : 'bg-surface-card border-slate-300 hover:border-[#005D97] text-slate-700 cursor-pointer'}
           ${open ? '!border-[#005D97] ring-2 ring-[#005D9725]' : ''}
         `}
       >
@@ -227,7 +227,7 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
               onChange('');
               setOpen(false);
             }}
-            className="ml-auto p-0.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600"
+            className="ml-auto p-0.5 rounded hover:bg-[#005D9710] text-slate-400 hover:text-slate-600"
             aria-label="Clear date"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

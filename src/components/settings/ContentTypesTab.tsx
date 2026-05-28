@@ -288,7 +288,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
 
       {/* Content Types List */}
       {contentTypes.length === 0 ? (
-        <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+        <div className="text-center py-12 bg-surface-nested rounded-lg border border-dashed border-slate-300">
           <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 mb-4">No content types yet</p>
           <button
@@ -310,7 +310,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
             >
               {/* Header - Always visible */}
               <div
-                className="flex items-center justify-between px-4 py-3 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors"
+                className="flex items-center justify-between px-4 py-3 bg-surface-nested cursor-pointer hover:bg-[#005D9710] transition-colors"
                 onClick={() => {
                   if (expandedType === type.id) {
                     setExpandedType(null);
@@ -363,7 +363,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
                         />
                       </div>
                       <div>
@@ -371,7 +371,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                         <select
                           value={formData.icon}
                           onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
                         >
                           {ICON_OPTIONS.map((icon) => (
                             <option key={icon.value} value={icon.value}>{icon.label}</option>
@@ -409,7 +409,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                       {STANDARD_FIELDS.map((field) => (
                         <div
                           key={field.key}
-                          className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                          className="flex items-center justify-between p-3 bg-surface-nested rounded-lg"
                         >
                           <div>
                             <span className="text-sm font-medium text-slate-900">{field.label}</span>
@@ -452,7 +452,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                           <label
                             key={column.id}
                             className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                              isSelected ? 'bg-brand-50 border border-brand-200' : 'bg-slate-50 border border-transparent'
+                              isSelected ? 'bg-brand-50 border border-brand-200' : 'bg-surface-nested border border-transparent'
                             }`}
                           >
                             <input
@@ -523,7 +523,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                   placeholder="e.g., Blog Post"
                 />
               </div>
@@ -533,7 +533,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                 <select
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
                 >
                   {ICON_OPTIONS.map((icon) => (
                     <option key={icon.value} value={icon.value}>{icon.label}</option>
@@ -696,7 +696,7 @@ function CustomFieldsManager({
       {typeFields.length > 0 && (
         <div className="space-y-2 mb-3">
           {typeFields.map(field => (
-            <div key={field.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+            <div key={field.id} className="flex items-center justify-between p-3 bg-surface-nested rounded-lg">
               <div>
                 <span className="text-sm font-medium text-slate-900">{field.name}</span>
                 <span className="text-xs text-slate-500 ml-2">
@@ -736,7 +736,7 @@ function CustomFieldsManager({
                   setNewType(e.target.value as CustomFieldType);
                   setNewOptions([]);
                 }}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface-card"
               >
                 {FIELD_TYPES.map(ft => (
                   <option key={ft.value} value={ft.value}>{ft.label}</option>

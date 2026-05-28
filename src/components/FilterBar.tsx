@@ -134,7 +134,7 @@ export function FilterBar({
           {searchValue && (
             <button
               onClick={() => setSearchValue('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 rounded"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-[#005D9710] rounded"
             >
               <X className="w-3 h-3 text-slate-400" />
             </button>
@@ -351,9 +351,9 @@ function FilterDropdown({
             ? 'text-brand-700 bg-brand-50 hover:bg-brand-100'
             : count === 1
               ? indicatorColor
-                ? 'hover:bg-slate-50'
-                : 'text-slate-700 hover:bg-slate-100'
-              : 'text-slate-600 hover:bg-slate-100'
+                ? 'hover:bg-[#005D9708]'
+                : 'text-slate-700 hover:bg-[#005D9710]'
+              : 'text-slate-600 hover:bg-[#005D9710]'
         }`}
         style={
           count === 1 && indicatorColor

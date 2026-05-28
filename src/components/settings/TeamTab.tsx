@@ -233,7 +233,7 @@ export function TeamTab() {
 
       <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
         <table className="w-full">
-          <thead className="bg-slate-50">
+          <thead className="bg-[#005D9712]">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Member</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Role</th>
@@ -251,7 +251,7 @@ export function TeamTab() {
               return (
                 <tr
                   key={member.user_id}
-                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-slate-50'} transition-colors`}
+                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-[#005D9708]'} transition-colors`}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -503,7 +503,7 @@ function AddMemberModal({
           <select
             value={selectedRole}
             onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option value="editor">Editor — can create, edit, and manage content</option>
             <option value="admin">Admin — full access including settings</option>
@@ -518,7 +518,7 @@ function AddMemberModal({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-9 pr-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Search by name or email..."
             autoFocus
           />
@@ -541,7 +541,7 @@ function AddMemberModal({
               {filteredUsers.map((profile) => (
                 <div
                   key={profile.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-[#005D9708] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {profile.avatar_url ? (
@@ -692,7 +692,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
               placeholder="colleague@company.com"
               autoFocus
             />
@@ -703,7 +703,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as Role)}
-              className="w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               <option value="editor">Editor — can create, edit, and manage content</option>
               <option value="admin">Admin — full access including settings</option>

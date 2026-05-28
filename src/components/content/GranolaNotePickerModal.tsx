@@ -112,7 +112,7 @@ export function GranolaNotePickerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[#005D9710] transition-colors"
           >
             <X className="w-4 h-4 text-slate-500" />
           </button>
@@ -155,7 +155,7 @@ export function GranolaNotePickerModal({
               {filtered.map((note) => (
                 <div
                   key={note.id}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors group"
                 >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"

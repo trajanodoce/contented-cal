@@ -127,7 +127,7 @@ function LoginRoute() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-surface-page">
         <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
       </div>
     );
@@ -146,7 +146,7 @@ function CreateWorkspaceRoute() {
 
   if (authLoading || workspaceLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-surface-page">
         <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
       </div>
     );
@@ -170,7 +170,7 @@ function ProtectedLayout() {
 
   if (authLoading || workspaceLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-surface-page">
         <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
       </div>
     );

@@ -82,9 +82,9 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
   const FileIcon = isFile ? getFileIcon(fileName) : Image;
 
   return (
-    <div className="group bg-surface-card border border-slate-300 rounded-xl overflow-hidden hover:shadow-md hover:border-slate-400 transition-all">
+    <div className="group bg-surface-card rounded-xl overflow-hidden hover:shadow-md hover:border-[#005D9730] transition-all" style={{ border: '1px solid #00233930' }}>
       {/* Thumbnail */}
-      <div className="w-full h-16 bg-slate-50 flex items-center justify-center overflow-hidden relative">
+      <div className="w-full h-16 bg-surface-nested flex items-center justify-center overflow-hidden relative">
         {isFile && isImage && !imgError ? (
           <img
             src={link.url}
@@ -465,7 +465,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
             </>
           ) : (
             <>
-              <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-brand-100 flex items-center justify-center mb-2 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-[#005D9712] group-hover:bg-brand-100 flex items-center justify-center mb-2 transition-colors">
                 <Upload className="w-5 h-5 text-slate-400 group-hover:text-brand-500 transition-colors" />
               </div>
               <p className="text-sm font-medium text-slate-600 group-hover:text-brand-600 transition-colors">
@@ -493,7 +493,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
 
                   if (isEditing) {
                     return (
-                      <div key={link.id} className="px-3 py-2 rounded-lg bg-slate-50 space-y-2">
+                      <div key={link.id} className="px-3 py-2 rounded-lg bg-surface-nested space-y-2">
                         <input
                           autoFocus
                           type="text"
@@ -514,7 +514,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                           <button onClick={saveEditLink} className="px-2.5 py-1 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 flex items-center gap-1">
                             <Check className="w-3 h-3" /> Save
                           </button>
-                          <button onClick={() => setEditingLinkId(null)} className="px-2.5 py-1 text-slate-500 text-xs border border-slate-200 rounded-lg hover:bg-slate-100">
+                          <button onClick={() => setEditingLinkId(null)} className="px-2.5 py-1 text-slate-500 text-xs border border-slate-200 rounded-lg hover:bg-[#005D9710]">
                             Cancel
                           </button>
                         </div>
@@ -525,7 +525,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                   return (
                     <div
                       key={link.id}
-                      className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                      className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#005D9708] transition-colors"
                     >
                       <span
                         className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold leading-none shrink-0"
