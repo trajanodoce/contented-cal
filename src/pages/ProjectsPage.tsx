@@ -219,7 +219,7 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-[#005D9708]"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-[#005D9718]"
           >
             Cancel
           </button>

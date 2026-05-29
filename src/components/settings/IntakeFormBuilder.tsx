@@ -57,7 +57,7 @@ function FieldRow({ field, onDelete, onToggleRequired, onDragStart, onDragOver, 
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onToggleRequired}
-          className="text-xs px-2 py-1 rounded border transition-colors text-slate-500 border-slate-200 hover:bg-[#005D9708]"
+          className="text-xs px-2 py-1 rounded border transition-colors text-slate-500 border-slate-200 hover:bg-[#005D9718]"
           title={field.required ? 'Make optional' : 'Make required'}
         >
           {field.required ? 'Required' : 'Optional'}
@@ -219,7 +219,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           <button
             onClick={() => setPreviewMode(!previewMode)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors
-              ${previewMode ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:bg-[#005D9708]'}`}
+              ${previewMode ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:bg-[#005D9718]'}`}
           >
             {previewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             {previewMode ? 'Edit' : 'Preview'}
@@ -327,7 +327,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
                       onClick={() => !added && addField(f.key, f.label, f.type, (f as any).options)}
                       disabled={added}
                       className={`w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-lg transition-colors
-                        ${added ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-[#005D9708] cursor-pointer'}`}
+                        ${added ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-[#005D9718] cursor-pointer'}`}
                     >
                       <span>{f.label}</span>
                       {added ? (
@@ -478,7 +478,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
             <button onClick={createForm} disabled={!newFormName.trim() || creating} className="px-4 py-1.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-60 flex items-center gap-1.5">
               {creating && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Create
             </button>
-            <button onClick={() => setAddingForm(false)} className="px-3 py-1.5 text-slate-600 text-sm border border-slate-200 rounded-lg hover:bg-[#005D9708]">Cancel</button>
+            <button onClick={() => setAddingForm(false)} className="px-3 py-1.5 text-slate-600 text-sm border border-slate-200 rounded-lg hover:bg-[#005D9718]">Cancel</button>
           </div>
         </div>
       )}
@@ -510,7 +510,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setEditingForm(form)}
-                    className="px-3 py-1 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9708]"
+                    className="px-3 py-1 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718]"
                   >
                     Edit
                   </button>

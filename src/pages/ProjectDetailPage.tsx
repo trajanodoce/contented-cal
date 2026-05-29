@@ -399,7 +399,7 @@ export function ProjectDetailPage() {
                   setDescDraft(project.description ?? '');
                   setEditingDesc(false);
                 }}
-                className="px-3 py-1 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
+                className="px-3 py-1 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
               >
                 Cancel
               </button>
@@ -558,7 +558,7 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
     <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#005D9708] transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#005D9718] transition-colors"
       >
         <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Clock className="w-4 h-4 text-slate-400" />
@@ -841,7 +841,7 @@ function TeamMembersSection({
                   <button
                     key={m.id}
                     onClick={() => addMember(m.id)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9708] transition-colors"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors"
                   >
                     <AvatarCircle profile={m} size="sm" />
                     <span className="truncate">{m.full_name || m.email}</span>
@@ -1003,7 +1003,7 @@ function ListTab({
                   <tr
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
-                    className="hover:bg-[#005D9708] cursor-pointer transition-colors"
+                    className="hover:bg-[#005D9718] cursor-pointer transition-colors"
                     style={{
                       ...(rowBg ? { backgroundColor: rowBg } : {}),
                       ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
@@ -1565,7 +1565,7 @@ function CalendarTab({
             onClick={toggleWeekends}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
               weekendsCollapsed
-                ? 'border-slate-300 text-slate-600 hover:bg-[#005D9708]'
+                ? 'border-slate-300 text-slate-600 hover:bg-[#005D9718]'
                 : 'border-brand-200 bg-brand-50 text-brand-700'
             }`}
           >
@@ -1573,19 +1573,19 @@ function CalendarTab({
           </button>
           <button
             onClick={goToday}
-            className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
+            className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
           >
             Today
           </button>
           <button
             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
+            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9708]"
+            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -1627,7 +1627,7 @@ function CalendarTab({
         <div className="flex justify-center pt-4">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9708] hover:text-slate-900 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9718] hover:text-slate-900 transition-colors shadow-sm"
           >
             {expanded ? (
               <>

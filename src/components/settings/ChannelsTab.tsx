@@ -197,7 +197,7 @@ export function ChannelsTab({ workspaceId }: ChannelsTabProps) {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group ${
                 dragOverIndex === index
                   ? 'bg-brand-50 border border-brand-200'
-                  : 'bg-surface-nested hover:bg-[#005D9708]'
+                  : 'bg-surface-nested hover:bg-[#005D9718]'
               }`}
               style={
                 dragOverIndex !== index

@@ -251,7 +251,7 @@ export function TeamTab() {
               return (
                 <tr
                   key={member.user_id}
-                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-[#005D9708]'} transition-colors`}
+                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-[#005D9718]'} transition-colors`}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -400,7 +400,7 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
                   setIsOpen(false);
                   if (role !== currentRole) onChange(role);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
                   role === currentRole ? 'bg-brand-50' : ''
                 }`}
               >
@@ -541,7 +541,7 @@ function AddMemberModal({
               {filteredUsers.map((profile) => (
                 <div
                   key={profile.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-[#005D9708] transition-colors"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-[#005D9718] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     {profile.avatar_url ? (

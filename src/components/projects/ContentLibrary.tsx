@@ -267,7 +267,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     setShowAddMenu(false);
                     fileInputRef.current?.click();
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9708]"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718]"
                 >
                   <Upload className="w-4 h-4 text-slate-400" />
                   Upload file
@@ -277,7 +277,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     setShowAddMenu(false);
                     setShowLinkForm(true);
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9708]"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718]"
                 >
                   <Link2 className="w-4 h-4 text-slate-400" />
                   Add link
@@ -370,7 +370,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                 {fileItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9708] group transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
                   >
                     {getFileIcon(item.file_type)}
                     <div className="flex-1 min-w-0">
@@ -459,7 +459,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                 {linkItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9708] group transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
                   >
                     <Link2 className="w-5 h-5 text-brand-400 shrink-0" />
                     <div className="flex-1 min-w-0">

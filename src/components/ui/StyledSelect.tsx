@@ -112,7 +112,7 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
                     setIsOpen(false);
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                    isSelected ? '' : 'hover:bg-[#005D9708]'
+                    isSelected ? '' : 'hover:bg-[#005D9718]'
                   }`}
                   style={{ backgroundColor: isSelected ? '#e8f0fe' : undefined }}
                 >

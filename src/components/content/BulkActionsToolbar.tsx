@@ -171,7 +171,7 @@ export function BulkActionsToolbar({
                   <button
                     key={member.id}
                     onClick={() => handleBulkAssign(member.id)}
-                    className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 rounded"
+                    className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 rounded"
                   >
                     {member.avatar_url ? (
                       <img
@@ -213,7 +213,7 @@ export function BulkActionsToolbar({
                     <button
                       key={column.id}
                       onClick={() => handleBulkStatusChange(column.id)}
-                      className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 rounded"
+                      className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 rounded"
                     >
                       <span
                         className="w-2 h-2 rounded-full"

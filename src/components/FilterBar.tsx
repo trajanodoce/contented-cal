@@ -345,7 +345,7 @@ function FilterDropdown({
             ? 'text-brand-700 bg-brand-50 hover:bg-brand-100'
             : count === 1
               ? indicatorColor
-                ? 'hover:bg-[#005D9708]'
+                ? 'hover:bg-[#005D9718]'
                 : 'text-slate-700 hover:bg-[#005D9710]'
               : 'text-slate-600 hover:bg-[#005D9710]'
         }`}
@@ -378,7 +378,7 @@ function FilterDropdown({
                   key={option.id}
                   onClick={() => onToggle(option.id)}
                   className={`w-full px-2 py-2 text-left text-sm flex items-center gap-2 rounded-lg transition-colors ${
-                    isSelected ? '' : 'hover:bg-[#005D9708]'
+                    isSelected ? '' : 'hover:bg-[#005D9718]'
                   }`}
                   style={{
                     backgroundColor: isSelected

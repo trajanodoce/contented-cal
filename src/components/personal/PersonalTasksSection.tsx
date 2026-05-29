@@ -302,7 +302,7 @@ export function PersonalTasksSection({ workspaceId }: Props) {
                 <div key={catKey} className="border border-slate-200 rounded-lg overflow-hidden">
                   <button
                     onClick={() => toggleCategory(catKey)}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-[#005D9708] transition-colors"
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-[#005D9718] transition-colors"
                   >
                     {isCollapsed ? (
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
@@ -546,7 +546,7 @@ function TaskRow({
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#005D9708] transition-colors group cursor-pointer"
+      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#005D9718] transition-colors group cursor-pointer"
       onClick={() => !task.completed && onStartEdit()}
     >
       {/* Checkbox */}

@@ -64,7 +64,7 @@ function CustomSelect({ options, value, onChange, placeholder }: {
         <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
           {options.map(opt => (
             <button key={opt.value} type="button" onClick={() => { onChange(opt.value); setIsOpen(false); }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${opt.value === value ? 'bg-purple-50 text-purple-900' : 'text-slate-700'}`}>
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${opt.value === value ? 'bg-purple-50 text-purple-900' : 'text-slate-700'}`}>
               {opt.color && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: opt.color }} />}
               {opt.label}
               {opt.value === value && <Check className="w-4 h-4 ml-auto" />}
@@ -118,7 +118,7 @@ function AssigneeMultiSelect({ members, value, onChange }: {
             const sel = value.includes(m.id);
             return (
               <button key={m.id} type="button" onClick={() => toggle(m.id)}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-3 ${sel ? 'bg-purple-50' : ''}`}>
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-3 ${sel ? 'bg-purple-50' : ''}`}>
                 <div className={`w-5 h-5 rounded border flex items-center justify-center ${sel ? 'bg-purple-600 border-purple-600' : 'border-slate-300'}`}>
                   {sel && <Check className="w-3 h-3 text-white" />}
                 </div>

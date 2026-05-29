@@ -211,7 +211,7 @@ function FieldTable({
           {fields.map(field => {
             const opts = parseOptions(field.options);
             return (
-              <tr key={field.id} className="hover:bg-[#005D9708] transition-colors">
+              <tr key={field.id} className="hover:bg-[#005D9718] transition-colors">
                 <td className="px-4 py-3">
                   <span className="text-sm font-medium text-slate-900">{field.name}</span>
                 </td>

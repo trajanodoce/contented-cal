@@ -349,7 +349,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
           return (
             <div
               key={subtask.id}
-              className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-[#005D9708] rounded-lg transition-colors ${
+              className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-[#005D9718] rounded-lg transition-colors ${
                 subtask.completed ? 'opacity-60' : ''
               } ${dragOverId === subtask.id ? 'bg-brand-50' : ''}`}
               draggable
@@ -452,7 +452,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                   >
                     <button
                       onClick={() => updateAssignee(subtask.id, null)}
-                      className="w-full text-left px-3 py-1.5 text-sm text-slate-500 hover:bg-[#005D9708] transition-colors"
+                      className="w-full text-left px-3 py-1.5 text-sm text-slate-500 hover:bg-[#005D9718] transition-colors"
                     >
                       None
                     </button>
@@ -460,7 +460,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                       <button
                         key={m.id}
                         onClick={() => updateAssignee(subtask.id, m.id)}
-                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-[#005D9708] flex items-center gap-2 transition-colors"
+                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-[#005D9718] flex items-center gap-2 transition-colors"
                       >
                         {m.avatar_url ? (
                           <img

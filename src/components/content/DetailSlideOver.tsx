@@ -539,7 +539,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     className={`p-1.5 rounded-full transition-all ${
                       showSavedCheck
                         ? 'bg-green-100 text-green-600'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-[#005D9708]'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-[#005D9718]'
                     }`}
                   >
                     {showSavedCheck ? (
@@ -807,7 +807,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         </button>
                         <button
                           onClick={() => { setEditingDescription(false); setDescription(item.description); }}
-                          className="px-3 py-1.5 text-slate-600 text-xs rounded-lg hover:bg-[#005D9708]" style={{ border: '1px solid #00233930' }}
+                          className="px-3 py-1.5 text-slate-600 text-xs rounded-lg hover:bg-[#005D9718]" style={{ border: '1px solid #00233930' }}
                         >
                           Cancel
                         </button>
@@ -1001,7 +1001,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-surface-card hover:bg-[#005D9708] rounded-lg transition-colors" style={{ border: '1px solid #00233930' }}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-surface-card hover:bg-[#005D9718] rounded-lg transition-colors" style={{ border: '1px solid #00233930' }}
                 >
                   Cancel
                 </button>

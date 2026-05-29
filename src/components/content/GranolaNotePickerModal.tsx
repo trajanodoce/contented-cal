@@ -155,7 +155,7 @@ export function GranolaNotePickerModal({
               {filtered.map((note) => (
                 <div
                   key={note.id}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors group"
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors group"
                 >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"

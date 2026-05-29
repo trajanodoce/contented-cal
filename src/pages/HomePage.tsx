@@ -200,7 +200,7 @@ export function HomePage() {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors text-left group"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors text-left group"
                     >
                       <div className={`w-2 h-2 rounded-full shrink-0 ${pStyle.dot}`} />
                       <div className="flex-1 min-w-0">
@@ -256,7 +256,7 @@ export function HomePage() {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9708] transition-colors text-left group"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors text-left group"
                     >
                       <div className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
                         isDueToday ? 'bg-brand-100 text-brand-700' : 'bg-[#005D9712] text-slate-600'
@@ -300,7 +300,7 @@ export function HomePage() {
                   <button
                     key={project.id}
                     onClick={() => navigate(`/projects/${project.id}`)}
-                    className="bg-surface-card p-4 hover:bg-[#005D9708] transition-colors text-left group"
+                    className="bg-surface-card p-4 hover:bg-[#005D9718] transition-colors text-left group"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <div

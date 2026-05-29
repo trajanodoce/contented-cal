@@ -88,7 +88,7 @@ export function DatePickerPanel({
             onChange('');
             onClose?.();
           }}
-          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-[#005D9708] transition-colors"
+          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-[#005D9718] transition-colors"
         >
           Clear
         </button>
@@ -98,7 +98,7 @@ export function DatePickerPanel({
             onChange(toDateString(new Date()));
             onClose?.();
           }}
-          className="text-[11px] font-semibold text-[#005D97] hover:text-[#003d66] px-2 py-1 rounded hover:bg-[#005D9708] transition-colors"
+          className="text-[11px] font-semibold text-[#005D97] hover:text-[#003d66] px-2 py-1 rounded hover:bg-[#005D9718] transition-colors"
         >
           Today
         </button>

@@ -398,7 +398,7 @@ export function ListPage() {
                   <tr
                     key={item.id}
                     onClick={() => handleRowClick(item)}
-                    className={`hover:bg-[#005D9708] cursor-pointer transition-colors ${
+                    className={`hover:bg-[#005D9718] cursor-pointer transition-colors ${
                       isSelected ? 'bg-brand-50 hover:bg-brand-100' : ''
                     }`}
                     style={{
@@ -622,7 +622,7 @@ function InlineStatusEdit({
                   e.stopPropagation();
                   handleStatusChange(column.id);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
                   column.id === statusId ? 'bg-brand-50' : ''
                 }`}
               >
@@ -717,7 +717,7 @@ function InlinePriorityEdit({
                 e.stopPropagation();
                 handlePriorityChange(key);
               }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
                 key === priority ? 'bg-brand-50' : ''
               }`}
             >
@@ -858,7 +858,7 @@ function InlineAssigneeEdit({
                   e.stopPropagation();
                   toggleAssignee(member.id);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-3 rounded ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-3 rounded ${
                   isSelected ? 'bg-brand-50' : ''
                 }`}
               >

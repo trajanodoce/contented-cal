@@ -242,7 +242,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9708] cursor-pointer transition-colors">
+            <label className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9718] cursor-pointer transition-colors">
               <Upload className="w-4 h-4" />
               {isUploading ? 'Uploading...' : logoUrl ? 'Change logo' : 'Upload logo'}
               <input
@@ -510,7 +510,7 @@ function BoardColumnsTab({ workspaceId }: { workspaceId: string | null }) {
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
-                  className={`hover:bg-[#005D9708] ${dragOverIndex === index ? 'bg-brand-50' : ''} ${draggedItem?.id === column.id ? 'opacity-50' : ''}`}
+                  className={`hover:bg-[#005D9718] ${dragOverIndex === index ? 'bg-brand-50' : ''} ${draggedItem?.id === column.id ? 'opacity-50' : ''}`}
                 >
                   <td className="px-2 py-3">
                     <div className="cursor-move text-slate-400">

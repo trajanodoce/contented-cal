@@ -189,7 +189,7 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
         </button>
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9708] transition-colors"
+          className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
         >
           Cancel
         </button>
@@ -263,7 +263,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               <button
                 onClick={onTest}
                 disabled={testing}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9708] transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
                 title="Test connection"
               >
                 {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
@@ -274,7 +274,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               onClick={handleConnectClick}
               className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
                 ${connected
-                  ? 'text-slate-700 border border-slate-200 hover:bg-[#005D9708]'
+                  ? 'text-slate-700 border border-slate-200 hover:bg-[#005D9718]'
                   : 'bg-brand-600 text-white hover:bg-brand-500'}`}
             >
               {connected ? (
@@ -321,7 +321,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               </button>
               <button
                 onClick={() => setExpanded(false)}
-                className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9708] transition-colors"
+                className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
               >
                 Cancel
               </button>
@@ -816,7 +816,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       onClick={() => setExpandedPlatform(isExpanded ? null : platform.id)}
                       className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
                         ${isConnected
-                          ? 'text-slate-700 border border-slate-200 hover:bg-[#005D9708]'
+                          ? 'text-slate-700 border border-slate-200 hover:bg-[#005D9718]'
                           : 'bg-brand-600 text-white hover:bg-brand-500'}`}
                     >
                       {isConnected ? (
@@ -878,7 +878,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       </button>
                       <button
                         onClick={() => setExpandedPlatform(null)}
-                        className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9708] transition-colors"
+                        className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
                       >
                         Cancel
                       </button>

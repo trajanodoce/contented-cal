@@ -138,7 +138,7 @@ function CustomSelect({
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-2 ${
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
                 option.value === value ? 'bg-brand-50 text-brand-900' : 'text-slate-700'
               }`}
             >
@@ -237,7 +237,7 @@ function AssigneeMultiSelect({
                   key={member.id}
                   type="button"
                   onClick={() => toggleMember(member.id)}
-                  className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9708] flex items-center gap-3 ${
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-3 ${
                     isSelected ? 'bg-brand-50' : ''
                   }`}
                 >

@@ -252,7 +252,7 @@ function SlackTab({ addToast, onOpenItem }: { addToast: Props['addToast']; onOpe
                   <button
                     key={item.id}
                     onClick={(e) => handleRowClick(item, e)}
-                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9708] transition-colors
+                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9718] transition-colors
                       ${isSelected ? 'bg-mint border-l-2 border-brand-400' : ''}
                       ${isChecked ? 'bg-brand-50' : ''}`}
                   >
@@ -657,7 +657,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
                   <button
                     key={sub.id}
                     onClick={() => setSelected(sub)}
-                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9708] transition-colors
+                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9718] transition-colors
                       ${selected?.id === sub.id ? 'bg-mint border-l-2 border-brand-400' : ''}`}
                   >
                     <div className="flex items-start justify-between gap-2">

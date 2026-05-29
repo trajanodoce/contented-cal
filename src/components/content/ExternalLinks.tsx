@@ -525,7 +525,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                   return (
                     <div
                       key={link.id}
-                      className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#005D9708] transition-colors"
+                      className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#005D9718] transition-colors"
                     >
                       <span
                         className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold leading-none shrink-0"
