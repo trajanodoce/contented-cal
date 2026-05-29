@@ -1,0 +1,22 @@
+{
+  "name": "contentedcal-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for ContentedCal — lets Claude read, create, update, and delete content calendar items",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "contentedcal-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
