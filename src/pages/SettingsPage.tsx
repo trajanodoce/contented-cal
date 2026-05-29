@@ -10,11 +10,13 @@ import { IntakeFormsList } from '../components/settings/IntakeFormBuilder';
 import { TeamTab } from '../components/settings/TeamTab';
 import { CustomFieldsTab } from '../components/settings/CustomFieldsTab';
 import { ChannelsTab } from '../components/settings/ChannelsTab';
+import { ApiKeysTab } from '../components/settings/ApiKeysTab';
 import {
   Settings, FileText, Layout, Save, Trash2, Plus, Inbox, Users,
   ChevronDown, ChevronUp, GripVertical, AlertTriangle, Zap, Upload, X, ImageIcon,
   SlidersHorizontal,
   Radio,
+  Key,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -24,7 +26,7 @@ const COLOR_PALETTE = [
   '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#64748b', '#94a3b8',
 ];
 
-type Tab = 'general' | 'team' | 'content-types' | 'channels' | 'custom-fields' | 'board-columns' | 'intake-forms' | 'integrations';
+type Tab = 'general' | 'team' | 'content-types' | 'channels' | 'custom-fields' | 'board-columns' | 'intake-forms' | 'integrations' | 'api';
 
 export function SettingsPage() {
   const { currentWorkspace, userRole } = useWorkspace();
@@ -61,6 +63,7 @@ export function SettingsPage() {
           <TabBtn active={activeTab === 'board-columns'} onClick={() => setActiveTab('board-columns')} icon={Layout} label="Board Columns" />
           <TabBtn active={activeTab === 'intake-forms'} onClick={() => setActiveTab('intake-forms')} icon={Inbox} label="Intake Forms" />
           <TabBtn active={activeTab === 'integrations'} onClick={() => setActiveTab('integrations')} icon={Zap} label="Integrations" />
+          <TabBtn active={activeTab === 'api'} onClick={() => setActiveTab('api')} icon={Key} label="API" />
         </nav>
       </div>
 
@@ -73,6 +76,7 @@ export function SettingsPage() {
         {activeTab === 'board-columns' && <BoardColumnsTab workspaceId={currentWorkspace?.id || null} />}
         {activeTab === 'intake-forms' && <IntakeFormsList addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}
         {activeTab === 'integrations' && <IntegrationsPage addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}
+        {activeTab === 'api' && <ApiKeysTab workspaceId={currentWorkspace?.id || null} />}
       </div>
     </div>
   );
