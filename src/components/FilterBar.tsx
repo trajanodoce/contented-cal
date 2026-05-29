@@ -118,8 +118,8 @@ export function FilterBar({
   }), [filters]);
 
   return (
-    <div className="bg-surface-card border-2 rounded-lg p-4 mb-4" style={{ borderColor: '#002339' }}>
-      <div className="flex flex-wrap items-center gap-3">
+    <div className="rounded-xl p-3 mb-4" style={{ background: 'linear-gradient(135deg, #005D9722 0%, #005D970A 50%, transparent 70%), #ffffff', border: '1px solid #00233930' }}>
+      <div className="flex flex-wrap items-center gap-2">
         {/* Search input */}
         <div className="relative flex-shrink-0 min-w-[200px] max-w-[300px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -128,8 +128,8 @@ export function FilterBar({
             placeholder="Search items..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="w-full pl-10 pr-9 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-            style={{ borderColor: '#002339' }}
+            className="w-full pl-10 pr-9 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            style={{ border: '1px solid #00233920', background: 'white' }}
           />
           {searchValue && (
             <button
@@ -141,7 +141,7 @@ export function FilterBar({
           )}
         </div>
 
-        <div className="h-6 w-px" style={{ backgroundColor: '#002339' }} />
+        <div className="h-6 w-px" style={{ backgroundColor: '#00233920' }} />
 
         {/* Content Type filter */}
         <FilterDropdown
@@ -264,7 +264,7 @@ export function FilterBar({
       </div>
 
       {/* Results count */}
-      <div className="mt-3 text-xs text-slate-500">
+      <div className="mt-2 text-xs text-slate-500">
         Showing {filteredCount} of {totalCount} items
         {hasActiveFilters && <span className="ml-1 text-brand-600">(filtered)</span>}
       </div>
@@ -340,7 +340,7 @@ function FilterDropdown({
     <div ref={containerRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
+        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
           count > 1
             ? 'text-brand-700 bg-brand-50 hover:bg-brand-100'
             : count === 1
@@ -351,8 +351,8 @@ function FilterDropdown({
         }`}
         style={
           count === 1 && indicatorColor
-            ? { backgroundColor: `${indicatorColor}15`, borderColor: indicatorColor }
-            : { borderColor: '#002339' }
+            ? { backgroundColor: `${indicatorColor}15`, border: `1px solid ${indicatorColor}` }
+            : { border: 'none' }
         }
       >
         {count === 1 && indicatorColor && (
