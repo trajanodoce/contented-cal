@@ -833,7 +833,7 @@ function TeamMembersSection({
             Add
           </button>
           {showPicker && (
-            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
+            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
               {availableToAdd.length === 0 ? (
                 <p className="text-xs text-slate-400 text-center py-3">All workspace members are on this project</p>
               ) : (

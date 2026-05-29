@@ -614,7 +614,7 @@ function InlineStatusEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[150px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[150px]" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
           {[...boardColumns]
             .sort((a, b) => a.position - b.position)
             .map((column) => (
@@ -711,7 +711,7 @@ function InlinePriorityEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[120px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[120px]" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
           {Object.entries(PRIORITY_STYLES).map(([key, ps]) => (
             <button
               key={key}
@@ -850,7 +850,7 @@ function InlineAssigneeEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[180px] p-2" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[180px] p-2" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
           {members.map((member) => {
             const isSelected = assigneeIds.includes(member.id);
             return (

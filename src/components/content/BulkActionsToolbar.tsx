@@ -164,7 +164,7 @@ export function BulkActionsToolbar({
           </button>
 
           {showAssignDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 bg-surface-card rounded-xl shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
+            <div className="absolute bottom-full mb-1 left-0 bg-surface-card rounded-xl shadow-xl min-w-[200px] max-h-[300px] overflow-y-auto" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select member</p>
                 {members.map((member) => (
@@ -204,7 +204,7 @@ export function BulkActionsToolbar({
           </button>
 
           {showStatusDropdown && (
-            <div className="absolute bottom-full mb-1 left-0 bg-surface-card rounded-xl shadow-xl min-w-[180px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC' }}>
+            <div className="absolute bottom-full mb-1 left-0 bg-surface-card rounded-xl shadow-xl min-w-[180px]" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
               <div className="p-2">
                 <p className="text-xs font-medium text-slate-500 uppercase px-2 py-1">Select status</p>
                 {[...boardColumns]

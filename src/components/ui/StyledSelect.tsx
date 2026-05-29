@@ -17,7 +17,6 @@ interface StyledSelectProps {
   className?: string;
 }
 
-const COOL_WASHES = ['#f0f4f8', '#edf2f8', '#f0f1f6', '#eef3f7', '#f1f0f6', '#edf1f7', '#f0f2f5'];
 
 export function StyledSelect({ value, onChange, options, placeholder = 'Select...', disabled = false, className = '' }: StyledSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -98,13 +97,12 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
             width: pos.width,
             zIndex: 9999,
             borderColor: '#00233930',
-            background: 'linear-gradient(135deg, #005D9708 0%, transparent 40%), #F7F9FC',
+            background: '#ffffff',
           }}
         >
           <div className="p-1 space-y-0.5">
             {options.map((option, idx) => {
               const isSelected = option.value === value;
-              const rowBg = isSelected ? '#005D9715' : COOL_WASHES[idx % COOL_WASHES.length];
               return (
                 <button
                   key={option.value}
@@ -113,8 +111,10 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors hover:brightness-95"
-                  style={{ backgroundColor: rowBg }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+                    isSelected ? '' : 'hover:bg-[#005D9708]'
+                  }`}
+                  style={{ backgroundColor: isSelected ? '#e8f0fe' : undefined }}
                 >
                   {option.color && (
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: option.color }} />
