@@ -121,7 +121,7 @@ export function FilterBar({
     <div className="rounded-xl p-3 mb-4" style={{ background: 'linear-gradient(135deg, #005D9722 0%, #005D970A 50%, transparent 70%), #ffffff', border: '1px solid #00233930' }}>
       <div className="flex flex-wrap items-center gap-2">
         {/* Search input */}
-        <div className="relative flex-shrink-0 min-w-[200px] max-w-[300px]">
+        <div className="relative flex-shrink-0 min-w-[260px] max-w-[360px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
@@ -340,7 +340,7 @@ function FilterDropdown({
     <div ref={containerRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+        className={`flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors ${
           count > 1
             ? 'text-brand-700 bg-brand-50 hover:bg-brand-100'
             : count === 1
@@ -351,8 +351,8 @@ function FilterDropdown({
         }`}
         style={
           count === 1 && indicatorColor
-            ? { backgroundColor: `${indicatorColor}15`, border: `1px solid ${indicatorColor}` }
-            : { border: 'none' }
+            ? { fontSize: '13.5px', fontWeight: 600, backgroundColor: `${indicatorColor}15`, border: `1px solid ${indicatorColor}` }
+            : { fontSize: '13.5px', fontWeight: 600, border: '1px solid #00233925' }
         }
       >
         {count === 1 && indicatorColor && (
