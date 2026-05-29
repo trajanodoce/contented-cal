@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json, Profile } from '../../lib/database.types';
-import { formatDateFull, PRIORITY_STYLES } from '../../lib/utils';
+import { formatDateFull, PRIORITY_STYLES, getWorkspaceChannels } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import { SubtasksSection } from './SubtasksSection';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, LINEAR_TEXT, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
@@ -31,7 +31,7 @@ interface CommentWithProfile extends Comment {
   profiles: Pick<Profile, 'id' | 'full_name' | 'email' | 'avatar_url'> | null;
 }
 
-const CHANNELS = ['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Media/External', 'Other'];
+// Channels are now loaded from workspace settings via getWorkspaceChannels()
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 
 // Default field visibility - all fields visible by default
@@ -101,7 +101,8 @@ function TitleInput({ title, onSave }: { title: string; onSave: (val: string) =>
 
 export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const { contentTypes, boardColumns, user, customFieldDefs, projects, members } = useApp();
-  const { userRole } = useWorkspace();
+  const { userRole, currentWorkspace } = useWorkspace();
+  const channels = useMemo(() => getWorkspaceChannels(currentWorkspace?.settings), [currentWorkspace?.settings]);
   const isOrdinalPost = isOrdinalItem(item);
   const isLinearIssue = isLinearItem(item);
   const cf = (item.custom_fields as Record<string, string>) ?? {};
@@ -696,7 +697,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       disabled={isReadOnly}
                       options={[
                         { value: '', label: 'None' },
-                        ...CHANNELS.map(c => ({ value: c, label: c })),
+                        ...channels.map(c => ({ value: c, label: c })),
                       ]}
                       placeholder="None"
                     />

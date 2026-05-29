@@ -9,6 +9,7 @@ import { useWorkspaceData } from '../../hooks/useWorkspaceData';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import DatePicker from '../ui/DatePicker';
 import type { ContentType, Profile, BoardColumn, Json } from '../../lib/database.types';
+import { getWorkspaceChannels } from '../../lib/utils';
 import {
   X,
   ChevronDown,
@@ -583,7 +584,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
                 className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-surface-card"
               >
                 <option value="">Select a channel...</option>
-                {['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Media/External', 'Other'].map(c => (
+                {getWorkspaceChannels(currentWorkspace?.settings).map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>

@@ -9,10 +9,12 @@ import { IntegrationsPage } from '../components/settings/IntegrationsPage';
 import { IntakeFormsList } from '../components/settings/IntakeFormBuilder';
 import { TeamTab } from '../components/settings/TeamTab';
 import { CustomFieldsTab } from '../components/settings/CustomFieldsTab';
+import { ChannelsTab } from '../components/settings/ChannelsTab';
 import {
   Settings, FileText, Layout, Save, Trash2, Plus, Inbox, Users,
   ChevronDown, ChevronUp, GripVertical, AlertTriangle, Zap, Upload, X, ImageIcon,
   SlidersHorizontal,
+  Radio,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -22,7 +24,7 @@ const COLOR_PALETTE = [
   '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#64748b', '#94a3b8',
 ];
 
-type Tab = 'general' | 'team' | 'content-types' | 'custom-fields' | 'board-columns' | 'intake-forms' | 'integrations';
+type Tab = 'general' | 'team' | 'content-types' | 'channels' | 'custom-fields' | 'board-columns' | 'intake-forms' | 'integrations';
 
 export function SettingsPage() {
   const { currentWorkspace, userRole } = useWorkspace();
@@ -54,6 +56,7 @@ export function SettingsPage() {
           <TabBtn active={activeTab === 'general'} onClick={() => setActiveTab('general')} icon={Settings} label="General" />
           <TabBtn active={activeTab === 'team'} onClick={() => setActiveTab('team')} icon={Users} label="Team" />
           <TabBtn active={activeTab === 'content-types'} onClick={() => setActiveTab('content-types')} icon={FileText} label="Content Types" />
+          <TabBtn active={activeTab === 'channels'} onClick={() => setActiveTab('channels')} icon={Radio} label="Channels" />
           <TabBtn active={activeTab === 'custom-fields'} onClick={() => setActiveTab('custom-fields')} icon={SlidersHorizontal} label="Custom Fields" />
           <TabBtn active={activeTab === 'board-columns'} onClick={() => setActiveTab('board-columns')} icon={Layout} label="Board Columns" />
           <TabBtn active={activeTab === 'intake-forms'} onClick={() => setActiveTab('intake-forms')} icon={Inbox} label="Intake Forms" />
@@ -65,6 +68,7 @@ export function SettingsPage() {
         {activeTab === 'general' && <GeneralTab workspace={currentWorkspace} />}
         {activeTab === 'team' && <TeamTab />}
         {activeTab === 'content-types' && <ContentTypeEditor workspaceId={currentWorkspace?.id || null} />}
+        {activeTab === 'channels' && <ChannelsTab workspaceId={currentWorkspace?.id || null} />}
         {activeTab === 'custom-fields' && <CustomFieldsTab workspaceId={currentWorkspace?.id || null} />}
         {activeTab === 'board-columns' && <BoardColumnsTab workspaceId={currentWorkspace?.id || null} />}
         {activeTab === 'intake-forms' && <IntakeFormsList addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}

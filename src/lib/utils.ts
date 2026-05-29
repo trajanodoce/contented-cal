@@ -128,3 +128,29 @@ export function getUserInitials(email?: string, fullName?: string): string {
 export function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
+
+/** Default channel list for new workspaces or when none are configured */
+export const DEFAULT_CHANNELS = [
+  'Blog',
+  'Social',
+  'Newsletter/Email',
+  'Sales Enablement',
+  'Promo',
+  'Website',
+  'Media/External',
+  'Other',
+];
+
+/** Extract channels from workspace settings JSON, falling back to defaults */
+export function getWorkspaceChannels(settings: unknown): string[] {
+  if (
+    settings &&
+    typeof settings === 'object' &&
+    !Array.isArray(settings) &&
+    'channels' in settings &&
+    Array.isArray((settings as Record<string, unknown>).channels)
+  ) {
+    return (settings as Record<string, string[]>).channels;
+  }
+  return DEFAULT_CHANNELS;
+}

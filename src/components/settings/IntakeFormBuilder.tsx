@@ -5,18 +5,22 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { getWorkspaceChannels } from '../../lib/utils';
 import type { IntakeForm, IntakeFormField } from '../../lib/database.types';
 
-const STANDARD_FIELDS = [
-  { key: 'title', label: 'Title', type: 'text' },
-  { key: 'description', label: 'Description', type: 'long_text' },
-  { key: 'channel', label: 'Channel', type: 'single_select', options: ['Blog', 'Social', 'Newsletter/Email', 'Sales Enablement', 'Promo', 'Website', 'Media/External', 'Other'] },
-  { key: 'due_date', label: 'Due Date', type: 'date' },
-  { key: 'publish_date', label: 'Publish Date', type: 'date' },
-  { key: 'tags', label: 'Tags', type: 'text' },
-  { key: 'submitter_email', label: 'Your Email', type: 'text' },
-  { key: 'submitter_name', label: 'Your Name', type: 'text' },
-];
+function getStandardFields(channels: string[]) {
+  return [
+    { key: 'title', label: 'Title', type: 'text' },
+    { key: 'description', label: 'Description', type: 'long_text' },
+    { key: 'channel', label: 'Channel', type: 'single_select', options: channels },
+    { key: 'due_date', label: 'Due Date', type: 'date' },
+    { key: 'publish_date', label: 'Publish Date', type: 'date' },
+    { key: 'tags', label: 'Tags', type: 'text' },
+    { key: 'submitter_email', label: 'Your Email', type: 'text' },
+    { key: 'submitter_name', label: 'Your Name', type: 'text' },
+  ];
+}
 
 interface FieldRowProps {
   field: IntakeFormField;
@@ -74,6 +78,11 @@ interface FormBuilderProps {
 
 export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
   const { refreshIntakeForms } = useApp();
+  const { currentWorkspace } = useWorkspace();
+  const STANDARD_FIELDS = React.useMemo(
+    () => getStandardFields(getWorkspaceChannels(currentWorkspace?.settings)),
+    [currentWorkspace?.settings]
+  );
   const dragId = useRef<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
 

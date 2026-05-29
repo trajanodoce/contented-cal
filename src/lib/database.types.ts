@@ -1235,6 +1235,7 @@ export type Database = {
           id: string
           logo_url: string | null
           name: string
+          settings: Json
           slug: string
         }
         Insert: {
@@ -1242,6 +1243,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name: string
+          settings?: Json
           slug: string
         }
         Update: {
@@ -1249,6 +1251,7 @@ export type Database = {
           id?: string
           logo_url?: string | null
           name?: string
+          settings?: Json
           slug?: string
         }
         Relationships: []
