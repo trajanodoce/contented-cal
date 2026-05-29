@@ -392,7 +392,7 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[140px]" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
+          <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[140px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
             {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([role, config]) => (
               <button
                 key={role}

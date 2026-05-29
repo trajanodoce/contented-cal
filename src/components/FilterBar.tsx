@@ -368,7 +368,7 @@ function FilterDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 rounded-xl shadow-lg min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
+        <div className="absolute top-full mt-1 rounded-xl shadow-lg min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
           <div className="p-2 space-y-1">
             <p className="text-xs font-medium uppercase px-2 py-1" style={{ color: '#002339' }}>{label}</p>
             {options.map((option, idx) => {

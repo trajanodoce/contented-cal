@@ -97,7 +97,7 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
             width: pos.width,
             zIndex: 9999,
             borderColor: '#00233930',
-            background: '#ffffff',
+            background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff',
           }}
         >
           <div className="p-1 space-y-0.5">

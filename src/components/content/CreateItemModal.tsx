@@ -128,7 +128,7 @@ function CustomSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
           {options.map((option) => (
             <button
               key={option.value}
@@ -225,7 +225,7 @@ function AssigneeMultiSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: '#ffffff' }}>
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
           {members.length === 0 ? (
             <div className="px-3 py-2 text-sm text-slate-500">No members found</div>
           ) : (
