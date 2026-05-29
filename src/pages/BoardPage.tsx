@@ -328,6 +328,11 @@ export function BoardPage() {
     setSelectedItemId(item.id);
   }, [setSelectedItemId]);
 
+  const [showOrdinal, setShowOrdinal] = useState(() => {
+    const saved = localStorage.getItem('cc-show-ordinal');
+    return saved !== null ? saved === 'true' : true;
+  });
+
   const [activeDragItem, setActiveDragItem] = useState<ContentItem | null>(null);
   const channels = useMemo(() => {
     const configured = getWorkspaceChannels(currentWorkspace?.settings);
@@ -372,9 +377,10 @@ export function BoardPage() {
   }, [fetchData]);
 
   const filteredItems = useMemo(() => {
-    if (!isLoaded) return contentItems;
-    return applyFilters(contentItems, filters, linkCounts);
-  }, [contentItems, filters, isLoaded, linkCounts]);
+    let result = isLoaded ? applyFilters(contentItems, filters, linkCounts) : contentItems;
+    if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    return result;
+  }, [contentItems, filters, isLoaded, linkCounts, showOrdinal]);
 
   const itemsByColumn = useMemo(() => {
     const grouped: Record<string, ContentItem[]> = {};
@@ -488,6 +494,35 @@ export function BoardPage() {
           totalCount={contentItems.length}
           filteredCount={filteredItems.length}
         />
+        <div className="flex items-center gap-2 mt-2">
+          <button
+            onClick={() => {
+              setShowOrdinal(prev => {
+                const next = !prev;
+                localStorage.setItem('cc-show-ordinal', String(next));
+                return next;
+              });
+            }}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+            style={{
+              borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
+              backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
+              color: showOrdinal ? ORDINAL_TEXT : '#64748b',
+            }}
+            title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
+          >
+            <div
+              className="relative w-8 h-[18px] rounded-full transition-colors"
+              style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : '#CBD5E1' }}
+            >
+              <div
+                className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
+                style={{ left: showOrdinal ? '18px' : '2px' }}
+              />
+            </div>
+            Ordinal
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0" style={{ overflowX: 'scroll', overflowY: 'hidden' }}>
