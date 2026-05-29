@@ -4,7 +4,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 // UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
-import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES } from '../lib/utils';
+import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
 import { CreateItemModal } from '../components/content/CreateItemModal';
@@ -114,7 +114,13 @@ export function ListPage() {
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
   const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id || null);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
-  const [channels, setChannels] = useState<string[]>([]);
+  // Channels: workspace settings merged with any orphaned values from items
+  const channels = useMemo(() => {
+    const configured = getWorkspaceChannels(currentWorkspace?.settings);
+    const fromItems = rawItems.map((i) => i.channel).filter(Boolean) as string[];
+    return [...new Set([...configured, ...fromItems])];
+  }, [currentWorkspace?.settings, rawItems]);
+
   const [showOrdinal, setShowOrdinal] = useState(() => {
     const saved = localStorage.getItem('cc-show-ordinal');
     return saved !== null ? saved === 'true' : true;
@@ -123,14 +129,6 @@ export function ListPage() {
   useEffect(() => {
     localStorage.removeItem('cc-show-granola');
   }, []);
-
-  // Extract unique channels from items
-  useEffect(() => {
-    if (rawItems.length > 1) {
-      const uniqueChannels = [...new Set(rawItems.map((item) => item.channel).filter(Boolean))];
-      setChannels(uniqueChannels as string[]);
-    }
-  }, [rawItems]);
 
   // Apply filters to items
   const items = useMemo(() => {

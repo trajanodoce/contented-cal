@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, Subtask } from '../lib/database.types';
 import { isPast, isToday } from 'date-fns';
-import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES } from '../lib/utils';
+import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -63,10 +63,11 @@ export function MyWorkPage() {
     () => (user ? contentItems.filter((i) => i.assignee_ids?.includes(user.id)) : []),
     [contentItems, user],
   );
-  const channels = useMemo(
-    () => [...new Set(myItems.map((item) => item.channel).filter(Boolean))] as string[],
-    [myItems],
-  );
+  const channels = useMemo(() => {
+    const configured = getWorkspaceChannels(currentWorkspace?.settings);
+    const fromItems = myItems.map((i) => i.channel).filter(Boolean) as string[];
+    return [...new Set([...configured, ...fromItems])];
+  }, [currentWorkspace?.settings, myItems]);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
 
   const fetchData = useCallback(async () => {

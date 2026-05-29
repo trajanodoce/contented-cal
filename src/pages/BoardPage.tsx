@@ -17,7 +17,7 @@ import {
   Mic,
 } from 'lucide-react';
 import { isPast, isToday } from 'date-fns';
-import { parseLocalDate, formatDate } from '../lib/utils';
+import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import {
@@ -329,10 +329,11 @@ export function BoardPage() {
   }, [setSelectedItemId]);
 
   const [activeDragItem, setActiveDragItem] = useState<ContentItem | null>(null);
-  const channels = useMemo(
-    () => [...new Set(contentItems.map((item) => item.channel).filter(Boolean))] as string[],
-    [contentItems],
-  );
+  const channels = useMemo(() => {
+    const configured = getWorkspaceChannels(currentWorkspace?.settings);
+    const fromItems = contentItems.map((i) => i.channel).filter(Boolean) as string[];
+    return [...new Set([...configured, ...fromItems])];
+  }, [currentWorkspace?.settings, contentItems]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),

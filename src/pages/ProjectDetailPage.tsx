@@ -15,7 +15,7 @@ import type {
   Profile,
   ActivityLog,
 } from '../lib/database.types';
-import { parseLocalDate, pillTextColor } from '../lib/utils';
+import { parseLocalDate, pillTextColor, getWorkspaceChannels } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
 import {
   format,
@@ -930,13 +930,12 @@ function ListTab({
   workspaceId: string | null;
   onItemClick: (id: string) => void;
 }) {
+  const { currentWorkspace } = useWorkspace();
   const channels = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach((i) => {
-      if (i.channel) set.add(i.channel);
-    });
-    return Array.from(set);
-  }, [items]);
+    const configured = getWorkspaceChannels(currentWorkspace?.settings);
+    const fromItems = items.map((i) => i.channel).filter(Boolean) as string[];
+    return [...new Set([...configured, ...fromItems])];
+  }, [currentWorkspace?.settings, items]);
 
   const filteredItems = useMemo(() => applyFilters(items, filters), [items, filters]);
 

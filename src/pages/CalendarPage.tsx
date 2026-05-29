@@ -5,7 +5,7 @@ import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, Profile, BoardColumn, Project, Subtask } from '../lib/database.types';
-import { parseLocalDate } from '../lib/utils';
+import { parseLocalDate, getWorkspaceChannels } from '../lib/utils';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts';
@@ -931,10 +931,11 @@ export function CalendarPage() {
   }, [setCalendarViewType]);
 
   const { filters, setFilters, isLoaded } = useFilters();
-  const channels = useMemo(
-    () => [...new Set(contentItems.map((item) => item.channel).filter(Boolean))] as string[],
-    [contentItems],
-  );
+  const channels = useMemo(() => {
+    const configured = getWorkspaceChannels(currentWorkspace?.settings);
+    const fromItems = contentItems.map((i) => i.channel).filter(Boolean) as string[];
+    return [...new Set([...configured, ...fromItems])];
+  }, [currentWorkspace?.settings, contentItems]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
