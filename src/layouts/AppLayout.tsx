@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type ChangeEvent } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -22,6 +22,7 @@ import {
   LayoutDashboard,
   Palette,
   FileText,
+  Camera,
 } from 'lucide-react';
 
 interface NavItem {
@@ -76,7 +77,6 @@ export function AppLayout() {
   const [modalTags, setModalTags] = useState<string[]>([]);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [showFabMenu, setShowFabMenu] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const createMenuRef = useRef<HTMLDivElement>(null);
   const fabMenuRef = useRef<HTMLDivElement>(null);
   const { selectedItemId, setSelectedItemId } = useSelectedItem();
@@ -148,7 +148,81 @@ export function AppLayout() {
   }
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
-  const userAvatar = user?.user_metadata?.avatar_url;
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Load avatar: prefer profiles table, fall back to auth metadata
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase.from('profiles').select('avatar_url').eq('id', user.id).maybeSingle();
+      setAvatarUrl(data?.avatar_url || user.user_metadata?.avatar_url || null);
+    })();
+  }, [user]);
+
+  const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (e.target) e.target.value = '';
+    if (!file || !user) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be under 2MB');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const ext = file.name.split('.').pop() || 'png';
+      const path = `avatars/${user.id}.${ext}`;
+
+      // Remove old avatar files
+      try {
+        await supabase.storage.from('workspace-assets').remove([
+          `avatars/${user.id}.png`, `avatars/${user.id}.jpg`,
+          `avatars/${user.id}.jpeg`, `avatars/${user.id}.webp`,
+        ]);
+      } catch { /* non-critical */ }
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-assets')
+        .upload(path, file, { upsert: true });
+
+      if (uploadError) {
+        toast.error('Failed to upload avatar: ' + uploadError.message);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage.from('workspace-assets').getPublicUrl(path);
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      // Update profiles table
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (profileErr) {
+        toast.error('Failed to save avatar: ' + profileErr.message);
+        return;
+      }
+
+      // Update auth metadata so it reflects immediately everywhere
+      await supabase.auth.updateUser({ data: { avatar_url: publicUrl } });
+
+      setAvatarUrl(publicUrl);
+      toast.success('Avatar updated!');
+    } catch (err) {
+      toast.error('Something went wrong uploading avatar');
+      console.error(err);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-surface-page">
@@ -264,17 +338,38 @@ export function AppLayout() {
         {/* User section */}
         <div className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            {userAvatar ? (
-              <img
-                src={userAvatar}
-                alt={userName}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white text-sm font-medium">
-                {userName.charAt(0).toUpperCase()}
+            <button
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={isUploadingAvatar}
+              className="relative group flex-shrink-0"
+              title="Change avatar"
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={userName}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white text-sm font-medium">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                {isUploadingAvatar ? (
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-3.5 h-3.5 text-white" />
+                )}
               </div>
-            )}
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+            </button>
             <div className="flex-1 min-w-1">
               <p className="text-sm font-medium text-white truncate">{userName}</p>
               <p className="text-xs text-white/50 truncate">{user?.email}</p>
@@ -390,7 +485,7 @@ export function AppLayout() {
 function ItemDetailPanelWrapper() {
   const { selectedItemId, selectedItem, setSelectedItem, closePanel } = useSelectedItem();
   const { currentWorkspace } = useWorkspace();
-  const [_loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Fetch item data when selectedItemId changes
   useEffect(() => {
