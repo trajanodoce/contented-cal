@@ -22,25 +22,11 @@ export function useExternalLinkCounts(workspaceId: string | null) {
     }
     setLoading(true);
 
-    // Get all content item IDs for this workspace
-    const { data: items } = await supabase
-      .from('content_items')
-      .select('id')
-      .eq('workspace_id', workspaceId);
-
-    if (!items || items.length === 0) {
-      setLinks(new Map());
-      setLoading(false);
-      return;
-    }
-
-    const itemIds = items.map((i) => i.id);
-
-    // Fetch all external links for these items
+    // Single query: join through content_items FK to filter by workspace
     const { data: externalLinks } = await supabase
       .from('external_links')
-      .select('content_item_id, platform')
-      .in('content_item_id', itemIds);
+      .select('content_item_id, platform, content_items!inner(workspace_id)')
+      .eq('content_items.workspace_id', workspaceId);
 
     const map = new Map<string, LinkInfo>();
     if (externalLinks) {

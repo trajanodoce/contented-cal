@@ -21,25 +21,11 @@ export function useSubtaskCounts(workspaceId: string | null) {
     }
     setLoading(true);
 
-    // Get all content item IDs for this workspace
-    const { data: items } = await supabase
-      .from('content_items')
-      .select('id')
-      .eq('workspace_id', workspaceId);
-
-    if (!items || items.length === 0) {
-      setCounts(new Map());
-      setLoading(false);
-      return;
-    }
-
-    const itemIds = items.map(i => i.id);
-
-    // Fetch all subtasks for these items
+    // Single query: join through content_items FK to filter by workspace
     const { data: subtasks } = await supabase
       .from('subtasks')
-      .select('content_item_id, completed')
-      .in('content_item_id', itemIds);
+      .select('content_item_id, completed, content_items!inner(workspace_id)')
+      .eq('content_items.workspace_id', workspaceId);
 
     const map = new Map<string, SubtaskCount>();
     if (subtasks) {
