@@ -87,16 +87,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const refreshLinkedItems = useCallback(async () => {
     if (!workspace) return;
+    // Single query: join external_links through content_items via FK
     const { data } = await supabase
       .from('external_links')
-      .select('content_item_id, platform')
-      .in('content_item_id',
-        (await supabase
-          .from('content_items')
-          .select('id')
-          .eq('workspace_id', workspace.id)
-          .then(r => (r.data ?? []).map(i => i.id)))
-      );
+      .select('content_item_id, platform, content_items!inner(workspace_id)')
+      .eq('content_items.workspace_id', workspace.id);
     if (data) {
       const map = new Map<string, string[]>();
       for (const row of data) {
