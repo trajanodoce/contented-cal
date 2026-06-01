@@ -21,7 +21,7 @@ interface AppContextValue {
   projects: Project[];
   customFieldDefs: CustomFieldDefinition[];
   intakeForms: IntakeForm[];
-  members: (WorkspaceMember & { email?: string; full_name?: string; avatar_url?: string })[];
+  members: (WorkspaceMember & { id: string; email?: string; full_name?: string; avatar_url?: string })[];
   linkedItemIds: Map<string, string[]>;
   setWorkspace: (w: Workspace) => void;
   refreshWorkspaces: () => Promise<void>;
@@ -48,7 +48,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [customFieldDefs, setCustomFieldDefs] = useState<CustomFieldDefinition[]>([]);
   const [intakeForms, setIntakeForms] = useState<IntakeForm[]>([]);
-  const [members, setMembers] = useState<(WorkspaceMember & { email?: string; full_name?: string; avatar_url?: string })[]>([]);
+  const [members, setMembers] = useState<(WorkspaceMember & { id: string; email?: string; full_name?: string; avatar_url?: string })[]>([]);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [linkedItemIds, setLinkedItemIds] = useState<Map<string, string[]>>(new Map());
 
@@ -140,6 +140,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
       const enriched = membersRes.data.map((m: any) => ({
         ...m,
+        id: m.user_id, // Alias so members work as Profile-compatible (assignee_ids match on .id)
         email: m.profiles?.email ?? (m.user_id === user.id ? user.email : undefined),
         full_name: m.profiles?.full_name ?? (m.user_id === user.id ? user.user_metadata?.full_name : undefined),
         avatar_url: m.profiles?.avatar_url ?? (m.user_id === user.id ? user.user_metadata?.avatar_url : undefined),

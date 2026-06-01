@@ -314,10 +314,9 @@ export function BoardPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
   const { filters, setFilters, isLoaded } = useFilters();
-  const { contentItems, contentItemsLoading, patchContentItem } = useApp();
+  const { contentItems, contentItemsLoading, patchContentItem, members } = useApp();
   const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
-  const [members, setMembers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const { setSelectedItemId } = useSelectedItem();
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
@@ -357,15 +356,6 @@ export function BoardPage() {
 
       setColumns(columnsData || []);
       setContentTypes(typesData || []);
-
-      const { data: membersData } = await supabase
-        .from('workspace_members')
-        .select('user_id, role, profiles:user_id(id, full_name, email, avatar_url)')
-        .eq('workspace_id', currentWorkspace.id);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
-      const profiles = (membersData || []).map((m: any) => m.profiles).filter(Boolean);
-      setMembers(profiles);
     } catch (err) {
       console.error('Error fetching board data:', err);
     } finally {

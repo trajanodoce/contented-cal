@@ -885,10 +885,9 @@ export function CalendarPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
   const { calendarViewType, setCalendarViewType } = useViewPersistence();
-  const { contentItems, contentItemsLoading, patchContentItem } = useApp();
+  const { contentItems, contentItemsLoading, patchContentItem, members } = useApp();
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
-  const [members, setMembers] = useState<Profile[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [subtasksRaw, setSubtasksRaw] = useState<Subtask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -956,15 +955,6 @@ export function CalendarPage() {
       setBoardColumns(colsData || []);
       setProjects(projectsData || []);
       setSubtasksRaw(subtasksData || []);
-
-      const { data: membersData } = await supabase
-        .from('workspace_members')
-        .select('user_id, role, profiles:user_id(id, full_name, email, avatar_url)')
-        .eq('workspace_id', currentWorkspace.id);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
-      const profiles = (membersData || []).map((m: any) => m.profiles).filter(Boolean);
-      setMembers(profiles);
     } catch (err) {
       console.error('Error fetching calendar data:', err);
     } finally {
