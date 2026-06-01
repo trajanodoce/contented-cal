@@ -6,6 +6,10 @@
 #
 # Replace {{SUPABASE_URL}} with your Supabase project URL, e.g.:
 #   https://riizkhddtaacmcymbeqo.supabase.co
+#
+# UPDATED 2026-06-01: Added im:history, im:read, mpim:history for DM support,
+# conversations.info scope for channel name resolution, and message.im event
+# so the bot can receive DMs.
 # ─────────────────────────────────────────────────────────────────────────────
 
 display_information:
@@ -19,6 +23,8 @@ display_information:
     • Use the /content-request slash command
     • Right-click any message to add it to your calendar
     • Ask "what are my tasks" to see your assigned work with due dates and priorities
+    • @mention in a thread to capture the full conversation as context
+    • Repeat @mentions in the same thread add comments instead of duplicates
 
 features:
   bot_user:
@@ -53,20 +59,33 @@ oauth_config:
     - "{{SUPABASE_URL}}/functions/v1/slack-oauth-callback"
   scopes:
     bot:
-      - app_mentions:read
-      - channels:history
-      - groups:history
-      - chat:write
-      - chat:write.public
-      - commands
-      - users:read
-      - users:read.email
+      # Reading messages
+      - app_mentions:read       # @mention events in channels
+      - channels:history        # Read messages in public channels (for thread capture)
+      - channels:read           # Resolve channel names via conversations.info
+      - groups:history          # Read messages in private channels
+      - groups:read             # Resolve private channel names
+      - im:history              # Read DM messages (for DM-based requests)
+      - im:read                 # List DM conversations
+      - mpim:history            # Read group DM messages
+
+      # Writing
+      - chat:write              # Post messages in channels the bot is in
+      - chat:write.public       # Post in channels the bot hasn't joined
+
+      # Commands & interactivity
+      - commands                # Slash commands
+
+      # Users
+      - users:read              # Resolve user display names
+      - users:read.email        # Map Slack users to ContentedCal accounts
 
 settings:
   event_subscriptions:
     request_url: "{{SUPABASE_URL}}/functions/v1/slack-contentcal-bot"
     bot_events:
-      - app_mention
+      - app_mention             # @ContentedCal in channels
+      - message.im              # DMs to the bot
 
   interactivity:
     is_enabled: true
