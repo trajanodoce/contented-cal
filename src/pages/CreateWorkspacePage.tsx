@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { Building2, Loader2, LogOut, ArrowLeft, User } from 'lucide-react';
+import { Loader2, LogOut, ArrowLeft, User } from 'lucide-react';
 
 export function CreateWorkspacePage() {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export function CreateWorkspacePage() {
         toast.success('Workspace created!');
         navigate('/list');
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to create workspace. Please try again.');
       setLoading(false);
     }

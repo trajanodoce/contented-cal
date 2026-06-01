@@ -115,8 +115,6 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const [comments, setComments] = useState<CommentWithProfile[]>([]);
   const [activity, setActivity] = useState<ActivityLog[]>([]);
   const [commentText, setCommentText] = useState('');
-  const [editingField, setEditingField] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<Partial<ContentItem>>({});
   const [savingField, setSavingField] = useState<string | null>(null);
   const [editingDescription, setEditingDescription] = useState(false);
   const [description, setDescription] = useState(item.description);
@@ -273,7 +271,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   async function duplicateItem() {
     setDuplicating(true);
     try {
-      const { data, error } = await supabase.from('content_items').insert({
+      const { error } = await supabase.from('content_items').insert({
         workspace_id: item.workspace_id,
         title: `${item.title} (copy)`,
         description: item.description,

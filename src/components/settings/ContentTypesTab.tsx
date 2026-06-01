@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { useApp } from '../../contexts/AppContext';
-import type { ContentType, BoardColumn, CustomFieldDefinition, CustomFieldType, SelectOption, Json } from '../../lib/database.types';
+import type { ContentType, BoardColumn, CustomFieldType, SelectOption, Json } from '../../lib/database.types';
 import {
   Plus,
   Trash2,

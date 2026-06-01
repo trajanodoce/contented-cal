@@ -13,7 +13,6 @@ import { getWorkspaceChannels } from '../../lib/utils';
 import {
   X,
   ChevronDown,
-  Calendar,
   Check,
   User,
   Loader2,

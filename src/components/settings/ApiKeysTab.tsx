@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { toast } from 'sonner';
 import {
   Key,
@@ -48,7 +47,6 @@ const SCOPE_LABELS: Record<string, { label: string; color: string; bg: string }>
 };
 
 export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
-  const { currentWorkspace } = useWorkspace();
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
 

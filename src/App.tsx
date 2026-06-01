@@ -55,7 +55,7 @@ class ChunkErrorBoundary extends Component<
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, _info: ErrorInfo) {
+  componentDidCatch(error: Error) {
     // If it's a chunk load error, reload the page once
     const isChunkError =
       error.name === 'ChunkLoadError' ||

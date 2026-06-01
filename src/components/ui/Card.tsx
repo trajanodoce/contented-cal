@@ -17,7 +17,8 @@ export function Card({ children, className = '', as: Tag = 'div', style, ...rest
     <Tag
       className={`bg-surface-card rounded-xl shadow-sm overflow-hidden ${className}`}
       style={{ border: '1px solid #00233930', ...style }}
-      {...(rest as any)}
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- polymorphic component; Tag is a union of element types */}
+      {...(rest as Record<string, unknown>)}
     >
       {children}
     </Tag>

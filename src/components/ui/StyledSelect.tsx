@@ -101,7 +101,7 @@ export function StyledSelect({ value, onChange, options, placeholder = 'Select..
           }}
         >
           <div className="p-1 space-y-0.5">
-            {options.map((option, idx) => {
+            {options.map((option, _idx) => {
               const isSelected = option.value === value;
               return (
                 <button

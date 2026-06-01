@@ -75,6 +75,7 @@ export function TeamTab() {
     if (membersRes.error) {
       toast.error('Failed to load team members');
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
       const mapped = (membersRes.data || []).map((m: any) => ({
         user_id: m.user_id,
         role: m.role as Role,

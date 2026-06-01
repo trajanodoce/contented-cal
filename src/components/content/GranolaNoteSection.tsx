@@ -3,7 +3,7 @@ import { Mic, ExternalLink, ChevronDown, ChevronUp, Clock, Users, Folder, Loader
 import { supabase } from '../../lib/supabase';
 import type { GranolaNoteLink, Json } from '../../lib/database.types';
 import { format } from 'date-fns';
-import { parseLocalDate } from '../../lib/utils';
+
 import { GRANOLA_TEXT as GRANOLA_GREEN } from '../../lib/ordinal';
 
 interface Props {
@@ -56,7 +56,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
 
     async function fetchNotes() {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('granola_note_links')
         .select('*')
         .eq('content_item_id', contentItemId)

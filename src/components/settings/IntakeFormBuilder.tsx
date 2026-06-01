@@ -324,7 +324,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
                   return (
                     <button
                       key={f.key}
-                      onClick={() => !added && addField(f.key, f.label, f.type, (f as any).options)}
+                      onClick={() => !added && addField(f.key, f.label, f.type, (f as { options?: string[] }).options)}
                       disabled={added}
                       className={`w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-lg transition-colors
                         ${added ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-[#005D9718] cursor-pointer'}`}

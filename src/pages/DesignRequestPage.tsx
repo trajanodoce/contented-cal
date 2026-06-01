@@ -6,12 +6,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useApp } from '../contexts/AppContext';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
-import type { Profile, BoardColumn, Json } from '../lib/database.types';
+import type { Profile, Json } from '../lib/database.types';
 import DatePicker from '../components/ui/DatePicker';
 import {
-  X,
   ChevronDown,
-  Calendar,
   Check,
   User,
   Loader2,

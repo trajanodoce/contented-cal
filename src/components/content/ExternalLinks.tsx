@@ -59,19 +59,6 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function PlatformBadge({ platform }: { platform: ExternalLinkPlatform }) {
-  const meta = PLATFORM_META[platform] ?? PLATFORM_META.other;
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-      style={{ backgroundColor: meta.bgColor, color: meta.textColor }}
-    >
-      <span className="font-bold leading-none">{meta.icon}</span>
-      {meta.label}
-    </span>
-  );
-}
-
 function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; onDelete: () => void; readOnly?: boolean }) {
   const [imgError, setImgError] = useState(false);
   const isFile = link.platform === 'file';

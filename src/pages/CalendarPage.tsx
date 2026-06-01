@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, Profile, BoardColumn, Project, Subtask } from '../lib/database.types';
 import { parseLocalDate, getWorkspaceChannels } from '../lib/utils';
+import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts';
@@ -58,7 +59,6 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  DragStartEvent,
   DragEndEvent,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
@@ -117,8 +117,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
 
   const dateField = dateMode === 'due' ? item.due_date : item.publish_date;
   const statusCol = boardColumns.find(c => c.id === item.status);
-  const statusName = statusCol?.name?.toLowerCase();
-  const isDone = statusName === 'published' || statusName === 'completed';
+  const isDone = isDoneStatus(statusCol?.name);
   const isOverdue = dateField && isPast(parseLocalDate(dateField)) && !isToday(parseLocalDate(dateField)) && !isDone;
 
   const borderColor = isOverdue ? '#ef4444' : contentType?.color || '#e2e8f0';
@@ -250,7 +249,7 @@ interface SingleMonthGridProps {
   onShowMore: (date: Date) => void;
 }
 
-function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick, onShowMore }: SingleMonthGridProps) {
+function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends: _onToggleWeekends, onItemClick, onDateClick, onShowMore }: SingleMonthGridProps) {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
   const calendarStart = startOfWeek(monthStart);
@@ -491,7 +490,7 @@ interface WeekViewProps {
   onDateClick: (date: Date) => void;
 }
 
-function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick }: WeekViewProps) {
+function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends: _onToggleWeekends, onItemClick, onDateClick }: WeekViewProps) {
   const weekStart = startOfWeek(currentDate);
   const weekEnd = endOfWeek(currentDate);
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -806,8 +805,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
   const contentType = contentTypes.find((ct) => ct.id === item.content_type_id);
   const itemMembers = members.filter((m) => item.assignee_ids?.includes(m.id));
   const statusCol = boardColumns.find(c => c.id === item.status);
-  const statusName = statusCol?.name?.toLowerCase();
-  const isDone = statusName === 'published' || statusName === 'completed';
+  const isDone = isDoneStatus(statusCol?.name);
   const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isDone;
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
@@ -964,6 +962,7 @@ export function CalendarPage() {
         .select('user_id, role, profiles:user_id(id, full_name, email, avatar_url)')
         .eq('workspace_id', currentWorkspace.id);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
       const profiles = (membersData || []).map((m: any) => m.profiles).filter(Boolean);
       setMembers(profiles);
     } catch (err) {
@@ -1022,7 +1021,7 @@ export function CalendarPage() {
     setIsCreateModalOpen(true);
   };
 
-  const handleDragStart = (_event: DragStartEvent) => {
+  const handleDragStart = () => {
     // drag start - no additional state needed
   };
 

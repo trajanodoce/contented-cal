@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { X, Trash2, UserPlus, ChevronDown, User, AlertTriangle } from 'lucide-react';
 import type { Profile, BoardColumn } from '../../lib/database.types';
+import { isDoneStatus } from '../../lib/itemHelpers';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -91,8 +92,7 @@ export function BulkActionsToolbar({
       const status = boardColumns.find((bc) => bc.id === statusId);
 
       // Sync completed boolean when bulk-moving to/from done columns
-      const statusName = status?.name?.toLowerCase();
-      const isDone = statusName === 'published' || statusName === 'completed';
+      const isDone = isDoneStatus(status?.name);
       const payload: Record<string, unknown> = { status: statusId };
       if (isDone) {
         payload.completed = true;

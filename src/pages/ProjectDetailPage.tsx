@@ -46,11 +46,9 @@ import {
   Users,
   Clock,
   AlertTriangle,
-  Plus,
   X,
   UserPlus,
   Link2,
-  Share2,
 } from 'lucide-react';
 import { formatDate, getPriorityDot, getUserInitials } from '../lib/utils';
 import {
@@ -230,12 +228,6 @@ export function ProjectDetailPage() {
   }, [descDraft, updateProject]);
 
   // Derived data
-  const lastColumnId = useMemo(() => {
-    if (boardColumns.length === 0) return null;
-    const sorted = [...boardColumns].sort((a, b) => a.position - b.position);
-    return sorted[sorted.length - 1].id;
-  }, [boardColumns]);
-
   const doneColumnIds = useMemo(() => {
     const ids = new Set<string>();
     boardColumns.forEach(c => {
@@ -1386,14 +1378,13 @@ function ProjectMonthGrid({
   items,
   contentTypes,
   weekendsCollapsed,
-  onToggleWeekends,
   onItemClick,
 }: {
   monthDate: Date;
   items: ContentItem[];
   contentTypes: ContentType[];
   weekendsCollapsed: boolean;
-  onToggleWeekends: () => void;
+  onToggleWeekends?: () => void;
   onItemClick: (id: string) => void;
 }) {
   const monthStart = startOfMonth(monthDate);

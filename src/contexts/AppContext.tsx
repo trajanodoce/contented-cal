@@ -142,6 +142,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (membersRes.data) {
       // Enrich with profile data from the profiles join
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
       const enriched = membersRes.data.map((m: any) => ({
         ...m,
         email: m.profiles?.email ?? (m.user_id === user.id ? user.email : undefined),

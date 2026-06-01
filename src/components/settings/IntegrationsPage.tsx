@@ -103,6 +103,9 @@ function StatusBadge({ status }: { status: string | null }) {
   );
 }
 
+// Platforms that store credentials in user_integrations (API key flow)
+const USER_INTEGRATION_PLATFORMS = ['granola', 'linear', 'notion'] as const;
+
 // ── Setup form ────────────────────────────────────────────────────────────────
 
 interface SetupFormProps {
@@ -473,7 +476,7 @@ export function IntegrationsPage({ addToast }: Props) {
     addToast('Integration disconnected');
   }
 
-  function startOAuth(platform: IntegrationPlatform) {
+  function startOAuth(_platform: IntegrationPlatform) {
     if (!workspace || !user) return;
     const oauthUrl = `${SUPABASE_URL}/functions/v1/slack-oauth?action=authorize&workspace_id=${workspace.id}&user_id=${user.id}`;
     window.location.href = oauthUrl;
@@ -580,10 +583,10 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       .select('*')
       .eq('workspace_id', workspace.id)
       .eq('user_id', user.id)
-      .in('platform', ['granola', 'linear', 'notion']);
+      .in('platform', [...USER_INTEGRATION_PLATFORMS]);
 
-    const map: Record<string, UserIntegration | null> = { granola: null, linear: null, notion: null };
-    const keys: Record<string, string> = { granola: '', linear: '', notion: '' };
+    const map: Record<string, UserIntegration | null> = Object.fromEntries(USER_INTEGRATION_PLATFORMS.map(p => [p, null]));
+    const keys: Record<string, string> = Object.fromEntries(USER_INTEGRATION_PLATFORMS.map(p => [p, '']));
     (data || []).forEach((d: UserIntegration) => {
       map[d.platform] = d;
       if (d.access_token) keys[d.platform] = d.access_token;
@@ -641,8 +644,8 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       if (platform === 'linear') {
         testLinear(apiKeys[platform].trim());
       }
-    } catch (err: any) {
-      addToast(err.message || 'Failed to save', 'error');
+    } catch (err: unknown) {
+      addToast(err instanceof Error ? err.message : 'Failed to save', 'error');
     } finally {
       setSaving(null);
     }

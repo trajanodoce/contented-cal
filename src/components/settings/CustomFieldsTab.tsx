@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { useApp } from '../../contexts/AppContext';
@@ -8,7 +8,6 @@ import {
   Trash2,
   Save,
   X,
-  GripVertical,
   Edit2,
   FileText,
   Globe,

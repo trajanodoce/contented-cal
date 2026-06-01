@@ -1,10 +1,10 @@
 import { useState, useMemo, useCallback, useRef, useEffect }  from 'react';
-import { isPast, isToday, isTomorrow } from 'date-fns';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 // UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
-import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
+import { pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
+import { getContentType, getBoardColumn, getAssignees, formatDueDateWithStatus, isDoneStatus } from '../lib/itemHelpers';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
 import { CreateItemModal } from '../components/content/CreateItemModal';
@@ -12,7 +12,7 @@ import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
+import type { ContentItem, BoardColumn, Profile } from '../lib/database.types';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
@@ -52,48 +52,7 @@ interface SortState {
   direction: SortDirection;
 }
 
-// Helper to get content type info
-function getContentType(
-  contentTypeId: string | null,
-  contentTypes: ContentType[]
-): ContentType | null {
-  if (!contentTypeId) return null;
-  return contentTypes.find((ct) => ct.id === contentTypeId) || null;
-}
-
-// Helper to get board column info
-function getBoardColumn(
-  statusId: string | null,
-  boardColumns: BoardColumn[]
-): BoardColumn | null {
-  if (!statusId) return null;
-  return boardColumns.find((bc) => bc.id === statusId) || null;
-}
-
-// Helper to get assignee profiles
-function getAssignees(assigneeIds: string[], members: Profile[]): Profile[] {
-  return assigneeIds
-    .map((id) => members.find((m) => m.id === id))
-    .filter((m): m is Profile => m !== undefined);
-}
-
-// Helper to format due date with status
-function formatDueDateWithStatus(date: string | null): { text: string; isOverdue: boolean; isSoon: boolean } {
-  if (!date) return { text: '-', isOverdue: false, isSoon: false };
-
-  const dueDate = parseLocalDate(date);
-  const overdue = isPast(dueDate) && !isToday(dueDate);
-  const soon = isToday(dueDate) || isTomorrow(dueDate);
-
-  return {
-    text: formatDate(date),
-    isOverdue: overdue,
-    isSoon: soon,
-  };
-}
-
-// Priority configuration
-// Priority config now sourced from PRIORITY_STYLES in lib/utils
+// Priority configuration sourced from PRIORITY_STYLES in lib/utils
 
 export function ListPage() {
   const { currentWorkspace, userRole } = useWorkspace();
@@ -373,8 +332,7 @@ export function ListPage() {
                 const isSelected = selectedItems.has(item.id);
                 const contentType = getContentType(item.content_type_id, contentTypes);
                 const status = getBoardColumn(item.status, boardColumns);
-                const statusName = status?.name?.toLowerCase();
-                const isDone = statusName === 'published' || statusName === 'completed';
+                const isDone = isDoneStatus(status?.name);
                 const assignees = getAssignees(item.assignee_ids || [], members);
                 const dueDate = formatDueDateWithStatus(item.due_date);
                 if (isDone) dueDate.isOverdue = false;
@@ -896,7 +854,6 @@ function InlineAssigneeEdit({
 function InlineDueDateEdit({
   dueDate,
   contentItemId,
-  isDone,
   onUpdate,
 }: {
   dueDate: string | null;

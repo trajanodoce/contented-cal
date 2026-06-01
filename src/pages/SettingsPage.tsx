@@ -169,7 +169,7 @@ function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug
         toast.success('Logo updated!');
         await refreshWorkspaces();
       }
-    } catch (err) {
+    } catch {
       toast.error('Logo upload failed. Please try again.');
     } finally {
       setIsUploading(false);

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
+import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import {
@@ -82,8 +83,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
   };
 
   const statusCol = boardColumns.find(c => c.id === item.status);
-  const statusName = statusCol?.name?.toLowerCase();
-  const isDone = statusName === 'published' || statusName === 'completed';
+  const isDone = isDoneStatus(statusCol?.name);
   const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isDone;
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
@@ -363,6 +363,7 @@ export function BoardPage() {
         .select('user_id, role, profiles:user_id(id, full_name, email, avatar_url)')
         .eq('workspace_id', currentWorkspace.id);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
       const profiles = (membersData || []).map((m: any) => m.profiles).filter(Boolean);
       setMembers(profiles);
     } catch (err) {
@@ -415,17 +416,15 @@ export function BoardPage() {
     if (item.status === targetColumnId) return;
 
     // Sync completed boolean when moving to/from done columns
-    const targetName = targetColumn.name.toLowerCase();
-    const isDoneColumn = targetName === 'published' || targetName === 'completed';
+    const isDoneCol = isDoneStatus(targetColumn.name);
     const updatePayload: Record<string, unknown> = { status: targetColumnId };
-    if (isDoneColumn) {
+    if (isDoneCol) {
       updatePayload.completed = true;
       updatePayload.completed_at = new Date().toISOString();
     } else {
       // Moving out of a done column — mark incomplete
       const prevCol = columns.find(c => c.id === item.status);
-      const prevName = prevCol?.name?.toLowerCase();
-      if (prevName === 'published' || prevName === 'completed') {
+      if (isDoneStatus(prevCol?.name)) {
         updatePayload.completed = false;
         updatePayload.completed_at = null;
       }

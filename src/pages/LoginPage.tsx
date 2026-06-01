@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
-import { Calendar, Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 function GoogleIcon({ className }: { className?: string }) {
   return (

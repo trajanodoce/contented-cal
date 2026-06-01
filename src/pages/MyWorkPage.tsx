@@ -9,7 +9,8 @@ import { toast } from 'sonner';
 import type { ContentItem, Subtask } from '../lib/database.types';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
+import { isDoneStatus } from '../lib/itemHelpers';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { PersonalTasksSection } from '../components/personal/PersonalTasksSection';
@@ -53,7 +54,7 @@ interface SubtaskWithParent extends Subtask {
 export function MyWorkPage() {
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
-  const { contentTypes, boardColumns, members, projects, contentItems, contentItemsLoading, patchContentItem } = useApp();
+  const { contentTypes, boardColumns, members, projects, contentItems, contentItemsLoading } = useApp();
   const { filters, setFilters, isLoaded } = useFilters();
   const { setSelectedItemId } = useSelectedItem();
 
@@ -85,6 +86,7 @@ export function MyWorkPage() {
         .eq('content_items.workspace_id', currentWorkspace.id)
         .order('due_date', { ascending: true, nullsFirst: false });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase join returns dynamic shape
       const mapped = (mySubtasks || []).map((st: any) => ({
         ...st,
         parent_title: st.content_items?.title || 'Unknown',
@@ -118,7 +120,7 @@ export function MyWorkPage() {
   const doneColumnIds = useMemo(() => {
     return new Set(
       boardColumns
-        .filter(c => c.name.toLowerCase() === 'published' || c.name.toLowerCase() === 'completed')
+        .filter(c => isDoneStatus(c.name))
         .map(c => c.id)
     );
   }, [boardColumns]);
