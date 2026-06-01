@@ -40,6 +40,16 @@ export default {
         heading: ['Faune-Text_Bold', 'Faune', 'serif'],
         body: ['Violet Sans', '-apple-system', 'BlinkMacSystemFont', 'Inter', 'Segoe UI', 'sans-serif'],
       },
+      boxShadow: {
+        // Navy-tinted shadow scale — see § Shadow Tokens in ContentedCal-Design-System.html
+        'xs': '0 1px 2px rgba(0,35,57,.09)',
+        'sm': '0 2px 4px rgba(0,35,57,.09), 0 4px 8px rgba(0,35,57,.11)',
+        DEFAULT: '0 2px 4px rgba(0,35,57,.09), 0 4px 8px rgba(0,35,57,.11)',
+        'md': '0 4px 6px rgba(0,35,57,.11), 0 10px 16px rgba(0,35,57,.16)',
+        'lg': '0 20px 40px -8px rgba(0,35,57,.22)',
+        'xl': '0 30px 56px -10px rgba(0,35,57,.30)',
+        'none': 'none',
+      },
       borderRadius: {
         xl: '12px',
         '2xl': '16px',

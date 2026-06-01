@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { GripVertical, Check, Plus, X, Calendar, User } from 'lucide-react';
+import { GripVertical, Check, Plus, X, Calendar } from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
 import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
 import type { Subtask, Profile } from '../../lib/database.types';
@@ -423,21 +424,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                   className="w-4 h-4 rounded-full flex items-center justify-center overflow-hidden"
                   title={member ? member.full_name ?? undefined : 'Assign'}
                 >
-                  {member ? (
-                    member.avatar_url ? (
-                      <img
-                        src={member.avatar_url}
-                        alt={member.full_name ?? undefined}
-                        className="w-4 h-4 rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-[8px] font-medium flex items-center justify-center">
-                        {getInitials(member.full_name ?? '')}
-                      </span>
-                    )
-                  ) : (
-                    <User className="w-3.5 h-3.5 text-slate-400" />
-                  )}
+                  <Avatar src={member?.avatar_url} name={member?.full_name} size="xs" />
                 </button>
 
                 {assigneePopoverId === subtask.id && createPortal(
@@ -462,17 +449,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
                         onClick={() => updateAssignee(subtask.id, m.id)}
                         className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-[#005D9718] flex items-center gap-2 transition-colors"
                       >
-                        {m.avatar_url ? (
-                          <img
-                            src={m.avatar_url}
-                            alt={m.full_name ?? undefined}
-                            className="w-4 h-4 rounded-full object-cover"
-                          />
-                        ) : (
-                          <span className="w-4 h-4 rounded-full bg-brand-500 text-white text-[8px] font-medium flex items-center justify-center">
-                            {getInitials(m.full_name ?? '')}
-                          </span>
-                        )}
+                        <Avatar src={m.avatar_url} name={m.full_name} size="xs" />
                         {m.full_name}
                       </button>
                     ))}

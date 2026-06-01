@@ -12,10 +12,10 @@ import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts'
 import {
   Calendar as CalendarIcon,
   AlertCircle,
-  User,
   ListChecks,
   Mic,
 } from 'lucide-react';
+import { AvatarStack } from '../components/ui/Avatar';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
@@ -167,26 +167,11 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
         <div className="flex items-center justify-between">
           {/* Assignees */}
           <div className="flex items-center gap-2">
-            <div className="flex -space-x-1.5">
-              {itemMembers.slice(0, 3).map((member) => (
-                <div
-                  key={member.id}
-                  className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center overflow-hidden"
-                  title={member.full_name ?? member.email ?? undefined}
-                >
-                  {member.avatar_url ? (
-                    <img src={member.avatar_url} alt={member.full_name || ''} className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-3 h-3 text-slate-500" />
-                  )}
-                </div>
-              ))}
-              {itemMembers.length > 3 && (
-                <div className="w-6 h-6 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-xs text-slate-600 font-medium">
-                  +{itemMembers.length - 3}
-                </div>
-              )}
-            </div>
+            <AvatarStack
+              users={itemMembers.map(m => ({ src: m.avatar_url, name: m.full_name }))}
+              size="md"
+              max={3}
+            />
 
             {/* Link platform icons */}
             {linkInfo && linkInfo.count > 0 && (

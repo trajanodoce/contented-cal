@@ -29,11 +29,11 @@ import {
   AlertCircle,
   ChevronDown,
   Check,
-  User,
   ListChecks,
   Link2,
   Mic,
 } from 'lucide-react';
+import { Avatar, AvatarStack } from '../components/ui/Avatar';
 
 type SortField =
   | 'title'
@@ -446,11 +446,11 @@ export function ListPage() {
                           {assignees.length === 0 ? (
                             <span className="text-slate-400 text-sm">-</span>
                           ) : (
-                            assignees.slice(0, 3).map((a) => (
-                              <div key={a.id} className="w-7 h-7 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs text-slate-600 overflow-hidden">
-                                {a.avatar_url ? <img src={a.avatar_url} alt="" className="w-full h-full object-cover" /> : (a.full_name?.[0] || a.email?.[0] || '?').toUpperCase()}
-                              </div>
-                            ))
+                            <AvatarStack
+                              users={assignees.map(a => ({ src: a.avatar_url, name: a.full_name }))}
+                              size="md"
+                              max={3}
+                            />
                           )}
                         </div>
                       )}
@@ -764,44 +764,13 @@ function InlineAssigneeEdit({
         {selectedMembers.length === 0 ? (
           <span className="text-slate-400 text-sm">-</span>
         ) : selectedMembers.length === 1 ? (
-          <>
-            {selectedMembers[0].avatar_url ? (
-              <img
-                src={selectedMembers[0].avatar_url}
-                alt={selectedMembers[0].full_name ?? selectedMembers[0].email ?? undefined}
-                className="w-8 h-8 rounded-full object-cover border-2 border-white"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-medium text-slate-600">
-                {(selectedMembers[0].full_name?.[0] || selectedMembers[0].email?.[0] || '?').toUpperCase()}
-              </div>
-            )}
-          </>
+          <Avatar src={selectedMembers[0].avatar_url} name={selectedMembers[0].full_name} size="lg" />
         ) : (
-          <>
-            {selectedMembers.slice(0, 3).map((assignee, i) => (
-              <div
-                key={assignee.id}
-                className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-medium text-slate-600"
-                style={{ zIndex: 3 - i }}
-              >
-                {assignee.avatar_url ? (
-                  <img
-                    src={assignee.avatar_url}
-                    alt={assignee.full_name ?? assignee.email ?? undefined}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  (assignee.full_name?.[0] || assignee.email?.[0] || '?').toUpperCase()
-                )}
-              </div>
-            ))}
-            {selectedMembers.length > 3 && (
-              <div className="w-8 h-8 rounded-full bg-[#005D9712] border-2 border-white flex items-center justify-center text-xs font-medium text-slate-500">
-                +{selectedMembers.length - 3}
-              </div>
-            )}
-          </>
+          <AvatarStack
+            users={selectedMembers.map(a => ({ src: a.avatar_url, name: a.full_name }))}
+            size="lg"
+            max={3}
+          />
         )}
       </button>
 
@@ -827,17 +796,7 @@ function InlineAssigneeEdit({
                 >
                   {isSelected && <Check className="w-3 h-3 text-white" />}
                 </div>
-                {member.avatar_url ? (
-                  <img
-                    src={member.avatar_url}
-                    alt={member.full_name ?? member.email ?? undefined}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                    <User className="w-3 h-3 text-slate-500" />
-                  </div>
-                )}
+                <Avatar src={member.avatar_url} name={member.full_name} size="md" />
                 <span className={isSelected ? 'text-brand-900' : 'text-slate-700'}>
                   {member.full_name || member.email || 'Unknown'}
                 </span>

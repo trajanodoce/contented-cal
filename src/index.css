@@ -111,3 +111,29 @@ body {
   background-color: #F7F9FC;
   color: #1e293b;
 }
+
+/* ── Loading Skeletons ── */
+@keyframes cc-skel-wave {
+  0%   { background-position: 220% 0; }
+  100% { background-position: -120% 0; }
+}
+.cc-skel {
+  background: linear-gradient(100deg, #DDE9F2 0%, #DDE9F2 38%, #FBE7F1 50%, #DDE9F2 62%, #DDE9F2 100%);
+  background-size: 220% 100%;
+  border-radius: 4px;
+  animation: cc-skel-wave 2.4s linear infinite;
+}
+.cc-skel-strong {
+  background: linear-gradient(100deg, #C5D8E8 0%, #C5D8E8 38%, #FBE7F1 50%, #C5D8E8 62%, #C5D8E8 100%);
+  background-size: 220% 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-skel, .cc-skel-strong { animation: none; background: #DDE9F2; }
+  .cc-skel-strong { background: #C5D8E8; }
+}
+
+/* ── Sonner Toast Theming ── */
+.cc-toast-success { border-left: 3px solid #92D1B2 !important; box-shadow: 0 2px 4px rgba(146,209,178,.35) !important; }
+.cc-toast-error   { border-left: 3px solid #BA2C2C !important; box-shadow: 0 2px 4px rgba(186,44,44,.25) !important; }
+.cc-toast-warning { border-left: 3px solid #FFC3B8 !important; box-shadow: 0 2px 4px rgba(255,195,184,.45) !important; }
+.cc-toast-info    { border-left: 3px solid #005D97 !important; box-shadow: 0 2px 4px rgba(0,93,151,.22) !important; }

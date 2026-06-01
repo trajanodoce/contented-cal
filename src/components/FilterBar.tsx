@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, X, ChevronDown, Check, User } from 'lucide-react';
+import { Search, X, ChevronDown, Check } from 'lucide-react';
+import { Avatar } from './ui/Avatar';
 import type { ContentType, BoardColumn, Profile } from '../lib/database.types';
 
 export interface FilterState {
@@ -388,19 +389,7 @@ function FilterDropdown({
                 >
                   {option.avatarUrl !== undefined ? (
                     // Avatar for assignees
-                    <>
-                      {option.avatarUrl ? (
-                        <img
-                          src={option.avatarUrl}
-                          alt={option.label || ''}
-                          className="w-5 h-5 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center">
-                          <User className="w-3 h-3 text-slate-500" />
-                        </div>
-                      )}
-                    </>
+                    <Avatar src={option.avatarUrl} name={option.label} size="sm" />
                   ) : option.color ? (
                     // Color dot for types/status/priority
                     <span

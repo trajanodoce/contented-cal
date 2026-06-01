@@ -6,7 +6,6 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { Profile, WorkspaceInvite } from '../../lib/database.types';
 import {
-  User,
   UserPlus,
   UserCheck,
   ChevronDown,
@@ -22,6 +21,7 @@ import {
   Clock,
   Search,
 } from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
 import { format } from 'date-fns';
 
 type Role = 'admin' | 'editor' | 'viewer';
@@ -256,17 +256,7 @@ export function TeamTab() {
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      {member.profile.avatar_url ? (
-                        <img
-                          src={member.profile.avatar_url}
-                          alt={member.profile.full_name || ''}
-                          className="w-9 h-9 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center">
-                          <User className="w-4 h-4 text-slate-500" />
-                        </div>
-                      )}
+                      <Avatar src={member.profile.avatar_url} name={member.profile.full_name} size="lg" />
                       <div>
                         <p className="text-sm font-medium text-slate-900">
                           {member.profile.full_name || 'Unnamed'}
@@ -545,17 +535,7 @@ function AddMemberModal({
                   className="flex items-center justify-between px-4 py-3 hover:bg-[#005D9718] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    {profile.avatar_url ? (
-                      <img
-                        src={profile.avatar_url}
-                        alt={profile.full_name || ''}
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-slate-500" />
-                      </div>
-                    )}
+                    <Avatar src={profile.avatar_url} name={profile.full_name} size="lg" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-slate-900 truncate">
                         {profile.full_name || 'Unnamed'}

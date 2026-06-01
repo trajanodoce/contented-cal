@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
-import { X, Trash2, UserPlus, ChevronDown, User, AlertTriangle } from 'lucide-react';
+import { X, Trash2, UserPlus, ChevronDown, AlertTriangle } from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
 import type { Profile, BoardColumn } from '../../lib/database.types';
 import { isDoneStatus } from '../../lib/itemHelpers';
 
@@ -173,17 +174,7 @@ export function BulkActionsToolbar({
                     onClick={() => handleBulkAssign(member.id)}
                     className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 rounded"
                   >
-                    {member.avatar_url ? (
-                      <img
-                        src={member.avatar_url}
-                        alt={member.full_name ?? member.email ?? undefined}
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                        <User className="w-3 h-3 text-slate-500" />
-                      </div>
-                    )}
+                    <Avatar src={member.avatar_url} name={member.full_name} size="md" />
                     <span className="text-slate-700">{member.full_name || member.email}</span>
                   </button>
                 ))}

@@ -3,6 +3,7 @@ import {
   X, Calendar, MessageSquare,
   Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2, Copy
 } from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -17,6 +18,7 @@ import { GranolaNoteSection } from './GranolaNoteSection';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
 import { StyledSelect } from '../ui/StyledSelect';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import DatePicker from '../ui/DatePicker';
 
 interface Props {
@@ -873,17 +875,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 const authorInitial = (authorName[0] || '?').toUpperCase();
                 return (
                   <div key={comment.id} className="flex gap-3">
-                    {comment.profiles?.avatar_url ? (
-                      <img
-                        src={comment.profiles.avatar_url}
-                        alt={authorName}
-                        className="w-8 h-8 rounded-full object-cover shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-xs font-medium shrink-0">
-                        {authorInitial}
-                      </div>
-                    )}
+                    <Avatar src={comment.profiles?.avatar_url} name={authorName} size="lg" />
                     <div className="flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xs font-medium text-slate-700">{authorName}</span>
@@ -986,35 +978,17 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         </div>
 
         {/* Delete confirmation modal */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00233960]" onClick={() => setShowDeleteConfirm(false)}>
-            <div className="bg-surface-card rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-[#BA2C2C12]">
-                <Trash2 className="w-6 h-6 text-accent-crimson" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 text-center">Are you sure?</h3>
-              <p className="mt-2 text-sm text-slate-500 text-center">
-                Once it's gone, it's gone for good.
-              </p>
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 bg-surface-card hover:bg-[#005D9718] rounded-lg transition-colors" style={{ border: '1px solid #00233930' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={deleteItem}
-                  disabled={deleting}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-accent-crimson hover:bg-[#a02525] rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-                >
-                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  Delete forever
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmModal
+          open={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          onConfirm={deleteItem}
+          variant="destructive"
+          icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+          title="Are you sure?"
+          description="Once it's gone, it's gone for good."
+          confirmLabel="Delete item"
+          loading={deleting}
+        />
       </div>
     </div>
   );

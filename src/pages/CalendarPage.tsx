@@ -25,7 +25,6 @@ import {
   Calendar as CalendarIcon,
   Columns,
   List,
-  User,
   Plus,
   Link2,
   FolderOpen,
@@ -33,6 +32,7 @@ import {
   Flag,
   Mic,
 } from 'lucide-react';
+import { Avatar, AvatarStack } from '../components/ui/Avatar';
 import {
   format,
   startOfMonth,
@@ -168,13 +168,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
         </span>
       )}
       {itemMembers[0] && (
-        <div className="w-4 h-4 rounded-full bg-slate-300 flex items-center justify-center flex-shrink-0 overflow-hidden">
-          {itemMembers[0].avatar_url ? (
-            <img src={itemMembers[0].avatar_url} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <User className="w-2 h-2 text-slate-600" />
-          )}
-        </div>
+        <Avatar src={itemMembers[0].avatar_url} name={itemMembers[0].full_name} size="xs" />
       )}
     </div>
   );
@@ -597,17 +591,11 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1.5">
-                        <div className="flex -space-x-1">
-                          {members.filter(m => item.assignee_ids?.includes(m.id)).slice(0, 2).map(m => (
-                            <div key={m.id} className="w-5 h-5 rounded-full bg-slate-200 border border-white overflow-hidden">
-                              {m.avatar_url ? (
-                                <img src={m.avatar_url} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <User className="w-3 h-3 text-slate-500" />
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                        <AvatarStack
+                          users={members.filter(m => item.assignee_ids?.includes(m.id)).map(m => ({ src: m.avatar_url, name: m.full_name }))}
+                          size="sm"
+                          max={2}
+                        />
                         {(() => {
                           const sc = subtaskCounts.get(item.id);
                           return sc && sc.total > 0 && sc.completed < sc.total ? (
@@ -857,23 +845,11 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
           )}
 
           <div className="flex items-center gap-2">
-            <div className="flex -space-x-1.5">
-              {itemMembers.slice(0, 3).map((member) => (
-                <div
-                  key={member.id}
-                  className="w-5 h-5 rounded-full bg-slate-200 border border-white flex items-center justify-center overflow-hidden"
-                >
-                  {member.avatar_url ? (
-                    <img src={member.avatar_url} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <User className="w-2.5 h-2.5 text-slate-500" />
-                  )}
-                </div>
-              ))}
-            </div>
-            {itemMembers.length > 3 && (
-              <span className="text-xs text-slate-500">+{itemMembers.length - 3}</span>
-            )}
+            <AvatarStack
+              users={itemMembers.map(m => ({ src: m.avatar_url, name: m.full_name }))}
+              size="sm"
+              max={3}
+            />
           </div>
         </div>
       </div>

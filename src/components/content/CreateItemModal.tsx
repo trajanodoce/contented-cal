@@ -14,9 +14,9 @@ import {
   X,
   ChevronDown,
   Check,
-  User,
   Loader2,
 } from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
 
 export interface MeetingPrefill {
   title: string;
@@ -202,17 +202,7 @@ function AssigneeMultiSelect({
             <span className="text-slate-400">Select assignees...</span>
           ) : selectedMembers.length === 1 ? (
             <>
-              {selectedMembers[0].avatar_url ? (
-                <img
-                  src={selectedMembers[0].avatar_url}
-                  alt={selectedMembers[0].full_name ?? selectedMembers[0].email ?? undefined}
-                  className="w-6 h-6 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                  <User className="w-3 h-3 text-slate-500" />
-                </div>
-              )}
+              <Avatar src={selectedMembers[0].avatar_url} name={selectedMembers[0].full_name} size="md" />
               <span className="text-slate-700">
                 {selectedMembers[0].full_name || selectedMembers[0].email}
               </span>
@@ -247,17 +237,7 @@ function AssigneeMultiSelect({
                   >
                     {isSelected && <Check className="w-3 h-3 text-white" />}
                   </div>
-                  {member.avatar_url ? (
-                    <img
-                      src={member.avatar_url}
-                      alt={member.full_name ?? member.email ?? undefined}
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-                      <User className="w-3 h-3 text-slate-500" />
-                    </div>
-                  )}
+                  <Avatar src={member.avatar_url} name={member.full_name} size="md" />
                   <span className={isSelected ? 'text-brand-900' : 'text-slate-700'}>
                     {member.full_name || member.email}
                   </span>

@@ -245,16 +245,19 @@ export default function App() {
                 <BrowserRouter>
                   <AppRoutes />
                   <Toaster
-                    position="bottom-left"
+                    position="bottom-right"
                     toastOptions={{
                       style: {
                         background: '#F7F9FC',
                         border: '1px solid #00233930',
-                        borderRadius: '0.75rem',
-                        borderLeft: '3px solid #005D97',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.08)',
-                        color: '#334155',
-                        fontSize: '14px',
+                        borderRadius: '8px',
+                        padding: '10px 14px',
+                      },
+                      classNames: {
+                        success: 'cc-toast-success',
+                        error: 'cc-toast-error',
+                        warning: 'cc-toast-warning',
+                        info: 'cc-toast-info',
                       },
                     }}
                   />

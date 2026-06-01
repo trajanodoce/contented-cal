@@ -13,6 +13,7 @@ import {
   Shield,
   X,
 } from 'lucide-react';
+import { ConfirmModal } from '../ui/ConfirmModal';
 
 interface ApiKey {
   id: string;
@@ -454,38 +455,17 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
       )}
 
       {/* ── Revoke confirmation modal ────────────────────────────────────── */}
-      {revokeId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: '#00233960' }}>
-          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-sm mx-4 p-6" style={{ border: '1px solid #00233930' }}>
-            <div className="flex flex-col items-center text-center mb-5">
-              <div className="p-3 rounded-full mb-3" style={{ backgroundColor: '#BA2C2C12' }}>
-                <AlertTriangle className="w-6 h-6" style={{ color: '#BA2C2C' }} />
-              </div>
-              <h4 className="text-lg font-heading text-slate-900">Revoke API Key</h4>
-              <p className="text-sm text-slate-500 mt-1">
-                Any integrations using this key will immediately stop working. This can't be undone.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setRevokeId(null)}
-                className="flex-1 px-4 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
-                style={{ border: '1px solid #00233930' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRevoke}
-                disabled={revoking}
-                className="flex-1 px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: '#BA2C2C' }}
-              >
-                {revoking ? 'Revoking...' : 'Revoke Key'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={revokeId !== null}
+        onClose={() => setRevokeId(null)}
+        onConfirm={handleRevoke}
+        variant="destructive"
+        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        title="Revoke API Key"
+        description="Any integrations using this key will immediately stop working. This can't be undone."
+        confirmLabel="Revoke key"
+        loading={revoking}
+      />
     </div>
   );
 }

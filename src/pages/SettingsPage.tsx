@@ -17,8 +17,8 @@ import {
   SlidersHorizontal,
   Radio,
   Key,
-  type LucideIcon,
 } from 'lucide-react';
+import SettingsTabs from '../components/ui/SettingsTabs';
 
 const COLOR_PALETTE = [
   '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#10b981',
@@ -53,18 +53,22 @@ export function SettingsPage() {
         <p className="text-slate-500 mt-1">Manage your workspace configuration</p>
       </div>
 
-      <div className="border-b border-slate-200 mb-6">
-        <nav className="flex gap-1">
-          <TabBtn active={activeTab === 'general'} onClick={() => setActiveTab('general')} icon={Settings} label="General" />
-          <TabBtn active={activeTab === 'team'} onClick={() => setActiveTab('team')} icon={Users} label="Team" />
-          <TabBtn active={activeTab === 'content-types'} onClick={() => setActiveTab('content-types')} icon={FileText} label="Content Types" />
-          <TabBtn active={activeTab === 'channels'} onClick={() => setActiveTab('channels')} icon={Radio} label="Channels" />
-          <TabBtn active={activeTab === 'custom-fields'} onClick={() => setActiveTab('custom-fields')} icon={SlidersHorizontal} label="Custom Fields" />
-          <TabBtn active={activeTab === 'board-columns'} onClick={() => setActiveTab('board-columns')} icon={Layout} label="Board Columns" />
-          <TabBtn active={activeTab === 'intake-forms'} onClick={() => setActiveTab('intake-forms')} icon={Inbox} label="Intake Forms" />
-          <TabBtn active={activeTab === 'integrations'} onClick={() => setActiveTab('integrations')} icon={Zap} label="Integrations" />
-          <TabBtn active={activeTab === 'api'} onClick={() => setActiveTab('api')} icon={Key} label="API" />
-        </nav>
+      <div className="mb-6">
+        <SettingsTabs
+          tabs={[
+            { id: 'general', label: 'General', icon: <Settings className="w-3.5 h-3.5" /> },
+            { id: 'team', label: 'Team', icon: <Users className="w-3.5 h-3.5" /> },
+            { id: 'content-types', label: 'Content Types', icon: <FileText className="w-3.5 h-3.5" /> },
+            { id: 'channels', label: 'Channels', icon: <Radio className="w-3.5 h-3.5" /> },
+            { id: 'custom-fields', label: 'Custom Fields', icon: <SlidersHorizontal className="w-3.5 h-3.5" /> },
+            { id: 'board-columns', label: 'Board Columns', icon: <Layout className="w-3.5 h-3.5" /> },
+            { id: 'intake-forms', label: 'Intake Forms', icon: <Inbox className="w-3.5 h-3.5" /> },
+            { id: 'integrations', label: 'Integrations', icon: <Zap className="w-3.5 h-3.5" /> },
+            { id: 'api', label: 'API', icon: <Key className="w-3.5 h-3.5" /> },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as Tab)}
+        />
       </div>
 
       <div className="bg-surface-card rounded-lg p-6" style={{ border: '1px solid #00233930' }}>
@@ -82,19 +86,6 @@ export function SettingsPage() {
   );
 }
 
-function TabBtn({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: LucideIcon; label: string }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-        active ? 'border-brand-600 text-brand-600' : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
-      }`}
-    >
-      <Icon className="w-4 h-4" />
-      {label}
-    </button>
-  );
-}
 
 function GeneralTab({ workspace }: { workspace: { id: string; name: string; slug: string; logo_url?: string | null } | null }) {
   const { refreshWorkspaces } = useWorkspace();

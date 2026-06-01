@@ -50,7 +50,8 @@ import {
   UserPlus,
   Link2,
 } from 'lucide-react';
-import { formatDate, getPriorityDot, getUserInitials } from '../lib/utils';
+import { Avatar } from '../components/ui/Avatar';
+import { formatDate, getPriorityDot } from '../lib/utils';
 import {
   DndContext,
   DragOverlay,
@@ -569,7 +570,7 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
                 const member = members.find((m) => m.id === log.user_id);
                 return (
                   <div key={log.id} className="flex items-start gap-3">
-                    <AvatarCircle profile={member ?? null} size="sm" />
+                    <Avatar src={member?.avatar_url} name={member?.full_name} size="md" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-slate-700">
                         <span className="font-medium">
@@ -835,7 +836,7 @@ function TeamMembersSection({
                     onClick={() => addMember(m.id)}
                     className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors"
                   >
-                    <AvatarCircle profile={m} size="sm" />
+                    <Avatar src={m.avatar_url} name={m.full_name} size="md" />
                     <span className="truncate">{m.full_name || m.email}</span>
                   </button>
                 ))
@@ -852,7 +853,7 @@ function TeamMembersSection({
               key={m.id}
               className="flex items-center gap-2 px-3 py-2 bg-surface-nested rounded-lg group"
             >
-              <AvatarCircle profile={m} size="sm" />
+              <Avatar src={m.avatar_url} name={m.full_name} size="md" />
               <span className="text-sm text-slate-700">
                 {m.full_name || m.email}
               </span>
@@ -1037,7 +1038,7 @@ function ListTab({
                     </td>
                     <td className="px-4 py-3">
                       {assignee ? (
-                        <AvatarCircle profile={assignee} size="sm" />
+                        <Avatar src={assignee.avatar_url} name={assignee.full_name} size="md" />
                       ) : (
                         <span className="text-xs text-slate-400">--</span>
                       )}
@@ -1138,7 +1139,7 @@ function ProjectBoardCard({
             />
           )}
           {assignee && (
-            <AvatarCircle profile={assignee} size="xs" />
+            <Avatar src={assignee.avatar_url} name={assignee.full_name} size="sm" />
           )}
         </div>
         {item.due_date && (
@@ -1638,38 +1639,3 @@ function CalendarTab({
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Shared: Avatar component
-// ────────────────────────────────────────────────────────────────────────────────
-
-function AvatarCircle({
-  profile,
-  size = 'sm',
-}: {
-  profile: Profile | null;
-  size?: 'xs' | 'sm';
-}) {
-  const sizeClasses = size === 'xs' ? 'w-5 h-5 text-[9px]' : 'w-6 h-6 text-[10px]';
-
-  if (profile?.avatar_url) {
-    return (
-      <img
-        src={profile.avatar_url}
-        alt={profile.full_name ?? profile.email ?? undefined}
-        className={`${sizeClasses} rounded-full object-cover shrink-0`}
-        title={profile.full_name ?? profile.email ?? undefined}
-      />
-    );
-  }
-
-  return (
-    <div
-      className={`${sizeClasses} rounded-full bg-slate-200 flex items-center justify-center shrink-0`}
-      title={profile?.full_name || profile?.email || 'Unknown'}
-    >
-      <span className="font-medium text-slate-600">
-        {getUserInitials(profile?.email ?? undefined, profile?.full_name ?? undefined)}
-      </span>
-    </div>
-  );
-}

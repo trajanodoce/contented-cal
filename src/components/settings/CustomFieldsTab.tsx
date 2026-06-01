@@ -12,6 +12,7 @@ import {
   FileText,
   Globe,
 } from 'lucide-react';
+import { ConfirmModal } from '../ui/ConfirmModal';
 
 const FIELD_TYPES: { value: CustomFieldType; label: string; description: string }[] = [
   { value: 'text', label: 'Text', description: 'Single-line text input' },
@@ -37,6 +38,7 @@ export function CustomFieldsTab({ workspaceId }: Props) {
   const { customFieldDefs, contentTypes, refreshWorkspaceData } = useApp();
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<CustomFieldDefinition | null>(null);
 
   const fields = useMemo(
     () => [...customFieldDefs].sort((a, b) => {
@@ -68,14 +70,16 @@ export function CustomFieldsTab({ workspaceId }: Props) {
   const getContentTypeColor = (id: string) =>
     contentTypes.find(ct => ct.id === id)?.color || '#94a3b8';
 
-  const handleDelete = async (field: CustomFieldDefinition) => {
-    if (!confirm(`Delete the "${field.name}" field? This will remove it from all content items.`)) return;
-    const { error } = await supabase.from('custom_field_definitions').delete().eq('id', field.id);
+  const handleDeleteConfirmed = async () => {
+    if (!deleteTarget) return;
+    const { error } = await supabase.from('custom_field_definitions').delete().eq('id', deleteTarget.id);
     if (error) {
       toast.error('Failed to delete field');
+      setDeleteTarget(null);
       return;
     }
-    toast.success(`Deleted "${field.name}"`);
+    toast.success(`Deleted "${deleteTarget.name}"`);
+    setDeleteTarget(null);
     refreshWorkspaceData();
   };
 
@@ -138,7 +142,7 @@ export function CustomFieldsTab({ workspaceId }: Props) {
           <FieldTable
             fields={globalFields}
             onEdit={(f) => { setEditingId(f.id); setShowCreate(false); }}
-            onDelete={handleDelete}
+            onDelete={setDeleteTarget}
           />
         </div>
       )}
@@ -157,10 +161,26 @@ export function CustomFieldsTab({ workspaceId }: Props) {
           <FieldTable
             fields={ctFields}
             onEdit={(f) => { setEditingId(f.id); setShowCreate(false); }}
-            onDelete={handleDelete}
+            onDelete={setDeleteTarget}
           />
         </div>
       ))}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirmed}
+        variant="destructive"
+        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        title="Delete Custom Field?"
+        description={
+          deleteTarget
+            ? `Delete the "${deleteTarget.name}" field? This will remove it from all content items.`
+            : ''
+        }
+        confirmLabel="Delete field"
+      />
 
       {/* Empty state */}
       {fields.length === 0 && !showCreate && (

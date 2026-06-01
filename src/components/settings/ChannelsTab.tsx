@@ -11,6 +11,7 @@ import {
   X,
   Radio,
 } from 'lucide-react';
+import { ConfirmModal } from '../ui/ConfirmModal';
 
 interface ChannelsTabProps {
   workspaceId: string | null;
@@ -279,46 +280,20 @@ export function ChannelsTab({ workspaceId }: ChannelsTabProps) {
       </p>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm !== null && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]"
-          onClick={() => setShowDeleteConfirm(null)}
-        >
-          <div
-            className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6"
-            style={{ border: '1px solid #00233930' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#BA2C2C12] flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-accent-crimson" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">
-                Delete Channel?
-              </h3>
-            </div>
-            <p className="text-slate-600 mb-4">
-              Remove <strong>"{channels[showDeleteConfirm]}"</strong> from the
-              channel list? Existing content items using this channel won't be
-              affected.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(showDeleteConfirm)}
-                className="px-4 py-2 text-sm font-medium text-white bg-accent-crimson hover:bg-[#a02525] rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={showDeleteConfirm !== null}
+        onClose={() => setShowDeleteConfirm(null)}
+        onConfirm={() => showDeleteConfirm !== null && handleDelete(showDeleteConfirm)}
+        variant="destructive"
+        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        title="Delete Channel?"
+        description={
+          showDeleteConfirm !== null
+            ? `Remove "${channels[showDeleteConfirm]}" from the channel list? Existing content items using this channel won't be affected.`
+            : ''
+        }
+        confirmLabel="Delete channel"
+      />
     </div>
   );
 }
