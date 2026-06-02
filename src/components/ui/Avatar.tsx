@@ -84,6 +84,8 @@ export function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) 
     return (
       <span
         className={className}
+        role="img"
+        aria-label={name}
         style={{
           ...base,
           background: 'linear-gradient(135deg, #005D97, #D4729E)',
@@ -102,6 +104,8 @@ export function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) 
   return (
     <span
       className={className}
+      role="img"
+      aria-label="User avatar"
       style={{ ...base, background: '#e2e8f0' }}
     >
       <User size={iconPx} color="#94a3b8" strokeWidth={2} />
