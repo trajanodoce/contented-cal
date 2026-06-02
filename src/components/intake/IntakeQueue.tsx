@@ -1,10 +1,12 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Inbox, ChevronRight, ArrowRight, Loader2, RefreshCw, Check, X, MessageSquare, FileText, ExternalLink } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useTriageItems } from '../../hooks/useTriageItems';
 import type { IntakeSubmission, IntakeForm, ContentItem } from '../../lib/database.types';
 import { formatDateFull } from '../../lib/utils';
+import { SLACK_COLOR, SLACK_TEXT } from '../../lib/ordinal';
+import SettingsTabs from '../ui/SettingsTabs';
 
 interface Props {
   addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
@@ -28,43 +30,90 @@ const REJECT_REASONS = [
 export function IntakeQueue({ addToast, onOpenItem }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('slack');
 
+  // Lift the Slack triage data to the parent so we can show a pending count
+  // on the tab badge without double-subscribing. SlackTab receives it as props.
+  const triage = useTriageItems();
+  const slackPendingCount = triage.items.length;
+
+  // Forms tab pending count — separate small query, independent of FormsTab's
+  // own paginated load.
+  const formsPendingCount = useFormsPendingCount();
+
+  const tabs = useMemo(
+    () => [
+      { id: 'slack',  label: 'Slack',  icon: <MessageSquare className="w-3.5 h-3.5" />, count: slackPendingCount },
+      { id: 'forms',  label: 'Forms',  icon: <FileText className="w-3.5 h-3.5" />,       count: formsPendingCount },
+    ],
+    [slackPendingCount, formsPendingCount]
+  );
+
   return (
     <div className="flex flex-col h-full">
-      {/* Tab bar */}
-      <div className="flex items-center gap-1 px-4 pt-4 pb-2 border-b" style={{ borderColor: '#00233930' }}>
-        <button
-          onClick={() => setActiveTab('slack')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors
-            ${activeTab === 'slack' ? 'bg-brand-600 text-white' : 'text-slate-600 hover:bg-[#005D9710]'}`}
-        >
-          <MessageSquare className="w-3.5 h-3.5" />
-          Slack
-        </button>
-        <button
-          onClick={() => setActiveTab('forms')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors
-            ${activeTab === 'forms' ? 'bg-brand-600 text-white' : 'text-slate-600 hover:bg-[#005D9710]'}`}
-        >
-          <FileText className="w-3.5 h-3.5" />
-          Forms
-        </button>
+      {/* Tab bar — canonical SettingsTabs */}
+      <div className="px-4 pt-3">
+        <SettingsTabs
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as Tab)}
+        />
       </div>
 
       {/* Tab content */}
       {activeTab === 'forms' ? (
         <FormsTab addToast={addToast} />
       ) : (
-        <SlackTab addToast={addToast} onOpenItem={onOpenItem} />
+        <SlackTab
+          addToast={addToast}
+          onOpenItem={onOpenItem}
+          items={triage.items}
+          loading={triage.loading}
+          channelMap={triage.channelMap}
+          refresh={triage.refresh}
+        />
       )}
     </div>
   );
 }
 
+// ── Forms pending count (lightweight query for the tab badge) ───────────────
+
+function useFormsPendingCount() {
+  const { workspace, intakeForms } = useApp();
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!workspace || intakeForms.length === 0) {
+      setCount(0);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { count: c } = await supabase
+        .from('intake_submissions')
+        .select('id', { count: 'exact', head: true })
+        .in('form_id', intakeForms.map((f) => f.id))
+        .eq('status', 'pending');
+      if (!cancelled) setCount(c ?? 0);
+    })();
+    return () => { cancelled = true; };
+  }, [workspace, intakeForms]);
+
+  return count;
+}
+
 // ── Slack Tab ───────────────────────────────────────────────────────────────
 
-function SlackTab({ addToast, onOpenItem }: { addToast: Props['addToast']; onOpenItem?: (id: string) => void }) {
+interface SlackTabProps {
+  addToast: Props['addToast'];
+  onOpenItem?: (id: string) => void;
+  items: ContentItem[];
+  loading: boolean;
+  channelMap: Map<string, string>;
+  refresh: () => void;
+}
+
+function SlackTab({ addToast, onOpenItem, items, loading, channelMap, refresh }: SlackTabProps) {
   const { userRole, user, refreshContentItems } = useApp();
-  const { items, loading, refresh } = useTriageItems();
   const [selected, setSelected] = useState<ContentItem | null>(null);
   const [processing, setProcessing] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -248,6 +297,7 @@ function SlackTab({ addToast, onOpenItem }: { addToast: Props['addToast']; onOpe
                 const isSelected = selected?.id === item.id;
                 const isChecked = selectedIds.has(item.id);
                 const cf = (item.custom_fields as Record<string, string>) ?? {};
+                const channelName = channelMap.get(item.id);
                 return (
                   <button
                     key={item.id}
@@ -257,12 +307,27 @@ function SlackTab({ addToast, onOpenItem }: { addToast: Props['addToast']; onOpe
                       ${isChecked ? 'bg-brand-50' : ''}`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-slate-800 truncate">{item.title}</p>
-                        {cf._slack_user_name && (
-                          <p className="text-xs text-slate-400 mt-0.5">from {cf._slack_user_name}</p>
-                        )}
-                        <p className="text-xs text-slate-400">{formatDateFull(item.created_at)}</p>
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          {channelName && (
+                            <span
+                              className="inline-flex items-center font-mono text-[10px] font-semibold"
+                              style={{
+                                padding: '2px 7px',
+                                backgroundColor: `${SLACK_COLOR}15`,
+                                color: SLACK_TEXT,
+                                borderRadius: 99,
+                              }}
+                            >
+                              #{channelName}
+                            </span>
+                          )}
+                          {cf._slack_user_name && (
+                            <span className="text-xs text-slate-400">from {cf._slack_user_name}</span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">{formatDateFull(item.created_at)}</p>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0 mt-1" />
                     </div>

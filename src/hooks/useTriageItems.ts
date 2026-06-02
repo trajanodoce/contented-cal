@@ -7,15 +7,20 @@ import type { ContentItem } from '../lib/database.types';
  * Fetches content_items where needs_triage = true.
  * AppContext deliberately filters these out, so the Slack triage tab
  * needs its own query + realtime subscription.
+ *
+ * Also batch-fetches channel_name from slack_thread_links (origin only) so
+ * the Slack tab can render a "#channel" chip per row without N+1 queries.
  */
 export function useTriageItems() {
   const { workspace } = useApp();
   const [items, setItems] = useState<ContentItem[]>([]);
+  const [channelMap, setChannelMap] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     if (!workspace) return;
     setLoading(true);
+
     const { data } = await supabase
       .from('content_items')
       .select('*')
@@ -23,7 +28,28 @@ export function useTriageItems() {
       .eq('needs_triage', true)
       .eq('archived', false)
       .order('created_at', { ascending: false });
-    if (data) setItems(data as ContentItem[]);
+
+    const rows = (data ?? []) as ContentItem[];
+    setItems(rows);
+
+    // Batch-fetch origin channel names. Single query, indexed lookup.
+    if (rows.length > 0) {
+      const { data: links } = await supabase
+        .from('slack_thread_links')
+        .select('content_item_id, channel_name')
+        .in('content_item_id', rows.map((r) => r.id))
+        .eq('is_origin', true);
+      const map = new Map<string, string>();
+      for (const link of links ?? []) {
+        if (link.content_item_id && link.channel_name) {
+          map.set(link.content_item_id, link.channel_name);
+        }
+      }
+      setChannelMap(map);
+    } else {
+      setChannelMap(new Map());
+    }
+
     setLoading(false);
   }, [workspace]);
 
@@ -65,5 +91,5 @@ export function useTriageItems() {
     return () => { supabase.removeChannel(channel); };
   }, [workspace]);
 
-  return { items, loading, refresh };
+  return { items, loading, refresh, channelMap };
 }
