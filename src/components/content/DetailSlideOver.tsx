@@ -15,6 +15,7 @@ import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR,
 import { useOrdinalPost } from '../../hooks/useOrdinalPost';
 import { ExternalLinksSection } from './ExternalLinks';
 import { GranolaNoteSection } from './GranolaNoteSection';
+import { SlackSourceBanner } from './SlackSourceBanner';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
 import { StyledSelect } from '../ui/StyledSelect';
@@ -111,8 +112,6 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const isLinearIssue = isLinearItem(item);
   const cf = (item.custom_fields as Record<string, string>) ?? {};
   const isSlackItem = cf._source === 'slack';
-  const slackPermalink = cf._slack_permalink || null;
-  const slackRequester = cf._slack_user_name || null;
   const isReadOnly = userRole === 'viewer' || isOrdinalPost;
   const isExternalSource = isOrdinalPost || isLinearIssue;
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'activity'>('details');
@@ -464,48 +463,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           </div>
         )}
 
-        {/* Slack source banner */}
+        {/* Slack source banner — canonical Draft 4.6 (reads slack_thread_links) */}
         {isSlackItem && !isExternalSource && (
-          <div
-            className="px-6 py-3 border-b"
-            style={{
-              backgroundColor: '#005D9715',
-              borderColor: '#005D9740',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: '#005D97', color: 'white' }}
-                >
-                  <Hash className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold" style={{ color: '#005D97' }}>
-                    Sourced from Slack
-                  </p>
-                  {slackRequester && (
-                    <p className="text-xs" style={{ color: '#005D97' }}>
-                      Requested by {slackRequester}
-                    </p>
-                  )}
-                </div>
-              </div>
-              {slackPermalink && (
-                <a
-                  href={slackPermalink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                  style={{ color: '#005D97', borderColor: '#005D9740', backgroundColor: '#F7F9FC' }}
-                >
-                  <span>View in Slack</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
-            </div>
-          </div>
+          <SlackSourceBanner contentItemId={item.id} />
         )}
 
         {/* Header */}
