@@ -385,6 +385,26 @@ Deno.serve(async (req) => {
     const teamId: string = payload.team_id;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+    // Idempotency: Slack retries on >3s response or 5xx, same event_id,
+    // within ~5min. Record on first arrival; silently ACK on retry so we
+    // don't re-create items, post duplicate replies, or stack comments.
+    // The UNIQUE PK on slack_processed_events.event_id rejects duplicates.
+    if (payload.event_id) {
+      const { error: dedupError } = await supabase
+        .from("slack_processed_events")
+        .insert({ event_id: payload.event_id });
+
+      if (dedupError?.code === "23505") {
+        // Already processed — silently ACK the retry.
+        return new Response("OK", { status: 200 });
+      }
+      if (dedupError) {
+        // Non-conflict error: log but continue. Better to risk a duplicate
+        // on a transient DB issue than fail the user.
+        console.error("Failed to record event_id:", dedupError);
+      }
+    }
+
     // Look up connected workspace
     const { data: integration, error: lookupError } = await supabase
       .from("integrations")
