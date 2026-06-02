@@ -8,6 +8,7 @@ import { CreateItemModal } from '../components/content/CreateItemModal';
 import { DetailSlideOver } from '../components/content/DetailSlideOver';
 import { Avatar } from '../components/ui/Avatar';
 import { AvatarUploadModal } from '../components/ui/AvatarUploadModal';
+import { useUserAlerts } from '../hooks/useUserAlerts';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import {
@@ -81,6 +82,7 @@ export function AppLayout() {
   const createMenuRef = useRef<HTMLDivElement>(null);
   const fabMenuRef = useRef<HTMLDivElement>(null);
   const { selectedItemId, setSelectedItemId } = useSelectedItem();
+  const { unreadCount: unreadAlertCount } = useUserAlerts();
   const canCreate = userRole === 'admin' || userRole === 'editor';
   const canAccessSettings = userRole === 'admin';
   const urlSyncRef = useRef(false);
@@ -274,28 +276,40 @@ export function AppLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              onClick={handleNavigation}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+          {navItems.map((item) => {
+            const showAlertDot = item.path === '/my-work' && unreadAlertCount > 0;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={handleNavigation}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-white'
+                      : 'text-white/60 hover:bg-white/10 hover:text-white'
+                  }`
+                }
+                style={({ isActive }) =>
                   isActive
-                    ? 'text-white'
-                    : 'text-white/60 hover:bg-white/10 hover:text-white'
-                }`
-              }
-              style={({ isActive }) =>
-                isActive
-                  ? { background: 'linear-gradient(135deg, rgba(251,231,241,0.25) 0%, rgba(251,231,241,0.08) 100%)', borderLeft: '2px solid #FBE7F1' }
-                  : undefined
-              }
-            >
-              <span className={`opacity-70`}>{item.icon}</span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+                    ? { background: 'linear-gradient(135deg, rgba(251,231,241,0.25) 0%, rgba(251,231,241,0.08) 100%)', borderLeft: '2px solid #FBE7F1' }
+                    : undefined
+                }
+              >
+                <span className={`opacity-70`}>{item.icon}</span>
+                <span className="flex-1">{item.label}</span>
+                {showAlertDot && (
+                  <span
+                    className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold text-white"
+                    style={{ backgroundColor: '#BA2C2C' }}
+                    aria-label={`${unreadAlertCount} unread alert${unreadAlertCount === 1 ? '' : 's'}`}
+                  >
+                    {unreadAlertCount > 99 ? '99+' : unreadAlertCount}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
         {/* Settings link (above user section) — admin only */}

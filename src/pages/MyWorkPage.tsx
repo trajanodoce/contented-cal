@@ -14,6 +14,7 @@ import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, GRANOLA_TEXT 
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { PersonalTasksSection } from '../components/personal/PersonalTasksSection';
+import { MentionsPanel } from '../components/personal/MentionsPanel';
 import {
   Calendar,
   AlertCircle,
@@ -270,6 +271,9 @@ export function MyWorkPage() {
         totalCount={myItems.length}
         filteredCount={filteredItems.length}
       />
+
+      {/* Mentions + alerts — hidden when zero */}
+      <MentionsPanel onOpenItem={setSelectedItemId} />
 
       {/* Personal Tasks — always visible */}
       <PersonalTasksSection workspaceId={currentWorkspace.id} />

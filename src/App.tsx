@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider, useWorkspace } from './contexts/WorkspaceContext';
 import { AppProvider } from './contexts/AppContext';
+import { PresenceProvider } from './contexts/PresenceContext';
 import { FiltersProvider } from './contexts/FiltersContext';
 import { ViewPersistenceProvider, useViewPersistence } from './contexts/ViewPersistenceContext';
 import { SelectedItemProvider } from './contexts/SelectedItemContext';
@@ -243,6 +244,7 @@ export default function App() {
           <AppWithFilters>
             <ViewPersistenceProvider>
               <SelectedItemProvider>
+                <PresenceProvider>
                 <BrowserRouter>
                   <AppRoutes />
                   <Toaster
@@ -263,6 +265,7 @@ export default function App() {
                     }}
                   />
                 </BrowserRouter>
+                </PresenceProvider>
               </SelectedItemProvider>
             </ViewPersistenceProvider>
           </AppWithFilters>

@@ -71,6 +71,7 @@ import { ContentLibrary } from '../components/projects/ContentLibrary';
 import DatePicker from '../components/ui/DatePicker';
 import { BulkActionToolbar, selectedRowClass } from '../components/list/BulkActionToolbar';
 import { RowActionsMenu } from '../components/list/RowActionsMenu';
+import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -1167,6 +1168,7 @@ function ListTab({
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} truncate`}>
                           {item.title}
                         </span>
+                        <TaskPresenceChip taskId={item.id} variant="inline-dot" />
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -1319,9 +1321,14 @@ function ProjectBoardCard({
         borderLeft: `3px solid ${sourceLeftBarColor}`,
       }}
     >
-      <p className="text-xs font-medium text-slate-900 mb-2 line-clamp-2">
-        {item.title}
-      </p>
+      <div className="flex items-start gap-1.5 mb-2">
+        <p className="text-xs font-medium text-slate-900 line-clamp-2 flex-1">
+          {item.title}
+        </p>
+        <span className="flex-shrink-0 mt-0.5">
+          <TaskPresenceChip taskId={item.id} variant="inline-dot" />
+        </span>
+      </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           {ct && (

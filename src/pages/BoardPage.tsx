@@ -21,6 +21,7 @@ import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
+import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import {
   DndContext,
   DragOverlay,
@@ -132,6 +133,9 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
         {hasGranolaNotes && (
           <Mic className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
         )}
+        <span className="flex-shrink-0 mt-0.5">
+          <TaskPresenceChip taskId={item.id} variant="inline-dot" />
+        </span>
       </div>
 
       {/* Metadata row: content type + priority dot */}

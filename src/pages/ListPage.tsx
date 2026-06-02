@@ -8,6 +8,7 @@ import { getContentType, getBoardColumn, getAssignees, formatDueDateWithStatus, 
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionToolbar } from '../components/list/BulkActionToolbar';
 import { RowActionsMenu } from '../components/list/RowActionsMenu';
+import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import { CreateItemModal } from '../components/content/CreateItemModal';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -467,6 +468,7 @@ export function ListPage() {
                             {linkCounts.get(item.id)!.count > 1 && <span>{linkCounts.get(item.id)!.count}</span>}
                           </span>
                         )}
+                        <TaskPresenceChip taskId={item.id} variant="inline-dot" />
                       </div>
                     </td>
                     <td className="px-4 py-3">
