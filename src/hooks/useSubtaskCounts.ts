@@ -22,10 +22,14 @@ export function useSubtaskCounts(workspaceId: string | null) {
     setLoading(true);
 
     // Single query: join through content_items FK to filter by workspace
-    const { data: subtasks } = await supabase
+    const { data: subtasks, error } = await supabase
       .from('subtasks')
       .select('content_item_id, completed, content_items!inner(workspace_id)')
       .eq('content_items.workspace_id', workspaceId);
+
+    if (error) {
+      console.error('[useSubtaskCounts] failed to load:', error.message);
+    }
 
     const map = new Map<string, SubtaskCount>();
     if (subtasks) {

@@ -73,12 +73,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Sync workspace from WorkspaceContext so AppContext stays in sync
+  // Sync workspace from WorkspaceContext so AppContext stays in sync.
+  // Compare by reference — WorkspaceContext returns a new object when
+  // anything changes (incl. in-place settings updates), so we want to mirror
+  // those too, not just ID swaps.
   useEffect(() => {
-    if (wsFromContext && wsFromContext.id !== workspace?.id) {
+    if (wsFromContext && wsFromContext !== workspace) {
       setWorkspaceState(wsFromContext);
     }
-  }, [wsFromContext, workspace?.id]);
+  }, [wsFromContext, workspace]);
 
   const setWorkspace = useCallback((w: Workspace) => {
     setWorkspaceState(w);

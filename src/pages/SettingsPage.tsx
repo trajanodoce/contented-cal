@@ -13,21 +13,37 @@ import {
 } from 'lucide-react';
 import SettingsTabs from '../components/ui/SettingsTabs';
 
-const OLD_CUSTOMIZATION_SLUGS = [
+const CUSTOMIZATION_SLUGS = [
   'content-types', 'channels', 'custom-fields', 'board-columns', 'subtask-templates',
 ] as const;
 
+const DEFAULT_CUSTOMIZATION_SLUG = 'content-types';
+
 type TopTab = 'general' | 'team' | 'customizations' | 'intake-forms' | 'integrations' | 'api';
 
+/**
+ * Single source of truth for /settings routing. Resolves the active top tab
+ * from the URL and emits any redirect needed for old-URL compatibility or
+ * default-route landing. Owns both layers so CustomizationsTab doesn't have
+ * to second-guess the URL.
+ */
 function resolveTab(pathname: string): { topTab: TopTab; redirect?: string } {
   const segments = pathname.replace(/^\/settings\/?/, '').split('/').filter(Boolean);
   const first = segments[0] || 'general';
 
-  if (OLD_CUSTOMIZATION_SLUGS.includes(first as typeof OLD_CUSTOMIZATION_SLUGS[number])) {
+  // Legacy flat customization URL: /settings/content-types → /settings/customizations/content-types
+  if (CUSTOMIZATION_SLUGS.includes(first as typeof CUSTOMIZATION_SLUGS[number])) {
     return { topTab: 'customizations', redirect: `/settings/customizations/${first}` };
   }
 
-  if (first === 'customizations') return { topTab: 'customizations' };
+  // Customizations parent — ensure a sub-slug is present in the URL
+  if (first === 'customizations') {
+    const sub = segments[1];
+    if (!sub || !CUSTOMIZATION_SLUGS.includes(sub as typeof CUSTOMIZATION_SLUGS[number])) {
+      return { topTab: 'customizations', redirect: `/settings/customizations/${DEFAULT_CUSTOMIZATION_SLUG}` };
+    }
+    return { topTab: 'customizations' };
+  }
 
   const valid: TopTab[] = ['general', 'team', 'intake-forms', 'integrations', 'api'];
   if (valid.includes(first as TopTab)) return { topTab: first as TopTab };
@@ -65,11 +81,9 @@ export function SettingsPage() {
   }
 
   const handleTabChange = (id: string) => {
-    if (id === 'customizations') {
-      navigate('/settings/customizations/content-types');
-    } else {
-      navigate(`/settings/${id}`);
-    }
+    // /settings/customizations is handled by resolveTab which auto-redirects
+    // to the default sub-slug, so we can route uniformly here.
+    navigate(`/settings/${id}`);
   };
 
   return (
@@ -95,9 +109,17 @@ export function SettingsPage() {
       </div>
 
       {topTab === 'customizations' ? (
-        <CustomizationsTab workspaceId={currentWorkspace?.id || null} />
+        <div role="tabpanel" id="settings-tab-panel-customizations" aria-labelledby="settings-tab-customizations">
+          <CustomizationsTab workspaceId={currentWorkspace?.id || null} />
+        </div>
       ) : (
-        <div className="bg-surface-card rounded-lg p-6" style={{ border: '1px solid #00233930' }}>
+        <div
+          role="tabpanel"
+          id={`settings-tab-panel-${topTab}`}
+          aria-labelledby={`settings-tab-${topTab}`}
+          className="bg-surface-card rounded-lg p-6"
+          style={{ border: '1px solid #00233930' }}
+        >
           {topTab === 'general' && <GeneralTab workspace={currentWorkspace} />}
           {topTab === 'team' && <TeamTab />}
           {topTab === 'intake-forms' && <IntakeFormsList addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}

@@ -59,6 +59,7 @@ export default function SettingsTabs({
 }: SettingsTabsProps) {
   return (
     <div
+      role="tablist"
       style={{
         display: 'flex',
         gap: 4,
@@ -73,7 +74,10 @@ export default function SettingsTabs({
             key={tab.id}
             type="button"
             role="tab"
+            id={`settings-tab-${tab.id}`}
             aria-selected={isActive}
+            aria-controls={`settings-tab-panel-${tab.id}`}
+            tabIndex={isActive ? 0 : -1}
             onClick={() => onTabChange(tab.id)}
             style={{
               /* Reset */

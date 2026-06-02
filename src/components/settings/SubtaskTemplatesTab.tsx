@@ -116,6 +116,20 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
     setEditIndex(null);
   };
 
+  // True when the user has typed anything in the modal — used to prevent
+  // accidental backdrop dismissal mid-edit.
+  const isModalDirty =
+    modalName.trim().length > 0 ||
+    modalItems.some(i => i.trim().length > 0);
+
+  const handleBackdropClick = () => {
+    if (isModalDirty) {
+      const ok = window.confirm('Discard this template? Your changes will be lost.');
+      if (!ok) return;
+    }
+    closeModal();
+  };
+
   const handleModalSave = async () => {
     const name = modalName.trim();
     if (!name) return;
@@ -193,19 +207,17 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
     if (lines.length <= 1) return;
 
     e.preventDefault();
-    const remaining = MAX_ITEMS - modalItems.length;
-    const accepted = lines.slice(0, remaining + 1); // +1 because current slot counts
-    const dropped = lines.length - accepted.length;
-
+    // Replace the target slot with the first pasted line, then splice the
+    // remaining lines in directly after — up to the max cap.
     const updated = [...modalItems];
-    updated[index] = accepted[0];
-    accepted.slice(1).forEach(line => {
-      if (updated.length < MAX_ITEMS) updated.push(line);
-    });
+    updated.splice(index, 1, ...lines);
+    const accepted = Math.min(updated.length, MAX_ITEMS);
+    const dropped = updated.length - accepted;
+    updated.length = accepted;
 
     setModalItems(updated);
     if (dropped > 0) {
-      toast.warning(`Pasted ${accepted.length} items — ${dropped} dropped (max ${MAX_ITEMS})`);
+      toast.warning(`Pasted ${lines.length - dropped} items — ${dropped} dropped (max ${MAX_ITEMS})`);
     }
   };
 
@@ -283,11 +295,8 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
           {templates.map((template, index) => (
             <div
               key={`${template.name}-${index}`}
-              draggable
-              onDragStart={() => setListDragIndex(index)}
               onDragOver={e => { e.preventDefault(); setListDragOverIndex(index); }}
               onDrop={() => handleListDrop(index)}
-              onDragEnd={() => { setListDragIndex(null); setListDragOverIndex(null); }}
               className={`group flex items-start gap-3 p-4 rounded-xl transition-colors ${
                 listDragOverIndex === index
                   ? 'bg-[#005D9710]'
@@ -300,7 +309,15 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
               }}
             >
               {/* Drag handle */}
-              <GripVertical className="w-4 h-4 text-slate-300 cursor-grab flex-shrink-0 mt-0.5" />
+              <span
+                draggable
+                onDragStart={() => setListDragIndex(index)}
+                onDragEnd={() => { setListDragIndex(null); setListDragOverIndex(null); }}
+                className="cursor-grab flex-shrink-0 mt-0.5"
+                aria-label="Drag to reorder"
+              >
+                <GripVertical className="w-4 h-4 text-slate-300" />
+              </span>
 
               {/* Card body */}
               <div className="flex-1 min-w-0">
@@ -355,7 +372,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ backgroundColor: '#00233960' }}
-          onClick={closeModal}
+          onClick={handleBackdropClick}
         >
           <div
             className="bg-surface-card shadow-xl w-full max-w-[520px] mx-4"
@@ -399,16 +416,21 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                   {modalItems.map((item, index) => (
                     <div
                       key={index}
-                      draggable
-                      onDragStart={() => setItemDragIndex(index)}
                       onDragOver={e => { e.preventDefault(); setItemDragOverIndex(index); }}
                       onDrop={() => handleItemDrop(index)}
-                      onDragEnd={() => { setItemDragIndex(null); setItemDragOverIndex(null); }}
                       className={`flex items-center gap-2 ${
                         itemDragOverIndex === index ? 'bg-[#005D9710] rounded' : ''
                       } ${itemDragIndex === index ? 'opacity-50' : ''}`}
                     >
-                      <GripVertical className="w-3.5 h-3.5 text-slate-300 cursor-grab shrink-0" />
+                      <span
+                        draggable
+                        onDragStart={() => setItemDragIndex(index)}
+                        onDragEnd={() => { setItemDragIndex(null); setItemDragOverIndex(null); }}
+                        className="cursor-grab shrink-0 flex items-center"
+                        aria-label="Drag to reorder"
+                      >
+                        <GripVertical className="w-3.5 h-3.5 text-slate-300" />
+                      </span>
                       <input
                         ref={index === modalItems.length - 1 ? lastItemRef : undefined}
                         type="text"

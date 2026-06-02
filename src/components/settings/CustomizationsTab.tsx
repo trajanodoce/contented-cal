@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ContentTypeEditor } from './ContentTypesTab';
 import { ChannelsTab } from './ChannelsTab';
@@ -33,17 +32,10 @@ interface CustomizationsTabProps {
 export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  // SettingsPage owns the redirect to /settings/customizations/<slug> when the
+  // sub-slug is missing or invalid, so by the time we render we know there's
+  // a valid sub-slug in the URL.
   const activeSlug = resolveSubTab(location.pathname);
-
-  const needsRedirect = !location.pathname.replace(/\/+$/, '').startsWith('/settings/customizations/');
-
-  useEffect(() => {
-    if (needsRedirect) {
-      navigate('/settings/customizations/content-types', { replace: true });
-    }
-  }, [needsRedirect, navigate]);
-
-  if (needsRedirect) return null;
 
   return (
     <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
