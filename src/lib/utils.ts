@@ -154,3 +154,34 @@ export function getWorkspaceChannels(settings: unknown): string[] {
   }
   return DEFAULT_CHANNELS;
 }
+
+/** A reusable subtask checklist template stored on a workspace. */
+export interface SubtaskTemplate {
+  name: string;
+  items: string[];
+}
+
+/** Extract subtask templates from workspace settings JSON, returning [] if absent or malformed. */
+export function getWorkspaceSubtaskTemplates(settings: unknown): SubtaskTemplate[] {
+  if (
+    settings &&
+    typeof settings === 'object' &&
+    !Array.isArray(settings) &&
+    'subtask_templates' in settings &&
+    Array.isArray((settings as Record<string, unknown>).subtask_templates)
+  ) {
+    const templates = (settings as Record<string, unknown>).subtask_templates as unknown[];
+    return templates.filter((t): t is SubtaskTemplate => {
+      return (
+        typeof t === 'object' &&
+        t !== null &&
+        'name' in t &&
+        'items' in t &&
+        typeof (t as SubtaskTemplate).name === 'string' &&
+        Array.isArray((t as SubtaskTemplate).items) &&
+        (t as SubtaskTemplate).items.every((i) => typeof i === 'string')
+      );
+    });
+  }
+  return [];
+}

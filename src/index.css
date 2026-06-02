@@ -145,6 +145,9 @@ body {
   .cc-skel-strong { background: #C5D8E8; }
 }
 
+/* ── Drag-and-Drop snap animation (canonical) ── */
+.cc-dnd-snap { transition: transform 200ms ease-out; }
+
 /* ── Sonner Toast Theming ── */
 .cc-toast-success { border-left: 3px solid #92D1B2 !important; box-shadow: 0 2px 4px rgba(146,209,178,.35) !important; }
 .cc-toast-error   { border-left: 3px solid #BA2C2C !important; box-shadow: 0 2px 4px rgba(186,44,44,.25) !important; }

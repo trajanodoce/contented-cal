@@ -3,17 +3,19 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import {
   Key,
-  Plus,
   Copy,
   Check,
   Trash2,
-  AlertTriangle,
   ChevronDown,
   ChevronUp,
-  Shield,
+  Eye,
+  PenLine,
+  Circle,
   X,
 } from 'lucide-react';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { EmptyState } from '../ui/EmptyState';
+import { formatRelativeTime } from '../../lib/relativeTime';
 
 interface ApiKey {
   id: string;
@@ -41,11 +43,19 @@ function generateRawKey(): string {
   return `cc_sk_${hex}`;
 }
 
-const SCOPE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  read:       { label: 'Read only',    color: '#005D97', bg: '#005D9715' },
-  read_write: { label: 'Read & Write', color: '#16a34a', bg: '#16a34a15' },
-  full:       { label: 'Full access',  color: '#7c3aed', bg: '#7c3aed15' },
+type Scope = 'read' | 'read_write' | 'full';
+
+const SCOPE_CHIP: Record<Scope, { label: string; bg: string; color: string; border: string }> = {
+  read:       { label: 'Read only',   bg: '#94A3B820', color: '#475569', border: '#94A3B840' },
+  read_write: { label: 'Read+Write',  bg: '#005D9712', color: '#005D97', border: '#005D9730' },
+  full:       { label: 'Full admin',  bg: '#BA2C2C15', color: '#BA2C2C', border: '#BA2C2C30' },
 };
+
+// Format key preview as cc_sk_{first4}…
+// The stored key_prefix is the first 12 chars of the raw key, e.g. "cc_sk_a8f3k2"
+function formatKeyPreview(prefix: string): string {
+  return `${prefix}…`;
+}
 
 export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
   const [keys, setKeys] = useState<ApiKey[]>([]);
@@ -54,7 +64,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
   // Create modal
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
-  const [newScope, setNewScope] = useState<'read' | 'read_write' | 'full'>('read');
+  const [newScope, setNewScope] = useState<Scope>('read');
   const [creating, setCreating] = useState(false);
 
   // One-time key display
@@ -122,7 +132,6 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
       return;
     }
 
-    // Show one-time key display
     setShowCreate(false);
     setDisplayKey({ name: newName.trim(), key: rawKey });
     setNewName('');
@@ -163,25 +172,35 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-heading text-slate-900">API Keys</h3>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <h3 className="text-lg font-heading" style={{ color: '#002339' }}>API Keys</h3>
+          <p className="text-sm mt-0.5" style={{ color: '#64748b' }}>
             Create keys to let external tools connect to your workspace
           </p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90"
-          style={{ backgroundColor: '#005D97' }}
-        >
-          <Plus className="w-4 h-4" />
-          Create API Key
-        </button>
+        {keys.length > 0 && (
+          <button
+            onClick={() => setShowCreate(true)}
+            style={{
+              padding: '8px 16px',
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'white',
+              background: '#005D97',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
+            }}
+          >
+            + Create API key
+          </button>
+        )}
       </div>
 
       {/* API Docs toggle */}
       <button
         onClick={() => setShowDocs(!showDocs)}
-        className="flex items-center gap-2 mb-4 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+        className="flex items-center gap-2 mb-4 text-sm font-medium transition-colors"
+        style={{ color: '#475569' }}
       >
         {showDocs ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         API Documentation
@@ -189,33 +208,33 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
 
       {showDocs && (
         <div className="mb-6 rounded-xl p-5" style={{ border: '1px solid #00233930', background: '#F7F9FC' }}>
-          <div className="space-y-4 text-sm text-slate-700">
+          <div className="space-y-4 text-sm" style={{ color: '#475569' }}>
             <div>
-              <p className="font-semibold text-slate-900 mb-1">Base URL</p>
-              <code className="block bg-slate-900 text-slate-100 rounded-lg px-4 py-2 text-xs font-mono">
+              <p className="font-semibold mb-1" style={{ color: '#002339' }}>Base URL</p>
+              <code className="block rounded-lg px-4 py-2 text-xs font-mono" style={{ background: '#002339', color: '#c8dde8' }}>
                 {apiBase}
               </code>
             </div>
             <div>
-              <p className="font-semibold text-slate-900 mb-1">Authentication</p>
-              <p className="text-slate-600 mb-2">Include your API key in the Authorization header:</p>
-              <code className="block bg-slate-900 text-slate-100 rounded-lg px-4 py-2 text-xs font-mono">
+              <p className="font-semibold mb-1" style={{ color: '#002339' }}>Authentication</p>
+              <p className="mb-2" style={{ color: '#64748b' }}>Include your API key in the Authorization header:</p>
+              <code className="block rounded-lg px-4 py-2 text-xs font-mono" style={{ background: '#002339', color: '#c8dde8' }}>
                 Authorization: Bearer cc_sk_your_key_here
               </code>
             </div>
             <div>
-              <p className="font-semibold text-slate-900 mb-2">Endpoints</p>
+              <p className="font-semibold mb-2" style={{ color: '#002339' }}>Endpoints</p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="text-left text-slate-500">
+                    <tr className="text-left" style={{ color: '#64748b' }}>
                       <th className="pb-2 pr-4 font-medium">Method</th>
                       <th className="pb-2 pr-4 font-medium">Path</th>
                       <th className="pb-2 pr-4 font-medium">Scope</th>
                       <th className="pb-2 font-medium">Description</th>
                     </tr>
                   </thead>
-                  <tbody className="font-mono text-slate-700">
+                  <tbody className="font-mono" style={{ color: '#475569' }}>
                     <tr><td className="py-1 pr-4 text-green-700">GET</td><td className="pr-4">/items</td><td className="pr-4">read</td><td className="font-sans">List items (filterable)</td></tr>
                     <tr><td className="py-1 pr-4 text-green-700">GET</td><td className="pr-4">/items/:id</td><td className="pr-4">read</td><td className="font-sans">Get single item</td></tr>
                     <tr><td className="py-1 pr-4 text-blue-700">POST</td><td className="pr-4">/items</td><td className="pr-4">read_write</td><td className="font-sans">Create item</td></tr>
@@ -228,228 +247,392 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
               </div>
             </div>
             <div>
-              <p className="font-semibold text-slate-900 mb-1">Example: List items</p>
-              <pre className="bg-slate-900 text-slate-100 rounded-lg px-4 py-3 text-xs font-mono overflow-x-auto whitespace-pre">{`curl ${apiBase}/items \\
+              <p className="font-semibold mb-1" style={{ color: '#002339' }}>Example: List items</p>
+              <pre className="rounded-lg px-4 py-3 text-xs font-mono overflow-x-auto whitespace-pre" style={{ background: '#002339', color: '#c8dde8' }}>{`curl ${apiBase}/items \\
   -H "Authorization: Bearer cc_sk_your_key_here"`}</pre>
             </div>
             <div>
-              <p className="font-semibold text-slate-900 mb-1">Example: Create item</p>
-              <pre className="bg-slate-900 text-slate-100 rounded-lg px-4 py-3 text-xs font-mono overflow-x-auto whitespace-pre">{`curl -X POST ${apiBase}/items \\
+              <p className="font-semibold mb-1" style={{ color: '#002339' }}>Example: Create item</p>
+              <pre className="rounded-lg px-4 py-3 text-xs font-mono overflow-x-auto whitespace-pre" style={{ background: '#002339', color: '#c8dde8' }}>{`curl -X POST ${apiBase}/items \\
   -H "Authorization: Bearer cc_sk_your_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{"title": "New blog post", "channel": "Blog"}'`}</pre>
-            </div>
-            <div>
-              <p className="font-semibold text-slate-900 mb-1">Query filters</p>
-              <p className="text-slate-600">
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">status</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">content_type_id</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">channel</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">project_id</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">priority</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">assignee_id</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">limit</code>{' '}
-                <code className="text-xs bg-slate-100 px-1.5 py-0.5 rounded">offset</code>
-              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Keys table */}
+      {/* ── Body: loading / empty / table ────────────────────────────────── */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full" />
+          <div className="animate-spin w-6 h-6 border-2 rounded-full" style={{ borderColor: '#005D97', borderTopColor: 'transparent' }} />
         </div>
       ) : keys.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 rounded-lg border border-dashed border-slate-300 bg-surface-nested">
-          <Key className="w-12 h-12 text-slate-300 mb-3" />
-          <p className="text-sm font-medium text-slate-600 mb-1">No API keys yet</p>
-          <p className="text-xs text-slate-400 mb-4">Create a key to let external tools access your workspace</p>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90"
-            style={{ backgroundColor: '#005D97' }}
-          >
-            <Plus className="w-4 h-4" />
-            Create API Key
-          </button>
-        </div>
+        <EmptyState
+          level={1}
+          state="info"
+          icon={<Key size={22} strokeWidth={2} />}
+          title="No API keys"
+          description="Create a key to give external apps access to your ContentedCal workspace."
+          action={{ label: '+ Create API key', onClick: () => setShowCreate(true) }}
+        />
       ) : (
-        <div className="overflow-hidden rounded-xl" style={{ border: '1px solid #00233930' }}>
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: '#005D9712' }}>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Scope</th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Key</th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Created</th>
-                <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Last Used</th>
-                <th className="py-3 px-4"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {keys.map((key) => {
-                const scopeInfo = SCOPE_LABELS[key.scope] || SCOPE_LABELS.read;
-                return (
-                  <tr key={key.id} className="border-t border-slate-100 hover:bg-[#005D9718] transition-colors">
-                    <td className="py-3 px-4 font-medium text-slate-900">{key.name}</td>
-                    <td className="py-3 px-4">
-                      <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-                        style={{ color: scopeInfo.color, backgroundColor: scopeInfo.bg }}
-                      >
-                        <Shield className="w-3 h-3" />
-                        {scopeInfo.label}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-mono text-xs text-slate-500">{key.key_prefix}...</td>
-                    <td className="py-3 px-4 text-slate-500 text-xs">
-                      {new Date(key.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="py-3 px-4 text-slate-500 text-xs">
-                      {key.last_used_at
-                        ? new Date(key.last_used_at).toLocaleDateString()
-                        : <span className="text-slate-400">Never</span>
-                      }
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => setRevokeId(key.id)}
-                        className="p-1.5 rounded-lg transition-colors hover:bg-[#BA2C2C12] text-slate-400 hover:text-[#BA2C2C]"
-                        title="Revoke key"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div
+          style={{
+            background: 'white',
+            border: '1px solid #00233930',
+            borderRadius: 12,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Header row */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1.5fr 1.8fr 110px 110px 130px 90px',
+              gap: 12,
+              padding: '10px 16px',
+              background: '#F7F9FC',
+              borderBottom: '1px solid #00233918',
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#64748b',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            <div>Name</div>
+            <div>Key</div>
+            <div>Scope</div>
+            <div>Created</div>
+            <div>Last used</div>
+            <div />
+          </div>
+
+          {/* Body rows */}
+          {keys.map((key, idx) => {
+            const chip = SCOPE_CHIP[key.scope] || SCOPE_CHIP.read;
+            const isLast = idx === keys.length - 1;
+            return (
+              <div
+                key={key.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1.5fr 1.8fr 110px 110px 130px 90px',
+                  gap: 12,
+                  padding: '12px 16px',
+                  borderBottom: isLast ? 'none' : '1px solid #00233918',
+                  alignItems: 'center',
+                  fontSize: 12,
+                }}
+              >
+                <div style={{ color: '#002339', fontWeight: 500 }}>{key.name}</div>
+                <div style={{ fontFamily: 'ui-monospace, monospace', color: '#64748b' }}>
+                  {formatKeyPreview(key.key_prefix)}
+                </div>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    padding: '2px 7px',
+                    borderRadius: 99,
+                    background: chip.bg,
+                    color: chip.color,
+                    border: `1px solid ${chip.border}`,
+                    justifySelf: 'start',
+                  }}
+                >
+                  {chip.label}
+                </span>
+                <div style={{ color: '#64748b' }}>{formatRelativeTime(key.created_at)}</div>
+                <div style={{ color: key.last_used_at ? '#64748b' : '#94a3b8' }}>
+                  {key.last_used_at ? formatRelativeTime(key.last_used_at) : 'Never'}
+                </div>
+                <button
+                  onClick={() => setRevokeId(key.id)}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: '#BA2C2C',
+                    background: 'transparent',
+                    border: '1px solid #BA2C2C30',
+                    padding: '4px 10px',
+                    borderRadius: 6,
+                    cursor: 'pointer',
+                    justifySelf: 'end',
+                  }}
+                >
+                  Revoke
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
 
       {/* ── Create modal ─────────────────────────────────────────────────── */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: '#00233960' }}>
-          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md mx-4 p-6" style={{ border: '1px solid #00233930' }}>
-            <div className="flex items-center justify-between mb-5">
-              <h4 className="text-lg font-heading text-slate-900">Create API Key</h4>
-              <button onClick={() => setShowCreate(false)} className="p-1 hover:bg-slate-100 rounded-lg">
-                <X className="w-5 h-5 text-slate-400" />
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: 'rgba(0,35,57,0.5)' }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 480,
+              background: 'white',
+              border: '1.5px solid #002339',
+              borderRadius: 14,
+              boxShadow: '0 6px 10px rgba(0,35,57,0.14), 0 20px 32px -8px rgba(0,35,57,0.22)',
+              padding: 22,
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div
+                style={{
+                  fontFamily: "'Faune-Text_Bold', serif",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: '#002339',
+                }}
+              >
+                Create API key
+              </div>
+              <button
+                onClick={() => setShowCreate(false)}
+                aria-label="Close"
+                style={{ padding: 4, background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Key name</label>
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="e.g. Zapier integration"
-                  className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  style={{ border: '1px solid #00233930' }}
-                  autoFocus
-                />
+            {/* Key name field */}
+            <div style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#64748b',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: 6,
+                }}
+              >
+                Key name
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Permission scope</label>
-                <div className="space-y-2">
-                  {(['read', 'read_write', 'full'] as const).map((s) => {
-                    const info = SCOPE_LABELS[s];
-                    const descriptions: Record<string, string> = {
-                      read: 'Can list and read content items, types, and statuses',
-                      read_write: 'Can also create and update content items',
-                      full: 'Can also delete content items',
-                    };
-                    return (
-                      <label
-                        key={s}
-                        className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                          newScope === s ? 'ring-2 ring-brand-500' : 'hover:bg-[#005D9718]'
-                        }`}
-                        style={{ border: '1px solid #00233930' }}
-                      >
-                        <input
-                          type="radio"
-                          name="scope"
-                          value={s}
-                          checked={newScope === s}
-                          onChange={() => setNewScope(s)}
-                          className="mt-0.5 accent-[#005D97]"
-                        />
-                        <div>
-                          <span className="text-sm font-semibold" style={{ color: info.color }}>{info.label}</span>
-                          <p className="text-xs text-slate-500 mt-0.5">{descriptions[s]}</p>
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="e.g. Mobile app — production"
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '11px 13px',
+                  fontSize: 13,
+                  color: '#334155',
+                  background: 'white',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: 8,
+                  outline: 'none',
+                }}
+              />
+              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
+                A human-readable label. Doesn't affect permissions.
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            {/* Scope radio cards */}
+            <div style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#64748b',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: 8,
+                }}
+              >
+                Scope
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <ScopeRadioCard
+                  selected={newScope === 'read'}
+                  onSelect={() => setNewScope('read')}
+                  icon={<Eye size={13} strokeWidth={2} color="#64748b" />}
+                  label="Read"
+                  description="List items, fetch single items, list types and statuses. No writes."
+                />
+                <ScopeRadioCard
+                  selected={newScope === 'read_write'}
+                  onSelect={() => setNewScope('read_write')}
+                  icon={<PenLine size={13} strokeWidth={2} color="#005D97" />}
+                  label="Read & Write"
+                  description="Everything in Read, plus create, update, and delete items."
+                />
+                <ScopeRadioCard
+                  selected={newScope === 'full'}
+                  onSelect={() => setNewScope('full')}
+                  icon={<Circle size={13} strokeWidth={2} color="#BA2C2C" />}
+                  label="Full admin"
+                  description="Everything above, plus workspace settings, members, and API key management."
+                  sensitive
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button
                 onClick={() => setShowCreate(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
-                style={{ border: '1px solid #00233930' }}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#475569',
+                  background: 'white',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreate}
                 disabled={!newName.trim() || creating}
-                className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
-                style={{ backgroundColor: '#005D97' }}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'white',
+                  background: '#005D97',
+                  border: 'none',
+                  borderRadius: 8,
+                  cursor: !newName.trim() || creating ? 'not-allowed' : 'pointer',
+                  opacity: !newName.trim() || creating ? 0.5 : 1,
+                }}
               >
-                {creating ? 'Creating...' : 'Create Key'}
+                {creating ? 'Creating…' : 'Create key'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── One-time key display modal ───────────────────────────────────── */}
+      {/* ── One-time reveal modal ────────────────────────────────────────── */}
       {displayKey && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: '#00233960' }}>
-          <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg mx-4 p-6" style={{ border: '1px solid #00233930' }}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-lg" style={{ backgroundColor: '#f59e0b20' }}>
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
-              </div>
-              <div>
-                <h4 className="text-lg font-heading text-slate-900">Save your API key</h4>
-                <p className="text-sm text-slate-500">You won't be able to see it again</p>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <p className="text-xs text-slate-500 mb-2">{displayKey.name}</p>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          style={{ background: 'rgba(0,35,57,0.5)' }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 480,
+              background: 'white',
+              border: '1.5px solid #002339',
+              borderRadius: 14,
+              boxShadow: '0 6px 10px rgba(0,35,57,0.14), 0 20px 32px -8px rgba(0,35,57,0.22)',
+              padding: 22,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14 }}>
               <div
-                className="flex items-center gap-2 p-3 rounded-lg font-mono text-sm break-all"
-                style={{ backgroundColor: '#0f172a', color: '#e2e8f0' }}
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #92D1B228 0%, #FBE7F140 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
               >
-                <span className="flex-1 select-all">{displayKey.key}</span>
-                <button
-                  onClick={() => copyToClipboard(displayKey.key)}
-                  className="flex-shrink-0 p-1.5 rounded hover:bg-white/10 transition-colors"
-                  title="Copy to clipboard"
+                <Check size={18} strokeWidth={2.5} color="#357254" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div
+                  style={{
+                    fontFamily: "'Faune-Text_Bold', serif",
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: '#002339',
+                    marginBottom: 2,
+                  }}
                 >
-                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-slate-400" />}
-                </button>
+                  Key created
+                </div>
+                <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+                  Copy this key and store it somewhere safe.{' '}
+                  <strong style={{ color: '#BA2C2C' }}>It won't be shown again.</strong>
+                </div>
               </div>
             </div>
 
-            <button
-              onClick={() => { setDisplayKey(null); setCopied(false); }}
-              className="w-full px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90"
-              style={{ backgroundColor: '#005D97' }}
+            {/* Dark monospace key box */}
+            <div
+              style={{
+                background: '#002339',
+                color: '#c8dde8',
+                padding: '12px 14px',
+                borderRadius: 8,
+                fontFamily: 'ui-monospace, monospace',
+                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 10,
+                marginBottom: 14,
+              }}
             >
-              Done
-            </button>
+              <span style={{ overflowX: 'auto', whiteSpace: 'nowrap', flex: 1 }} className="select-all">
+                {displayKey.key}
+              </span>
+              <button
+                onClick={() => copyToClipboard(displayKey.key)}
+                style={{
+                  padding: '4px 10px',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#c8dde8',
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 6,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                {copied ? <Check size={12} /> : <Copy size={12} />}
+                {copied ? 'Copied' : 'Copy'}
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setDisplayKey(null);
+                  setCopied(false);
+                }}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'white',
+                  background: '#005D97',
+                  border: 'none',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                }}
+              >
+                Done — I've saved it
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -467,5 +650,82 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
         loading={revoking}
       />
     </div>
+  );
+}
+
+// ── Scope radio card ─────────────────────────────────────────────────────
+interface ScopeRadioCardProps {
+  selected: boolean;
+  onSelect: () => void;
+  icon: React.ReactNode;
+  label: string;
+  description: string;
+  sensitive?: boolean;
+}
+
+function ScopeRadioCard({ selected, onSelect, icon, label, description, sensitive }: ScopeRadioCardProps) {
+  return (
+    <label
+      onClick={onSelect}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 10,
+        padding: '12px 14px',
+        background: selected ? '#005D9708' : 'white',
+        border: selected ? '1.5px solid #005D97' : '1px solid #cbd5e1',
+        borderRadius: 10,
+        cursor: 'pointer',
+      }}
+    >
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 14,
+          height: 14,
+          border: `1.5px solid ${selected ? '#005D97' : '#cbd5e1'}`,
+          borderRadius: '50%',
+          flexShrink: 0,
+          marginTop: 2,
+        }}
+      >
+        {selected && (
+          <span
+            style={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              background: '#005D97',
+            }}
+          />
+        )}
+      </span>
+      <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+          {icon}
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#002339' }}>{label}</span>
+          {sensitive && (
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                padding: '1px 6px',
+                borderRadius: 99,
+                background: '#BA2C2C15',
+                color: '#BA2C2C',
+                border: '1px solid #BA2C2C30',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Sensitive
+            </span>
+          )}
+        </div>
+        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.4 }}>{description}</div>
+      </div>
+    </label>
   );
 }

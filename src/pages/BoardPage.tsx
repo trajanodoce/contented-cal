@@ -36,6 +36,7 @@ import {
   DropAnimation,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
+import { DropTarget, DragGhost, BoardSourcePlaceholder } from '../components/dnd/DndPrimitives';
 
 const priorityColors: Record<string, string> = {
   urgent: '#ef4444',
@@ -92,11 +93,9 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
 
   if (isDragging && !isOverlay) {
     return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="bg-[#005D9712] border-2 border-dashed border-slate-300 rounded-lg p-4 h-32"
-      />
+      <div ref={setNodeRef} style={style}>
+        <BoardSourcePlaceholder height={128} />
+      </div>
     );
   }
 
@@ -108,8 +107,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       onClick={onClick}
       className={`rounded-xl p-4 shadow-sm border cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden ${
         isExternal ? '' : 'bg-surface-card'
-      } ${isOverlay ? 'shadow-xl rotate-2 scale-105 cursor-grabbing' : ''
-      }`}
+      } ${isOverlay ? 'cursor-grabbing' : ''}`}
       style={{
         ...style,
         ...(externalBg ? { backgroundColor: externalBg } : {}),
@@ -239,8 +237,8 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
       ref={setNodeRef}
       className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl transition-all`}
       style={{
-        backgroundColor: isOver ? `${colColor}0C` : `${colColor}05`,
-        border: isOver ? `2px solid ${colColor}` : '1px solid #00233930',
+        backgroundColor: isOver ? '#005D9710' : `${colColor}05`,
+        border: isOver ? '2px dashed #005D97' : '1px solid #00233930',
       }}
     >
       {/* Column Header */}
@@ -284,11 +282,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
             />
           ))
         )}
-        {isOver && (
-          <div className="h-24 border-2 border-dashed border-brand-300 rounded-lg bg-brand-50/50 flex items-center justify-center">
-            <p className="text-sm text-brand-500 font-medium">Drop here</p>
-          </div>
-        )}
+        {/* zone-level drop target styling is applied to the column container itself */}
       </div>
     </div>
   );
@@ -523,7 +517,7 @@ export function BoardPage() {
           </div>
           <DragOverlay dropAnimation={dropAnimation}>
             {activeDragItem ? (
-              <div className="rotate-2 scale-105">
+              <DragGhost rotate={-1.5}>
                 <BoardCard
                   item={activeDragItem}
                   contentTypes={contentTypes}
@@ -532,7 +526,7 @@ export function BoardPage() {
                   isOverlay={true}
                   onClick={() => {}}
                 />
-              </div>
+              </DragGhost>
             ) : null}
           </DragOverlay>
         </DndContext>

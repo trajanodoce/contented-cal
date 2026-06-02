@@ -62,6 +62,9 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
+// Calendar drags use the in-flow element (no DragOverlay), so canonical ghost
+// styling (opacity .9 + shadow-md + -1.5deg rotate) is applied inline on the
+// dragged pill — visually matches <DragGhost> from DndPrimitives.
 
 type CalendarView = 'month' | 'week' | 'day';
 type DateMode = 'due' | 'publish';
@@ -82,12 +85,18 @@ function DroppableDayCell({ dateId, children, className, onClick, style }: {
   style?: React.CSSProperties;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: dateId });
+  // Canonical drop-target visual: 2px dashed navy + 10% navy wash.
+  // Mirrors <DropTarget> from DndPrimitives — applied inline so we don't
+  // wrap an extra layout box that would break grid/calendar cell sizing.
+  const overStyle: React.CSSProperties | undefined = isOver
+    ? { ...style, border: '2px dashed #005D97', backgroundColor: '#005D9710' }
+    : style;
   return (
     <div
       ref={setNodeRef}
-      className={`overflow-hidden min-w-0 ${className || ''} ${isOver ? 'ring-2 ring-inset ring-brand-400 !bg-brand-50/60' : ''}`}
+      className={`overflow-hidden min-w-0 ${className || ''}`}
       onClick={onClick}
-      style={style}
+      style={overStyle}
     >
       {children}
     </div>
@@ -134,12 +143,18 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       onClick={onClick}
       className="flex items-center gap-1.5 px-2 py-1 rounded-[3px] text-[14px] cursor-pointer hover:opacity-80 transition-opacity mb-[6px] overflow-hidden min-w-0 leading-tight"
       style={{
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? 1 : 1,
+        transform: isDragging
+          ? `${CSS.Translate.toString(transform) ?? ''} rotate(-1.5deg)`
+          : CSS.Translate.toString(transform),
+        opacity: isDragging ? 0.9 : 1,
         // Slim 1px tinted outline + 2px solid left border for emphasis.
         border: `1px solid ${isLinear ? LINEAR_COLOR : borderColor}30`,
         borderLeft: `2px solid ${isLinear ? LINEAR_COLOR : borderColor}`,
         backgroundColor: itemBg,
+        boxShadow: isDragging
+          ? '0 4px 6px rgba(0,35,57,.11), 0 10px 16px rgba(0,35,57,.16)'
+          : undefined,
+        cursor: isDragging ? 'grabbing' : undefined,
       }}
     >
       {isLinear && (
