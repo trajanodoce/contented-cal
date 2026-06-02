@@ -7,6 +7,7 @@ import { parseLocalDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } 
 import { getContentType, getBoardColumn, getAssignees, formatDueDateWithStatus, isDoneStatus } from '../lib/itemHelpers';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionToolbar } from '../components/list/BulkActionToolbar';
+import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { CreateItemModal } from '../components/content/CreateItemModal';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -69,6 +70,7 @@ export function ListPage() {
 
   const [sort, setSort] = useState<SortState>({ field: 'due_date', direction: 'asc' });
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { setSelectedItemId } = useSelectedItem();
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
@@ -173,9 +175,49 @@ export function ListPage() {
     });
   }, []);
 
-  const handleRowClick = useCallback((item: ContentItem) => {
+  const handleRowClick = useCallback((item: ContentItem, idx?: number) => {
     setSelectedItemId(item.id);
+    if (typeof idx === 'number') setFocusedIndex(idx);
   }, [setSelectedItemId]);
+
+  // Keyboard nav: ArrowUp/Down · Enter to open · Space to toggle select.
+  // Scoped to the table container so it doesn't hijack arrow keys in inputs
+  // or inline editors elsewhere on the page.
+  const handleTableKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.tagName === 'SELECT' ||
+      target.isContentEditable
+    ) {
+      return;
+    }
+    if (sortedItems.length === 0) return;
+    const current = focusedIndex ?? -1;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocusedIndex(Math.min(current + 1, sortedItems.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusedIndex(Math.max(current - 1, 0));
+    } else if (e.key === 'Enter' && current >= 0 && current < sortedItems.length) {
+      e.preventDefault();
+      handleRowClick(sortedItems[current], current);
+    } else if (e.key === ' ' && current >= 0 && current < sortedItems.length) {
+      e.preventDefault();
+      handleSelectItem(sortedItems[current].id);
+    }
+  }, [focusedIndex, sortedItems, handleRowClick, handleSelectItem]);
+
+  // Keep focusedIndex valid as items change (filter, sort, delete, etc.)
+  useEffect(() => {
+    if (focusedIndex === null) return;
+    if (focusedIndex >= sortedItems.length) {
+      setFocusedIndex(sortedItems.length > 0 ? sortedItems.length - 1 : null);
+    }
+  }, [sortedItems.length, focusedIndex]);
 
   const handleItemUpdated = useCallback(() => {
     refetch();
@@ -298,7 +340,12 @@ export function ListPage() {
       )}
 
       {/* Table */}
-      <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1.5px solid #002339' }}>
+      <div
+        className="bg-surface-card rounded-lg overflow-hidden focus:outline-none"
+        style={{ border: '1.5px solid #002339' }}
+        tabIndex={0}
+        onKeyDown={handleTableKeyDown}
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead
@@ -329,11 +376,13 @@ export function ListPage() {
                 <SortHeader label="Due Date" field="due_date" sort={sort} onSort={handleSort} />
                 <SortHeader label="Priority" field="priority" sort={sort} onSort={handleSort} />
                 <SortHeader label="Channel" field="channel" sort={sort} onSort={handleSort} />
+                <th className="px-2 py-3 w-10" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sortedItems.map((item) => {
+              {sortedItems.map((item, idx) => {
                 const isSelected = selectedItems.has(item.id);
+                const isFocused = focusedIndex === idx;
                 const contentType = getContentType(item.content_type_id, contentTypes);
                 const status = getBoardColumn(item.status, boardColumns);
                 const isDone = isDoneStatus(status?.name);
@@ -365,10 +414,15 @@ export function ListPage() {
                 return (
                   <tr
                     key={item.id}
-                    onClick={() => handleRowClick(item)}
-                    className={`cursor-pointer transition-colors ${
+                    onClick={() => handleRowClick(item, idx)}
+                    className={`group cursor-pointer transition-colors ${
                       isSelected ? 'bg-[#005D9710]' : 'hover:bg-[#005D9718]'
                     }`}
+                    style={
+                      isFocused
+                        ? { outline: '2px solid #005D97', outlineOffset: '-2px' }
+                        : undefined
+                    }
                   >
                     <td
                       className="px-4 py-3"
@@ -501,6 +555,13 @@ export function ListPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm text-slate-600">{item.channel || '-'}</span>
+                    </td>
+                    <td className="px-2 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      <RowActionsMenu
+                        item={item}
+                        onOpen={() => handleRowClick(item, idx)}
+                        onUpdate={handleItemUpdated}
+                      />
                     </td>
                   </tr>
                 );

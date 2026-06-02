@@ -16,7 +16,7 @@ import type {
   ActivityLog,
 } from '../lib/database.types';
 import { parseLocalDate, pillTextColor, getWorkspaceChannels } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import {
   format,
   startOfMonth,
@@ -70,6 +70,7 @@ import { DragGhost, BoardSourcePlaceholder } from '../components/dnd/DndPrimitiv
 import { ContentLibrary } from '../components/projects/ContentLibrary';
 import DatePicker from '../components/ui/DatePicker';
 import { BulkActionToolbar, selectedRowClass } from '../components/list/BulkActionToolbar';
+import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -274,6 +275,21 @@ export function ProjectDetailPage() {
     return map[status] ?? 'bg-[#005D9712] text-slate-500';
   };
 
+  // Timeline-health dot color for the status pill (canonical Draft 5.3).
+  // Only meaningful for active projects with an end date.
+  const timelineHealthColor = useMemo(() => {
+    if (project?.status !== 'active' || !project?.end_date) return null;
+    const totalItems = items.length;
+    const completion = totalItems > 0 ? completedCount / totalItems : 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endDate = parseLocalDate(project.end_date);
+    const daysToEnd = Math.ceil((endDate.getTime() - today.getTime()) / 86400000);
+    if (daysToEnd < 0) return '#BA2C2C'; // overdue
+    if (daysToEnd <= 7 && completion < 0.8) return '#A05042'; // approaching due, under-done
+    return '#357254'; // on track
+  }, [project?.status, project?.end_date, items.length, completedCount]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
@@ -316,12 +332,22 @@ export function ProjectDetailPage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-surface-page">
-      {/* Header */}
-      <div className="bg-surface-card px-6 py-4 shrink-0" style={{ borderBottom: '1px solid #00233930' }}>
+      {/* Header — light-wash gradient (canonical Draft 5.3) */}
+      <div
+        className="px-6 py-4 shrink-0"
+        style={{
+          background: 'linear-gradient(to right, #005D9720 0%, #FBE7F118 100%)',
+          borderBottom: '1px solid #00233918',
+        }}
+      >
         <button
           onClick={() => navigate('/projects')}
-          className="flex items-center gap-1.5 text-sm font-medium text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity mb-3"
-          style={{ backgroundColor: '#0B2763' }}
+          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-[#005D9710] transition-colors mb-3"
+          style={{
+            backgroundColor: '#ffffff',
+            color: '#002339',
+            border: '1px solid #00233920',
+          }}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           Back to Projects
@@ -354,8 +380,23 @@ export function ProjectDetailPage() {
           )}
           <div className="flex items-center gap-2 shrink-0 mt-1">
             <span
-              className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusBadge(project.status)}`}
+              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusBadge(project.status)}`}
+              title={
+                timelineHealthColor === '#BA2C2C'
+                  ? 'Overdue'
+                  : timelineHealthColor === '#A05042'
+                    ? 'Approaching due — under 80% complete'
+                    : timelineHealthColor === '#357254'
+                      ? 'On track'
+                      : undefined
+              }
             >
+              {timelineHealthColor && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: timelineHealthColor }}
+                />
+              )}
               {project.status}
             </span>
             <button
@@ -933,6 +974,7 @@ function ListTab({
   const filteredItems = useMemo(() => applyFilters(items, filters), [items, filters]);
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 
   const handleSelectAll = useCallback(() => {
     if (selectedItems.size === filteredItems.length) {
@@ -950,6 +992,42 @@ function ListTab({
       return next;
     });
   }, []);
+
+  // Keyboard nav: ArrowUp/Down · Enter to open · Space to toggle select.
+  const handleTableKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.tagName === 'SELECT' ||
+      target.isContentEditable
+    ) {
+      return;
+    }
+    if (filteredItems.length === 0) return;
+    const current = focusedIndex ?? -1;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocusedIndex(Math.min(current + 1, filteredItems.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusedIndex(Math.max(current - 1, 0));
+    } else if (e.key === 'Enter' && current >= 0 && current < filteredItems.length) {
+      e.preventDefault();
+      onItemClick(filteredItems[current].id);
+    } else if (e.key === ' ' && current >= 0 && current < filteredItems.length) {
+      e.preventDefault();
+      handleSelectItem(filteredItems[current].id);
+    }
+  }, [focusedIndex, filteredItems, onItemClick, handleSelectItem]);
+
+  useEffect(() => {
+    if (focusedIndex === null) return;
+    if (focusedIndex >= filteredItems.length) {
+      setFocusedIndex(filteredItems.length > 0 ? filteredItems.length - 1 : null);
+    }
+  }, [filteredItems.length, focusedIndex]);
 
   const isAllSelected = filteredItems.length > 0 && selectedItems.size === filteredItems.length;
   const isIndeterminate = selectedItems.size > 0 && selectedItems.size < filteredItems.length;
@@ -973,7 +1051,12 @@ function ListTab({
           No content items match the current filters.
         </div>
       ) : (
-        <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
+        <div
+          className="bg-surface-card rounded-xl overflow-hidden focus:outline-none"
+          style={{ border: '1px solid #00233930' }}
+          tabIndex={0}
+          onKeyDown={handleTableKeyDown}
+        >
           <table className="w-full">
             <thead
               className="sticky top-0 z-10"
@@ -1014,10 +1097,12 @@ function ListTab({
                 <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Priority
                 </th>
+                <th className="px-2 py-3 w-10" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredItems.map((item) => {
+              {filteredItems.map((item, idx) => {
+                const isFocused = focusedIndex === idx;
                 const ct = contentTypes.find(
                   (c) => c.id === item.content_type_id
                 );
@@ -1042,10 +1127,18 @@ function ListTab({
                 return (
                   <tr
                     key={item.id}
-                    onClick={() => onItemClick(item.id)}
-                    className={`cursor-pointer transition-colors ${
+                    onClick={() => {
+                      onItemClick(item.id);
+                      setFocusedIndex(idx);
+                    }}
+                    className={`group cursor-pointer transition-colors ${
                       isSelected ? selectedRowClass : 'hover:bg-[#005D9718]'
                     }`}
+                    style={
+                      isFocused
+                        ? { outline: '2px solid #005D97', outlineOffset: '-2px' }
+                        : undefined
+                    }
                   >
                     <td
                       className="px-4 py-3"
@@ -1132,6 +1225,13 @@ function ListTab({
                         </span>
                       </div>
                     </td>
+                    <td className="px-2 py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                      <RowActionsMenu
+                        item={item}
+                        onOpen={() => onItemClick(item.id)}
+                        onUpdate={onRefresh}
+                      />
+                    </td>
                   </tr>
                 );
               })}
@@ -1188,14 +1288,20 @@ function ProjectBoardCard({
   if (isDragging && !isOverlay) {
     return (
       <div ref={setNodeRef} style={style}>
-        <BoardSourcePlaceholder height={80} />
+        <BoardSourcePlaceholder height={64} />
       </div>
     );
   }
 
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
-  const cardBg = isOrdinal ? `${ORDINAL_COLOR}18` : isLinear ? `${LINEAR_COLOR}18` : undefined;
+  const customFields = item.custom_fields as Record<string, unknown> | null;
+  const isSlackSource = customFields?._source === 'slack';
+  // 3px source-color left border (canonical Draft 5.2) — replaces v1 bg tint.
+  const sourceLeftBarColor = isOrdinal ? ORDINAL_COLOR
+    : isLinear ? LINEAR_COLOR
+    : isSlackSource ? SLACK_COLOR
+    : INTERNAL_COLOR;
 
   return (
     <div
@@ -1203,32 +1309,33 @@ function ProjectBoardCard({
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`rounded-xl border p-3 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
+      className={`bg-surface-card rounded-lg border shadow-xs cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
         isOverlay ? 'cursor-grabbing' : ''
-      } ${!cardBg ? 'bg-surface-card' : ''}`}
+      }`}
       style={{
         ...style,
+        padding: '10px 12px',
         borderColor: '#00233930',
-        ...(cardBg ? { backgroundColor: cardBg } : {}),
+        borderLeft: `3px solid ${sourceLeftBarColor}`,
       }}
     >
-      <p className="text-sm font-medium text-slate-800 mb-2">
+      <p className="text-xs font-medium text-slate-900 mb-2 line-clamp-2">
         {item.title}
       </p>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {ct && (
             <span
-              className="w-2 h-2 rounded-full"
+              className="w-1.5 h-1.5 rounded-full"
               style={{ backgroundColor: ct.color ?? undefined }}
             />
           )}
           {assignee && (
-            <Avatar src={assignee.avatar_url} name={assignee.full_name} size="sm" />
+            <Avatar src={assignee.avatar_url} name={assignee.full_name} size="xs-inline" />
           )}
         </div>
         {item.due_date && (
-          <span className="text-xs text-slate-400">
+          <span className="text-[10px] text-slate-400">
             {formatDate(item.due_date)}
           </span>
         )}
@@ -1263,17 +1370,17 @@ function ProjectBoardColumn({
       ref={setNodeRef}
       className={`w-72 flex-shrink-0 rounded-xl transition-all`}
       style={{
-        backgroundColor: isOver ? '#005D9710' : `${colColor}05`,
+        backgroundColor: isOver ? '#005D9710' : `${colColor}06`,
         border: isOver ? '2px dashed #005D97' : '1px solid #00233930',
       }}
     >
-      {/* Column header */}
+      {/* Column header — 4px color band + 12-alpha tinted header zone */}
       <div
         className="flex items-center gap-2 px-3 py-3 border-b rounded-t-xl"
         style={{
-          borderTop: `3px solid ${colColor}`,
+          borderTop: `4px solid ${colColor}`,
           borderBottomColor: `${colColor}30`,
-          backgroundColor: `${colColor}15`,
+          backgroundColor: `${colColor}12`,
         }}
       >
         <span className="text-sm font-heading text-slate-900">
@@ -1299,7 +1406,7 @@ function ProjectBoardColumn({
           />
         ))}
         {items.length === 0 && !isOver && (
-          <p className="text-xs text-slate-400 text-center py-4">
+          <p className="text-xs text-slate-400 text-center py-4 italic">
             Drop items here
           </p>
         )}
@@ -1411,7 +1518,7 @@ function BoardTab({
   };
 
   return (
-    <div className="p-6 overflow-x-scroll">
+    <div className="cc-board-scrollbar p-6 overflow-x-scroll">
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}

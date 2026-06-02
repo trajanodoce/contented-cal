@@ -152,6 +152,34 @@ body {
 /* ── Drag-and-Drop snap animation (canonical) ── */
 .cc-dnd-snap { transition: transform 200ms ease-out; }
 
+/* ── Softened board scrollbar (canonical Draft 5.2) ── */
+/* Used on board view's horizontal + per-column vertical scrolls. Lighter
+   than the global navy pill so dense board layouts don't read as busy. */
+.cc-board-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.cc-board-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cc-board-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 93, 151, 0.45);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.cc-board-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 93, 151, 0.60);
+  background-clip: padding-box;
+}
+.cc-board-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.cc-board-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 93, 151, 0.45) transparent;
+}
+
 /* ── Banner Tokens (canonical) ── */
 /* Three canonical banner tokens. Replace the v1 navy→cream gradients.
    Both tiers use dark text (#002339) and a navy-teal-pink meld. */

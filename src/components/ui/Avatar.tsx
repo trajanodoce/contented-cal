@@ -5,7 +5,7 @@ import { User, Camera } from 'lucide-react';
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type Size = 'xs' | 'xs-inline' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface AvatarProps {
   src?: string | null;
@@ -32,8 +32,10 @@ interface AvatarStackProps {
 /*  Size maps                                                          */
 /* ------------------------------------------------------------------ */
 
-const PX: Record<Size, number> = { xs: 16, sm: 20, md: 24, lg: 32, xl: 40 };
-const FONT: Record<Size, number> = { xs: 7, sm: 9, md: 10, lg: 13, xl: 16 };
+// 'xs-inline' is the 18px size used in board cards + activity log actor blocks.
+// Falls between xs (16) and sm (20). Promoted to canonical after 3+ surface uses.
+const PX: Record<Size, number> = { xs: 16, 'xs-inline': 18, sm: 20, md: 24, lg: 32, xl: 40 };
+const FONT: Record<Size, number> = { xs: 7, 'xs-inline': 8, sm: 9, md: 10, lg: 13, xl: 16 };
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -44,8 +46,8 @@ function getInitials(name: string, size: Size): string {
   const first = parts[0]?.[0] ?? '';
   const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
 
-  // XS / SM → one letter max
-  if (size === 'xs' || size === 'sm') return first.toUpperCase();
+  // XS / XS-inline / SM → one letter max
+  if (size === 'xs' || size === 'xs-inline' || size === 'sm') return first.toUpperCase();
   return (first + last).toUpperCase();
 }
 
@@ -236,15 +238,21 @@ export function AvatarStack({ users, size = 'md', max = 3 }: AvatarStackProps) {
   const overflow = users.length - max;
   const px = PX[size];
 
+  // Smaller sizes use a thinner border + tighter overlap, per canonical Draft 5.2.
+  const isSmall = size === 'xs' || size === 'xs-inline' || size === 'sm';
+  const borderWidth = isSmall ? 1.5 : 2;
+  const overlap = isSmall ? -6 : -8;
+  const borderStyle = `${borderWidth}px solid #fff`;
+
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center' }}>
       {visible.map((u, i) => (
         <span
           key={i}
           style={{
-            marginLeft: i === 0 ? 0 : -8,
+            marginLeft: i === 0 ? 0 : overlap,
             borderRadius: '50%',
-            border: '2px solid #fff',
+            border: borderStyle,
             display: 'inline-flex',
             zIndex: visible.length - i,
             position: 'relative',
@@ -257,11 +265,11 @@ export function AvatarStack({ users, size = 'md', max = 3 }: AvatarStackProps) {
       {overflow > 0 && (
         <span
           style={{
-            marginLeft: -8,
+            marginLeft: overlap,
             width: px,
             height: px,
             borderRadius: '50%',
-            border: '2px solid #fff',
+            border: borderStyle,
             background: '#cbd5e1',
             color: '#475569',
             fontSize: FONT[size],

@@ -19,7 +19,7 @@ import { AvatarStack } from '../components/ui/Avatar';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import {
   DndContext,
@@ -88,13 +88,19 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
   const isOverdue = item.due_date && isPast(parseLocalDate(item.due_date)) && !isToday(parseLocalDate(item.due_date)) && !isDone;
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
-  const isExternal = isOrdinal || isLinear;
-  const externalBg = isOrdinal ? `${ORDINAL_COLOR}18` : isLinear ? `${LINEAR_COLOR}18` : undefined;
+  const customFields = item.custom_fields as Record<string, unknown> | null;
+  const isSlackSource = customFields?._source === 'slack';
+  // 3px source-color left border (canonical Draft 5.2) — replaces v1 bg tint.
+  const sourceLeftBarColor = isOrdinal ? ORDINAL_COLOR
+    : isLinear ? LINEAR_COLOR
+    : hasGranolaNotes ? GRANOLA_COLOR
+    : isSlackSource ? SLACK_COLOR
+    : INTERNAL_COLOR;
 
   if (isDragging && !isOverlay) {
     return (
       <div ref={setNodeRef} style={style}>
-        <BoardSourcePlaceholder height={128} />
+        <BoardSourcePlaceholder height={96} />
       </div>
     );
   }
@@ -105,107 +111,115 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`rounded-xl p-4 shadow-sm border cursor-grab active:cursor-grabbing hover:shadow-md transition-all relative overflow-hidden ${
-        isExternal ? '' : 'bg-surface-card'
-      } ${isOverlay ? 'cursor-grabbing' : ''}`}
+      className={`bg-surface-card rounded-lg shadow-xs border cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
+        isOverlay ? 'cursor-grabbing' : ''
+      }`}
       style={{
         ...style,
-        ...(externalBg ? { backgroundColor: externalBg } : {}),
+        padding: '10px 12px',
         borderColor: '#00233930',
+        borderLeft: `3px solid ${sourceLeftBarColor}`,
       }}
     >
-      {/* Priority indicator */}
-      <div
-        className="absolute left-0 top-4 bottom-4 w-1 rounded-full"
-        style={{ backgroundColor: priorityColors[item.priority ?? 'low'] || 'transparent' }}
-      />
-
-      <div className="pl-3">
-        {/* Title */}
-        <div className="flex items-start gap-1.5 mb-2">
-          <h4 className="text-sm font-semibold text-slate-900 line-clamp-2" title={item.title}>
-            {item.title}
-          </h4>
-          {hasGranolaNotes && (
-            <Mic className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
-          )}
-        </div>
-
-        {/* Content type */}
-        {contentType && (
-          <div className="flex items-center gap-1.5 mb-3">
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: contentType.color ?? undefined }}
-            />
-            <span className="text-xs text-slate-500">{contentType.name}</span>
-          </div>
+      {/* Title */}
+      <div className="flex items-start gap-1.5 mb-2">
+        <h4
+          className="text-xs font-medium text-slate-900 line-clamp-2 flex-1"
+          title={item.title}
+        >
+          {item.title}
+        </h4>
+        {hasGranolaNotes && (
+          <Mic className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
         )}
+      </div>
 
-        {/* Subtask indicator */}
-        {subtaskCount && subtaskCount.total > 0 && (
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex items-center gap-1 text-xs text-slate-500">
-              <ListChecks className="w-3.5 h-3.5" />
-              <span>{subtaskCount.completed}/{subtaskCount.total}</span>
-            </div>
-            <div className="flex-1 h-1 bg-[#005D9712] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${(subtaskCount.completed / subtaskCount.total) * 100}%`,
-                  backgroundColor: subtaskCount.completed === subtaskCount.total ? '#92D1B2' : '#005D97',
-                }}
+      {/* Metadata row: content type + priority dot */}
+      {(contentType || (item.priority && item.priority !== 'medium')) && (
+        <div className="flex items-center gap-2 mb-2">
+          {contentType && (
+            <div className="flex items-center gap-1">
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: contentType.color ?? undefined }}
               />
+              <span className="text-[10px] text-slate-500">{contentType.name}</span>
             </div>
-          </div>
-        )}
-
-        {/* Footer: Assignees, Links, and Due Date */}
-        <div className="flex items-center justify-between">
-          {/* Assignees */}
-          <div className="flex items-center gap-2">
-            <AvatarStack
-              users={itemMembers.map(m => ({ src: m.avatar_url, name: m.full_name }))}
-              size="md"
-              max={3}
-            />
-
-            {/* Link platform icons */}
-            {linkInfo && linkInfo.count > 0 && (
-              <div className="flex items-center gap-0.5" title={`${linkInfo.count} linked asset${linkInfo.count !== 1 ? 's' : ''}`}>
-                {linkInfo.platforms.slice(0, 3).map((p) => {
-                  const meta = LINK_PLATFORM_META[p] ?? LINK_PLATFORM_META.other;
-                  return (
-                    <span
-                      key={p}
-                      className="w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center leading-none"
-                      style={{ backgroundColor: meta.bg, color: meta.color }}
-                    >
-                      {meta.icon}
-                    </span>
-                  );
-                })}
-                {linkInfo.platforms.length > 3 && (
-                  <span className="text-[9px] text-slate-400 font-medium">+{linkInfo.platforms.length - 3}</span>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Due date */}
-          {item.due_date && (
-            <div
-              className={`flex items-center gap-1 text-xs ${
-                isOverdue ? 'text-accent-crimson font-medium' : 'text-slate-500'
-              }`}
+          )}
+          {item.priority && item.priority !== 'medium' && (
+            <span
+              className="text-[10px] font-semibold uppercase tracking-wide"
+              style={{ color: priorityColors[item.priority] }}
             >
-              {isOverdue && <AlertCircle className="w-3 h-3" />}
-              <CalendarIcon className="w-3 h-3" />
-              {formatDate(item.due_date)}
+              {item.priority}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Subtask progress */}
+      {subtaskCount && subtaskCount.total > 0 && (
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-1 text-[10px] text-slate-500">
+            <ListChecks className="w-3 h-3" />
+            <span>{subtaskCount.completed}/{subtaskCount.total}</span>
+          </div>
+          <div className="flex-1 h-1 bg-[#005D9712] rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${(subtaskCount.completed / subtaskCount.total) * 100}%`,
+                backgroundColor: subtaskCount.completed === subtaskCount.total ? '#92D1B2' : '#005D97',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Footer: Assignees, Links, and Due Date */}
+      <div className="flex items-center justify-between">
+        {/* Assignees + link platform icons */}
+        <div className="flex items-center gap-1.5">
+          <AvatarStack
+            users={itemMembers.map(m => ({ src: m.avatar_url, name: m.full_name }))}
+            size="xs-inline"
+            max={3}
+          />
+
+          {linkInfo && linkInfo.count > 0 && (
+            <div className="flex items-center gap-0.5" title={`${linkInfo.count} linked asset${linkInfo.count !== 1 ? 's' : ''}`}>
+              {linkInfo.platforms.slice(0, 3).map((p) => {
+                const meta = LINK_PLATFORM_META[p] ?? LINK_PLATFORM_META.other;
+                return (
+                  <span
+                    key={p}
+                    className="w-3.5 h-3.5 rounded text-[8px] font-bold flex items-center justify-center leading-none"
+                    style={{ backgroundColor: meta.bg, color: meta.color }}
+                  >
+                    {meta.icon}
+                  </span>
+                );
+              })}
+              {linkInfo.platforms.length > 3 && (
+                <span className="text-[8px] text-slate-400 font-medium">+{linkInfo.platforms.length - 3}</span>
+              )}
             </div>
           )}
         </div>
+
+        {/* Due date */}
+        {item.due_date && (
+          <div
+            className={`flex items-center gap-1 text-[10px] ${
+              isOverdue ? 'font-medium' : 'text-slate-400'
+            }`}
+            style={isOverdue ? { color: '#BA2C2C' } : undefined}
+          >
+            {isOverdue && <AlertCircle className="w-3 h-3" />}
+            <CalendarIcon className="w-3 h-3" />
+            {formatDate(item.due_date)}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -237,17 +251,17 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
       ref={setNodeRef}
       className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl transition-all`}
       style={{
-        backgroundColor: isOver ? '#005D9710' : `${colColor}05`,
+        backgroundColor: isOver ? '#005D9710' : `${colColor}06`,
         border: isOver ? '2px dashed #005D97' : '1px solid #00233930',
       }}
     >
-      {/* Column Header */}
+      {/* Column Header — 4px color band + 12-alpha tinted header zone */}
       <div
         className="px-4 py-3 border-b rounded-t-xl"
         style={{
-          borderTop: `3px solid ${colColor}`,
+          borderTop: `4px solid ${colColor}`,
           borderBottomColor: `${colColor}30`,
-          backgroundColor: `${colColor}15`,
+          backgroundColor: `${colColor}12`,
         }}
       >
         <div className="flex items-center justify-between">
@@ -262,11 +276,11 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
       </div>
 
       {/* Column Content */}
-      <div className="flex-1 p-3 space-y-3 overflow-y-auto max-h-[calc(100vh-280px)] min-h-[100px]">
+      <div className="cc-board-scrollbar flex-1 p-3 space-y-3 overflow-y-auto max-h-[calc(100vh-280px)] min-h-[100px]">
         {items.length === 0 && !isOver ? (
-          <div className="text-center py-8 text-slate-400 text-sm">
-            <p>Drop items here</p>
-          </div>
+          <p className="text-center py-8 text-slate-400 text-xs italic">
+            Drop items here
+          </p>
         ) : (
           items.map((item) => (
             <BoardCard
@@ -493,7 +507,7 @@ export function BoardPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0" style={{ overflowX: 'scroll', overflowY: 'hidden' }}>
+      <div className="cc-board-scrollbar flex-1 min-h-0" style={{ overflowX: 'scroll', overflowY: 'hidden' }}>
         <DndContext
           sensors={sensors}
           onDragStart={handleDragStart}
