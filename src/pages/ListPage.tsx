@@ -349,7 +349,7 @@ export function ListPage() {
                     : hasGranola
                       ? `${GRANOLA_COLOR}18`
                       : undefined;
-                const isBlocked = statusName === 'blocked';
+                const isBlocked = status?.name?.toLowerCase() === 'blocked';
                 const isUrgentRow = isBlocked || (dueDate.isOverdue && !isDone);
 
                 return (
