@@ -201,6 +201,39 @@ async function buildThreadDescription(
   return { description: lines.join("\n\n"), snapshot: messages };
 }
 
+// ── Comment-on-existing-thread helper ───────────────────────────────────────
+// Used by both the dedup branch (line ~370) and the compensation path when
+// two simultaneous @mentions race to create a thread link.
+
+async function addAsCommentToExistingItem(
+  supabase: ReturnType<typeof createClient>,
+  botToken: string,
+  channel: string,
+  replyTs: string,
+  contentItemId: string,
+  slackUserId: string,
+  rawText: string
+): Promise<void> {
+  const slackUserName = await getSlackUserName(botToken, slackUserId);
+  const commentBody = `**${slackUserName ?? "Someone"} via Slack:**\n${rawText}`;
+
+  await supabase.from("comments").insert({
+    content_item_id: contentItemId,
+    user_id: null, // Slack-originated comment, no CC user mapping yet
+    body: commentBody,
+  });
+
+  const { data: existingItem } = await supabase
+    .from("content_items")
+    .select("title")
+    .eq("id", contentItemId)
+    .maybeSingle();
+
+  const itemUrl = `${APP_URL}/list?item=${contentItemId}`;
+  await postSlackMessage(botToken, channel, replyTs,
+    `💬 Added to ContentedCal — *${existingItem?.title ?? "item"}*\n<${itemUrl}|View in ContentedCal>`);
+}
+
 // ── My Tasks handler ────────────────────────────────────────────────────────
 
 async function handleMyTasks(
@@ -368,26 +401,10 @@ Deno.serve(async (req) => {
 
     if (existingLink) {
       // ── Subsequent @mention in same thread → add as comment ────────────
-      const slackUserName = await getSlackUserName(botToken, event.user);
-      const commentBody = `**${slackUserName ?? "Someone"} via Slack:**\n${rawText}`;
-
-      await supabase.from("comments").insert({
-        content_item_id: existingLink.content_item_id,
-        user_id: null, // Slack-originated comment, no CC user mapping yet
-        body: commentBody,
-      });
-
-      // Get item title for the reply
-      const { data: existingItem } = await supabase
-        .from("content_items")
-        .select("title")
-        .eq("id", existingLink.content_item_id)
-        .maybeSingle();
-
-      const itemUrl = `${APP_URL}/list?item=${existingLink.content_item_id}`;
-      await postSlackMessage(botToken, event.channel, replyTs,
-        `💬 Added to ContentedCal — *${existingItem?.title ?? "item"}*\n<${itemUrl}|View in ContentedCal>`);
-
+      await addAsCommentToExistingItem(
+        supabase, botToken, event.channel, replyTs,
+        existingLink.content_item_id, event.user, rawText
+      );
       return new Response("OK", { status: 200 });
     }
 
@@ -485,7 +502,13 @@ Deno.serve(async (req) => {
       }
 
       // ── Insert slack_thread_links row (origin) ─────────────────────────
-      await supabase.from("slack_thread_links").insert({
+      // Blocking insert with compensation: if two simultaneous @mentions
+      // both reached this point, the UNIQUE constraint on
+      // (content_item_id, slack_channel_id, slack_thread_ts) will reject
+      // the loser. The losing path deletes its just-created content_item
+      // and falls through to the comment-on-existing flow so the @mention
+      // still gets recorded against the winner.
+      const { error: linkError } = await supabase.from("slack_thread_links").insert({
         content_item_id: newItem.id,
         slack_channel_id: event.channel,
         slack_thread_ts: threadTs,
@@ -500,9 +523,42 @@ Deno.serve(async (req) => {
         thread_start_at: new Date(parseFloat(threadTs) * 1000).toISOString(),
         is_origin: true,
         raw_thread_snapshot: isThread ? threadSnapshot : null,
-      }).then(({ error }) => {
-        if (error) console.error("Failed to insert slack_thread_links:", error);
       });
+
+      if (linkError) {
+        // PostgreSQL UNIQUE violation = lost the race
+        if (linkError.code === "23505") {
+          console.log("Lost slack_thread_links race for", event.channel, threadTs, "— rolling back item and falling through to comment flow");
+
+          // Undo our orphan content_item
+          await supabase.from("content_items").delete().eq("id", newItem.id);
+
+          // Find the winning link and add this @mention as a comment instead
+          const { data: winningLink } = await supabase
+            .from("slack_thread_links")
+            .select("content_item_id")
+            .eq("slack_channel_id", event.channel)
+            .eq("slack_thread_ts", threadTs)
+            .maybeSingle();
+
+          if (winningLink) {
+            await addAsCommentToExistingItem(
+              supabase, botToken, event.channel, replyTs,
+              winningLink.content_item_id, event.user, rawText
+            );
+          } else {
+            // Extremely unlikely: conflict raised but no winning row found.
+            // Log and fall back to a generic reply rather than 500-ing.
+            console.error("Race lost but no winning link found for", event.channel, threadTs);
+          }
+          return new Response("OK", { status: 200 });
+        }
+
+        // Non-conflict error: item exists without a link. Log loudly so we
+        // can investigate. Don't fail the user — they'll still get an item,
+        // just without thread context.
+        console.error("Failed to insert slack_thread_links:", linkError);
+      }
 
       const itemUrl = `${APP_URL}/intake-queue?item=${newItem.id}`;
       const threadNote = isThread ? " (thread captured)" : "";
