@@ -1,0 +1,477 @@
+import { useState, useCallback, useRef } from 'react';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { supabase } from '../../lib/supabase';
+import { toast } from 'sonner';
+import { getWorkspaceSubtaskTemplates, type SubtaskTemplate } from '../../lib/utils';
+import {
+  Plus, Trash2, GripVertical, ClipboardCheck, Copy, Edit2, X,
+} from 'lucide-react';
+import { ConfirmModal } from '../ui/ConfirmModal';
+import { EmptyState } from '../ui/EmptyState';
+
+const MAX_ITEMS = 10;
+
+interface SubtaskTemplatesTabProps {
+  workspaceId: string | null;
+}
+
+export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
+  const { currentWorkspace, refreshWorkspaces } = useWorkspace();
+  const [templates, setTemplates] = useState<SubtaskTemplate[]>(() =>
+    getWorkspaceSubtaskTemplates(currentWorkspace?.settings)
+  );
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [modalName, setModalName] = useState('');
+  const [modalItems, setModalItems] = useState<string[]>(['']);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Delete confirm
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+
+  // Drag state — list level
+  const [listDragIndex, setListDragIndex] = useState<number | null>(null);
+  const [listDragOverIndex, setListDragOverIndex] = useState<number | null>(null);
+
+  // Drag state — modal items
+  const [itemDragIndex, setItemDragIndex] = useState<number | null>(null);
+  const [itemDragOverIndex, setItemDragOverIndex] = useState<number | null>(null);
+
+  const lastItemRef = useRef<HTMLInputElement>(null);
+
+  // ── Persist to workspace.settings ───────────────────────────────────
+  const saveTemplates = useCallback(
+    async (updated: SubtaskTemplate[]) => {
+      if (!workspaceId || !currentWorkspace) return false;
+      setIsSaving(true);
+      const currentSettings =
+        currentWorkspace.settings &&
+        typeof currentWorkspace.settings === 'object' &&
+        !Array.isArray(currentWorkspace.settings)
+          ? (currentWorkspace.settings as Record<string, unknown>)
+          : {};
+      const { error } = await supabase
+        .from('workspaces')
+        .update({
+          settings: { ...currentSettings, subtask_templates: updated },
+        })
+        .eq('id', workspaceId);
+      setIsSaving(false);
+      if (error) {
+        toast.error('Failed to save templates: ' + error.message);
+        return false;
+      }
+      await refreshWorkspaces();
+      return true;
+    },
+    [workspaceId, currentWorkspace, refreshWorkspaces]
+  );
+
+  // ── Modal helpers ───────────────────────────────────────────────────
+  const openCreate = () => {
+    setEditIndex(null);
+    setModalName('');
+    setModalItems(['']);
+    setModalOpen(true);
+  };
+
+  const openEdit = (index: number) => {
+    const t = templates[index];
+    setEditIndex(index);
+    setModalName(t.name);
+    setModalItems([...t.items]);
+    setModalOpen(true);
+  };
+
+  const openDuplicate = (index: number) => {
+    const t = templates[index];
+    setEditIndex(null);
+    setModalName(`${t.name} (copy)`);
+    setModalItems([...t.items]);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditIndex(null);
+  };
+
+  const handleModalSave = async () => {
+    const name = modalName.trim();
+    if (!name) return;
+
+    const items = modalItems.map(i => i.trim()).filter(Boolean);
+    if (items.length === 0) {
+      toast.error('Add at least one item');
+      return;
+    }
+
+    const template: SubtaskTemplate = { name, items };
+    let updated: SubtaskTemplate[];
+
+    if (editIndex !== null) {
+      updated = templates.map((t, i) => (i === editIndex ? template : t));
+    } else {
+      updated = [...templates, template];
+    }
+
+    setTemplates(updated);
+    closeModal();
+
+    const ok = await saveTemplates(updated);
+    if (ok) {
+      toast.success(editIndex !== null ? 'Template updated' : `Template "${name}" created`);
+    }
+  };
+
+  // ── Delete ──────────────────────────────────────────────────────────
+  const handleDelete = async () => {
+    if (deleteIndex === null) return;
+    const removed = templates[deleteIndex];
+    const updated = templates.filter((_, i) => i !== deleteIndex);
+    setTemplates(updated);
+    setDeleteIndex(null);
+    const ok = await saveTemplates(updated);
+    if (ok) toast.success(`Template "${removed.name}" deleted`);
+  };
+
+  // ── Modal item management ──────────────────────────────────────────
+  const addItem = () => {
+    if (modalItems.length >= MAX_ITEMS) return;
+    setModalItems([...modalItems, '']);
+    requestAnimationFrame(() => lastItemRef.current?.focus());
+  };
+
+  const removeItem = (index: number) => {
+    setModalItems(modalItems.filter((_, i) => i !== index));
+  };
+
+  const updateItem = (index: number, value: string) => {
+    setModalItems(modalItems.map((item, i) => (i === index ? value : item)));
+  };
+
+  const handleItemKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (index === modalItems.length - 1 && modalItems.length < MAX_ITEMS) {
+        addItem();
+      }
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent, index: number) => {
+    const text = e.clipboardData.getData('text');
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length <= 1) return;
+
+    e.preventDefault();
+    const remaining = MAX_ITEMS - modalItems.length;
+    const accepted = lines.slice(0, remaining + 1); // +1 because current slot counts
+    const dropped = lines.length - accepted.length;
+
+    const updated = [...modalItems];
+    updated[index] = accepted[0];
+    accepted.slice(1).forEach(line => {
+      if (updated.length < MAX_ITEMS) updated.push(line);
+    });
+
+    setModalItems(updated);
+    if (dropped > 0) {
+      toast.warning(`Pasted ${accepted.length} items — ${dropped} dropped (max ${MAX_ITEMS})`);
+    }
+  };
+
+  // ── List drag-and-drop ─────────────────────────────────────────────
+  const handleListDrop = async (dropIndex: number) => {
+    if (listDragIndex === null || listDragIndex === dropIndex) {
+      setListDragIndex(null);
+      setListDragOverIndex(null);
+      return;
+    }
+    const updated = [...templates];
+    const [moved] = updated.splice(listDragIndex, 1);
+    updated.splice(dropIndex, 0, moved);
+    setTemplates(updated);
+    setListDragIndex(null);
+    setListDragOverIndex(null);
+    await saveTemplates(updated);
+  };
+
+  // ── Modal item drag-and-drop ───────────────────────────────────────
+  const handleItemDrop = (dropIndex: number) => {
+    if (itemDragIndex === null || itemDragIndex === dropIndex) {
+      setItemDragIndex(null);
+      setItemDragOverIndex(null);
+      return;
+    }
+    const updated = [...modalItems];
+    const [moved] = updated.splice(itemDragIndex, 1);
+    updated.splice(dropIndex, 0, moved);
+    setModalItems(updated);
+    setItemDragIndex(null);
+    setItemDragOverIndex(null);
+  };
+
+  const filledCount = modalItems.filter(i => i.trim()).length;
+  const atMax = modalItems.length >= MAX_ITEMS;
+
+  // ── Render ──────────────────────────────────────────────────────────
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-medium text-slate-900">Subtask Templates</h3>
+          <p className="text-sm text-slate-500 mt-1">
+            Reusable checklists that can be added to any content item
+          </p>
+        </div>
+        {templates.length > 0 && (
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90"
+            style={{ backgroundColor: '#005D97' }}
+          >
+            <Plus className="w-4 h-4" />
+            Create Template
+          </button>
+        )}
+      </div>
+
+      {/* Template list or empty state */}
+      {templates.length === 0 ? (
+        <EmptyState
+          level={1}
+          state="neutral"
+          icon={<ClipboardCheck className="w-5 h-5" />}
+          title="No subtask templates yet"
+          description="Create reusable checklists that your team can add to any content item with one click."
+          action={{ label: '+ Create your first template', onClick: openCreate }}
+        />
+      ) : (
+        <div className="space-y-2">
+          {templates.map((template, index) => (
+            <div
+              key={`${template.name}-${index}`}
+              draggable
+              onDragStart={() => setListDragIndex(index)}
+              onDragOver={e => { e.preventDefault(); setListDragOverIndex(index); }}
+              onDrop={() => handleListDrop(index)}
+              onDragEnd={() => { setListDragIndex(null); setListDragOverIndex(null); }}
+              className={`group flex items-start gap-3 p-4 rounded-xl transition-colors ${
+                listDragOverIndex === index
+                  ? 'bg-[#005D9710]'
+                  : 'bg-surface-nested hover:bg-[#005D9708]'
+              } ${listDragIndex === index ? 'opacity-50' : ''}`}
+              style={{
+                border: listDragOverIndex === index
+                  ? '2px dashed #005D97'
+                  : '1px solid #00233918',
+              }}
+            >
+              {/* Drag handle */}
+              <GripVertical className="w-4 h-4 text-slate-300 cursor-grab flex-shrink-0 mt-0.5" />
+
+              {/* Card body */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className="text-[15px] font-bold text-slate-900 truncate"
+                    style={{ fontFamily: 'Faune-Text_Bold, sans-serif' }}
+                  >
+                    {template.name}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mb-1.5">
+                  {template.items.length} {template.items.length === 1 ? 'item' : 'items'}
+                </p>
+                <p className="text-xs text-slate-400 truncate">
+                  {template.items.slice(0, 3).join(' · ')}
+                  {template.items.length > 3 && ` · +${template.items.length - 3} more`}
+                </p>
+              </div>
+
+              {/* Actions — always visible per spec */}
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => openEdit(index)}
+                  className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-[#005D9710] rounded transition-colors"
+                  title="Edit"
+                >
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => openDuplicate(index)}
+                  className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-[#005D9710] rounded transition-colors"
+                  title="Duplicate"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setDeleteIndex(index)}
+                  className="p-1.5 text-slate-400 hover:text-[#BA2C2C] hover:bg-[#BA2C2C08] rounded transition-colors"
+                  title="Delete"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Create / Edit modal ─────────────────────────────────────────── */}
+      {modalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: '#00233960' }}
+          onClick={closeModal}
+        >
+          <div
+            className="bg-surface-card shadow-xl w-full max-w-[520px] mx-4"
+            style={{ border: '1.5px solid #002339', borderRadius: 14 }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 pt-5 pb-3">
+              <h4 className="text-lg font-heading text-slate-900">
+                {editIndex !== null ? 'Edit Template' : 'Create Template'}
+              </h4>
+              <button onClick={closeModal} className="p-1 hover:bg-slate-100 rounded-lg">
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="px-6 pb-4 space-y-4">
+              {/* Name input */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Template name
+                </label>
+                <input
+                  type="text"
+                  value={modalName}
+                  onChange={e => setModalName(e.target.value)}
+                  placeholder="e.g. Blog Post Checklist"
+                  autoFocus
+                  className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  style={{ border: '1px solid #00233930' }}
+                />
+              </div>
+
+              {/* Items list */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Checklist items
+                </label>
+                <div className="space-y-1.5">
+                  {modalItems.map((item, index) => (
+                    <div
+                      key={index}
+                      draggable
+                      onDragStart={() => setItemDragIndex(index)}
+                      onDragOver={e => { e.preventDefault(); setItemDragOverIndex(index); }}
+                      onDrop={() => handleItemDrop(index)}
+                      onDragEnd={() => { setItemDragIndex(null); setItemDragOverIndex(null); }}
+                      className={`flex items-center gap-2 ${
+                        itemDragOverIndex === index ? 'bg-[#005D9710] rounded' : ''
+                      } ${itemDragIndex === index ? 'opacity-50' : ''}`}
+                    >
+                      <GripVertical className="w-3.5 h-3.5 text-slate-300 cursor-grab shrink-0" />
+                      <input
+                        ref={index === modalItems.length - 1 ? lastItemRef : undefined}
+                        type="text"
+                        value={item}
+                        onChange={e => updateItem(index, e.target.value)}
+                        onKeyDown={e => handleItemKeyDown(e, index)}
+                        onPaste={e => handlePaste(e, index)}
+                        placeholder={`Item ${index + 1}`}
+                        className="flex-1 px-2.5 py-1.5 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        style={{ border: '1px solid #00233930' }}
+                      />
+                      <button
+                        onClick={() => removeItem(index)}
+                        disabled={modalItems.length <= 1}
+                        className="w-[26px] h-[26px] flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-[#005D9708] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add item button */}
+                <button
+                  onClick={addItem}
+                  disabled={atMax}
+                  className="w-full mt-2 py-2 text-sm font-medium rounded-lg transition-colors"
+                  style={{
+                    border: atMax ? '1.5px dashed #cbd5e1' : '1.5px dashed #005D9730',
+                    color: atMax ? '#94a3b8' : '#005D97',
+                    cursor: atMax ? 'not-allowed' : 'pointer',
+                    backgroundColor: 'transparent',
+                  }}
+                  title={atMax ? `Templates max out at ${MAX_ITEMS} items. If a task needs more, split it into separate templates.` : undefined}
+                >
+                  + Add item
+                </button>
+              </div>
+            </div>
+
+            {/* Modal footer */}
+            <div
+              className="flex items-center justify-between px-6 py-3.5"
+              style={{
+                backgroundColor: '#F7F9FC',
+                borderTop: '1px solid #00233918',
+              }}
+            >
+              <span
+                className="text-xs font-medium"
+                style={{ color: atMax ? '#BA2C2C' : '#64748b' }}
+              >
+                {atMax ? `${modalItems.length} / ${MAX_ITEMS} — max` : `${modalItems.length} / ${MAX_ITEMS} items`}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+                  style={{ border: '1px solid #00233930' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleModalSave}
+                  disabled={!modalName.trim() || filledCount === 0 || isSaving}
+                  className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
+                  style={{ backgroundColor: '#005D97' }}
+                >
+                  {isSaving ? 'Saving...' : editIndex !== null ? 'Save Changes' : 'Create Template'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete confirmation ─────────────────────────────────────────── */}
+      <ConfirmModal
+        open={deleteIndex !== null}
+        onClose={() => setDeleteIndex(null)}
+        onConfirm={handleDelete}
+        variant="destructive"
+        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        title="Delete Template?"
+        description={
+          deleteIndex !== null
+            ? `Remove "${templates[deleteIndex]?.name}"? Items already added to existing tasks stay where they are.`
+            : ''
+        }
+        confirmLabel="Delete template"
+      />
+    </div>
+  );
+}
