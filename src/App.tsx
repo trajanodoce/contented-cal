@@ -228,6 +228,7 @@ function AppRoutes() {
         <Route path="/intake-queue" element={<LazyPage><IntakeQueuePage /></LazyPage>} />
         <Route path="/design-request" element={<LazyPage><DesignRequestPage /></LazyPage>} />
         <Route path="/settings" element={<LazyPage><SettingsPage /></LazyPage>} />
+        <Route path="/settings/*" element={<LazyPage><SettingsPage /></LazyPage>} />
         <Route path="/" element={<LastViewRedirect />} />
       </Route>
     </Routes>
