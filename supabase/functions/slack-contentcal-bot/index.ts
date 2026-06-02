@@ -214,14 +214,40 @@ async function addAsCommentToExistingItem(
   slackUserId: string,
   rawText: string
 ): Promise<void> {
-  const slackUserName = await getSlackUserName(botToken, slackUserId);
+  // Resolve Slack user → ContentedCal profile via email. comments.user_id is
+  // NOT NULL, so a comment requires a real CC user. Same email-lookup pattern
+  // used by handleMyTasks.
+  const { name: slackUserName, email: slackEmail } = await getSlackUserInfo(botToken, slackUserId);
+
+  let userId: string | null = null;
+  if (slackEmail) {
+    const { data: profile } = await supabase
+      .from("profiles").select("id").eq("email", slackEmail).maybeSingle();
+    userId = profile?.id ?? null;
+  }
+
+  if (!userId) {
+    // No matching CC user — can't attach a comment with the current schema.
+    // Tell the user honestly instead of failing silently.
+    await postSlackMessage(botToken, channel, replyTs,
+      `Heads up: ${slackUserName ?? "this Slack user"} isn't a ContentedCal member yet, so I couldn't add the comment. Add them to the workspace and try again.`);
+    return;
+  }
+
   const commentBody = `**${slackUserName ?? "Someone"} via Slack:**\n${rawText}`;
 
-  await supabase.from("comments").insert({
+  const { error: commentError } = await supabase.from("comments").insert({
     content_item_id: contentItemId,
-    user_id: null, // Slack-originated comment, no CC user mapping yet
+    user_id: userId,
     body: commentBody,
   });
+
+  if (commentError) {
+    console.error("Failed to insert Slack-originated comment:", commentError);
+    await postSlackMessage(botToken, channel, replyTs,
+      "Sorry, I couldn't add that comment. Try again or open the item directly.");
+    return;
+  }
 
   const { data: existingItem } = await supabase
     .from("content_items")
