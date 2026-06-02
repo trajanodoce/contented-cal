@@ -28,9 +28,8 @@ import {
   subMonths,
   isSameMonth,
   isToday,
-  parseISO,
-  formatDistanceToNow,
 } from 'date-fns';
+import { ActivityLog as ActivityLogList, ActivityLogRow, mapActionToType } from '../components/activity/ActivityLogRow';
 import {
   ArrowLeft,
   Loader2,
@@ -69,6 +68,8 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { ContentLibrary } from '../components/projects/ContentLibrary';
 import DatePicker from '../components/ui/DatePicker';
+import { BulkActionToolbar, selectedRowClass } from '../components/list/BulkActionToolbar';
+import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
 
@@ -516,6 +517,7 @@ export function ProjectDetailPage() {
             setFilters={setFilters}
             workspaceId={currentWorkspace?.id ?? null}
             onItemClick={setSelectedItemId}
+            onRefresh={fetchItems}
           />
         )}
         {activeTab === 'board' && (
@@ -565,27 +567,22 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
       {open && (
         <div className="px-5 pb-5">
           {activityLogs.length > 0 ? (
-            <div className="space-y-3">
+            <ActivityLogList>
               {activityLogs.map((log) => {
                 const member = members.find((m) => m.id === log.user_id);
+                const actorName = member?.full_name || member?.email || 'Unknown';
                 return (
-                  <div key={log.id} className="flex items-start gap-3">
-                    <Avatar src={member?.avatar_url} name={member?.full_name} size="md" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-slate-700">
-                        <span className="font-medium">
-                          {member?.full_name || member?.email || 'Unknown'}
-                        </span>{' '}
-                        {log.action}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        {formatDistanceToNow(parseISO(log.created_at), { addSuffix: true })}
-                      </p>
-                    </div>
-                  </div>
+                  <ActivityLogRow
+                    key={log.id}
+                    type={mapActionToType(log.action)}
+                    actor={{ name: actorName, avatarUrl: member?.avatar_url }}
+                    timestamp={log.created_at}
+                    action={log.action}
+                    metadata={log.metadata}
+                  />
                 );
               })}
-            </div>
+            </ActivityLogList>
           ) : (
             <div className="flex flex-col items-center py-6">
               <Clock className="w-8 h-8 text-slate-200 mb-2" />
@@ -913,6 +910,7 @@ function ListTab({
   setFilters,
   workspaceId,
   onItemClick,
+  onRefresh,
 }: {
   items: ContentItem[];
   boardColumns: BoardColumn[];
@@ -922,6 +920,7 @@ function ListTab({
   setFilters: (f: import('../components/FilterBar').FilterState) => void;
   workspaceId: string | null;
   onItemClick: (id: string) => void;
+  onRefresh: () => void;
 }) {
   const { currentWorkspace } = useWorkspace();
   const channels = useMemo(() => {
@@ -931,6 +930,28 @@ function ListTab({
   }, [currentWorkspace?.settings, items]);
 
   const filteredItems = useMemo(() => applyFilters(items, filters), [items, filters]);
+
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedItems.size === filteredItems.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(filteredItems.map((i) => i.id)));
+    }
+  }, [filteredItems, selectedItems.size]);
+
+  const handleSelectItem = useCallback((id: string) => {
+    setSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const isAllSelected = filteredItems.length > 0 && selectedItems.size === filteredItems.length;
+  const isIndeterminate = selectedItems.size > 0 && selectedItems.size < filteredItems.length;
 
   return (
     <div className="p-6">
@@ -955,6 +976,22 @@ function ListTab({
           <table className="w-full">
             <thead className="bg-[#005D9712] border-b border-slate-200">
               <tr>
+                <th className="px-4 py-3 w-12">
+                  <button
+                    onClick={handleSelectAll}
+                    className="p-1 hover:bg-[#005D9710] rounded transition-colors"
+                  >
+                    {isAllSelected ? (
+                      <CheckSquare className="w-5 h-5 text-brand-600" />
+                    ) : isIndeterminate ? (
+                      <div className="w-5 h-5 bg-brand-600 rounded flex items-center justify-center">
+                        <div className="w-3 h-0.5 bg-white" />
+                      </div>
+                    ) : (
+                      <Square className="w-5 h-5 text-slate-400" />
+                    )}
+                  </button>
+                </th>
                 <th className="text-left text-xs font-bold text-slate-700 uppercase tracking-wider px-4 py-3">
                   Title
                 </th>
@@ -992,16 +1029,29 @@ function ListTab({
                 const isBlocked = colName === 'blocked';
                 const isOverdue = item.due_date && !isDone && new Date(item.due_date + 'T00:00:00') < new Date(new Date().toDateString());
                 const isUrgentRow = isBlocked || isOverdue;
+                const isSelected = selectedItems.has(item.id);
                 return (
                   <tr
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
-                    className="hover:bg-[#005D9718] cursor-pointer transition-colors"
+                    className={`hover:bg-[#005D9718] cursor-pointer transition-colors ${isSelected ? selectedRowClass : ''}`}
                     style={{
-                      ...(rowBg ? { backgroundColor: rowBg } : {}),
+                      ...(rowBg && !isSelected ? { backgroundColor: rowBg } : {}),
                       ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
                     }}
                   >
+                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleSelectItem(item.id)}
+                        className="p-1 hover:bg-[#005D9710] rounded transition-colors"
+                      >
+                        {isSelected ? (
+                          <CheckSquare className="w-5 h-5 text-brand-600" />
+                        ) : (
+                          <Square className="w-5 h-5 text-slate-400" />
+                        )}
+                      </button>
+                    </td>
                     <td className="px-4 py-3 text-sm font-medium text-slate-800 max-w-[300px] truncate">
                       {item.title}
                     </td>
@@ -1062,6 +1112,17 @@ function ListTab({
             </tbody>
           </table>
         </div>
+      )}
+
+      {selectedItems.size > 0 && (
+        <BulkActionToolbar
+          selectedCount={selectedItems.size}
+          selectedIds={Array.from(selectedItems)}
+          members={members}
+          boardColumns={boardColumns}
+          onClear={() => setSelectedItems(new Set())}
+          onUpdate={onRefresh}
+        />
       )}
     </div>
   );

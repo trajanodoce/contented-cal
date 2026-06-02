@@ -112,6 +112,19 @@ body {
   color: #1e293b;
 }
 
+/* ── Avatar Upload Ring Sweep ── */
+@keyframes cc-avatar-ring {
+  0%   { stroke-dashoffset: 240; }
+  100% { stroke-dashoffset: 0; }
+}
+.cc-avatar-ring { animation: cc-avatar-ring 1.2s linear infinite; }
+
+/* ── Bulk Action Toolbar Entry ── */
+@keyframes cc-bulk-bar-enter {
+  0%   { opacity: 0; transform: translate(-50%, 12px); }
+  100% { opacity: 1; transform: translate(-50%, 0); }
+}
+
 /* ── Loading Skeletons ── */
 @keyframes cc-skel-wave {
   0%   { background-position: 220% 0; }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User } from 'lucide-react';
+import { User, Camera } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -13,6 +13,12 @@ interface AvatarProps {
   name?: string | null;
   size?: Size;
   className?: string;
+  /** Shows hover overlay with camera icon (sm and up only) */
+  editable?: boolean;
+  /** Shows ring-sweep overlay + 60% opacity */
+  uploading?: boolean;
+  /** Fired when the editable overlay is clicked */
+  onEditClick?: () => void;
 }
 
 interface AvatarStackProps {
@@ -47,7 +53,15 @@ function getInitials(name: string, size: Size): string {
 /*  Avatar                                                             */
 /* ------------------------------------------------------------------ */
 
-export function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) {
+export function Avatar({
+  src,
+  name,
+  size = 'md',
+  className = '',
+  editable = false,
+  uploading = false,
+  onEditClick,
+}: AvatarProps) {
   const [imgError, setImgError] = useState(false);
   const px = PX[size];
 
@@ -63,10 +77,16 @@ export function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) 
     lineHeight: 1,
   };
 
-  /* 1️ Image */
+  // xs is too small for the hover affordance — fall back to non-editable
+  const showEditable = editable && size !== 'xs';
+  const showLabel = size === 'lg' || size === 'xl';
+
+  /* Render the inner avatar visual (image / initials / silhouette) */
+  let inner: React.ReactNode;
+
   if (src && !imgError) {
-    return (
-      <span className={className} style={base}>
+    inner = (
+      <span style={base}>
         <img
           src={src}
           alt={name ?? ''}
@@ -77,13 +97,9 @@ export function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) 
         />
       </span>
     );
-  }
-
-  /* 2️ Initials */
-  if (name?.trim()) {
-    return (
+  } else if (name?.trim()) {
+    inner = (
       <span
-        className={className}
         role="img"
         aria-label={name}
         style={{
@@ -97,18 +113,116 @@ export function Avatar({ src, name, size = 'md', className = '' }: AvatarProps) 
         {getInitials(name, size)}
       </span>
     );
+  } else {
+    const iconPx = Math.round(px * 0.5);
+    inner = (
+      <span
+        role="img"
+        aria-label="User avatar"
+        style={{ ...base, background: '#e2e8f0' }}
+      >
+        <User size={iconPx} color="#94a3b8" strokeWidth={2} />
+      </span>
+    );
   }
 
-  /* 3️ User icon silhouette */
-  const iconPx = Math.round(px * 0.5);
+  // No overlay needed — return inner directly, preserving className on the outer span
+  if (!showEditable && !uploading) {
+    return <span className={className} style={base}>{inner}</span>;
+  }
+
+  // Wrapped: relative container with optional editable overlay + uploading ring
+  const overlayIconPx = size === 'sm' || size === 'md' ? Math.round(px * 0.55) : 20;
+  const ringStrokeRadius = (px / 2) - 1.5; // inset so 3px stroke sits inside
+  const ringCircumference = 2 * Math.PI * ringStrokeRadius;
+
   return (
     <span
-      className={className}
-      role="img"
-      aria-label="User avatar"
-      style={{ ...base, background: '#e2e8f0' }}
+      className={`group ${className}`}
+      style={{
+        ...base,
+        position: 'relative',
+        overflow: 'visible',
+      }}
     >
-      <User size={iconPx} color="#94a3b8" strokeWidth={2} />
+      <span
+        style={{
+          ...base,
+          opacity: uploading ? 0.6 : 1,
+          transition: 'opacity 150ms ease',
+        }}
+      >
+        {inner}
+      </span>
+
+      {showEditable && !uploading && (
+        <button
+          type="button"
+          onClick={onEditClick}
+          aria-label="Change avatar"
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            background: 'rgba(0,35,57,.55)',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            lineHeight: 1,
+          }}
+        >
+          <Camera size={overlayIconPx} strokeWidth={2} />
+          {showLabel && (
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: '#fff',
+                marginTop: 2,
+              }}
+            >
+              Change
+            </span>
+          )}
+        </button>
+      )}
+
+      {uploading && (
+        <svg
+          width={px}
+          height={px}
+          viewBox={`0 0 ${px} ${px}`}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            transform: 'rotate(-90deg)',
+            pointerEvents: 'none',
+          }}
+          aria-hidden="true"
+        >
+          <circle
+            className="cc-avatar-ring"
+            cx={px / 2}
+            cy={px / 2}
+            r={ringStrokeRadius}
+            fill="none"
+            stroke="#005D97"
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeDasharray="40 200"
+            style={{
+              // Override generic 240 default so the dash anim wraps fully on any size
+              strokeDashoffset: ringCircumference,
+            }}
+          />
+        </svg>
+      )}
     </span>
   );
 }

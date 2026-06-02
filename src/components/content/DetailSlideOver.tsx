@@ -20,6 +20,7 @@ import { AiAssistant } from './AiAssistant';
 import { StyledSelect } from '../ui/StyledSelect';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import DatePicker from '../ui/DatePicker';
+import { ActivityLog as ActivityLogList, ActivityLogRow, mapActionToType } from '../activity/ActivityLogRow';
 
 interface Props {
   item: ContentItem;
@@ -914,17 +915,24 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <p className="text-sm">No activity yet</p>
                 </div>
               )}
-              {activity.map(log => (
-                <div key={log.id} className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-[#005D9712] flex items-center justify-center shrink-0 mt-0.5">
-                    <Activity className="w-3 h-3 text-slate-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-700">{log.action}</p>
-                    <p className="text-xs text-slate-400">{formatDateFull(log.created_at)}</p>
-                  </div>
-                </div>
-              ))}
+              {activity.length > 0 && (
+                <ActivityLogList>
+                  {activity.map(log => {
+                    const member = members.find(m => m.user_id === log.user_id);
+                    const actorName = member?.full_name || member?.email || 'Unknown';
+                    return (
+                      <ActivityLogRow
+                        key={log.id}
+                        type={mapActionToType(log.action)}
+                        actor={{ name: actorName, avatarUrl: member?.avatar_url }}
+                        timestamp={log.created_at}
+                        action={log.action}
+                        metadata={log.metadata}
+                      />
+                    );
+                  })}
+                </ActivityLogList>
+              )}
             </div>
           )}
         </div>

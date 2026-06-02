@@ -6,7 +6,7 @@ import { useContentItems } from '../hooks/useContentItems';
 import { parseLocalDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
 import { getContentType, getBoardColumn, getAssignees, formatDueDateWithStatus, isDoneStatus } from '../lib/itemHelpers';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
-import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
+import { BulkActionToolbar } from '../components/list/BulkActionToolbar';
 import { CreateItemModal } from '../components/content/CreateItemModal';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -286,7 +286,7 @@ export function ListPage() {
 
       {/* Bulk Actions Floating Toolbar */}
       {selectedItems.size > 0 && (
-        <BulkActionsToolbar
+        <BulkActionToolbar
           selectedCount={selectedItems.size}
           selectedIds={Array.from(selectedItems)}
           members={members}

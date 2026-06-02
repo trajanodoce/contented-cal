@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, type ChangeEvent } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -6,6 +6,8 @@ import { useViewPersistence, type ViewType } from '../contexts/ViewPersistenceCo
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { CreateItemModal } from '../components/content/CreateItemModal';
 import { DetailSlideOver } from '../components/content/DetailSlideOver';
+import { Avatar } from '../components/ui/Avatar';
+import { AvatarUploadModal } from '../components/ui/AvatarUploadModal';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import {
@@ -22,7 +24,6 @@ import {
   LayoutDashboard,
   Palette,
   FileText,
-  Camera,
 } from 'lucide-react';
 
 interface NavItem {
@@ -150,7 +151,7 @@ export function AppLayout() {
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   // Load avatar: prefer profiles table, fall back to auth metadata
   useEffect(() => {
@@ -161,19 +162,8 @@ export function AppLayout() {
     })();
   }, [user]);
 
-  const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (e.target) e.target.value = '';
-    if (!file || !user) return;
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be under 2MB');
-      return;
-    }
+  const handleAvatarUpload = async (file: File) => {
+    if (!user) return;
 
     setIsUploadingAvatar(true);
     try {
@@ -216,6 +206,7 @@ export function AppLayout() {
 
       setAvatarUrl(publicUrl);
       toast.success('Avatar updated!');
+      setUploadModalOpen(false);
     } catch (err) {
       toast.error('Something went wrong uploading avatar');
       console.error(err);
@@ -338,38 +329,14 @@ export function AppLayout() {
         {/* User section */}
         <div className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <button
-              onClick={() => avatarInputRef.current?.click()}
-              disabled={isUploadingAvatar}
-              className="relative group flex-shrink-0"
-              title="Change avatar"
-            >
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={userName}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-white text-sm font-medium">
-                  {userName.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                {isUploadingAvatar ? (
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Camera className="w-3.5 h-3.5 text-white" />
-                )}
-              </div>
-              <input
-                ref={avatarInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                className="hidden"
-              />
-            </button>
+            <Avatar
+              src={avatarUrl}
+              name={userName}
+              size="lg"
+              editable
+              uploading={isUploadingAvatar}
+              onEditClick={() => setUploadModalOpen(true)}
+            />
             <div className="flex-1 min-w-1">
               <p className="text-sm font-medium text-white truncate">{userName}</p>
               <p className="text-xs text-white/50 truncate">{user?.email}</p>
@@ -384,6 +351,16 @@ export function AppLayout() {
           </button>
         </div>
       </aside>
+
+      {/* Avatar upload modal — top-level so it's not constrained by the sidebar flex layout */}
+      <AvatarUploadModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onSave={handleAvatarUpload}
+        currentAvatarUrl={avatarUrl}
+        currentName={userName}
+        uploading={isUploadingAvatar}
+      />
 
       {/* Main content */}
       <main className="flex-1 flex flex-col min-w-1 bg-surface-page overflow-hidden relative">
