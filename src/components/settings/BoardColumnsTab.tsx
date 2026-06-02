@@ -112,15 +112,23 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
     if (direction === 'up' && index === 0) return;
     if (direction === 'down' && index === columns.length - 1) return;
 
+    const prevColumns = columns;
     const newColumns = [...columns];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     [newColumns[index], newColumns[targetIndex]] = [newColumns[targetIndex], newColumns[index]];
-
-    const updates = newColumns.map((col, i) =>
-      supabase.from('board_columns').update({ position: i }).eq('id', col.id)
-    );
-    await Promise.all(updates);
     setColumns(newColumns);
+
+    const results = await Promise.all(
+      newColumns.map((col, i) =>
+        supabase.from('board_columns').update({ position: i }).eq('id', col.id)
+      )
+    );
+    if (results.some(r => r.error)) {
+      toast.error('Failed to reorder columns');
+      setColumns(prevColumns);
+      fetchColumns();
+      return;
+    }
     refreshWorkspaceData();
   };
 
@@ -147,16 +155,24 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
     const dragIndex = columns.findIndex((c) => c.id === draggedItem.id);
     if (dragIndex === dropIndex) return;
 
+    const prevColumns = columns;
     const newColumns = [...columns];
     newColumns.splice(dragIndex, 1);
     newColumns.splice(dropIndex, 0, draggedItem);
-
-    const updates = newColumns.map((col, i) =>
-      supabase.from('board_columns').update({ position: i }).eq('id', col.id)
-    );
-    await Promise.all(updates);
     setColumns(newColumns);
     setDraggedItem(null);
+
+    const results = await Promise.all(
+      newColumns.map((col, i) =>
+        supabase.from('board_columns').update({ position: i }).eq('id', col.id)
+      )
+    );
+    if (results.some(r => r.error)) {
+      toast.error('Failed to reorder columns');
+      setColumns(prevColumns);
+      fetchColumns();
+      return;
+    }
     refreshWorkspaceData();
   };
 

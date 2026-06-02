@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
@@ -17,9 +17,24 @@ interface SubtaskTemplatesTabProps {
 
 export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
   const { currentWorkspace, refreshWorkspaces } = useWorkspace();
-  const [templates, setTemplates] = useState<SubtaskTemplate[]>(() =>
-    getWorkspaceSubtaskTemplates(currentWorkspace?.settings)
+
+  // Source of truth: workspace.settings. Local state mirrors it so optimistic
+  // updates render instantly, but server-confirmed changes flow back through
+  // currentWorkspace via refreshWorkspaces() and we re-sync on each remote update.
+  const remoteTemplates = useMemo(
+    () => getWorkspaceSubtaskTemplates(currentWorkspace?.settings),
+    [currentWorkspace?.settings]
   );
+  const [templates, setTemplates] = useState<SubtaskTemplate[]>(remoteTemplates);
+  const pendingRef = useRef(false);
+
+  // Sync local state when remote changes (another tab, another admin)
+  // — skip while an optimistic update is in flight.
+  useEffect(() => {
+    if (!pendingRef.current) {
+      setTemplates(remoteTemplates);
+    }
+  }, [remoteTemplates]);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -46,6 +61,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
     async (updated: SubtaskTemplate[]) => {
       if (!workspaceId || !currentWorkspace) return false;
       setIsSaving(true);
+      pendingRef.current = true;
       const currentSettings =
         currentWorkspace.settings &&
         typeof currentWorkspace.settings === 'object' &&
@@ -60,10 +76,12 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
         .eq('id', workspaceId);
       setIsSaving(false);
       if (error) {
+        pendingRef.current = false;
         toast.error('Failed to save templates: ' + error.message);
         return false;
       }
       await refreshWorkspaces();
+      pendingRef.current = false;
       return true;
     },
     [workspaceId, currentWorkspace, refreshWorkspaces]
@@ -109,6 +127,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
     }
 
     const template: SubtaskTemplate = { name, items };
+    const prev = templates;
     let updated: SubtaskTemplate[];
 
     if (editIndex !== null) {
@@ -123,6 +142,8 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
     const ok = await saveTemplates(updated);
     if (ok) {
       toast.success(editIndex !== null ? 'Template updated' : `Template "${name}" created`);
+    } else {
+      setTemplates(prev);
     }
   };
 
@@ -130,11 +151,16 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
   const handleDelete = async () => {
     if (deleteIndex === null) return;
     const removed = templates[deleteIndex];
+    const prev = templates;
     const updated = templates.filter((_, i) => i !== deleteIndex);
     setTemplates(updated);
     setDeleteIndex(null);
     const ok = await saveTemplates(updated);
-    if (ok) toast.success(`Template "${removed.name}" deleted`);
+    if (ok) {
+      toast.success(`Template "${removed.name}" deleted`);
+    } else {
+      setTemplates(prev);
+    }
   };
 
   // ── Modal item management ──────────────────────────────────────────
@@ -190,13 +216,15 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
       setListDragOverIndex(null);
       return;
     }
+    const prev = templates;
     const updated = [...templates];
     const [moved] = updated.splice(listDragIndex, 1);
     updated.splice(dropIndex, 0, moved);
     setTemplates(updated);
     setListDragIndex(null);
     setListDragOverIndex(null);
-    await saveTemplates(updated);
+    const ok = await saveTemplates(updated);
+    if (!ok) setTemplates(prev);
   };
 
   // ── Modal item drag-and-drop ───────────────────────────────────────

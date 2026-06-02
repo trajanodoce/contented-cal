@@ -326,13 +326,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
     const updated = reordered.map((s, i) => ({ ...s, position: i }));
     setSubtasks(updated);
 
-    try {
-      await Promise.all(
-        updated.map(s =>
-          supabase.from('subtasks').update({ position: s.position }).eq('id', s.id)
-        )
-      );
-    } catch {
+    const results = await Promise.all(
+      updated.map(s =>
+        supabase.from('subtasks').update({ position: s.position }).eq('id', s.id)
+      )
+    );
+    if (results.some(r => r.error)) {
       addToast('Failed to reorder subtasks', 'error');
       fetchSubtasks();
     }

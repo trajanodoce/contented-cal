@@ -4,6 +4,8 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { Save, Upload, X, ImageIcon } from 'lucide-react';
 
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
 interface GeneralTabProps {
   workspace: { id: string; name: string; slug: string; logo_url?: string | null } | null;
 }
@@ -30,8 +32,8 @@ export function GeneralTab({ workspace }: GeneralTabProps) {
 
     e.target.value = '';
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please upload an image file');
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      toast.error('Please upload a JPG, PNG, GIF, or WebP image');
       return;
     }
 
