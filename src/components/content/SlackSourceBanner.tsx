@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink, MessageSquare } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { SLACK_COLOR, SLACK_TEXT } from '../../lib/ordinal';
+import { SLACK_COLOR } from '../../lib/ordinal';
 import { formatRelativeTime } from '../../lib/relativeTime';
 
 interface Props {
@@ -15,16 +15,20 @@ interface OriginLink {
   permalink: string;
   requester_name: string | null;
   captured_at: string;
+  parent_message: string | null;
 }
 
 /**
  * Source banner for items originated in Slack (canonical Draft 4.6).
  *
- * Mounted at the top of the detail panel above the title — same slot as the
- * Ordinal/Linear banner but for Slack-originated items. Reads from
- * `slack_thread_links` where `is_origin = true`, NOT from custom_fields, so
- * the banner disappears cleanly if the origin link is unlinked later. The
- * item itself stays fully editable (unlike Ordinal which forces read-only).
+ * Mounted at the top of the detail panel above the title. Mirrors the
+ * Ordinal/Linear source-identification pattern (NOT the Batch 5 banner
+ * tokens — those are for page/section headers).
+ *
+ * Data: reads from `slack_thread_links` where `is_origin = true`, not from
+ * `custom_fields`, so the banner disappears cleanly if the origin link is
+ * unlinked later. The item itself stays fully editable (unlike Ordinal
+ * which forces read-only).
  */
 export function SlackSourceBanner({ contentItemId, refreshKey }: Props) {
   const [link, setLink] = useState<OriginLink | null>(null);
@@ -35,7 +39,7 @@ export function SlackSourceBanner({ contentItemId, refreshKey }: Props) {
     setLoading(true);
     supabase
       .from('slack_thread_links')
-      .select('channel_name, permalink, requester_name, captured_at')
+      .select('channel_name, permalink, requester_name, captured_at, parent_message')
       .eq('content_item_id', contentItemId)
       .eq('is_origin', true)
       .maybeSingle()
@@ -50,53 +54,79 @@ export function SlackSourceBanner({ contentItemId, refreshKey }: Props) {
 
   if (loading || !link) return null;
 
-  const channelLabel = link.channel_name ? `#${link.channel_name}` : 'a Slack thread';
   const requester = link.requester_name?.trim();
+  const parentPreview = link.parent_message?.trim().replace(/\s+/g, ' ');
 
   return (
     <div
-      className="px-6 py-3 border-b"
+      className="mx-6 my-4 flex items-center gap-3"
       style={{
-        backgroundColor: `${SLACK_COLOR}30`,
-        borderColor: SLACK_TEXT,
+        backgroundColor: `${SLACK_COLOR}08`,
+        border: `1px solid ${SLACK_COLOR}20`,
+        borderLeft: `3px solid ${SLACK_COLOR}`,
+        borderRadius: 8,
+        padding: '12px 16px',
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div
-            className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: SLACK_TEXT, color: 'white' }}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold truncate" style={{ color: SLACK_TEXT }}>
-              Sourced from Slack — {channelLabel}
-            </p>
-            <p className="text-xs truncate" style={{ color: SLACK_TEXT, opacity: 0.85 }}>
-              {requester ? `Requested by ${requester}` : 'Requested via Slack'}
-              {' · '}
-              {formatRelativeTime(link.captured_at)}
-            </p>
-          </div>
+      {/* Icon tile */}
+      <span
+        className="flex items-center justify-center flex-shrink-0"
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 8,
+          backgroundColor: `${SLACK_COLOR}15`,
+        }}
+      >
+        <MessageSquare className="w-3.5 h-3.5" style={{ color: SLACK_COLOR }} />
+      </span>
+
+      {/* Text block */}
+      <div className="flex-1 min-w-0">
+        <div className="text-[13px] leading-snug text-slate-600">
+          <strong className="text-slate-900">From Slack</strong>
+          {link.channel_name && (
+            <>
+              <span> · </span>
+              <span
+                className="font-mono font-semibold"
+                style={{ color: SLACK_COLOR }}
+              >
+                #{link.channel_name}
+              </span>
+            </>
+          )}
+          {requester && (
+            <>
+              <span> · captured by </span>
+              <strong className="text-slate-900">{requester}</strong>
+            </>
+          )}
+          <span> {formatRelativeTime(link.captured_at)}</span>
         </div>
-        <a
-          href={link.permalink}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={(e) => e.stopPropagation()}
-          className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors flex-shrink-0 hover:opacity-90"
-          style={{
-            color: SLACK_TEXT,
-            borderColor: `${SLACK_COLOR}60`,
-            border: `1px solid ${SLACK_COLOR}60`,
-            backgroundColor: '#ffffff',
-          }}
-        >
-          Open in Slack
-          <ExternalLink className="w-3 h-3" />
-        </a>
+        {parentPreview && (
+          <div className="text-[11px] italic text-slate-400 mt-0.5 truncate">
+            "{parentPreview}"
+          </div>
+        )}
       </div>
+
+      {/* Open in Slack CTA — solid Slack-red */}
+      <a
+        href={link.permalink}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className="inline-flex items-center gap-1 text-xs font-semibold rounded-md transition-opacity flex-shrink-0 hover:opacity-90"
+        style={{
+          padding: '6px 11px',
+          color: '#ffffff',
+          backgroundColor: SLACK_COLOR,
+        }}
+      >
+        Open in Slack
+        <ExternalLink className="w-3 h-3" />
+      </a>
     </div>
   );
 }
