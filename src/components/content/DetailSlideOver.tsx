@@ -3,11 +3,10 @@ import {
   X, Calendar, MessageSquare,
   Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2, Copy
 } from 'lucide-react';
-import { Avatar } from '../ui/Avatar';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json, Profile } from '../../lib/database.types';
+import type { ContentItem, ActivityLog, ContentType, BoardColumn, Json } from '../../lib/database.types';
 import { formatDateFull, PRIORITY_STYLES, getWorkspaceChannels, getWorkspaceSubtaskTemplates } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import { SubtasksSection } from './SubtasksSection';
@@ -17,6 +16,11 @@ import { ExternalLinksSection } from './ExternalLinks';
 import { GranolaNoteSection } from './GranolaNoteSection';
 import { SlackSourceBanner } from './SlackSourceBanner';
 import { SlackThreadsSection } from './SlackThreadsSection';
+import { CommentRow, type CommentWithProfile } from './CommentRow';
+import { MentionAutocomplete } from './MentionAutocomplete';
+import { extractMentionIds } from '../../lib/mentionFormat';
+import { TaskPresenceChip } from './TaskPresenceChip';
+import { usePresence } from '../../contexts/PresenceContext';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
 import { StyledSelect } from '../ui/StyledSelect';
@@ -32,9 +36,7 @@ interface Props {
 }
 
 // Comment enriched with author profile via FK join
-interface CommentWithProfile extends Comment {
-  profiles: Pick<Profile, 'id' | 'full_name' | 'email' | 'avatar_url'> | null;
-}
+// CommentWithProfile imported from ./CommentRow
 
 // Channels are now loaded from workspace settings via getWorkspaceChannels()
 const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
@@ -163,7 +165,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const loadComments = useCallback(async () => {
     const { data } = await supabase
       .from('comments')
-      .select('*, profiles:user_id(id, full_name, email, avatar_url)')
+      .select('*, profiles:user_id(id, full_name, email, avatar_url), deletedByProfile:deleted_by(id, full_name, email)')
       .eq('content_item_id', item.id)
       .order('created_at');
     if (data) setComments(data as unknown as CommentWithProfile[]);
@@ -183,6 +185,13 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
     loadComments();
     loadActivity();
   }, [loadComments, loadActivity]);
+
+  // Phase 6.6 — broadcast presence for this task while the slide-over is open
+  const { setViewing } = usePresence();
+  useEffect(() => {
+    setViewing(item.id);
+    return () => setViewing(null);
+  }, [item.id, setViewing]);
 
   async function updateField(field: string, value: unknown) {
     setSavingField(field);
@@ -238,15 +247,47 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
   async function addComment() {
     if (!commentText.trim() || !user) return;
+    const trimmed = commentText.trim();
+    const mentions = extractMentionIds(trimmed);
     const { error } = await supabase.from('comments').insert({
       content_item_id: item.id,
       user_id: user.id,
-      body: commentText.trim(),
+      body: trimmed,
+      mentions,
     });
     if (error) { addToast(error.message, 'error'); return; }
     setCommentText('');
     loadComments();
     addToast('Comment added');
+  }
+
+  // Phase 6.2: edit comment body. Author only (RLS-enforced).
+  // Phase 6.3: also accepts mentions[] derived from the new body.
+  async function editComment(commentId: string, newBody: string, mentions: string[]): Promise<boolean> {
+    const { error } = await supabase
+      .from('comments')
+      .update({ body: newBody, mentions })
+      .eq('id', commentId);
+    if (error) {
+      addToast(error.message, 'error');
+      return false;
+    }
+    // updated_at is bumped by trigger; trigger also fires for newly-added mentions.
+    await loadComments();
+    addToast('Comment updated');
+    return true;
+  }
+
+  // Phase 6.2: soft-delete via SECURITY DEFINER RPC. Author OR workspace admin.
+  async function softDeleteComment(commentId: string): Promise<boolean> {
+    const { error } = await supabase.rpc('soft_delete_comment', { comment_id: commentId });
+    if (error) {
+      addToast(error.message, 'error');
+      return false;
+    }
+    await loadComments();
+    addToast('Comment deleted');
+    return true;
   }
 
   async function deleteItem() {
@@ -479,7 +520,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             <div style={{ borderBottom: '1px solid #00233930' }}>
               {/* Action buttons row */}
               <div className="flex items-center justify-between px-6 pt-3 pb-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   {contentType && (
                     <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
                       <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: titleColor }} />
@@ -488,6 +529,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   )}
                   <span className="text-slate-300">•</span>
                   <span className="text-xs text-slate-400">Created {formatDateFull(item.created_at)}</span>
+                  {/* Phase 6.6 — quiet presence chip when others are viewing */}
+                  <TaskPresenceChip taskId={item.id} />
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
@@ -847,38 +890,44 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   <p className="text-sm">No comments yet</p>
                 </div>
               )}
-              {comments.map(comment => {
-                const authorName = comment.profiles?.full_name || comment.profiles?.email || 'Unknown';
-                const authorInitial = (authorName[0] || '?').toUpperCase();
-                return (
-                  <div key={comment.id} className="flex gap-3">
-                    <Avatar src={comment.profiles?.avatar_url} name={authorName} size="lg" />
-                    <div className="flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-medium text-slate-700">{authorName}</span>
-                        <span className="text-xs text-slate-400">{formatDateFull(comment.created_at)}</span>
-                      </div>
-                      <p className="text-sm text-slate-700 mt-0.5 whitespace-pre-wrap">{comment.body}</p>
-                    </div>
-                  </div>
-                );
-              })}
+              {comments.map(comment => (
+                <CommentRow
+                  key={comment.id}
+                  comment={comment}
+                  currentUserId={user?.id ?? null}
+                  isAdmin={userRole === 'admin'}
+                  members={members}
+                  onEdit={editComment}
+                  onDelete={softDeleteComment}
+                />
+              ))}
 
               <div className="pt-2" style={{ borderTop: '1px solid #00233930' }}>
-                <textarea
+                <MentionAutocomplete
                   value={commentText}
-                  onChange={e => setCommentText(e.target.value)}
-                  placeholder="Add a comment..."
+                  onChange={setCommentText}
+                  members={members}
+                  placeholder="Add a comment… (type @ to mention)"
                   rows={3}
-                  className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none" style={{ border: '1px solid #00233930' }}
+                  className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
+                  style={{ border: '1px solid #00233930' }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                      e.preventDefault();
+                      addComment();
+                    }
+                  }}
                 />
-                <button
-                  onClick={addComment}
-                  disabled={!commentText.trim()}
-                  className="mt-2 px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors"
-                >
-                  Post comment
-                </button>
+                <div className="flex items-center gap-3 mt-2">
+                  <button
+                    onClick={addComment}
+                    disabled={!commentText.trim()}
+                    className="px-4 py-2 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-50 transition-colors"
+                  >
+                    Post comment
+                  </button>
+                  <span className="text-[10px] text-slate-400">⌘↵ to post · @ to mention</span>
+                </div>
               </div>
             </div>
           )}

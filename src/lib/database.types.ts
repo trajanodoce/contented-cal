@@ -1649,6 +1649,7 @@ export type AiInteraction = Database['public']['Tables']['ai_interactions']['Row
 export type OrdinalPostLink = Database['public']['Tables']['ordinal_post_links']['Row'];
 export type GranolaNoteLink = Database['public']['Tables']['granola_note_links']['Row'];
 export type UserIntegration = Database['public']['Tables']['user_integrations']['Row'];
+export type UserAlert = Database['public']['Tables']['user_alerts']['Row'];
 
 // Personal tasks (manually typed until next type generation)
 export interface PersonalTask {
