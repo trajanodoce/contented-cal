@@ -166,8 +166,12 @@ async function buildThreadDescription(
 ): Promise<{ description: string; snapshot: SlackMessage[] }> {
   if (messages.length === 0) return { description: "", snapshot: [] };
 
+  // Filter bot messages first, then truncate — so the omitted count
+  // reflects user-visible messages, not bot noise.
+  const humanMessages = messages.filter((m) => m.user !== botUserId);
+
   // Resolve user names
-  const userIds = [...new Set(messages.map((m) => m.user).filter(Boolean))] as string[];
+  const userIds = [...new Set(humanMessages.map((m) => m.user).filter(Boolean))] as string[];
   const userNames: Record<string, string> = {};
   await Promise.all(
     userIds.map(async (uid) => {
@@ -176,18 +180,17 @@ async function buildThreadDescription(
     })
   );
 
-  // Apply truncation: first 5 + last 20 if > 50 messages
-  let displayMessages = messages;
+  // Apply truncation: first 5 + last 20 if > 50 human messages
+  let displayMessages = humanMessages;
   let omittedCount = 0;
-  if (messages.length > 50) {
-    const head = messages.slice(0, 5);
-    const tail = messages.slice(-20);
-    omittedCount = messages.length - 25;
+  if (humanMessages.length > 50) {
+    const head = humanMessages.slice(0, 5);
+    const tail = humanMessages.slice(-20);
+    omittedCount = humanMessages.length - 25;
     displayMessages = [...head, { text: `[…${omittedCount} messages omitted…]` } as SlackMessage, ...tail];
   }
 
   const lines = displayMessages
-    .filter((m) => m.user !== botUserId)
     .map((m) => {
       if (!m.user && m.text?.startsWith("[…")) return m.text; // omitted marker
       const name = m.user ? (userNames[m.user] ?? m.user) : "Unknown";
@@ -351,20 +354,27 @@ Deno.serve(async (req) => {
   const body = await req.text();
   const timestamp = req.headers.get("x-slack-request-timestamp") ?? "";
   const signature = req.headers.get("x-slack-signature") ?? "";
-  const payload = JSON.parse(body);
 
-  // URL verification challenge
-  if (payload.type === "url_verification") {
-    return new Response(JSON.stringify({ challenge: payload.challenge }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  // Verify signature
+  // Verify signature BEFORE parsing body or acting on any payload data.
+  // Slack's url_verification challenge also requires signature validation.
   const valid = await verifySlackSignature(body, timestamp, signature);
   if (!valid) {
     console.error("Invalid Slack signature");
     return new Response("Invalid signature", { status: 401 });
+  }
+
+  let payload: Record<string, unknown>;
+  try {
+    payload = JSON.parse(body);
+  } catch {
+    return new Response("Bad request", { status: 400 });
+  }
+
+  // URL verification challenge (safe — signature already verified above)
+  if (payload.type === "url_verification") {
+    return new Response(JSON.stringify({ challenge: payload.challenge }), {
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // ── Event callback ─────────────────────────────────────────────────────
@@ -550,10 +560,10 @@ Deno.serve(async (req) => {
       // ── Insert slack_thread_links row (origin) ─────────────────────────
       // Blocking insert with compensation: if two simultaneous @mentions
       // both reached this point, the UNIQUE constraint on
-      // (content_item_id, slack_channel_id, slack_thread_ts) will reject
-      // the loser. The losing path deletes its just-created content_item
-      // and falls through to the comment-on-existing flow so the @mention
-      // still gets recorded against the winner.
+      // (slack_channel_id, slack_thread_ts) will reject the loser. The
+      // losing path deletes its just-created content_item and falls
+      // through to the comment-on-existing flow so the @mention still
+      // gets recorded against the winner.
       const { error: linkError } = await supabase.from("slack_thread_links").insert({
         content_item_id: newItem.id,
         slack_channel_id: event.channel,
@@ -577,7 +587,10 @@ Deno.serve(async (req) => {
           console.log("Lost slack_thread_links race for", event.channel, threadTs, "— rolling back item and falling through to comment flow");
 
           // Undo our orphan content_item
-          await supabase.from("content_items").delete().eq("id", newItem.id);
+          const { error: deleteError } = await supabase.from("content_items").delete().eq("id", newItem.id);
+          if (deleteError) {
+            console.error("Failed to clean up orphaned content_item:", newItem.id, deleteError);
+          }
 
           // Find the winning link and add this @mention as a comment instead
           const { data: winningLink } = await supabase

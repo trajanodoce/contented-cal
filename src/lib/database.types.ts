@@ -138,21 +138,33 @@ export type Database = {
           body: string
           content_item_id: string
           created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
+          mentions: string[]
+          updated_at: string
           user_id: string
         }
         Insert: {
           body: string
           content_item_id: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
+          mentions?: string[]
+          updated_at?: string
           user_id: string
         }
         Update: {
           body?: string
           content_item_id?: string
           created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
+          mentions?: string[]
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -1107,6 +1119,74 @@ export type Database = {
           },
         ]
       }
+      user_alerts: {
+        Row: {
+          actor_id: string | null
+          alert_type: string
+          content_item_id: string | null
+          created_at: string
+          id: string
+          read_at: string | null
+          source_id: string
+          source_type: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          alert_type: string
+          content_item_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          source_id: string
+          source_type: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          alert_type?: string
+          content_item_id?: string | null
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          source_id?: string
+          source_type?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_alerts_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_alerts_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_alerts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_alerts_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_integrations: {
         Row: {
           access_token: string | null
@@ -1196,18 +1276,21 @@ export type Database = {
       workspace_members: {
         Row: {
           created_at: string
+          muted_projects: string[]
           role: Database["public"]["Enums"]["workspace_role"]
           user_id: string
           workspace_id: string
         }
         Insert: {
           created_at?: string
+          muted_projects?: string[]
           role?: Database["public"]["Enums"]["workspace_role"]
           user_id: string
           workspace_id: string
         }
         Update: {
           created_at?: string
+          muted_projects?: string[]
           role?: Database["public"]["Enums"]["workspace_role"]
           user_id?: string
           workspace_id?: string
