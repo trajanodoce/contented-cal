@@ -115,7 +115,7 @@ export function HomePage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-display text-slate-900">
+        <h1 className="text-3xl font-display text-slate-900">
           {greeting}, {userName}
         </h1>
         <p className="text-slate-500 mt-1">
@@ -170,7 +170,7 @@ export function HomePage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Flame className="w-4.5 h-4.5 text-orange-500" />
-                <h2 className="font-heading text-slate-900">High Priority Items</h2>
+                <h2 className="text-2xl font-heading text-slate-900">High Priority Items</h2>
                 {highPriorityItems.length > 0 && (
                   <span className="text-xs font-medium text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">
                     {highPriorityItems.length}
@@ -232,7 +232,7 @@ export function HomePage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4.5 h-4.5 text-brand-500" />
-                <h2 className="font-heading text-slate-900">Due This Week</h2>
+                <h2 className="text-2xl font-heading text-slate-900">Due This Week</h2>
               </div>
               <button
                 onClick={() => navigate('/calendar')}
@@ -285,7 +285,7 @@ export function HomePage() {
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <FolderOpen className="w-4.5 h-4.5 text-brand-500" />
-                  <h2 className="font-heading text-slate-900">Active Projects</h2>
+                  <h2 className="text-2xl font-heading text-slate-900">Active Projects</h2>
                 </div>
                 <button
                   onClick={() => navigate('/projects')}
@@ -328,7 +328,7 @@ export function HomePage() {
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4.5 h-4.5 text-slate-500" />
-                <h2 className="font-heading text-slate-900">By Status</h2>
+                <h2 className="text-2xl font-heading text-slate-900">By Status</h2>
               </div>
             </div>
 
@@ -368,7 +368,7 @@ export function HomePage() {
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4.5 h-4.5 text-slate-500" />
-                <h2 className="font-heading text-slate-900">By Priority</h2>
+                <h2 className="text-2xl font-heading text-slate-900">By Priority</h2>
               </div>
             </div>
             <div className="p-4 grid grid-cols-2 gap-2">
@@ -394,7 +394,7 @@ export function HomePage() {
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Activity className="w-4.5 h-4.5 text-slate-500" />
-                <h2 className="font-heading text-slate-900">Recent Activity</h2>
+                <h2 className="text-2xl font-heading text-slate-900">Recent Activity</h2>
               </div>
             </div>
 

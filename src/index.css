@@ -148,6 +148,37 @@ body {
 /* ── Drag-and-Drop snap animation (canonical) ── */
 .cc-dnd-snap { transition: transform 200ms ease-out; }
 
+/* ── Banner Tokens (canonical) ── */
+/* Three canonical banner tokens. Replace the v1 navy→cream gradients.
+   Both tiers use dark text (#002339) and a navy-teal-pink meld. */
+
+/* page-header-bar — top of every page; full-bleed, no rounding */
+.cc-banner-page-header {
+  background:
+    linear-gradient(135deg, #005D9722 0%, #005D9720 30%, #0F8B8D18 50%, #0F8B8D10 70%, #D4729E0C 85%, #D4729E10 100%),
+    linear-gradient(to top right, #9B2D5E0A 0%, transparent 25%);
+  padding: 14px 24px;
+}
+
+/* section-header — content-width section/panel headers; rounded top corners */
+.cc-banner-section-header {
+  background:
+    linear-gradient(160deg, #005D9790 0%, #005D9788 25%, #0F8B8D60 45%, #0F8B8D40 75%, #0F8B8D30 100%),
+    linear-gradient(to top, #D4729E18 0%, #D4729E06 40%, transparent 65%);
+  padding: 10px 20px;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* calendar-month-header — month/week labels on calendar surfaces; rounded-lg */
+.cc-banner-calendar-month {
+  background:
+    linear-gradient(160deg, #005D9790 0%, #005D9788 25%, #0F8B8D60 45%, #0F8B8D40 75%, #0F8B8D30 100%),
+    linear-gradient(to top, #D4729E18 0%, #D4729E06 40%, transparent 65%);
+  padding: 8px 20px;
+  border-radius: 8px;
+}
+
 /* ── Sonner Toast Theming ── */
 .cc-toast-success { border-left: 3px solid #92D1B2 !important; box-shadow: 0 2px 4px rgba(146,209,178,.35) !important; }
 .cc-toast-error   { border-left: 3px solid #BA2C2C !important; box-shadow: 0 2px 4px rgba(186,44,44,.25) !important; }

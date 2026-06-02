@@ -347,7 +347,7 @@ export function ProjectDetailPage() {
           ) : (
             <h1
               onClick={() => setEditingTitle(true)}
-              className="text-xl font-display text-slate-900 cursor-pointer hover:text-brand-600 transition-colors"
+              className="text-2xl font-display text-slate-900 cursor-pointer hover:text-brand-600 transition-colors"
             >
               {project.title}
             </h1>
@@ -1650,15 +1650,9 @@ function CalendarTab({
             className="bg-[#F7F9FC] rounded-xl overflow-hidden"
             style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '16px' : 0 }}
           >
-            {/* Month header bar — navy → pink gradient per design system */}
-            <div
-              className="px-5 py-3.5 border-b border-[#002339]"
-              style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)' }}
-            >
-              <h3
-                className="text-base font-bold text-white tracking-wide"
-                style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}
-              >
+            {/* Month header bar — canonical calendar-month-header token */}
+            <div className="cc-banner-calendar-month border-b border-[#002339]" style={{ borderRadius: 0 }}>
+              <h3 className="text-sm font-heading tracking-wide" style={{ color: '#002339' }}>
                 {format(monthDate, 'MMMM yyyy')}
               </h3>
             </div>

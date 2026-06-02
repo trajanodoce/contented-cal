@@ -427,12 +427,9 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
     <div className="space-y-0">
       {months.map((monthDate, idx) => (
         <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '16px' : 0 }}>
-          {/* Month header bar — navy → pink gradient per design system */}
-          <div
-            className="px-5 py-3.5 border-b border-[#002339]"
-            style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)' }}
-          >
-            <h3 className="text-base font-bold text-white tracking-wide" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+          {/* Month header bar — canonical calendar-month-header token */}
+          <div className="cc-banner-calendar-month border-b border-[#002339]" style={{ borderRadius: 0 }}>
+            <h3 className="text-sm font-heading tracking-wide" style={{ color: '#002339' }}>
               {format(monthDate, 'MMMM yyyy')}
             </h3>
           </div>
@@ -536,8 +533,11 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
 
   return (
     <div className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339' }}>
-      {/* Week header — navy → pink gradient with day + number per design system */}
-      <div className="grid" style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)', gridTemplateColumns: gridCols }}>
+      {/* Week header — canonical calendar-month-header token (applied via grid bg) */}
+      <div
+        className="cc-banner-calendar-month grid"
+        style={{ gridTemplateColumns: gridCols, borderRadius: 0, padding: 0 }}
+      >
         {visibleDays.map((day) => {
           const isTodayDate = isToday(day);
           return (
@@ -545,11 +545,12 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
               key={day.toISOString()}
               className="px-2 py-3 text-center"
             >
-              <div className="text-[11px] font-bold uppercase tracking-wider text-white/85 mb-1">
+              <div className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: 'rgba(0,35,57,.7)' }}>
                 {format(day, 'EEE')}
               </div>
               <div
-                className={`text-base font-bold ${isTodayDate ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-white text-[#005D97]' : 'text-white'}`}
+                className={`text-base font-bold ${isTodayDate ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-white' : ''}`}
+                style={{ color: '#002339' }}
               >
                 {format(day, 'd')}
               </div>

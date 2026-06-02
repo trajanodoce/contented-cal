@@ -337,7 +337,7 @@ export function ProjectsPage() {
     <div className="p-8">
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-display text-slate-900">Projects</h1>
+        <h1 className="text-3xl font-display text-slate-900">Projects</h1>
         <button
           onClick={() => setShowCreate(true)}
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700"

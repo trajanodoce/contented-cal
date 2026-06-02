@@ -264,15 +264,15 @@ export function PersonalTasksSection({ workspaceId }: Props) {
   return (
     <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
       {/* Header */}
-      <div
-        className="flex items-center justify-between px-5 py-4 border-b border-slate-100"
-        style={{ background: 'linear-gradient(to right, #005D97 0%, #F5F0E8 100%)' }}
-      >
+      <div className="cc-banner-section-header flex items-center justify-between border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <Briefcase className="w-5 h-5 text-white/80" />
-          <h2 className="text-lg font-semibold text-white">Personal Tasks</h2>
+          <Briefcase className="w-3.5 h-3.5" style={{ color: '#002339' }} />
+          <h2 className="text-base font-heading" style={{ color: '#002339' }}>Personal Tasks</h2>
           {activeTasks.length > 0 && (
-            <span className="text-xs font-medium text-white/80 bg-white/20 px-2 py-0.5 rounded-full">
+            <span
+              className="text-xs font-semibold px-2 py-0.5 rounded-full"
+              style={{ backgroundColor: 'rgba(0,35,57,.12)', color: '#002339' }}
+            >
               {activeTasks.length}
             </span>
           )}

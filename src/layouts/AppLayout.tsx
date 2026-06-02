@@ -366,10 +366,10 @@ export function AppLayout() {
       <main className="flex-1 flex flex-col min-w-1 bg-surface-page overflow-hidden relative">
         {/* Header */}
         <header
-          className="h-16 flex items-center justify-between px-6 flex-shrink-0"
-          style={{ background: 'linear-gradient(to right, #005D97 0%, #FBE7F1 100%)', borderBottom: '1.5px solid #002339' }}
+          className="cc-banner-page-header h-16 flex items-center justify-between flex-shrink-0"
+          style={{ borderBottom: '1.5px solid #002339' }}
         >
-          <h1 className="text-lg font-heading text-white">
+          <h1 className="text-lg font-heading" style={{ color: '#002339' }}>
             {getPageTitle(location.pathname)}
           </h1>
           {canCreate && (
