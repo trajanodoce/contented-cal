@@ -16,6 +16,7 @@ import { useOrdinalPost } from '../../hooks/useOrdinalPost';
 import { ExternalLinksSection } from './ExternalLinks';
 import { GranolaNoteSection } from './GranolaNoteSection';
 import { SlackSourceBanner } from './SlackSourceBanner';
+import { SlackThreadsSection } from './SlackThreadsSection';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
 import { AiAssistant } from './AiAssistant';
 import { StyledSelect } from '../ui/StyledSelect';
@@ -123,6 +124,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const [description, setDescription] = useState(item.description);
   const [granolaPickerOpen, setGranolaPickerOpen] = useState(false);
   const [granolaRefreshKey, setGranolaRefreshKey] = useState(0);
+  // Slack threads share a refresh key — when SlackThreadsSection unlinks the
+  // origin thread, the source banner needs to disappear too.
+  const [slackRefreshKey, setSlackRefreshKey] = useState(0);
   const [hasChanges, setHasChanges] = useState(false);
   const [showSavedCheck, setShowSavedCheck] = useState(false);
 
@@ -465,7 +469,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
         {/* Slack source banner — canonical Draft 4.6 (reads slack_thread_links) */}
         {isSlackItem && !isExternalSource && (
-          <SlackSourceBanner contentItemId={item.id} />
+          <SlackSourceBanner contentItemId={item.id} refreshKey={slackRefreshKey} />
         )}
 
         {/* Header */}
@@ -735,6 +739,15 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 contentItemId={item.id}
                 onLinked={() => setGranolaRefreshKey((k) => k + 1)}
               />
+
+              {/* Slack Threads (canonical section #9 per Draft 4.7) */}
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
+                <SlackThreadsSection
+                  key={slackRefreshKey}
+                  contentItemId={item.id}
+                  onUnlink={() => setSlackRefreshKey((k) => k + 1)}
+                />
+              </div>
 
               {/* Description */}
               {fieldVisibility.description && (
