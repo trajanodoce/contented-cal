@@ -3,7 +3,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 // UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
-import { pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
+import { parseLocalDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
 import { getContentType, getBoardColumn, getAssignees, formatDueDateWithStatus, isDoneStatus } from '../lib/itemHelpers';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionsToolbar } from '../components/content/BulkActionsToolbar';
