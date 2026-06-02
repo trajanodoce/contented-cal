@@ -16,7 +16,7 @@ import type {
   ActivityLog,
 } from '../lib/database.types';
 import { parseLocalDate, pillTextColor, getWorkspaceChannels } from '../lib/utils';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import {
   format,
   startOfMonth,
@@ -975,7 +975,10 @@ function ListTab({
       ) : (
         <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
           <table className="w-full">
-            <thead className="bg-[#005D9712] border-b border-slate-200">
+            <thead
+              className="sticky top-0 z-10"
+              style={{ background: '#F7F9FC', borderBottom: '1.5px solid #00233980' }}
+            >
               <tr>
                 <th className="px-4 py-3 w-12">
                   <button
@@ -1024,24 +1027,31 @@ function ListTab({
                 );
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
-                const rowBg = isOrdinal ? `${ORDINAL_COLOR}18` : isLinear ? `${LINEAR_COLOR}18` : undefined;
+                // Source-color left bar (canonical Draft 5.1) — replaces v1 bg tint.
+                // Urgent state overrides with delete-red.
+                const sourceLeftBarColor = isOrdinal ? ORDINAL_COLOR
+                  : isLinear ? LINEAR_COLOR
+                  : INTERNAL_COLOR;
                 const colName = col?.name?.toLowerCase();
                 const isDone = colName === 'published' || colName === 'completed';
                 const isBlocked = colName === 'blocked';
                 const isOverdue = item.due_date && !isDone && new Date(item.due_date + 'T00:00:00') < new Date(new Date().toDateString());
                 const isUrgentRow = isBlocked || isOverdue;
+                const leftBarColor = isUrgentRow ? '#BA2C2C' : sourceLeftBarColor;
                 const isSelected = selectedItems.has(item.id);
                 return (
                   <tr
                     key={item.id}
                     onClick={() => onItemClick(item.id)}
-                    className={`hover:bg-[#005D9718] cursor-pointer transition-colors ${isSelected ? selectedRowClass : ''}`}
-                    style={{
-                      ...(rowBg && !isSelected ? { backgroundColor: rowBg } : {}),
-                      ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
-                    }}
+                    className={`cursor-pointer transition-colors ${
+                      isSelected ? selectedRowClass : 'hover:bg-[#005D9718]'
+                    }`}
                   >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-3"
+                      style={{ borderLeft: `3px solid ${leftBarColor}` }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button
                         onClick={() => handleSelectItem(item.id)}
                         className="p-1 hover:bg-[#005D9710] rounded transition-colors"
@@ -1053,8 +1063,18 @@ function ListTab({
                         )}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium text-slate-800 max-w-[300px] truncate">
-                      {item.title}
+                    <td className="px-4 py-3 text-sm text-slate-800 max-w-[300px] truncate">
+                      <div className="flex items-center gap-2">
+                        {isUrgentRow && (
+                          <AlertTriangle
+                            className="w-3.5 h-3.5 shrink-0"
+                            style={{ color: '#BA2C2C' }}
+                          />
+                        )}
+                        <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} truncate`}>
+                          {item.title}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       {ct ? (
@@ -1094,7 +1114,12 @@ function ListTab({
                         <span className="text-xs text-slate-400">--</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-500">
+                    <td
+                      className={`px-4 py-3 text-xs ${
+                        isOverdue ? 'font-medium' : 'text-slate-500'
+                      }`}
+                      style={isOverdue ? { color: '#BA2C2C' } : undefined}
+                    >
                       {item.due_date ? formatDate(item.due_date) : '--'}
                     </td>
                     <td className="px-4 py-3">

@@ -13,7 +13,7 @@ import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, BoardColumn, Profile } from '../lib/database.types';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
@@ -27,6 +27,7 @@ import {
   Plus,
   FileText,
   AlertCircle,
+  AlertTriangle,
   ChevronDown,
   Check,
   ListChecks,
@@ -300,7 +301,10 @@ export function ListPage() {
       <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1.5px solid #002339' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead style={{ background: '#005D9712', borderBottom: '2px solid #00233930' }}>
+            <thead
+              className="sticky top-0 z-10"
+              style={{ background: '#F7F9FC', borderBottom: '1.5px solid #00233980' }}
+            >
               <tr>
                 <th className="px-4 py-3 w-12">
                   <button
@@ -341,30 +345,36 @@ export function ListPage() {
                 const isOrdinal = isOrdinalItem(item);
                 const isLinear = isLinearItem(item);
                 const hasGranola = granolaItemIds.has(item.id);
-                // Source-tinted row backgrounds — light alpha so the rows still read clearly.
-                const rowBg = isOrdinal
-                  ? `${ORDINAL_COLOR}18`
+                const customFields = item.custom_fields as Record<string, unknown> | null;
+                const isSlackSource = customFields?._source === 'slack';
+                // Source-color left bar (canonical Draft 5.1) — replaces the v1 bg tint.
+                // Urgent state overrides with delete-red.
+                const sourceLeftBarColor = isOrdinal
+                  ? ORDINAL_COLOR
                   : isLinear
-                    ? `${LINEAR_COLOR}18`
+                    ? LINEAR_COLOR
                     : hasGranola
-                      ? `${GRANOLA_COLOR}18`
-                      : undefined;
+                      ? GRANOLA_COLOR
+                      : isSlackSource
+                        ? SLACK_COLOR
+                        : INTERNAL_COLOR;
                 const isBlocked = status?.name?.toLowerCase() === 'blocked';
                 const isUrgentRow = isBlocked || (dueDate.isOverdue && !isDone);
+                const leftBarColor = isUrgentRow ? '#BA2C2C' : sourceLeftBarColor;
 
                 return (
                   <tr
                     key={item.id}
                     onClick={() => handleRowClick(item)}
-                    className={`hover:bg-[#005D9718] cursor-pointer transition-colors ${
-                      isSelected ? 'bg-brand-50 hover:bg-brand-100' : ''
+                    className={`cursor-pointer transition-colors ${
+                      isSelected ? 'bg-[#005D9710]' : 'hover:bg-[#005D9718]'
                     }`}
-                    style={{
-                      ...(rowBg && !isSelected ? { backgroundColor: rowBg } : {}),
-                      ...(isUrgentRow ? { outline: '2px solid #ef4444', outlineOffset: '-2px' } : {}),
-                    }}
                   >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-3"
+                      style={{ borderLeft: `3px solid ${leftBarColor}` }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <button
                         onClick={() => handleSelectItem(item.id)}
                         className="p-1 hover:bg-[#005D9710] rounded transition-colors"
@@ -378,7 +388,13 @@ export function ListPage() {
                     </td>
                     <td className="px-4 py-3 max-w-[400px]">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-900 truncate max-w-[320px]">{item.title}</span>
+                        {isUrgentRow && (
+                          <AlertTriangle
+                            className="w-3.5 h-3.5 shrink-0"
+                            style={{ color: '#BA2C2C' }}
+                          />
+                        )}
+                        <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} text-slate-900 truncate max-w-[320px]`}>{item.title}</span>
                         {granolaItemIds.has(item.id) && (
                           <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
                         )}
@@ -871,7 +887,7 @@ function SortHeader({
   const isActive = sort.field === field;
 
   return (
-    <th className="px-4 py-3 text-left">
+    <th className="group px-4 py-3 text-left">
       <button
         onClick={() => onSort(field)}
         className="flex items-center gap-1 text-xs font-bold text-slate-700 uppercase tracking-wider hover:text-slate-900 transition-colors"
@@ -884,7 +900,7 @@ function SortHeader({
             <ArrowDown className="w-3 h-3" />
           )
         ) : (
-          <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-50" />
+          <ArrowUpDown className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
         )}
       </button>
     </th>

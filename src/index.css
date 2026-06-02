@@ -73,25 +73,29 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Navy Pill Scrollbar ── */
+/* ── Navy Pill Scrollbar (canonical) ── */
+/* 8px wide · navy #005D97 thumb · 2px white inset border (floating pill
+   effect) · transparent track. background-clip: padding-box keeps the
+   white inset visible instead of being covered by the thumb fill. */
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-track {
-  background: #e2e8f0;
-  border-radius: 999px;
+  background: transparent;
 }
 *::-webkit-scrollbar-thumb {
   background: #005D97;
   border-radius: 999px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid white;
+  background-clip: padding-box;
 }
 *::-webkit-scrollbar-thumb:hover {
   background: #003d66;
+  background-clip: padding-box;
 }
 *::-webkit-scrollbar-corner {
-  background: #e2e8f0;
+  background: transparent;
 }
 /* Firefox */
 * {
