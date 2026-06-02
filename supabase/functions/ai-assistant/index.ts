@@ -1,5 +1,13 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import {
+  TOV_GUIDE,
+  BANNED_PHRASES,
+  STRUCTURES_TO_AVOID,
+  SCHWARTZ_MATRIX,
+  PERSONA_LIBRARY,
+  VOICE_PROFILES,
+} from "./skill-content.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -21,192 +29,113 @@ type AiAction =
   | "meta_description"
   | "custom";
 
-// ── Voice profiles (condensed from bolter-tones) ─────────────────────────────
+// ── Skill content imported from ./skill-content.ts ───────────────────────────
+//
+// The constants TOV_GUIDE, BANNED_PHRASES, STRUCTURES_TO_AVOID, SCHWARTZ_MATRIX,
+// PERSONA_LIBRARY, and VOICE_PROFILES are imported at the top of this file.
+// They're auto-generated from ~/Documents/skills/bolt-writing-skills via
+// scripts/sync-writing-skill.mjs. Run that script and redeploy when Taylor
+// updates any source skill file.
+//
+// PERSONA_LIBRARY is a single string containing all six persona profiles
+// (~30KB). We parse out the relevant section per request so we don't blow the
+// system-prompt budget shipping all six every call.
 
-const VOICE_PROFILES: Record<string, string> = {
-  "Eric Simons": `Voice: Eric Simons — Builder-CEO energy.
-Core traits: Casually confident, technically fluent, hype without polish. Writes like texting a group chat of engineers. Short sentences. Fragments. Lowercase energy.
-Sentence patterns: Short declarative openers. One-line follow-ups that reframe or escalate. Occasional parenthetical. Dashes for lists. Em dashes and line breaks for rhythm.
-Avoids: Corporate/PR language, long threads, hedging, hashtags, self-congratulatory tone — the team wins.
-Emoji: Sparse and purposeful. Lightning bolt for Bolt. Blue heart for community.
-Voice in 5 words: Casual. Concrete. Generous. Technical. Hyped.`,
+// ── Persona library parser ───────────────────────────────────────────────────
 
-  "Alexander Berger": `Voice: Alexander Berger — Operator-commentator energy.
-Core traits: Internet-native casual. Uses shorthand ("ppl," "u"), meme formats, quote-tweets as primary mode. Commentary over announcements — he reacts, not broadcasts. Humor-first: memes, reaction videos, dry one-liners. Broad topics (politics, culture, personal). Opinionated but measured.
-Sentence patterns: Very short one-liners, often a single fragment. Quote-tweet + reaction format. Two-part: observation + punchline. Colons to set up reveals.
-Avoids: Long threads, formal launch language, over-explained context, hashtags, corporate voice, taking himself too seriously.
-Emoji: More liberal than Eric but purposeful. Muscle for wins, prayer hands, laughing emoji.
-Voice in 5 words: Memetic. Reactive. Blunt. Playful. Grounded.`,
-
-  "Dominic Elm": `Voice: Dominic Elm — Engineer-educator energy.
-Core traits: Teacher-builder first, promoter second. Default mode is explaining how things work. Curiosity as hook — opens with questions ("Ever wondered how...?"). Grounded technical authority — names specific technologies without hedging. Measured enthusiasm — earns his exclamation points. Problem-framer, not opinion-warrior.
-Sentence patterns: Curiosity hook openers. Temporal/milestone leads. Dramatic pause with ellipsis. Direct thesis statements. Closes with community questions.
-Avoids: Hot takes, dunking, internet slang, memes, self-deprecation, empty superlatives, personal lifestyle content.
-Emoji: Moderate and purposeful. Structural markers more than emotional signals.
-Voice in 5 words: Methodical. Substantive. Curious. Grounded. Earned.`,
-
-  "Garrett Serviss": `Voice: Garrett Serviss — Marketing-operator energy.
-Core traits: Structured and deliberate. Writes in complete, well-formed sentences. Hook-first marketer's instinct — strong declarative opens. Benefit-led product framing. People and leadership lens. Practical value-sharer — teaches by showing his own work.
-Sentence patterns: Strong declarative hook. Problem statement → solution framing. Lists for features/steps. Closing CTA. Clean paragraph breaks.
-Avoids: Memes, reaction videos, political hot takes, sentence fragments, overly technical jargon, self-deprecation, hashtags.
-Emoji: Minimal and professional. Occasional emphasis.
-Voice in 5 words: Structured. Benefit-led. Warm. Polished. Practical.`,
-
-  "Donald Savard": `Voice: Donald Savard — Launch-mode PMM energy.
-Core traits: Ultra-compact bursts — 1-2 sentences max. Vibes-first product marketing — aesthetic and emotional reactions. Always-on launch energy. Show-don't-tell demo style. Conversational community builder — polls, questions, honest takes. Meme-literate. Aspirational micro-content.
-Sentence patterns: Ultra-short declarative. Screenshot/video does the heavy lifting. Drawn-out words for emphasis ("whiiiiiile"). Prompt-result pairs.
-Avoids: Long threads, technical deep-dives, formal marketing language, structured posts with headers, hashtags, corporate hedging.
-Emoji: Moderate and celebratory. Raised hands for wins.
-Voice in 5 words: Punchy. Vibes-driven. Prolific. Showcase-first. Conversational.`,
-
-  "Gary Ballabio": `Voice: Gary Ballabio — Enterprise partnerships energy.
-Core traits: Amplifier above all — ~85-90% reposts. When original, reads like BD announcements. Multi-paragraph, structured, benefit-oriented. Enterprise and partnership framing. Only Bolt voice who uses hashtags. Celebratory emoji style. Occasional ultra-short reactions with trailing dots.
-Sentence patterns: Multi-paragraph structured announcement. Hashtag-enriched first line. Celebratory emoji as punctuation. Trailing ellipsis for short reactions. CTA-driven closers.
-Avoids: Memes, technical deep-dives, sentence fragments, personal hot takes, irony, stream-of-consciousness.
-Emoji: Moderate, always celebratory/professional. Party popper, flexed bicep.
-Voice in 5 words: Professional. Amplifying. Partnership-focused. Polished. Hashtag-forward.`,
+// Map common UI persona labels to the heading anchors used in the library file.
+const PERSONA_HEADING_BY_LABEL: Record<string, string> = {
+  "Small business owner / founder": "Persona 1: Small business owner",
+  "Small business owner / founder / entrepreneur": "Persona 1: Small business owner",
+  "Enterprise CTO / App Dev Leader": "Persona 2a: CTO",
+  "Enterprise CPO": "Persona 2b: CPO",
+  "Enterprise buyer: CTO / App Dev Leader": "Persona 2a: CTO",
+  "Enterprise buyer: CPO": "Persona 2b: CPO",
+  "Product manager": "Persona 3: Product manager",
+  "Professional developer": "Persona 4: Professional developer",
+  "Marketer / creative / freelancer": "Persona 5: Marketer / creative",
+  "Marketer / creative agency / creative freelancer": "Persona 5: Marketer / creative",
+  "General reader": "Persona 6: General reader",
 };
 
-// ── Persona briefs (condensed from bolt-buyer-personas) ──────────────────────
+/**
+ * Pull the matching `## Persona N: ...` block out of the persona library so we
+ * inject only the relevant audience into the system prompt. Returns null if no
+ * section matches (caller skips persona injection).
+ */
+function getPersonaSection(label: string | undefined): string | null {
+  if (!label) return null;
 
-const PERSONA_BRIEFS: Record<string, string> = {
-  "Small business owner / founder": `Persona: Small business owner / founder / entrepreneur.
-Non-technical domain experts. Open to AI but don't know where to start. Zero patience for fluff.
-Voice: Plain language, relatable scenarios, ROI-focused, low jargon.
-Pain points: Website costs ($8K-$22K quotes), time, loss of control, AI knowledge gap, tool overwhelm.
-What works: Cost comparison ($20/month vs $12K upfront), speed (afternoon vs months), control, real examples from people like them.
-Reading level: Flesch 60-70, short sentences, minimal jargon.`,
+  // Prefer the explicit alias table; fall back to a fuzzy prefix match.
+  const anchor =
+    PERSONA_HEADING_BY_LABEL[label] ??
+    Object.entries(PERSONA_HEADING_BY_LABEL).find(([key]) =>
+      label.toLowerCase().startsWith(key.toLowerCase()),
+    )?.[1];
 
-  "Enterprise CTO / App Dev Leader": `Persona: Enterprise CTO / App Dev Leader.
-Technical gatekeeper, owns the stack and security posture. High jargon tolerance.
-Voice: Authoritative, infrastructure-focused, architecture and scale matter.
-Pain points: Security, compliance, performance at scale, legacy migration, team productivity.
-What works: Technical depth, architecture details, security certifications, performance benchmarks.
-Reading level: Flesch 40-55, technical precision, show don't tell.`,
+  if (!anchor) return null;
 
-  "Enterprise CPO": `Persona: Enterprise CPO.
-Product and innovation leader, owns velocity and team productivity.
-Voice: Authoritative, outcome-focused, business outcomes and competitive positioning.
-Pain points: Time to market, team velocity, competitive pressure, innovation pipeline.
-What works: Business outcomes, product strategy, competitive positioning, case studies.
-Reading level: Flesch 50-60, balanced jargon, features-to-outcomes framing.`,
+  const startMarker = `## ${anchor}`;
+  const startIdx = PERSONA_LIBRARY.indexOf(startMarker);
+  if (startIdx < 0) return null;
 
-  "Product manager": `Persona: Product manager.
-Bridge between business and engineering, needs speed to validation.
-Voice: Practical, PRD-fluent, workflow improvements, features-to-outcomes framing.
-Pain points: Slow prototyping cycles, dependency on engineering, validating ideas quickly.
-What works: Speed-to-prototype, reducing dependencies, workflow improvements, before/after.
-Reading level: Flesch 50-65, moderate jargon, concrete examples.`,
+  // Find the next top-level `## Persona ` heading OR `## Persona selection` so we
+  // stop cleanly at the boundary. Use a small offset so we don't match our own start.
+  const tail = PERSONA_LIBRARY.slice(startIdx + 1);
+  const nextHeadingMatch = tail.match(/\n## (Persona |Persona selection|Data sources)/);
+  const endIdx = nextHeadingMatch
+    ? startIdx + 1 + (nextHeadingMatch.index ?? tail.length)
+    : PERSONA_LIBRARY.length;
 
-  "Professional developer": `Persona: Professional developer.
-AI power user, skeptical of AI-coded output. High jargon tolerance, technical precision required.
-Voice: Technical, direct, humor welcome, show don't tell.
-Pain points: Code quality concerns, debugging AI output, workflow disruption.
-What works: Technical precision, code examples, honest limitations, respect for craft.
-Reading level: Flesch 35-50, high jargon density OK, demonstrate rather than claim.`,
-
-  "Marketer / creative / freelancer": `Persona: Marketer / creative / freelancer.
-Design-fluent builders who deliver for clients or campaigns.
-Voice: Confident, visual, outcome-driven, benefits and speed.
-Pain points: Client delivery deadlines, design-to-code gap, cost of specialized tools.
-What works: Visual results, speed, low technical barrier, client-facing output quality.
-Reading level: Flesch 55-65, moderate jargon, visual-first framing.`,
-
-  "General reader": `Persona: General reader.
-Curious explorer, top-of-funnel, not buying yet.
-Voice: Accessible, educational, broad appeal, minimal assumptions.
-Pain points: Curiosity about AI, information overload, not sure what's possible.
-What works: Plain language, surprising examples, low barrier, inspiration over instruction.
-Reading level: Flesch 65-75, minimal jargon, educational tone.`,
-};
-
-// ── Banned phrases (condensed from bolt-TOV-and-guidelines) ──────────────────
-
-const BANNED_PHRASES = `BANNED PHRASES — Remove every instance:
-Throat-clearing: "Here's the thing:", "Here's what/why/this...", "The uncomfortable truth is", "It turns out", "Let me be clear", "The truth is", "Can we talk about"
-Emphasis crutches: "Full stop.", "Let that sink in.", "Read that again.", "This matters because", "This changes everything"
-Dead AI language: "In today's...", "It's worth noting...", "Delve", "Dive into", "Landscape", "Realm", "Robust", "Game-changer", "Cutting-edge", "In order to", "In a world where", "When it comes to", "At the end of the day", "At its core"
-Dead transitions: "Furthermore", "Additionally", "Moreover", "Moving forward", "To put this in perspective...", "In other words..."
-AI cringe: "Supercharge", "Unlock", "Future-proof", "10x your productivity", "The AI revolution"
-Generic insider: "Here's the part nobody's talking about", "What nobody tells you"
-Business jargon: "Navigate (challenges)", "Lean into", "Double down", "Deep dive", "Circle back"
-Meta-commentary: "Hint:", "Plot twist:", "Let me walk you through...", "In this section, we'll..."
-Adverbs: Kill all -ly words. No softeners (really, just, simply), intensifiers (genuinely, truly, deeply), or hedges (honestly, actually, fundamentally).`;
-
-// ── Structures to avoid (condensed) ──────────────────────────────────────────
-
-const STRUCTURES_TO_AVOID = `STRUCTURES TO AVOID:
-Binary contrasts: "Not because X. Because Y." / "X isn't the problem. Y is." — State Y directly.
-Dramatic fragmentation: "[Noun]. That's it." / "X. And Y. And Z." — Complete sentences.
-Rhetorical setups: "What if I told you..." / "Here's what I mean:" — Make the point directly.
-False agency: "a complaint becomes a fix" — Name the human who fixed it.
-Narrator-from-distance: "People tend to..." — Use "you" instead.
-Overly smooth connectors: "This belief defines..." — Cut if the paragraph follows logically.
-Rhythm issues: Default to pairs (not tricolons). Vary sentence lengths. No stacked punchy fragments. Vary paragraph endings.`;
-
-// ── Schwartz matrix (condensed for diagnosis action) ─────────────────────────
-
-const SCHWARTZ_MATRIX = `SCHWARTZ 5x5 FRAMEWORK:
-
-Two axes determine your copy approach:
-1. Customer Awareness: How much does the reader know? (Unaware → Problem-aware → Solution-aware → Product-aware → Most aware)
-2. Market Sophistication: How many competitors made similar promises? (Stage 1: First to market → Stage 5: Total skepticism)
-
-AWARENESS LEVELS:
-- Unaware: Lead with story/identity, not the product. Long copy. Build the entire journey.
-- Problem-aware: Name the pain vividly. Show you understand better than they do. Medium-long copy.
-- Solution-aware: Show your mechanism is different. Unique approach matters most here. Medium copy.
-- Product-aware: Proof, comparison, social validation. Stack evidence. Medium-short copy.
-- Most aware: Just make the offer, remove friction. Short copy. Deal-driven.
-
-SOPHISTICATION LEVELS:
-- Stage 1 (First to market): Simple direct claim. State the benefit. Short headlines.
-- Stage 2 (Competing claims): Enlarge the claim. Bigger, faster, more specific.
-- Stage 3 (Mechanism era): Explain HOW it works differently. Unique mechanism wins.
-- Stage 4 (Proof required): Stack evidence. Testimonials, numbers, before/after.
-- Stage 5 (Total skepticism): Lead with identity or story. Proof through narrative.
-
-KEY INTERSECTIONS:
-- Unaware + Stage 1: Story → problem recognition → solution → product → CTA
-- Problem-aware + Stage 3: Agitate pain → introduce your mechanism → show how → proof → CTA
-- Solution-aware + Stage 4: Lead with proof your mechanism delivers → comparison → stacked evidence
-- Product-aware + Stage 5: Social proof + identity → "people like you chose this" → offer
-- Most aware + any stage: Remove friction. Offer + urgency. Shortest possible copy.
-
-For each content piece, diagnose: What should the headline strategy be? Should the lead be story, problem, mechanism, proof, or offer? What copy length? What proof type?`;
+  return PERSONA_LIBRARY.slice(startIdx, endIdx).trim();
+}
 
 // ── Core system prompt ───────────────────────────────────────────────────────
+//
+// The system prompt assembles in layers:
+//   1. CORE_INTRO — short framing of role + how the layers fit
+//   2. TOV_GUIDE — full bolt-TOV-and-guidelines (tone, editorial rules, Stop Slop)
+//   3. STOP_SLOP_DETAIL — full banned-phrase catalog + structures-to-avoid
+//   4. (selective) ACTIVE VOICE PROFILE — only the one selected on the item
+//   5. (selective) ACTIVE PERSONA — only the one selected on the item
+//   6. (action-conditional) SCHWARTZ_MATRIX — only for schwartz_diagnosis
+//
+// Total per-request system prompt: ~10-15K tokens depending on selections.
 
-const CORE_SYSTEM_PROMPT = `You are the Bolt.new Writer — a content creation assistant for the Bolt.new content team.
+const CORE_INTRO = `You are the Bolt.new Writer — the AI assistant inside ContentedCal that the Bolt.new content team uses to draft, edit, and audit content.
 
-VOICE AND TONE:
-- Default voice: Bolt.new TOV — direct, casual-confident, technically honest. Say what you mean. No corporate padding.
-- If a specific voice is selected on this content item, adapt: match that person's rhythm, energy, and vocabulary while keeping Bolt.new editorial standards.
-- No filler words, hedge phrases, or empty transitions. Every sentence earns its place.
-- Sentence casing for headings (not Title Case).
-- Always refer to the product as Bolt.new. Never just "Bolt."
-- Use the Oxford comma.
-- Active voice. Contractions. US spelling.
-- Limit adverbs and adjectives. Cut redundant modifiers.
+Three guides shape every response:
 
-CONTENT TYPE AWARENESS:
-Adapt your approach to the content type:
-- Blog: Hook opening, H2/H3 structure, 800-1500 words, CTA at end
-- Social: Platform-native voice. LinkedIn: professional with humor, ~250-1300 chars. X: brevity-first, ~250 chars.
-- Email: Subject line + body, one CTA per email, no clickbait subjects
-- Website copy: 5-question test (What is this? Who is it for? Why care? Why trust? What next?). CTA describes what happens when clicked.
-- Customer story: Lead with achievement, customer voice carries the story, every claim needs a number or quote
-- Ad copy: Produce 3 variants (TOV, Ogilvy, Schwartz). Respect character limits.
+1. \`bolt-TOV-and-guidelines\` (below) — the authoritative tone-of-voice, editorial rules, and Stop Slop filter that every Bolt.new and StackBlitz piece must follow.
+2. (Optional) \`bolter-tones\` — a specific Bolt team member's voice profile, injected below when one is selected on the content item.
+3. (Optional) \`bolt-buyer-personas\` — the target audience's persona profile, injected below when one is set on the content item.
 
-PERSONA AWARENESS:
-If a target persona is set, shape the content for that reader's language, depth, and pain points.
+When responding:
+- Apply the TOV + Stop Slop filter to every word you produce.
+- If a voice profile is active, adapt rhythm, energy, and vocabulary to it while keeping Bolt.new editorial standards.
+- If a persona is active, shape angle, depth, vocabulary, examples, and CTA for that reader.
+- Match the content type signaled by the request (blog, social, email, ad, etc.).
+- Specify what you produced and offer to iterate.`;
 
-STOP SLOP RULES:
+const CORE_SYSTEM_PROMPT = `${CORE_INTRO}
+
+═══════════════════════════════════════════════════════════════════════════════
+BOLT TOV AND EDITORIAL GUIDELINES (\`bolt-TOV-and-guidelines/SKILL.md\`)
+═══════════════════════════════════════════════════════════════════════════════
+
+${TOV_GUIDE}
+
+═══════════════════════════════════════════════════════════════════════════════
+BANNED PHRASES (\`bolt-TOV-and-guidelines/references/banned.md\`)
+═══════════════════════════════════════════════════════════════════════════════
+
 ${BANNED_PHRASES}
 
-${STRUCTURES_TO_AVOID}
+═══════════════════════════════════════════════════════════════════════════════
+STRUCTURES TO AVOID (\`bolt-TOV-and-guidelines/references/structures.md\`)
+═══════════════════════════════════════════════════════════════════════════════
 
-When generating content, specify what you produced and offer to iterate.`;
+${STRUCTURES_TO_AVOID}`;
 
 // ── Request body type ────────────────────────────────────────────────────────
 
@@ -269,25 +198,42 @@ function buildItemContext(body: RequestBody): string {
 function buildSystemPrompt(body: RequestBody): string {
   const parts: string[] = [CORE_SYSTEM_PROMPT];
 
+  // Inject the active voice profile if one is selected and we have a match.
   const voice = body.custom_field_context?.voice;
   if (voice && voice !== "Bolt.new TOV" && VOICE_PROFILES[voice]) {
-    parts.push(`\n--- ACTIVE VOICE PROFILE ---\n${VOICE_PROFILES[voice]}`);
-  }
-
-  const persona = body.custom_field_context?.target_persona;
-  if (persona) {
-    // Try exact match first, then partial
-    const key = Object.keys(PERSONA_BRIEFS).find(
-      (k) => k === persona || persona.startsWith(k) || k.startsWith(persona)
+    parts.push(
+      `\n═══════════════════════════════════════════════════════════════════════════════\n` +
+      `ACTIVE VOICE PROFILE — ${voice} (\`bolter-tones/references/...\`)\n` +
+      `═══════════════════════════════════════════════════════════════════════════════\n\n` +
+      `Apply this voice on top of the Bolt.new editorial guidelines. The TOV + Stop Slop ` +
+      `rules above still govern grammar, formatting, and quality. The voice profile shapes ` +
+      `rhythm, energy, sentence patterns, and vocabulary.\n\n` +
+      `${VOICE_PROFILES[voice]}`,
     );
-    if (key) {
-      parts.push(`\n--- ACTIVE PERSONA ---\n${PERSONA_BRIEFS[key]}`);
-    }
   }
 
-  // Inject Schwartz matrix for diagnosis action
+  // Inject the active persona section if one is selected and we can resolve it.
+  const persona = body.custom_field_context?.target_persona;
+  const personaSection = getPersonaSection(persona);
+  if (personaSection) {
+    parts.push(
+      `\n═══════════════════════════════════════════════════════════════════════════════\n` +
+      `ACTIVE PERSONA — ${persona} (\`bolt-buyer-personas/SKILL.md\`)\n` +
+      `═══════════════════════════════════════════════════════════════════════════════\n\n` +
+      `Shape every decision — angle, depth, vocabulary, examples, CTA — for this audience. ` +
+      `Apply the Voice adjustment + Readability targets on top of the Bolt.new TOV.\n\n` +
+      `${personaSection}`,
+    );
+  }
+
+  // Schwartz matrix is only relevant to the schwartz_diagnosis action.
   if (body.action === "schwartz_diagnosis") {
-    parts.push(`\n--- SCHWARTZ FRAMEWORK ---\n${SCHWARTZ_MATRIX}`);
+    parts.push(
+      `\n═══════════════════════════════════════════════════════════════════════════════\n` +
+      `SCHWARTZ 5x5 MATRIX (\`writing-bolt-ed-ly/references/schwartz-5x5-matrix.md\`)\n` +
+      `═══════════════════════════════════════════════════════════════════════════════\n\n` +
+      `${SCHWARTZ_MATRIX}`,
+    );
   }
 
   return parts.join("\n");
@@ -415,7 +361,10 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
-        max_tokens: 2048,
+        // 4096 leaves room for long-form drafts (blog, customer story, long-form)
+        // without truncating. Costs more on per-call tokens but the writing skill
+        // routinely needs the headroom.
+        max_tokens: 4096,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }],
       }),

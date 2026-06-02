@@ -144,6 +144,40 @@ function InsertModal({
   );
 }
 
+// ── Shimmer card (loading state) ─────────────────────────────────────────────
+
+function ShimmerCard({ action }: { action: AiAction | 'custom' }) {
+  const actionMeta = action === 'custom'
+    ? { label: 'Custom prompt', icon: <Sparkles className="w-3.5 h-3.5" /> }
+    : ALL_ACTIONS.find(a => a.id === action);
+  return (
+    <div
+      className="bg-surface-card border rounded-xl overflow-hidden"
+      style={{ borderColor: '#00233918' }}
+      role="status"
+      aria-live="polite"
+      aria-label={`Generating ${actionMeta?.label ?? action}`}
+    >
+      <div className="flex items-center justify-between px-3 py-2 bg-surface-nested border-b border-slate-100">
+        <div className="flex items-center gap-1.5">
+          <span style={{ color: AI_ACCENT }}>
+            {actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}
+          </span>
+          <span className="text-xs font-medium text-slate-700">{actionMeta?.label ?? 'Generating…'}</span>
+          <Loader2 className="w-3 h-3 animate-spin ml-1" style={{ color: AI_ACCENT }} />
+        </div>
+        <span className="text-[10px] text-slate-400">Generating…</span>
+      </div>
+      <div className="px-3 py-3 space-y-2">
+        <div className="cc-skel h-2.5 w-[92%]" />
+        <div className="cc-skel h-2.5 w-[97%]" />
+        <div className="cc-skel h-2.5 w-[78%]" />
+        <div className="cc-skel h-2.5 w-[85%]" />
+      </div>
+    </div>
+  );
+}
+
 // ── Response card ────────────────────────────────────────────────────────────
 
 function ResponseCard({
@@ -160,7 +194,7 @@ function ResponseCard({
   const timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-surface-card border rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
+    <div className="bg-surface-card border rounded-xl overflow-hidden" style={{ borderColor: '#00233918' }}>
       <div className="flex items-center justify-between px-3 py-2 bg-surface-nested border-b border-slate-100">
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">{actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}</span>
@@ -320,7 +354,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
 
   return (
     <>
-      <div className="border rounded-xl overflow-hidden" style={{ borderColor: '#002339' }}>
+      <div className="border rounded-xl overflow-hidden" style={{ borderColor: '#00233918' }}>
         {/* Header toggle */}
         <button
           onClick={() => setOpen(o => !o)}
@@ -456,15 +490,16 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                   </div>
                 </div>
 
-                {/* History */}
+                {/* History (with shimmer card on top while a request is in flight) */}
                 {loadingHistory ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                   </div>
-                ) : history.length > 0 ? (
+                ) : loading !== null || history.length > 0 ? (
                   <div>
                     <p className="text-xs font-medium text-slate-500 mb-2">Recent responses</p>
                     <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
+                      {loading !== null && <ShimmerCard action={loading} />}
                       {history.map(int => (
                         <ResponseCard
                           key={int.id}
