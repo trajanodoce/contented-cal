@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { GripVertical, Check, Plus, X, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { GripVertical, Check, Plus, X, Calendar, ChevronDown, ClipboardCheck, Settings } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
+import type { SubtaskTemplate } from '../../lib/utils';
 import type { Subtask, Profile } from '../../lib/database.types';
 import { DatePickerPanel, datePickerPopoverClass, datePickerPopoverStyle } from '../ui/DatePicker';
 
@@ -12,9 +14,12 @@ interface SubtasksSectionProps {
   userId: string | null;
   members: Profile[];
   addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
+  templates?: SubtaskTemplate[];
+  userRole?: string;
 }
 
-export function SubtasksSection({ contentItemId, userId, members, addToast }: SubtasksSectionProps) {
+export function SubtasksSection({ contentItemId, userId, members, addToast, templates = [], userRole }: SubtasksSectionProps) {
+  const navigate = useNavigate();
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -22,9 +27,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
   const [assigneePopoverId, setAssigneePopoverId] = useState<string | null>(null);
   const [dueDateEditId, setDueDateEditId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
 
   const dragIdRef = useRef<string | null>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
+  const templatePickerRef = useRef<HTMLDivElement>(null);
+  const templateBtnRef = useRef<HTMLButtonElement>(null);
   const assigneePopoverRef = useRef<HTMLDivElement>(null);
   const assigneeBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const dueDateRef = useRef<HTMLDivElement>(null);
@@ -56,7 +64,6 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
     function handleClickOutside(e: MouseEvent) {
       const target = e.target as Node;
       if (assigneePopoverId && assigneePopoverRef.current && !assigneePopoverRef.current.contains(target)) {
-        // Also check if click was on the toggle button itself
         const btn = assigneeBtnRefs.current[assigneePopoverId];
         if (!btn || !btn.contains(target)) {
           setAssigneePopoverId(null);
@@ -68,10 +75,42 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
           setDueDateEditId(null);
         }
       }
+      if (templatePickerOpen && templatePickerRef.current && !templatePickerRef.current.contains(target)) {
+        if (!templateBtnRef.current || !templateBtnRef.current.contains(target)) {
+          setTemplatePickerOpen(false);
+        }
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [assigneePopoverId, dueDateEditId]);
+  }, [assigneePopoverId, dueDateEditId, templatePickerOpen]);
+
+  // Apply a subtask template — appends items at the end
+  const applyTemplate = async (template: SubtaskTemplate) => {
+    setTemplatePickerOpen(false);
+    const startPos = subtasks.length;
+
+    const rows = template.items.map((title, i) => ({
+      content_item_id: contentItemId,
+      title,
+      position: startPos + i,
+    }));
+
+    const { data, error } = await supabase
+      .from('subtasks')
+      .insert(rows)
+      .select();
+
+    if (error) {
+      addToast('Failed to add subtasks from template', 'error');
+      return;
+    }
+
+    if (data && data.length > 0) {
+      setSubtasks(prev => [...prev, ...data]);
+      addToast(`Added ${data.length} subtasks from "${template.name}".`, 'success');
+    }
+  };
 
   // Position the due-date popover to the right of the trigger (subtask rows sit at
   // the bottom of a slide-over, so opening downward gets clipped). Fall back to the
@@ -329,6 +368,68 @@ export function SubtasksSection({ contentItemId, userId, members, addToast }: Su
           <span className="text-xs font-medium text-slate-500 bg-[#005D9712] px-1.5 py-0.5 rounded">
             {completedCount}/{totalCount}
           </span>
+        )}
+
+        <div className="flex-1" />
+
+        {/* Template picker — only shown when templates exist */}
+        {templates.length > 0 && (
+          <div className="relative">
+            <button
+              ref={templateBtnRef}
+              onClick={() => setTemplatePickerOpen(!templatePickerOpen)}
+              className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors"
+              style={{
+                color: '#005D97',
+                border: '1px solid #00233930',
+                backgroundColor: templatePickerOpen ? '#005D9710' : 'transparent',
+              }}
+            >
+              <ClipboardCheck className="w-3 h-3" />
+              Template
+              <ChevronDown className="w-3 h-3" />
+            </button>
+
+            {templatePickerOpen && (
+              <div
+                ref={templatePickerRef}
+                className="absolute right-0 top-full mt-1 min-w-[200px] max-h-[260px] overflow-y-auto bg-white rounded-lg shadow-lg py-1 z-50"
+                style={{
+                  border: '1px solid #00233930',
+                  backgroundImage: 'linear-gradient(135deg, #005D9708 0%, transparent 60%)',
+                }}
+              >
+                {templates.map((t, i) => (
+                  <button
+                    key={`${t.name}-${i}`}
+                    onClick={() => applyTemplate(t)}
+                    className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors"
+                  >
+                    <span className="font-medium text-slate-900 block">{t.name}</span>
+                    <span className="text-xs text-slate-400">
+                      {t.items.length} {t.items.length === 1 ? 'item' : 'items'}
+                    </span>
+                  </button>
+                ))}
+
+                {userRole === 'admin' && (
+                  <>
+                    <div className="border-t my-1" style={{ borderColor: '#00233918' }} />
+                    <button
+                      onClick={() => {
+                        setTemplatePickerOpen(false);
+                        navigate('/settings/customizations/subtask-templates');
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs font-medium text-slate-500 hover:text-[#005D97] hover:bg-[#005D9708] transition-colors flex items-center gap-1.5"
+                    >
+                      <Settings className="w-3 h-3" />
+                      Manage templates &rarr;
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
 

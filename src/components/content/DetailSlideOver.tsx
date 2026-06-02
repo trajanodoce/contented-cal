@@ -8,7 +8,7 @@ import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import type { ContentItem, Comment, ActivityLog, ContentType, BoardColumn, Json, Profile } from '../../lib/database.types';
-import { formatDateFull, PRIORITY_STYLES, getWorkspaceChannels } from '../../lib/utils';
+import { formatDateFull, PRIORITY_STYLES, getWorkspaceChannels, getWorkspaceSubtaskTemplates } from '../../lib/utils';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import { SubtasksSection } from './SubtasksSection';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, LINEAR_TEXT, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
@@ -106,6 +106,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const { contentTypes, boardColumns, user, customFieldDefs, projects, members } = useApp();
   const { userRole, currentWorkspace } = useWorkspace();
   const channels = useMemo(() => getWorkspaceChannels(currentWorkspace?.settings), [currentWorkspace?.settings]);
+  const subtaskTemplates = useMemo(() => getWorkspaceSubtaskTemplates(currentWorkspace?.settings), [currentWorkspace?.settings]);
   const isOrdinalPost = isOrdinalItem(item);
   const isLinearIssue = isLinearItem(item);
   const cf = (item.custom_fields as Record<string, string>) ?? {};
@@ -845,6 +846,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 userId={user?.id ?? null}
                 members={subtaskMembers}
                 addToast={addToast}
+                templates={subtaskTemplates}
+                userRole={userRole}
               />
 
               {/* AI Assistant */}
