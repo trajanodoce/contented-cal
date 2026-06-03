@@ -5,7 +5,7 @@
 // after updating any skill file. Updated content takes effect on next
 // edge-function deploy.
 //
-// Last sync: 2026-06-02
+// Last sync: 2026-06-03
 // Total content: ~164KB across 12 source files
 // ============================================================================
 

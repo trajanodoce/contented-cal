@@ -2,25 +2,34 @@
 /**
  * Sync the bolt-writing-skills content into the ai-assistant edge function.
  *
- * Reads from ~/Documents/skills/bolt-writing-skills/ and stamps the relevant
- * SKILL.md and reference files into a generated TypeScript module that the
- * edge function imports. Re-run this script after updating any skill file
- * so the deployed system prompt stays in sync.
+ * Reads from `supabase/functions/ai-assistant/writing-skills/` (inside this
+ * repo) and stamps the relevant SKILL.md and reference files into a
+ * generated TypeScript module that the edge function imports. Re-run this
+ * script after updating any skill file so the deployed system prompt stays
+ * in sync.
+ *
+ * Note: ~/Documents/skills/bolt-writing-skills is symlinked to the in-repo
+ * location, so Claude Code keeps reading from the same path it always has,
+ * and any edit made via Claude Code lands in the repo automatically.
  *
  * Usage:
  *   node scripts/sync-writing-skill.mjs
  *
  * Then deploy the function via Supabase MCP (deploy_edge_function with both
- * index.ts and skill-content.ts in the files array).
+ * index.ts and skill-content.ts in the files array) or run
+ * `bash scripts/deploy-ai-assistant.sh`.
  */
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { homedir } from 'node:os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const SKILLS_DIR = join(homedir(), 'Documents/skills/bolt-writing-skills');
+const SKILLS_DIR = join(
+  __dirname,
+  '..',
+  'supabase/functions/ai-assistant/writing-skills',
+);
 const OUT_PATH = join(
   __dirname,
   '..',
