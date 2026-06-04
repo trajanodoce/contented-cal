@@ -116,6 +116,32 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
         <div className="flex flex-wrap gap-1.5">
           {options.map(opt => {
             const active = selected.includes(opt.value);
+            const color = opt.color;
+
+            // With color: active pills use canonical pill styling (color-12 bg,
+            // color text, color-30 border); inactive pills carry a faint border
+            // hint of their color so users can preview before clicking.
+            // Without color: fall back to the original brand-blue treatment.
+            const style = color
+              ? active
+                ? {
+                    backgroundColor: `${color}12`,
+                    color,
+                    borderColor: `${color}30`,
+                  }
+                : {
+                    backgroundColor: 'transparent',
+                    color: '#475569',
+                    borderColor: `${color}30`,
+                  }
+              : undefined;
+
+            const fallbackClass = color
+              ? ''
+              : active
+                ? 'bg-brand-600 text-white border-brand-600'
+                : 'text-slate-600 border-slate-300 hover:border-slate-400';
+
             return (
               <button
                 key={opt.value}
@@ -126,10 +152,8 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
                     : [...selected, opt.value];
                   onChange(next);
                 }}
-                className={`px-2.5 py-1 text-xs rounded-full border transition-colors
-                  ${active
-                    ? 'bg-brand-600 text-white border-brand-600'
-                    : 'text-slate-600 border-slate-300 hover:border-slate-400'}`}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-full border transition-colors ${fallbackClass}`}
+                style={style}
               >
                 {opt.label}
               </button>
