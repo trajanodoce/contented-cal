@@ -188,6 +188,7 @@ export type Database = {
         Row: {
           archived: boolean
           assignee_ids: string[] | null
+          category: Database["public"]["Enums"]["task_category"]
           channel: string | null
           completed: boolean
           completed_at: string | null
@@ -212,6 +213,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           assignee_ids?: string[] | null
+          category?: Database["public"]["Enums"]["task_category"]
           channel?: string | null
           completed?: boolean
           completed_at?: string | null
@@ -236,6 +238,7 @@ export type Database = {
         Update: {
           archived?: boolean
           assignee_ids?: string[] | null
+          category?: Database["public"]["Enums"]["task_category"]
           channel?: string | null
           completed?: boolean
           completed_at?: string | null
@@ -335,6 +338,7 @@ export type Database = {
       }
       custom_field_definitions: {
         Row: {
+          applies_to: Database["public"]["Enums"]["field_applies_to"]
           content_type_id: string | null
           field_type: Database["public"]["Enums"]["field_type"]
           id: string
@@ -345,6 +349,7 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
+          applies_to?: Database["public"]["Enums"]["field_applies_to"]
           content_type_id?: string | null
           field_type?: Database["public"]["Enums"]["field_type"]
           id?: string
@@ -355,6 +360,7 @@ export type Database = {
           workspace_id: string
         }
         Update: {
+          applies_to?: Database["public"]["Enums"]["field_applies_to"]
           content_type_id?: string | null
           field_type?: Database["public"]["Enums"]["field_type"]
           id?: string
@@ -1443,6 +1449,7 @@ export type Database = {
       }
     }
     Enums: {
+      field_applies_to: "content" | "design" | "both"
       field_type:
         | "text"
         | "long_text"
@@ -1467,6 +1474,7 @@ export type Database = {
         | "file"
       priority_level: "low" | "medium" | "high" | "urgent"
       project_status: "active" | "completed" | "archived"
+      task_category: "content" | "design"
       workspace_role: "admin" | "editor" | "viewer"
     }
     CompositeTypes: {
@@ -1595,6 +1603,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      field_applies_to: ["content", "design", "both"],
       field_type: [
         "text",
         "long_text",
@@ -1621,6 +1630,7 @@ export const Constants = {
       ],
       priority_level: ["low", "medium", "high", "urgent"],
       project_status: ["active", "completed", "archived"],
+      task_category: ["content", "design"],
       workspace_role: ["admin", "editor", "viewer"],
     },
   },
@@ -1670,6 +1680,8 @@ export interface PersonalTask {
 // Enum type aliases for backward compatibility
 export type CustomFieldType = Database['public']['Enums']['field_type'];
 export type ExternalLinkPlatform = Database['public']['Enums']['platform_type'];
+export type TaskCategory = Database['public']['Enums']['task_category'];
+export type FieldAppliesTo = Database['public']['Enums']['field_applies_to'];
 export type IntegrationPlatform = 'google' | 'notion' | 'linear' | 'claude' | 'ordinal' | 'granola' | 'slack';
 export type AiAction = 'quick_draft' | 'full_workflow' | 'headlines' | 'social_posts' | 'schwartz_diagnosis' | 'stop_slop_audit' | 'improvements' | 'meta_description' | 'custom';
 

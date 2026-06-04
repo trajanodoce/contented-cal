@@ -31,6 +31,20 @@ const fieldTypeLabels: Record<string, string> = Object.fromEntries(
   FIELD_TYPES.map(ft => [ft.value, ft.label])
 );
 
+// Scope chip rendering — maps `applies_to` value to its visual treatment.
+// Content = brand navy, Design = berry from board palette, Both = neutral slate.
+const SCOPE_META: Record<'content' | 'design' | 'both', { label: string; color: string }> = {
+  content: { label: 'Content', color: '#005D97' },
+  design: { label: 'Design', color: '#B8447A' },
+  both: { label: 'Both', color: '#64748B' },
+};
+
+const SCOPE_OPTIONS = [
+  { value: 'both', label: 'Both — Content and Design tasks' },
+  { value: 'content', label: 'Content tasks only' },
+  { value: 'design', label: 'Design tasks only' },
+];
+
 interface Props {
   workspaceId: string | null;
 }
@@ -221,6 +235,7 @@ function FieldTable({
         <thead className="bg-[#005D9712] border-b border-slate-200">
           <tr>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Name</th>
+            <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Scope</th>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Type</th>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Required</th>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Options</th>
@@ -230,10 +245,23 @@ function FieldTable({
         <tbody className="divide-y divide-slate-100">
           {fields.map(field => {
             const opts = parseOptions(field.options);
+            const scopeMeta = SCOPE_META[field.applies_to];
             return (
               <tr key={field.id} className="hover:bg-[#005D9718] transition-colors">
                 <td className="px-4 py-3">
                   <span className="text-sm font-medium text-slate-900">{field.name}</span>
+                </td>
+                <td className="px-4 py-3">
+                  <span
+                    className="inline-flex items-center px-2 py-0.5 text-xs font-semibold rounded-full"
+                    style={{
+                      backgroundColor: `${scopeMeta.color}12`,
+                      color: scopeMeta.color,
+                      border: `1px solid ${scopeMeta.color}30`,
+                    }}
+                  >
+                    {scopeMeta.label}
+                  </span>
                 </td>
                 <td className="px-4 py-3">
                   <span className="text-sm text-slate-600">
@@ -311,6 +339,7 @@ function FieldForm({
   const [fieldType, setFieldType] = useState<CustomFieldType>(editing?.field_type || 'text');
   const [required, setRequired] = useState(editing?.required || false);
   const [contentTypeId, setContentTypeId] = useState(editing?.content_type_id || '');
+  const [appliesTo, setAppliesTo] = useState<'content' | 'design' | 'both'>(editing?.applies_to || 'both');
   const [options, setOptions] = useState<SelectOption[]>(() => parseOptions(editing?.options ?? null));
   const [optionInput, setOptionInput] = useState('');
   const [saving, setSaving] = useState(false);
@@ -339,6 +368,7 @@ function FieldForm({
     const payload = {
       workspace_id: workspaceId,
       content_type_id: contentTypeId || null,
+      applies_to: appliesTo,
       name: name.trim(),
       field_type: fieldType,
       options: (needsOptions ? options : []) as unknown as Json,
@@ -417,6 +447,18 @@ function FieldForm({
         />
         <p className="text-xs text-slate-400 mt-1">
           Global fields appear on every content item. Scoped fields only appear for the selected type.
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-slate-700 mb-1.5">Applies to</label>
+        <StyledSelect
+          value={appliesTo}
+          onChange={v => setAppliesTo(v as 'content' | 'design' | 'both')}
+          options={SCOPE_OPTIONS}
+        />
+        <p className="text-xs text-slate-400 mt-1">
+          Choose which task type this field shows up on. "Both" appears on every task; "Content" only on content tasks; "Design" only on design tasks.
         </p>
       </div>
 
