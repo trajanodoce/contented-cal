@@ -13,6 +13,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { StyledSelect } from '../ui/StyledSelect';
 
 const FIELD_TYPES: { value: CustomFieldType; label: string; description: string }[] = [
   { value: 'text', label: 'Text', description: 'Single-line text input' },
@@ -388,35 +389,32 @@ function FieldForm({
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-700 mb-1.5">Field Type</label>
-          <select
+          <StyledSelect
             value={fieldType}
-            onChange={e => {
-              setFieldType(e.target.value as CustomFieldType);
-              if (e.target.value !== 'single_select' && e.target.value !== 'multi_select') {
+            onChange={v => {
+              setFieldType(v as CustomFieldType);
+              if (v !== 'single_select' && v !== 'multi_select') {
                 setOptions([]);
               }
             }}
-            className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface-card"
-          >
-            {FIELD_TYPES.map(ft => (
-              <option key={ft.value} value={ft.value}>{ft.label} — {ft.description}</option>
-            ))}
-          </select>
+            options={FIELD_TYPES.map(ft => ({
+              value: ft.value,
+              label: `${ft.label} — ${ft.description}`,
+            }))}
+          />
         </div>
       </div>
 
       <div>
         <label className="block text-xs font-medium text-slate-700 mb-1.5">Content Type Scope</label>
-        <select
+        <StyledSelect
           value={contentTypeId}
-          onChange={e => setContentTypeId(e.target.value)}
-          className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface-card"
-        >
-          <option value="">All content types (global)</option>
-          {contentTypes.map(ct => (
-            <option key={ct.id} value={ct.id}>{ct.name}</option>
-          ))}
-        </select>
+          onChange={v => setContentTypeId(v)}
+          options={[
+            { value: '', label: 'All content types (global)' },
+            ...contentTypes.map(ct => ({ value: ct.id, label: ct.name })),
+          ]}
+        />
         <p className="text-xs text-slate-400 mt-1">
           Global fields appear on every content item. Scoped fields only appear for the selected type.
         </p>

@@ -1,5 +1,6 @@
 import type { CustomFieldDefinition, SelectOption, Profile } from '../../lib/database.types';
 import DatePicker from '../ui/DatePicker';
+import { StyledSelect } from '../ui/StyledSelect';
 
 interface Props {
   fields: CustomFieldDefinition[];
@@ -100,16 +101,12 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
 
     case 'single_select':
       return (
-        <select
+        <StyledSelect
           value={(value as string) ?? ''}
-          onChange={e => onChange(e.target.value || null)}
-          className={`${cls} bg-surface-card`}
-        >
-          <option value="">Select...</option>
-          {options.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+          onChange={v => onChange(v || null)}
+          options={options}
+          placeholder="Select..."
+        />
       );
 
     case 'multi_select': {
@@ -142,17 +139,17 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
     }
 
     case 'user': {
+      const memberOptions = members.map(m => ({
+        value: m.id,
+        label: m.full_name || m.email || 'Unknown',
+      }));
       return (
-        <select
+        <StyledSelect
           value={(value as string) ?? ''}
-          onChange={e => onChange(e.target.value || null)}
-          className={`${cls} bg-surface-card`}
-        >
-          <option value="">Select team member...</option>
-          {members.map(m => (
-            <option key={m.id} value={m.id}>{m.full_name || m.email}</option>
-          ))}
-        </select>
+          onChange={v => onChange(v || null)}
+          options={memberOptions}
+          placeholder="Select team member..."
+        />
       );
     }
 
