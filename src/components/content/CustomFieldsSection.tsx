@@ -189,10 +189,11 @@ function CustomFieldInput({ field, value, onChange, compact, members = [], taskC
             const active = selected.includes(opt.value);
             const color = opt.color;
 
-            // With color: active pills use canonical pill styling (color-12 bg,
-            // color text, color-30 border); inactive pills carry a faint border
-            // hint of their color so users can preview before clicking.
-            // Without color: fall back to the original brand-blue treatment.
+            // With color: active pills get a strong tinted bg + bold border
+            // so "selected" reads clearly at a glance; inactive pills carry
+            // a faint border hint of their color so users can preview before
+            // clicking. Without color: fall back to the original brand-blue
+            // treatment.
             // Force readable contrast on light/pastel option colors via
             // pillTextColor (high saturation + low lightness). Apply to both
             // text and border so pastels stay visible against the tinted bg.
@@ -200,9 +201,9 @@ function CustomFieldInput({ field, value, onChange, compact, members = [], taskC
             const style = color
               ? active
                 ? {
-                    backgroundColor: `${color}12`,
+                    backgroundColor: `${color}28`,
                     color: safeColor,
-                    borderColor: `${safeColor}55`,
+                    borderColor: safeColor,
                   }
                 : {
                     backgroundColor: 'transparent',
