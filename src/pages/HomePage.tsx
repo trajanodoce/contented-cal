@@ -61,6 +61,42 @@ const ACTIVITY_FIELD_LABELS: Record<string, string> = {
   archived: 'Archived',
 };
 
+// Project card helpers — timeline-health + due-date relative formatting
+// (canonical Draft 5.3 pattern). Mirrors the logic in ProjectDetailPage but
+// simplified for the home dashboard card.
+
+function projectHealthColor(project: Project, ps?: ProjectMiniStats): string {
+  if (project.status === 'completed') return '#357254'; // green
+  if (project.status === 'archived') return '#64748B'; // slate
+
+  // Active: derive timeline health from end_date + completion ratio
+  if (!project.end_date) return '#005D97'; // navy default — no due date
+  const endDate = parseLocalDate(project.end_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const daysToEnd = Math.ceil((endDate.getTime() - today.getTime()) / 86400000);
+  const completion = ps && ps.total > 0 ? ps.completed / ps.total : 0;
+  if (daysToEnd < 0) return '#BA2C2C'; // overdue
+  if (daysToEnd <= 7 && completion < 0.8) return '#C4504A'; // due soon, under-done
+  return '#357254'; // on track
+}
+
+function projectDueMeta(due: string | null): { label: string; color: string } | null {
+  if (!due) return null;
+  const dueDate = parseLocalDate(due);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.ceil((dueDate.getTime() - today.getTime()) / 86400000);
+  if (days < 0) {
+    const overdueDays = Math.abs(days);
+    return { label: `Overdue ${overdueDays}d`, color: '#BA2C2C' };
+  }
+  if (days === 0) return { label: 'Due today', color: '#C4504A' };
+  if (days <= 3) return { label: `Due in ${days}d`, color: '#D98A6B' };
+  if (days <= 7) return { label: `Due in ${days}d`, color: '#64748B' };
+  return { label: `Due ${formatDate(due)}`, color: '#64748B' };
+}
+
 function humanizeActivityAction(action: string): string {
   // Pattern: "Updated <field>" → look up canonical label
   const updateMatch = action.match(/^Updated\s+(.+)$/i);
@@ -80,6 +116,12 @@ function humanizeActivityAction(action: string): string {
   return action;
 }
 
+interface ProjectMiniStats {
+  total: number;
+  completed: number;
+  nearestUpcomingDue: string | null;
+}
+
 export function HomePage() {
   const navigate = useNavigate();
   const { currentWorkspace } = useWorkspace();
@@ -87,6 +129,7 @@ export function HomePage() {
   const { setSelectedItemId } = useSelectedItem();
   const [stats, setStats] = useState<WorkspaceStats | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [projectStats, setProjectStats] = useState<Map<string, ProjectMiniStats>>(new Map());
   const [highPriorityItems, setHighPriorityItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -114,8 +157,39 @@ export function HomePage() {
       ]);
 
       if (statsResult.data) setStats(statsResult.data as unknown as WorkspaceStats);
-      setProjects(projectsResult.data || []);
+      const activeProjects = projectsResult.data || [];
+      setProjects(activeProjects);
       setHighPriorityItems(priorityResult.data || []);
+
+      // Per-project mini-stats: total / completed / nearest upcoming due_date.
+      // One batched query covers all active projects in the card.
+      if (activeProjects.length > 0) {
+        const projectIds = activeProjects.map(p => p.id);
+        const itemsResult = await supabase
+          .from('content_items')
+          .select('project_id, due_date, completed')
+          .eq('workspace_id', currentWorkspace.id)
+          .in('project_id', projectIds)
+          .eq('archived', false);
+
+        const todayIso = new Date().toISOString().slice(0, 10); // YYYY-MM-DD for lex compare
+        const map = new Map<string, ProjectMiniStats>();
+        for (const row of itemsResult.data ?? []) {
+          if (!row.project_id) continue;
+          const m = map.get(row.project_id) ?? { total: 0, completed: 0, nearestUpcomingDue: null };
+          m.total++;
+          if (row.completed) m.completed++;
+          if (!row.completed && row.due_date && row.due_date >= todayIso) {
+            if (!m.nearestUpcomingDue || row.due_date < m.nearestUpcomingDue) {
+              m.nearestUpcomingDue = row.due_date;
+            }
+          }
+          map.set(row.project_id, m);
+        }
+        setProjectStats(map);
+      } else {
+        setProjectStats(new Map());
+      }
     } catch (err) {
       console.error('Error fetching homepage data:', err);
     } finally {
@@ -336,26 +410,52 @@ export function HomePage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#005D9712]">
-                {projects.map(project => (
-                  <button
-                    key={project.id}
-                    onClick={() => navigate(`/projects/${project.id}`)}
-                    className="bg-surface-card p-4 hover:bg-[#005D9718] transition-colors text-left group"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <div
-                        className="w-3 h-3 rounded-sm shrink-0"
-                        style={{ backgroundColor: project.color ?? '#6366f1' }}
-                      />
-                      <h3 className="text-sm font-semibold text-slate-900 truncate group-hover:text-brand-600 transition-colors">
-                        {project.name}
+                {projects.map(project => {
+                  const ps = projectStats.get(project.id);
+                  const dueMeta = projectDueMeta(ps?.nearestUpcomingDue ?? project.end_date ?? null);
+                  const healthColor = projectHealthColor(project, ps);
+                  return (
+                    <button
+                      key={project.id}
+                      onClick={() => navigate(`/projects/${project.id}`)}
+                      className="bg-surface-card p-4 hover:bg-[#005D9718] transition-colors text-left group"
+                    >
+                      <h3 className="text-sm font-semibold text-slate-900 truncate group-hover:text-brand-600 transition-colors mb-1.5">
+                        {project.title}
                       </h3>
-                    </div>
-                    {project.description && (
-                      <p className="text-xs text-slate-500 line-clamp-2 mt-1">{project.description}</p>
-                    )}
-                  </button>
-                ))}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide"
+                          style={{
+                            backgroundColor: `${healthColor}12`,
+                            color: healthColor,
+                            border: `1px solid ${healthColor}30`,
+                          }}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: healthColor }}
+                          />
+                          {project.status === 'active' ? 'Active' : project.status === 'completed' ? 'Completed' : 'Archived'}
+                        </span>
+                        {dueMeta && (
+                          <span
+                            className="inline-flex items-center gap-1 text-[11px] font-medium"
+                            style={{ color: dueMeta.color }}
+                          >
+                            <CalendarClock className="w-3 h-3" />
+                            {dueMeta.label}
+                          </span>
+                        )}
+                        {ps && ps.total > 0 && (
+                          <span className="text-[11px] text-slate-400">
+                            {ps.completed}/{ps.total} done
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           )}
