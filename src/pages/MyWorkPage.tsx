@@ -15,9 +15,12 @@ import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { PersonalTasksSection } from '../components/personal/PersonalTasksSection';
 import { MentionsPanel } from '../components/personal/MentionsPanel';
+import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
+import { useShowCompleted } from '../hooks/useShowCompleted';
 import {
   Calendar,
   AlertCircle,
+  CheckCircle2,
   Square,
   ListChecks,
   ExternalLink,
@@ -106,11 +109,7 @@ export function MyWorkPage() {
     fetchData();
   }, [fetchData]);
 
-  // Apply filters to items
-  const filteredItems = useMemo(() => {
-    if (!isLoaded) return myItems;
-    return applyFilters(myItems, filters);
-  }, [myItems, filters, isLoaded]);
+  const [showCompleted, setShowCompleted] = useShowCompleted('mywork');
 
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -125,6 +124,16 @@ export function MyWorkPage() {
         .map(c => c.id)
     );
   }, [boardColumns]);
+
+  // Apply filters to items
+  const filteredItems = useMemo(() => {
+    if (!isLoaded) return myItems;
+    let result = applyFilters(myItems, filters);
+    if (!showCompleted) {
+      result = result.filter((i) => !(i.completed || (i.status != null && doneColumnIds.has(i.status))));
+    }
+    return result;
+  }, [myItems, filters, isLoaded, showCompleted, doneColumnIds]);
 
   // An item is "done" if explicitly completed OR its status is Published/Completed
   const isItemDone = useCallback(
@@ -270,6 +279,8 @@ export function MyWorkPage() {
         onFiltersChange={setFilters}
         totalCount={myItems.length}
         filteredCount={filteredItems.length}
+        showCompleted={showCompleted}
+        onShowCompletedChange={setShowCompleted}
       />
 
       {/* Mentions + alerts — hidden when zero */}
@@ -354,12 +365,18 @@ export function MyWorkPage() {
                         <tr
                           key={item.id}
                           onClick={() => setSelectedItemId(item.id)}
-                          className={`cursor-pointer transition-colors ${done ? 'hover:brightness-95' : 'hover:bg-[#005D9718]'}`}
+                          className={`cursor-pointer transition-colors ${done ? 'opacity-60 hover:bg-[#005D970A]' : 'hover:bg-[#005D9718]'}`}
                           style={rowBg ? { backgroundColor: rowBg } : {}}
                         >
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1.5">
-                              <span className={`text-sm font-medium ${done ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
+                              <TaskCategoryIcon category={item.category} />
+                              {done && (
+                                <span title="Completed" className="inline-flex flex-shrink-0">
+                                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                                </span>
+                              )}
+                              <span className={`text-sm font-medium ${done ? 'text-slate-500' : 'text-slate-900'}`}>
                                 {item.title}
                               </span>
                               {granolaItemIds.has(item.id) && (

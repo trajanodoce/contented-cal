@@ -12,6 +12,7 @@ import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts'
 import {
   Calendar as CalendarIcon,
   AlertCircle,
+  CheckCircle2,
   ListChecks,
   Mic,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
+import { useShowCompleted } from '../hooks/useShowCompleted';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import {
@@ -115,7 +117,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       onClick={onClick}
       className={`bg-surface-card rounded-lg shadow-xs border cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
         isOverlay ? 'cursor-grabbing' : ''
-      }`}
+      } ${isDone ? 'opacity-60' : ''}`}
       style={{
         ...style,
         padding: '10px 12px',
@@ -128,8 +130,13 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
         <span className="flex-shrink-0 mt-0.5">
           <TaskCategoryIcon category={item.category} size={12} />
         </span>
+        {isDone && (
+          <span title="Completed" className="inline-flex flex-shrink-0 mt-0.5">
+            <CheckCircle2 className="w-3 h-3" style={{ color: '#357254' }} />
+          </span>
+        )}
         <h4
-          className="text-xs font-medium text-slate-900 line-clamp-2 flex-1"
+          className={`text-xs font-medium ${isDone ? 'text-slate-500' : 'text-slate-900'} line-clamp-2 flex-1`}
           title={item.title}
         >
           {item.title}
@@ -368,11 +375,17 @@ export function BoardPage() {
     fetchData();
   }, [fetchData]);
 
+  const [showCompleted, setShowCompleted] = useShowCompleted('board');
+
   const filteredItems = useMemo(() => {
     let result = isLoaded ? applyFilters(contentItems, filters, linkCounts) : contentItems;
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    if (!showCompleted) {
+      const colById = new Map(columns.map(c => [c.id, c]));
+      result = result.filter(i => !isDoneStatus(colById.get(i.status ?? '')?.name));
+    }
     return result;
-  }, [contentItems, filters, isLoaded, linkCounts, showOrdinal]);
+  }, [contentItems, filters, isLoaded, linkCounts, showOrdinal, showCompleted, columns]);
 
   const itemsByColumn = useMemo(() => {
     const grouped: Record<string, ContentItem[]> = {};
@@ -483,6 +496,8 @@ export function BoardPage() {
           onFiltersChange={setFilters}
           totalCount={contentItems.length}
           filteredCount={filteredItems.length}
+          showCompleted={showCompleted}
+          onShowCompletedChange={setShowCompleted}
         />
         <div className="flex items-center gap-2 mt-2">
           <button

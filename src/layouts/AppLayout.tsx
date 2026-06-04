@@ -17,6 +17,7 @@ import {
   List,
   Folder,
   Inbox,
+  Archive,
   Settings,
   LogOut,
   ChevronDown,
@@ -58,6 +59,8 @@ function getPageTitle(pathname: string): string {
       return 'Projects';
     case '/intake-queue':
       return 'Intake Queue';
+    case '/archive':
+      return 'Archive';
     case '/my-work':
       return 'My Work';
     case '/settings':
@@ -311,6 +314,30 @@ export function AppLayout() {
             );
           })}
         </nav>
+
+        {/* Archive — secondary nav between main views and Settings.
+            Visible to all roles since restore is per-row, not admin-only. */}
+        <div className="px-3 pb-1">
+          <NavLink
+            to="/archive"
+            onClick={handleNavigation}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                isActive
+                  ? 'text-white'
+                  : 'text-white/40 hover:bg-white/5 hover:text-white/70'
+              }`
+            }
+            style={({ isActive }) =>
+              isActive
+                ? { background: 'linear-gradient(135deg, rgba(251,231,241,0.25) 0%, rgba(251,231,241,0.08) 100%)', borderLeft: '2px solid #FBE7F1' }
+                : undefined
+            }
+          >
+            <Archive className="w-4 h-4 opacity-70" />
+            <span>Archive</span>
+          </NavLink>
+        </div>
 
         {/* Settings link (above user section) — admin only */}
         {canAccessSettings && (

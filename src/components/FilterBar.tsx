@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, X, ChevronDown, Check } from 'lucide-react';
+import { Search, X, ChevronDown, Check, CheckCircle2 } from 'lucide-react';
 import { Avatar } from './ui/Avatar';
 import type { ContentType, BoardColumn, Profile } from '../lib/database.types';
 
@@ -37,6 +37,10 @@ interface FilterBarProps {
   onFiltersChange: (filters: FilterState) => void;
   totalCount: number;
   filteredCount: number;
+  // Optional per-view "show completed" toggle. When provided, renders a chip
+  // in the filter bar that toggles inclusion of completed/published items.
+  showCompleted?: boolean;
+  onShowCompletedChange?: (next: boolean) => void;
 }
 
 const priorityOptions = [
@@ -70,6 +74,8 @@ export function FilterBar({
   onFiltersChange,
   totalCount,
   filteredCount,
+  showCompleted,
+  onShowCompletedChange,
 }: FilterBarProps) {
   const [searchValue, setSearchValue] = useState(filters.search);
 
@@ -248,6 +254,23 @@ export function FilterBar({
               onFiltersChange({ ...filters, linkedPlatforms: newSet });
             }}
           />
+        )}
+
+        {/* Show completed toggle (per-view) */}
+        {onShowCompletedChange && (
+          <button
+            onClick={() => onShowCompletedChange(!showCompleted)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
+            style={
+              showCompleted
+                ? { fontSize: '13.5px', fontWeight: 600, backgroundColor: '#35725415', border: '1px solid #357254', color: '#357254' }
+                : { fontSize: '13.5px', fontWeight: 600, border: '1px solid #00233925', color: '#475569' }
+            }
+            title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{showCompleted ? 'Showing completed' : 'Hiding completed'}</span>
+          </button>
         )}
 
         {/* Clear all filters */}

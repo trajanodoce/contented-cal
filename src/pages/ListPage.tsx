@@ -21,6 +21,7 @@ import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
+import { useShowCompleted } from '../hooks/useShowCompleted';
 import {
   CheckSquare,
   Square,
@@ -33,6 +34,7 @@ import {
   AlertTriangle,
   ChevronDown,
   Check,
+  CheckCircle2,
   ListChecks,
   Link2,
   Mic,
@@ -94,12 +96,17 @@ export function ListPage() {
     localStorage.removeItem('cc-show-granola');
   }, []);
 
+  const [showCompleted, setShowCompleted] = useShowCompleted('list');
+
   // Apply filters to items
   const items = useMemo(() => {
     let result = isLoaded ? applyFilters(rawItems, filters, linkCounts) : rawItems;
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    if (!showCompleted) {
+      result = result.filter(i => !isDoneStatus(getBoardColumn(i.status, boardColumns)?.name));
+    }
     return result;
-  }, [rawItems, filters, isLoaded, linkCounts, showOrdinal]);
+  }, [rawItems, filters, isLoaded, linkCounts, showOrdinal, showCompleted, boardColumns]);
 
   // Sort items
   const sortedItems = useMemo(() => {
@@ -297,6 +304,8 @@ export function ListPage() {
         onFiltersChange={setFilters}
         totalCount={rawItems.length}
         filteredCount={items.length}
+        showCompleted={showCompleted}
+        onShowCompletedChange={setShowCompleted}
       />
 
       <div className="flex items-center justify-end gap-2 mt-3 mb-1">
@@ -419,7 +428,7 @@ export function ListPage() {
                     onClick={() => handleRowClick(item, idx)}
                     className={`group cursor-pointer transition-colors ${
                       isSelected ? 'bg-[#005D9710]' : 'hover:bg-[#005D9718]'
-                    }`}
+                    } ${isDone ? 'opacity-60' : ''}`}
                     style={
                       isFocused
                         ? { outline: '2px solid #005D97', outlineOffset: '-2px' }
@@ -445,13 +454,18 @@ export function ListPage() {
                     <td className="px-4 py-3 max-w-[400px]">
                       <div className="flex items-center gap-2">
                         <TaskCategoryIcon category={item.category} />
+                        {isDone && (
+                          <span title="Completed" className="inline-flex flex-shrink-0">
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                          </span>
+                        )}
                         {isUrgentRow && (
                           <AlertTriangle
                             className="w-3.5 h-3.5 shrink-0"
                             style={{ color: '#BA2C2C' }}
                           />
                         )}
-                        <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} text-slate-900 truncate max-w-[320px]`}>{item.title}</span>
+                        <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : 'text-slate-900'} truncate max-w-[320px]`}>{item.title}</span>
                         {granolaItemIds.has(item.id) && (
                           <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
                         )}

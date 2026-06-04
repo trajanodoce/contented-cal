@@ -104,6 +104,7 @@ const SettingsPage = lazy(() => lazyRetry(() => import('./pages/SettingsPage').t
 const IntakeQueuePage = lazy(() => lazyRetry(() => import('./pages/IntakeQueuePage').then(m => ({ default: m.IntakeQueuePage }))));
 const IntakeFormPage = lazy(() => lazyRetry(() => import('./pages/IntakeFormPage').then(m => ({ default: m.IntakeFormPage }))));
 const MyWorkPage = lazy(() => lazyRetry(() => import('./pages/MyWorkPage').then(m => ({ default: m.MyWorkPage }))));
+const ArchivePage = lazy(() => lazyRetry(() => import('./pages/ArchivePage').then(m => ({ default: m.ArchivePage }))));
 const DesignRequestPage = lazy(() => lazyRetry(() => import('./pages/DesignRequestPage').then(m => ({ default: m.DesignRequestPage }))));
 const AuthCallback = lazy(() => lazyRetry(() => import('./components/auth/AuthCallback').then(m => ({ default: m.AuthCallback }))));
 
@@ -227,6 +228,7 @@ function AppRoutes() {
         <Route path="/projects" element={<LazyPage><ProjectsPage /></LazyPage>} />
         <Route path="/projects/:projectId" element={<LazyPage><ProjectDetailPage /></LazyPage>} />
         <Route path="/intake-queue" element={<LazyPage><IntakeQueuePage /></LazyPage>} />
+        <Route path="/archive" element={<LazyPage><ArchivePage /></LazyPage>} />
         <Route path="/design-request" element={<LazyPage><DesignRequestPage /></LazyPage>} />
         <Route path="/settings" element={<LazyPage><SettingsPage /></LazyPage>} />
         <Route path="/settings/*" element={<LazyPage><SettingsPage /></LazyPage>} />

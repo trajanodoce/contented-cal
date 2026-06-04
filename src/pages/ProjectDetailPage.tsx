@@ -46,6 +46,7 @@ import {
   Users,
   Clock,
   AlertTriangle,
+  CheckCircle2,
   X,
   UserPlus,
   Link2,
@@ -74,6 +75,8 @@ import { BulkActionToolbar, selectedRowClass } from '../components/list/BulkActi
 import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
+import { useShowCompleted } from '../hooks/useShowCompleted';
+import { isDoneStatus } from '../lib/itemHelpers';
 import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -972,7 +975,16 @@ function ListTab({
     return [...new Set([...configured, ...fromItems])];
   }, [currentWorkspace?.settings, items]);
 
-  const filteredItems = useMemo(() => applyFilters(items, filters), [items, filters]);
+  const [showCompleted, setShowCompleted] = useShowCompleted('projects');
+
+  const filteredItems = useMemo(() => {
+    let result = applyFilters(items, filters);
+    if (!showCompleted) {
+      const colById = new Map(boardColumns.map(c => [c.id, c]));
+      result = result.filter(i => !isDoneStatus(colById.get(i.status ?? '')?.name));
+    }
+    return result;
+  }, [items, filters, showCompleted, boardColumns]);
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
@@ -1045,6 +1057,8 @@ function ListTab({
         onFiltersChange={setFilters}
         totalCount={items.length}
         filteredCount={filteredItems.length}
+        showCompleted={showCompleted}
+        onShowCompletedChange={setShowCompleted}
       />
 
       {filteredItems.length === 0 ? (
@@ -1134,7 +1148,7 @@ function ListTab({
                     }}
                     className={`group cursor-pointer transition-colors ${
                       isSelected ? selectedRowClass : 'hover:bg-[#005D9718]'
-                    }`}
+                    } ${isDone ? 'opacity-60' : ''}`}
                     style={
                       isFocused
                         ? { outline: '2px solid #005D97', outlineOffset: '-2px' }
@@ -1160,13 +1174,18 @@ function ListTab({
                     <td className="px-4 py-3 text-sm text-slate-800 max-w-[300px] truncate">
                       <div className="flex items-center gap-2">
                         <TaskCategoryIcon category={item.category} />
+                        {isDone && (
+                          <span title="Completed" className="inline-flex flex-shrink-0">
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                          </span>
+                        )}
                         {isUrgentRow && (
                           <AlertTriangle
                             className="w-3.5 h-3.5 shrink-0"
                             style={{ color: '#BA2C2C' }}
                           />
                         )}
-                        <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} truncate`}>
+                        <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : ''} truncate`}>
                           {item.title}
                         </span>
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />
@@ -1266,12 +1285,14 @@ function ProjectBoardCard({
   item,
   contentTypes,
   members,
+  isDone,
   onClick,
   isOverlay,
 }: {
   item: ContentItem;
   contentTypes: ContentType[];
   members: Profile[];
+  isDone?: boolean;
   onClick: () => void;
   isOverlay?: boolean;
 }) {
@@ -1314,7 +1335,7 @@ function ProjectBoardCard({
       onClick={onClick}
       className={`bg-surface-card rounded-lg border shadow-xs cursor-grab active:cursor-grabbing hover:shadow-md transition-all ${
         isOverlay ? 'cursor-grabbing' : ''
-      }`}
+      } ${isDone ? 'opacity-60' : ''}`}
       style={{
         ...style,
         padding: '10px 12px',
@@ -1326,7 +1347,12 @@ function ProjectBoardCard({
         <span className="flex-shrink-0 mt-0.5">
           <TaskCategoryIcon category={item.category} size={12} />
         </span>
-        <p className="text-xs font-medium text-slate-900 line-clamp-2 flex-1">
+        {isDone && (
+          <span title="Completed" className="inline-flex flex-shrink-0 mt-0.5">
+            <CheckCircle2 className="w-3 h-3" style={{ color: '#357254' }} />
+          </span>
+        )}
+        <p className={`text-xs font-medium ${isDone ? 'text-slate-500' : 'text-slate-900'} line-clamp-2 flex-1`}>
           {item.title}
         </p>
         <span className="flex-shrink-0 mt-0.5">
@@ -1375,6 +1401,7 @@ function ProjectBoardColumn({
   });
 
   const colColor = column.color ?? '#94a3b8';
+  const isDoneCol = column.name.toLowerCase() === 'published' || column.name.toLowerCase() === 'completed';
 
   return (
     <div
@@ -1413,6 +1440,7 @@ function ProjectBoardColumn({
             item={item}
             contentTypes={contentTypes}
             members={members}
+            isDone={isDoneCol}
             onClick={() => onItemClick(item.id)}
           />
         ))}
