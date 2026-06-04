@@ -81,6 +81,34 @@ function projectHealthColor(project: Project, ps?: ProjectMiniStats): string {
   return '#357254'; // on track
 }
 
+// "Due This Week" badge — graduated color treatment by how close the
+// item's due_date is. The closer to today, the warmer the badge:
+//   today      → coral (urgent now)
+//   tomorrow   → peach (very soon)
+//   2–3 days   → peach softer
+//   4–7+ days  → brand navy (scheduled / not urgent yet)
+//
+// Background uses a tint of the same color (color-15 → color-12 → bg-12)
+// so the chip stays small + readable. Bold text reinforces hierarchy.
+function upcomingDueBadge(dueIso: string): { label: string; bg: string; text: string } {
+  const dueDate = parseLocalDate(dueIso);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.ceil((dueDate.getTime() - today.getTime()) / 86400000);
+
+  if (days === 0) {
+    return { label: 'Today', bg: '#C4504A18', text: '#C4504A' };
+  }
+  if (days === 1) {
+    return { label: 'Tomorrow', bg: '#D98A6B18', text: '#D98A6B' };
+  }
+  if (days <= 3) {
+    return { label: formatDate(dueIso), bg: '#D98A6B10', text: '#D98A6B' };
+  }
+  // 4-7 days out: scheduled, not urgent yet — keep neutral brand-navy
+  return { label: formatDate(dueIso), bg: '#005D9712', text: '#005D97' };
+}
+
 function projectDueMeta(due: string | null): { label: string; color: string } | null {
   if (!due) return null;
   const dueDate = parseLocalDate(due);
@@ -364,18 +392,21 @@ export function HomePage() {
             ) : (
               <div className="divide-y divide-slate-100">
                 {stats.upcoming_due.map(item => {
-                  const dueDate = parseLocalDate(item.due_date);
-                  const isDueToday = isToday(dueDate);
+                  const dueBadge = upcomingDueBadge(item.due_date);
                   return (
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
                       className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors text-left group"
                     >
-                      <div className={`px-2 py-1 rounded text-xs font-medium shrink-0 ${
-                        isDueToday ? 'bg-brand-100 text-brand-700' : 'bg-[#005D9712] text-slate-600'
-                      }`}>
-                        {formatDate(item.due_date)}
+                      <div
+                        className="px-2 py-1 rounded text-xs font-semibold shrink-0"
+                        style={{
+                          backgroundColor: dueBadge.bg,
+                          color: dueBadge.text,
+                        }}
+                      >
+                        {dueBadge.label}
                       </div>
                       <p className="text-sm text-slate-900 truncate flex-1 group-hover:text-brand-600 transition-colors">
                         {item.title}
