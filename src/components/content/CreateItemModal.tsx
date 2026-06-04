@@ -8,6 +8,7 @@ import { useApp } from '../../contexts/AppContext';
 import { useWorkspaceData } from '../../hooks/useWorkspaceData';
 import { CustomFieldsSection } from './CustomFieldsSection';
 import DatePicker from '../ui/DatePicker';
+import { StyledSelect } from '../ui/StyledSelect';
 import type { ContentType, Profile, BoardColumn, Json } from '../../lib/database.types';
 import { getWorkspaceChannels } from '../../lib/utils';
 import {
@@ -559,16 +560,14 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
           {fieldVisibility.channel && (
             <div>
               <label className="block text-sm font-bold text-slate-700 mb-1.5">Channel</label>
-              <select
+              <StyledSelect
                 value={channel}
-                onChange={(e) => setChannel(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 bg-surface-card"
-              >
-                <option value="">Select a channel...</option>
-                {getWorkspaceChannels(currentWorkspace?.settings).map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+                onChange={(v) => setChannel(v)}
+                options={[
+                  { value: '', label: 'Select a channel...' },
+                  ...getWorkspaceChannels(currentWorkspace?.settings).map((c) => ({ value: c, label: c })),
+                ]}
+              />
             </div>
           )}
 
