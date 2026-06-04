@@ -147,8 +147,10 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   // Get allowed statuses based on content type workflow
   const allowedStatuses = useMemo(() => getAllowedStatuses(contentType || null, boardColumns), [contentType, boardColumns]);
 
+  // Workspace-wide custom fields (content_type_id = null) show on every item;
+  // type-specific fields only show when the item's content_type matches.
   const activeCustomFields = useMemo(
-    () => customFieldDefs.filter(f => f.content_type_id === item.content_type_id || (!f.content_type_id && !item.content_type_id)),
+    () => customFieldDefs.filter(f => !f.content_type_id || f.content_type_id === item.content_type_id),
     [customFieldDefs, item.content_type_id]
   );
 

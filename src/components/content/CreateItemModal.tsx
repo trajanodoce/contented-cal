@@ -273,9 +273,11 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Custom fields for the selected content type
+  // Workspace-wide custom fields (content_type_id = null) show in every form;
+  // type-specific fields only show when the selected content_type matches.
   const activeCustomFields = useMemo(
     () => customFieldDefs
-      .filter(f => f.content_type_id === contentTypeId || (!f.content_type_id && !contentTypeId))
+      .filter(f => !f.content_type_id || f.content_type_id === contentTypeId)
       .sort((a, b) => a.position - b.position),
     [customFieldDefs, contentTypeId]
   );
