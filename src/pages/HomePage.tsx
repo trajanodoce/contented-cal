@@ -65,6 +65,12 @@ const ACTIVITY_FIELD_LABELS: Record<string, string> = {
 // (canonical Draft 5.3 pattern). Mirrors the logic in ProjectDetailPage but
 // simplified for the home dashboard card.
 
+interface ProjectMiniStats {
+  total: number;
+  completed: number;
+  nearestUpcomingDue: string | null;
+}
+
 function projectHealthColor(project: Project, ps?: ProjectMiniStats): string {
   if (project.status === 'completed') return '#357254'; // green
   if (project.status === 'archived') return '#64748B'; // slate
@@ -142,12 +148,6 @@ function humanizeActivityAction(action: string): string {
   if (lower === 'restored') return 'Restored task';
   // Fall through unchanged — keeps comment/subtask/assignment action strings intact
   return action;
-}
-
-interface ProjectMiniStats {
-  total: number;
-  completed: number;
-  nearestUpcomingDue: string | null;
 }
 
 export function HomePage() {

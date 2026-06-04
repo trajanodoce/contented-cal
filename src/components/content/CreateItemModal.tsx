@@ -10,7 +10,7 @@ import { CustomFieldsSection } from './CustomFieldsSection';
 import DatePicker from '../ui/DatePicker';
 import { StyledSelect } from '../ui/StyledSelect';
 import type { ContentType, Profile, BoardColumn, Json } from '../../lib/database.types';
-import { getWorkspaceChannels } from '../../lib/utils';
+import { getWorkspaceChannels, PRIORITY_STYLES } from '../../lib/utils';
 import {
   X,
   ChevronDown,
@@ -35,13 +35,13 @@ interface CreateItemModalProps {
   meetingPrefill?: MeetingPrefill | null;
 }
 
-// Priority options
-const priorityOptions = [
-  { value: 'low', label: 'Low', color: '#9ca3af' },
-  { value: 'medium', label: 'Medium', color: '#fbbf24' },
-  { value: 'high', label: 'High', color: '#f97316' },
-  { value: 'urgent', label: 'Urgent', color: '#ef4444' },
-] as const;
+// Priority options — derived from canonical PRIORITY_STYLES so dropdown dots
+// always match the rest of the app.
+const priorityOptions = (['low', 'medium', 'high', 'urgent'] as const).map(key => ({
+  value: key,
+  label: PRIORITY_STYLES[key].label,
+  color: PRIORITY_STYLES[key].hex,
+}));
 
 // Default field visibility - all fields visible by default
 interface DefaultWorkflow {
@@ -273,14 +273,26 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Custom fields for the selected content type
-  // Workspace-wide custom fields (content_type_id = null) show in every form;
-  // type-specific fields only show when the selected content_type matches.
+  // Task category: design tasks come in via the +New → "Design Request" path
+  // (which sets initialTags=['design-request']); everything else is content.
+  const taskCategory: 'content' | 'design' =
+    initialTags?.includes('design-request') ? 'design' : 'content';
+
+  // Custom fields for the selected content type + task category.
+  // Two-layer filter (matches DetailSlideOver):
+  //   1. Content-type scope: workspace-wide fields show in every form, type-specific
+  //      fields only show when the content_type matches.
+  //   2. Task-category scope: fields with applies_to='both' show everywhere,
+  //      'content'/'design' only show on matching task category.
   const activeCustomFields = useMemo(
     () => customFieldDefs
-      .filter(f => !f.content_type_id || f.content_type_id === contentTypeId)
+      .filter(f => {
+        const contentTypeMatch = !f.content_type_id || f.content_type_id === contentTypeId;
+        if (!contentTypeMatch) return false;
+        return f.applies_to === 'both' || f.applies_to === taskCategory;
+      })
       .sort((a, b) => a.position - b.position),
-    [customFieldDefs, contentTypeId]
+    [customFieldDefs, contentTypeId, taskCategory]
   );
 
   const memberProfiles = useMemo(
@@ -374,11 +386,6 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
     setIsSubmitting(true);
 
     try {
-      // Task category: design tasks come in via the +New → "Design Request" path
-      // (which sets initialTags=['design-request']); everything else is content.
-      const taskCategory: 'content' | 'design' =
-        initialTags?.includes('design-request') ? 'design' : 'content';
-
       const { data: newItem, error } = await supabase.from('content_items').insert({
         workspace_id: currentWorkspace.id,
         title: title.trim(),
@@ -600,6 +607,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
                 values={customFieldValues}
                 onChange={(id, value) => setCustomFieldValues(prev => ({ ...prev, [id]: value }))}
                 members={memberProfiles}
+                taskCategory={taskCategory}
               />
             </div>
           )}

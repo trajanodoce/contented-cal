@@ -1,6 +1,7 @@
 import type { CustomFieldDefinition, SelectOption, Profile, TaskCategory } from '../../lib/database.types';
 import DatePicker from '../ui/DatePicker';
 import { StyledSelect } from '../ui/StyledSelect';
+import { pillTextColor } from '../../lib/utils';
 
 // Category colors used by pill-row rendering (single_select with ≤5 options).
 // Aligned with TaskCategoryIcon + Optional Details zone tint.
@@ -192,17 +193,21 @@ function CustomFieldInput({ field, value, onChange, compact, members = [], taskC
             // color text, color-30 border); inactive pills carry a faint border
             // hint of their color so users can preview before clicking.
             // Without color: fall back to the original brand-blue treatment.
+            // Force readable contrast on light/pastel option colors via
+            // pillTextColor (high saturation + low lightness). Apply to both
+            // text and border so pastels stay visible against the tinted bg.
+            const safeColor = color ? pillTextColor(color) : undefined;
             const style = color
               ? active
                 ? {
                     backgroundColor: `${color}12`,
-                    color,
-                    borderColor: `${color}30`,
+                    color: safeColor,
+                    borderColor: `${safeColor}55`,
                   }
                 : {
                     backgroundColor: 'transparent',
                     color: '#475569',
-                    borderColor: `${color}30`,
+                    borderColor: `${safeColor}55`,
                   }
               : undefined;
 
