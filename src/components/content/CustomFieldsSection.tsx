@@ -106,6 +106,7 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
           onChange={v => onChange(v || null)}
           options={options}
           placeholder="Select..."
+          variant="pill"
         />
       );
 
