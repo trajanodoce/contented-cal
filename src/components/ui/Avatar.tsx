@@ -51,6 +51,21 @@ function getInitials(name: string, size: Size): string {
   return (first + last).toUpperCase();
 }
 
+/** 3 avatar gradients — all anchored from brand navy. Assigned per user by name hash. */
+const AVATAR_GRADIENTS = [
+  'linear-gradient(135deg, #005D97, #D4729E)', // navy → rose
+  'linear-gradient(135deg, #005D97, #0F8B8D)', // navy → teal
+  'linear-gradient(135deg, #005D97, #7C3AED)', // navy → amethyst
+];
+
+function getAvatarGradient(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0;
+  }
+  return AVATAR_GRADIENTS[Math.abs(hash) % AVATAR_GRADIENTS.length];
+}
+
 /* ------------------------------------------------------------------ */
 /*  Avatar                                                             */
 /* ------------------------------------------------------------------ */
@@ -106,7 +121,7 @@ export function Avatar({
         aria-label={name}
         style={{
           ...base,
-          background: 'linear-gradient(135deg, #005D97, #D4729E)',
+          background: getAvatarGradient(name),
           color: '#fff',
           fontWeight: 700,
           fontSize: FONT[size],
