@@ -793,7 +793,58 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               </div>
 
-              {/* 3. Description */}
+              {/* 3. Subtasks — what's left to do takes priority over context */}
+              <SubtasksSection
+                contentItemId={item.id}
+                userId={user?.id ?? null}
+                members={subtaskMembers}
+                addToast={addToast}
+                templates={subtaskTemplates}
+                userRole={userRole}
+              />
+
+              {/* 4. Linked Assets */}
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
+                <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
+              </div>
+
+              {/* 5. Optional Details (canonical Batch 5 v2): category-tinted
+                  zone housing all custom field affordances. Tint + label
+                  color match the task's category (navy for content, berry
+                  for design). Heading is 11px to match the unified canonical
+                  treatment; color stays category-tinted for context. */}
+              {activeCustomFields.length > 0 && (() => {
+                const isDesign = item.category === 'design';
+                const categoryColor = isDesign ? '#B8447A' : '#005D97';
+                const tintBg = isDesign ? '#FDF3F8' : '#005D9708';
+                return (
+                  <div
+                    className="rounded-xl overflow-hidden p-4"
+                    style={{
+                      backgroundColor: tintBg,
+                      border: `1px solid ${categoryColor}20`,
+                    }}
+                  >
+                    <label
+                      className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-3"
+                      style={{ color: categoryColor }}
+                    >
+                      Optional Details
+                    </label>
+                    <CustomFieldsSection
+                      fields={activeCustomFields}
+                      values={customFieldValues}
+                      onChange={updateCustomField}
+                      compact
+                      members={members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null }))}
+                      taskCategory={item.category}
+                    />
+                  </div>
+                );
+              })()}
+
+              {/* 6. Description — usually base-level context only, so sits
+                  below structured task data (subtasks, links, custom fields). */}
               {fieldVisibility.description && (
                 <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                   <div className="flex items-center justify-between mb-2">
@@ -842,56 +893,6 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   )}
                 </div>
               )}
-
-              {/* 4. Optional Details (canonical Batch 5 v2): category-tinted
-                  zone housing all custom field affordances. Tint + label
-                  color match the task's category (navy for content, berry
-                  for design). Heading is 11px to match the unified canonical
-                  treatment; color stays category-tinted for context. */}
-              {activeCustomFields.length > 0 && (() => {
-                const isDesign = item.category === 'design';
-                const categoryColor = isDesign ? '#B8447A' : '#005D97';
-                const tintBg = isDesign ? '#FDF3F8' : '#005D9708';
-                return (
-                  <div
-                    className="rounded-xl overflow-hidden p-4"
-                    style={{
-                      backgroundColor: tintBg,
-                      border: `1px solid ${categoryColor}20`,
-                    }}
-                  >
-                    <label
-                      className="text-[11px] font-semibold uppercase tracking-[0.06em] block mb-3"
-                      style={{ color: categoryColor }}
-                    >
-                      Optional Details
-                    </label>
-                    <CustomFieldsSection
-                      fields={activeCustomFields}
-                      values={customFieldValues}
-                      onChange={updateCustomField}
-                      compact
-                      members={members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null }))}
-                      taskCategory={item.category}
-                    />
-                  </div>
-                );
-              })()}
-
-              {/* 5. Subtasks */}
-              <SubtasksSection
-                contentItemId={item.id}
-                userId={user?.id ?? null}
-                members={subtaskMembers}
-                addToast={addToast}
-                templates={subtaskTemplates}
-                userRole={userRole}
-              />
-
-              {/* 6. Linked Assets */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
-                <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
-              </div>
 
               {/* 7. Granola Meeting Notes (conditional — section hides itself
                   when no note is linked and not in admin view) */}
