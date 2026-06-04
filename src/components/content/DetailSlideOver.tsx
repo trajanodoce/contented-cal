@@ -147,11 +147,19 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   // Get allowed statuses based on content type workflow
   const allowedStatuses = useMemo(() => getAllowedStatuses(contentType || null, boardColumns), [contentType, boardColumns]);
 
-  // Workspace-wide custom fields (content_type_id = null) show on every item;
-  // type-specific fields only show when the item's content_type matches.
+  // Two-layer filter on custom fields:
+  //   1. Content-type scope: workspace-wide fields (content_type_id = null)
+  //      show on every item; type-specific fields only on matching content_type.
+  //   2. Task-category scope: applies_to='both' shows on every task;
+  //      'content' only on content tasks; 'design' only on design tasks.
   const activeCustomFields = useMemo(
-    () => customFieldDefs.filter(f => !f.content_type_id || f.content_type_id === item.content_type_id),
-    [customFieldDefs, item.content_type_id]
+    () =>
+      customFieldDefs.filter(f => {
+        const contentTypeMatch = !f.content_type_id || f.content_type_id === item.content_type_id;
+        if (!contentTypeMatch) return false;
+        return f.applies_to === 'both' || f.applies_to === item.category;
+      }),
+    [customFieldDefs, item.content_type_id, item.category]
   );
 
   const customFieldValues = useMemo(
@@ -844,19 +852,42 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 </div>
               )}
 
-              {/* Custom fields */}
-              {activeCustomFields.length > 0 && (
-                <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
-                  <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-3 block">Custom fields</label>
-                  <CustomFieldsSection
-                    fields={activeCustomFields}
-                    values={customFieldValues}
-                    onChange={updateCustomField}
-                    compact
-                    members={members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null }))}
-                  />
-                </div>
-              )}
+              {/* Optional Details (canonical Batch 5 v2): category-tinted zone
+                  housing all custom field affordances. Tint + label color
+                  match the task's category (navy for content, berry for design). */}
+              {activeCustomFields.length > 0 && (() => {
+                const isDesign = item.category === 'design';
+                const categoryColor = isDesign ? '#B8447A' : '#005D97';
+                const tintBg = isDesign ? '#FDF3F8' : '#005D9708';
+                return (
+                  <div
+                    className="rounded-xl overflow-hidden p-4"
+                    style={{
+                      backgroundColor: tintBg,
+                      border: `1px solid ${categoryColor}20`,
+                    }}
+                  >
+                    <label
+                      className="font-semibold uppercase block mb-3"
+                      style={{
+                        fontSize: '9px',
+                        letterSpacing: '0.05em',
+                        color: categoryColor,
+                      }}
+                    >
+                      Optional Details
+                    </label>
+                    <CustomFieldsSection
+                      fields={activeCustomFields}
+                      values={customFieldValues}
+                      onChange={updateCustomField}
+                      compact
+                      members={members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null }))}
+                      taskCategory={item.category}
+                    />
+                  </div>
+                );
+              })()}
 
               {/* Subtasks */}
               <SubtasksSection

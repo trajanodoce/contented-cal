@@ -1,6 +1,17 @@
-import type { CustomFieldDefinition, SelectOption, Profile } from '../../lib/database.types';
+import type { CustomFieldDefinition, SelectOption, Profile, TaskCategory } from '../../lib/database.types';
 import DatePicker from '../ui/DatePicker';
 import { StyledSelect } from '../ui/StyledSelect';
+
+// Category colors used by pill-row rendering (single_select with ≤5 options).
+// Aligned with TaskCategoryIcon + Optional Details zone tint.
+const CATEGORY_COLOR: Record<TaskCategory, string> = {
+  content: '#005D97',
+  design: '#B8447A',
+};
+
+// Single-select fields with this many or fewer options render as a pill row
+// (per the v2 Optional Details spec) instead of a dropdown.
+const PILL_ROW_MAX_OPTIONS = 5;
 
 interface Props {
   fields: CustomFieldDefinition[];
@@ -8,9 +19,23 @@ interface Props {
   onChange: (id: string, value: unknown) => void;
   compact?: boolean;
   members?: Profile[];
+  /**
+   * Task category context. Used by pill-row renderer (single_select with ≤5
+   * options) to pick the right category color. Defaults to 'content' if not
+   * supplied — preserves visual behavior for places that render this section
+   * outside the detail panel (e.g. intake forms).
+   */
+  taskCategory?: TaskCategory;
 }
 
-export function CustomFieldsSection({ fields, values, onChange, compact = false, members = [] }: Props) {
+export function CustomFieldsSection({
+  fields,
+  values,
+  onChange,
+  compact = false,
+  members = [],
+  taskCategory = 'content',
+}: Props) {
   if (fields.length === 0) return null;
 
   return (
@@ -21,7 +46,14 @@ export function CustomFieldsSection({ fields, values, onChange, compact = false,
             {field.name}
             {field.required && <span className="text-red-500 ml-0.5">*</span>}
           </label>
-          <CustomFieldInput field={field} value={values[field.id]} onChange={v => onChange(field.id, v)} compact={compact} members={members} />
+          <CustomFieldInput
+            field={field}
+            value={values[field.id]}
+            onChange={v => onChange(field.id, v)}
+            compact={compact}
+            members={members}
+            taskCategory={taskCategory}
+          />
         </div>
       ))}
     </div>
@@ -34,9 +66,10 @@ interface InputProps {
   onChange: (v: unknown) => void;
   compact?: boolean;
   members?: Profile[];
+  taskCategory?: TaskCategory;
 }
 
-function CustomFieldInput({ field, value, onChange, compact, members = [] }: InputProps) {
+function CustomFieldInput({ field, value, onChange, compact, members = [], taskCategory = 'content' }: InputProps) {
   const cls = `w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 ${compact ? 'py-1.5' : ''}`;
   const rawOpts = field.options;
   const options: SelectOption[] = Array.isArray(rawOpts)
@@ -99,7 +132,43 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
         </label>
       );
 
-    case 'single_select':
+    case 'single_select': {
+      // Per the v2 Optional Details spec: ≤5 options render as a pill row
+      // using the TASK's category color (not per-option colors). 6+ options
+      // keep the StyledSelect dropdown so the picker stays manageable.
+      if (options.length > 0 && options.length <= PILL_ROW_MAX_OPTIONS) {
+        const selected = (value as string) ?? '';
+        const categoryColor = CATEGORY_COLOR[taskCategory];
+        return (
+          <div className="flex flex-wrap gap-1.5">
+            {options.map(opt => {
+              const active = opt.value === selected;
+              const activeStyle = {
+                backgroundColor: `${categoryColor}12`,
+                color: categoryColor,
+                borderColor: `${categoryColor}30`,
+              };
+              const inactiveStyle = {
+                backgroundColor: 'transparent',
+                color: '#475569',
+                borderColor: '#cbd5e1',
+              };
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => onChange(active ? null : opt.value)}
+                  className="px-2.5 py-1 text-xs font-semibold rounded-full border transition-colors"
+                  style={active ? activeStyle : inactiveStyle}
+                  aria-pressed={active}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
       return (
         <StyledSelect
           value={(value as string) ?? ''}
@@ -109,6 +178,7 @@ function CustomFieldInput({ field, value, onChange, compact, members = [] }: Inp
           variant="pill"
         />
       );
+    }
 
     case 'multi_select': {
       const selected = (value as string[]) ?? [];
