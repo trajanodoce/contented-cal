@@ -97,16 +97,16 @@ function upcomingDueBadge(dueIso: string): { label: string; bg: string; text: st
   const days = Math.ceil((dueDate.getTime() - today.getTime()) / 86400000);
 
   if (days === 0) {
-    return { label: 'Today', bg: '#C4504A18', text: '#C4504A' };
+    return { label: '🔥 Today', bg: '#C4504A18', text: '#C4504A' };
   }
   if (days === 1) {
-    return { label: 'Tomorrow', bg: '#D98A6B18', text: '#D98A6B' };
+    return { label: '🌅 Tomorrow', bg: '#D98A6B18', text: '#D98A6B' };
   }
   if (days <= 3) {
-    return { label: formatDate(dueIso), bg: '#D98A6B10', text: '#D98A6B' };
+    return { label: `🌤 ${formatDate(dueIso)}`, bg: '#D98A6B10', text: '#D98A6B' };
   }
   // 4-7 days out: scheduled, not urgent yet — keep neutral brand-navy
-  return { label: formatDate(dueIso), bg: '#005D9712', text: '#005D97' };
+  return { label: `🌊 ${formatDate(dueIso)}`, bg: '#005D9712', text: '#005D97' };
 }
 
 function projectDueMeta(due: string | null): { label: string; color: string } | null {
