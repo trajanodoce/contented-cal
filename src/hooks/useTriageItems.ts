@@ -70,6 +70,26 @@ export function useTriageItems() {
           const row = payload.new as ContentItem;
           if (!row.needs_triage || row.archived) return;
           setItems((prev) => [row, ...prev]);
+
+          // Backfill the channel chip for the new row. Fire-and-forget — the
+          // slack_thread_links insert from the Slack edge function follows
+          // milliseconds later; if the link isn't there yet, the chip stays
+          // blank until the next refresh (acceptable at current volume).
+          supabase
+            .from('slack_thread_links')
+            .select('content_item_id, channel_name')
+            .eq('content_item_id', row.id)
+            .eq('is_origin', true)
+            .maybeSingle()
+            .then(({ data: link }) => {
+              if (link?.channel_name) {
+                setChannelMap((prev) => {
+                  const next = new Map(prev);
+                  next.set(link.content_item_id, link.channel_name);
+                  return next;
+                });
+              }
+            });
         } else if (payload.eventType === 'UPDATE') {
           const row = payload.new as ContentItem;
           if (!row.needs_triage || row.archived) {

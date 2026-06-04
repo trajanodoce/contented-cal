@@ -14,12 +14,9 @@ export const SURFACE = {
   page: '#F4F8FB',
 } as const;
 
-export const PRIORITY_COLOR = {
-  urgent: '#ef4444',
-  high: '#f97316',
-  medium: '#fbbf24',
-  low: 'transparent',
-} as const;
+// Priority colors live in PRIORITY_STYLES (src/lib/utils.ts) — they need
+// Tailwind classes alongside hex, so they stay there as the single source.
+// Need raw hex? Use PRIORITY_STYLES[level].hex.
 
 // ── Board column palette (canonical Draft 5.2) ──────────────────────────────
 // Predefined 10-color set. No color picker — auto-assigns left to right on

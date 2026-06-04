@@ -69,6 +69,13 @@ export function useItemComments({ contentItemId }: UseItemCommentsOptions): UseI
         (payload) => {
           if (payload.eventType === 'INSERT') {
             setComments((prev) => [...prev, payload.new as Comment]);
+          } else if (payload.eventType === 'UPDATE') {
+            // Covers both edits ("(edited)" label) and soft-deletes
+            // (deleted_at transitions null → not null → CommentRow renders
+            // as a tombstone). Replace the row in place so the change is
+            // reflected without a hard refresh.
+            const row = payload.new as Comment;
+            setComments((prev) => prev.map((c) => (c.id === row.id ? row : c)));
           } else if (payload.eventType === 'DELETE') {
             setComments((prev) => prev.filter((c) => c.id !== payload.old.id));
           }

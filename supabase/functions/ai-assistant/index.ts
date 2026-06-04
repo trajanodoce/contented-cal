@@ -378,8 +378,13 @@ Deno.serve(async (req: Request) => {
       else if (status === 429) friendlyMsg = "Rate limit exceeded. Wait a moment and try again.";
       else if (status === 529) friendlyMsg = "Claude is temporarily overloaded. Try again in a few seconds.";
 
+      // Log the raw Claude error body server-side for debugging, but don't
+      // forward it to the client — it can leak provider internals (request IDs,
+      // model details, prompt fragments in some error shapes).
+      console.error("[ai-assistant] Claude API error", { status, errBody });
+
       return new Response(
-        JSON.stringify({ error: friendlyMsg, details: errBody }),
+        JSON.stringify({ error: friendlyMsg }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
