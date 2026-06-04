@@ -40,6 +40,46 @@ const PRIORITY_ICONS: Record<string, typeof Flame> = {
   low: CheckCircle2,
 };
 
+// Maps raw activity_log.action strings (e.g. "Updated due_date") to human-
+// readable labels for display in the Recent Activity panel. Falls back to
+// the original string if nothing matches.
+const ACTIVITY_FIELD_LABELS: Record<string, string> = {
+  due_date: 'Changed due date',
+  status: 'Changed status',
+  priority: 'Changed priority',
+  assignee_ids: 'Changed assignees',
+  content_type_id: 'Changed content type',
+  description: 'Edited description',
+  title: 'Renamed task',
+  channel: 'Changed channel',
+  tags: 'Changed tags',
+  project_id: 'Changed project',
+  category: 'Changed task type',
+  custom_fields: 'Updated custom fields',
+  publish_date: 'Changed publish date',
+  completed: 'Toggled completion',
+  archived: 'Archived',
+};
+
+function humanizeActivityAction(action: string): string {
+  // Pattern: "Updated <field>" → look up canonical label
+  const updateMatch = action.match(/^Updated\s+(.+)$/i);
+  if (updateMatch) {
+    const field = updateMatch[1].trim();
+    if (ACTIVITY_FIELD_LABELS[field]) return ACTIVITY_FIELD_LABELS[field];
+    // Fallback: snake_case → human title-case ("Updated due_date" → "Changed due date")
+    const pretty = field.replace(/_/g, ' ').replace(/\bid\b$/i, '').trim();
+    if (pretty) return `Changed ${pretty}`;
+  }
+  // Common standalone actions
+  const lower = action.toLowerCase();
+  if (lower === 'created') return 'Created task';
+  if (lower === 'archived') return 'Archived task';
+  if (lower === 'restored') return 'Restored task';
+  // Fall through unchanged — keeps comment/subtask/assignment action strings intact
+  return action;
+}
+
 export function HomePage() {
   const navigate = useNavigate();
   const { currentWorkspace } = useWorkspace();
@@ -146,8 +186,8 @@ export function HomePage() {
           label="Urgent + High"
           value={urgentCount + highCount}
           icon={<Flame className="w-5 h-5" />}
-          color="text-orange-600"
-          bg="bg-orange-50"
+          color="text-[#C4504A]"
+          bg="bg-[#C4504A12]"
           alert={urgentCount > 0}
           onClick={() => navigate('/list')}
         />
@@ -352,7 +392,7 @@ export function HomePage() {
                           className="h-full rounded-full transition-all duration-500"
                           style={{
                             width: `${pct}%`,
-                            backgroundColor: s.color || '#94a3b8',
+                            backgroundColor: s.color || '#64748B',
                           }}
                         />
                       </div>
@@ -408,7 +448,7 @@ export function HomePage() {
                   <div key={activity.id} className="px-5 py-3">
                     <p className="text-sm text-slate-700">
                       <span className="font-medium">{activity.user_name ?? 'Someone'}</span>{' '}
-                      <span className="text-slate-500">{activity.action}</span>
+                      <span className="text-slate-500">{humanizeActivityAction(activity.action)}</span>
                     </p>
                     <p className="text-xs text-slate-400 mt-0.5">
                       {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
@@ -455,8 +495,8 @@ function StatCard({
           <span className="w-2.5 h-2.5 rounded-full bg-accent-crimson animate-pulse" />
         )}
       </div>
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-sm text-slate-500 mt-0.5 group-hover:text-brand-600 transition-colors">{label}</p>
+      <p className="text-3xl font-display text-slate-900 leading-none">{value}</p>
+      <p className="text-sm text-slate-500 mt-1.5 group-hover:text-brand-600 transition-colors">{label}</p>
     </button>
   );
 }

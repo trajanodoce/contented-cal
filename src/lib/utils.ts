@@ -44,6 +44,12 @@ export function getPriorityColor(priority: string): string {
 // ── Centralized priority palette ────────────────────────────────────────────
 // Single source of truth — every page imports from here.
 
+// Per the v2 UI/UX update: priority colors now use canonical design system
+// hexes instead of stock Tailwind orange/yellow.
+//   urgent → delete-red  #BA2C2C
+//   high   → coral       #C4504A  (board palette)
+//   medium → peach       #D98A6B  (board palette)
+//   low    → slate       #64748B  (board palette)
 export const PRIORITY_STYLES: Record<string, {
   label: string;
   dot: string;       // small colored dot (bg class)
@@ -53,31 +59,31 @@ export const PRIORITY_STYLES: Record<string, {
 }> = {
   urgent: {
     label: 'Urgent',
-    dot: 'bg-accent-crimson',
-    text: 'text-accent-crimson',
-    pill: 'text-accent-crimson bg-[#BA2C2C08] border-[#BA2C2C30]',
+    dot: 'bg-[#BA2C2C]',
+    text: 'text-[#BA2C2C]',
+    pill: 'text-[#BA2C2C] bg-[#BA2C2C08] border-[#BA2C2C30]',
     hex: '#BA2C2C',
   },
   high: {
     label: 'High',
-    dot: 'bg-orange-500',
-    text: 'text-orange-700',
-    pill: 'text-orange-700 bg-orange-50 border-orange-200',
-    hex: '#f97316',
+    dot: 'bg-[#C4504A]',
+    text: 'text-[#C4504A]',
+    pill: 'text-[#C4504A] bg-[#C4504A08] border-[#C4504A30]',
+    hex: '#C4504A',
   },
   medium: {
     label: 'Medium',
-    dot: 'bg-yellow-500',
-    text: 'text-yellow-700',
-    pill: 'text-yellow-700 bg-yellow-50 border-yellow-200',
-    hex: '#fbbf24',
+    dot: 'bg-[#D98A6B]',
+    text: 'text-[#D98A6B]',
+    pill: 'text-[#D98A6B] bg-[#D98A6B08] border-[#D98A6B30]',
+    hex: '#D98A6B',
   },
   low: {
     label: 'Low',
-    dot: 'bg-slate-400',
-    text: 'text-slate-600',
-    pill: 'text-slate-600 bg-[#005D9712] border-slate-200',
-    hex: '#94a3b8',
+    dot: 'bg-[#64748B]',
+    text: 'text-[#64748B]',
+    pill: 'text-[#64748B] bg-[#64748B08] border-[#64748B30]',
+    hex: '#64748B',
   },
 };
 
