@@ -96,6 +96,22 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+  // Idempotency: Slack retries slash commands on >3s response. Use trigger_id
+  // (unique per invocation) to detect retries via slack_processed_events.
+  const triggerId = params.get("trigger_id");
+  if (triggerId) {
+    const { error: dedupError } = await supabase
+      .from("slack_processed_events")
+      .insert({ event_id: `slash:${triggerId}` });
+
+    if (dedupError?.code === "23505") {
+      return new Response(
+        JSON.stringify({ response_type: "ephemeral", text: "Already processing this request." }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+  }
+
   // Look up the connected workspace
   const { data: integration, error: lookupError } = await supabase
     .from("integrations")
@@ -215,7 +231,7 @@ Deno.serve(async (req) => {
           _slack_user_name: userName,
           _slack_team_id: teamId,
           _slack_via: "slash_command",
-          _slack_permalink: `https://slack.com/app_redirect?channel=${channelId}&team=${teamId}`,
+          _slack_channel_link: `https://slack.com/archives/${channelId}`,
         },
       })
       .select("id")

@@ -2,6 +2,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
 const LINEAR_API = "https://api.linear.app/graphql";
@@ -130,11 +131,39 @@ Deno.serve(async (req) => {
   };
 
   try {
+    // ── Auth: verify JWT before doing any work ──────────────────────────
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Missing authorization" }),
+        { status: 401, headers: corsHeaders }
+      );
+    }
+
+    const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user: authUser } } = await authClient.auth.getUser();
+    if (!authUser) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: corsHeaders }
+      );
+    }
+
     const { workspace_id, user_id } = await req.json();
     if (!workspace_id || !user_id) {
       return new Response(
         JSON.stringify({ error: "workspace_id and user_id required" }),
         { status: 400, headers: corsHeaders }
+      );
+    }
+
+    // Verify the authenticated user matches the requested user_id
+    if (authUser.id !== user_id) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden: user_id does not match authenticated user" }),
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -318,7 +347,7 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error("sync-linear error:", err);
     return new Response(
-      JSON.stringify({ error: (err as Error).message }),
+      JSON.stringify({ error: "Internal error during Linear sync" }),
       { status: 500, headers: corsHeaders }
     );
   }

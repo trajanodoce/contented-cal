@@ -262,7 +262,7 @@ Deno.serve(async (req: Request) => {
         try {
           const note = await getNote(apiKey, link.granola_note_id);
 
-          await supabase
+          const { error: updateErr } = await supabase
             .from("granola_note_links")
             .update({
               note_title: note.title,
@@ -278,7 +278,11 @@ Deno.serve(async (req: Request) => {
             })
             .eq("id", link.id);
 
-          synced++;
+          if (updateErr) {
+            errors.push(`Note ${link.granola_note_id}: update failed — ${updateErr.message}`);
+          } else {
+            synced++;
+          }
         } catch (e) {
           errors.push(
             `Note ${link.granola_note_id}: ${e instanceof Error ? e.message : String(e)}`

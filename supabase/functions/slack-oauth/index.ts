@@ -20,24 +20,48 @@ const corsHeaders = {
     "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── State signing ───────────────────────────────────────────────────────────
+// HMAC-sign the OAuth state with SLACK_CLIENT_SECRET so attackers can't forge
+// a state parameter that maps a legitimate OAuth code to the wrong workspace.
 
-/** Encode workspace + user into a tamper-resistant state param. */
-function encodeState(workspaceId: string, userId: string): string {
+async function hmacSign(data: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw", encoder.encode(SLACK_CLIENT_SECRET),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function hmacVerify(data: string, signature: string): Promise<boolean> {
+  const expected = await hmacSign(data);
+  return expected === signature;
+}
+
+async function encodeState(workspaceId: string, userId: string): Promise<string> {
   const payload = JSON.stringify({
     workspace_id: workspaceId,
     user_id: userId,
     ts: Date.now(),
   });
-  // Base64-URL encode (not signed — Slack's own code exchange is the real guard)
-  return btoa(payload).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const b64 = btoa(payload).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const sig = await hmacSign(b64);
+  return `${b64}.${sig}`;
 }
 
-function decodeState(
+async function decodeState(
   state: string
-): { workspace_id: string; user_id: string; ts: number } | null {
+): Promise<{ workspace_id: string; user_id: string; ts: number } | null> {
   try {
-    const padded = state.replace(/-/g, "+").replace(/_/g, "/");
+    const [b64, sig] = state.split(".");
+    if (!b64 || !sig) return null;
+
+    // Verify HMAC signature
+    const valid = await hmacVerify(b64, sig);
+    if (!valid) return null;
+
+    const padded = b64.replace(/-/g, "+").replace(/_/g, "/");
     const json = atob(padded);
     const parsed = JSON.parse(json);
     // Reject if state is older than 10 minutes
@@ -72,7 +96,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const state = encodeState(workspaceId, userId);
+    const state = await encodeState(workspaceId, userId);
 
     const slackUrl = new URL("https://slack.com/oauth/v2/authorize");
     slackUrl.searchParams.set("client_id", SLACK_CLIENT_ID);
@@ -106,7 +130,7 @@ Deno.serve(async (req) => {
     }
 
     // Validate state
-    const state = decodeState(stateParam);
+    const state = await decodeState(stateParam);
     if (!state) {
       return Response.redirect(
         `${APP_URL}/settings?tab=integrations&slack=error&reason=invalid_state`,

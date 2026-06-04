@@ -84,7 +84,12 @@ Deno.serve(async (req) => {
     return new Response("Missing payload", { status: 400 });
   }
 
-  const payload = JSON.parse(payloadStr);
+  let payload: Record<string, unknown>;
+  try {
+    payload = JSON.parse(payloadStr);
+  } catch {
+    return new Response("Bad payload", { status: 400 });
+  }
 
   // ── Message shortcut: "Add to Content Calendar" ────────────────────────
 
@@ -98,6 +103,9 @@ Deno.serve(async (req) => {
     const channel = payload.channel;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    const slackTs = message?.ts ?? "";
+    const slackChannel = channel?.id ?? "";
 
     // Look up the connected workspace
     const { data: integration, error: lookupError } = await supabase
@@ -118,6 +126,27 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Dedup: check if this Slack message was already added as a content item
+    if (slackTs && slackChannel) {
+      const { data: existingItems } = await supabase
+        .from("content_items")
+        .select("id")
+        .eq("workspace_id", integration.workspace_id)
+        .filter("custom_fields->>_slack_ts", "eq", slackTs)
+        .filter("custom_fields->>_slack_channel", "eq", slackChannel)
+        .limit(1);
+
+      if (existingItems && existingItems.length > 0) {
+        return new Response(
+          JSON.stringify({
+            response_type: "ephemeral",
+            text: `This message was already added to the content calendar.\n<${APP_URL}/list?item=${existingItems[0].id}|View in ContentedCal>`,
+          }),
+          { headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     const botToken = integration.access_token;
 
     // Extract content from the message
@@ -129,6 +158,11 @@ Deno.serve(async (req) => {
     // Look up who sent the original message
     const authorName = message?.user
       ? await getSlackUserName(botToken, message.user)
+      : null;
+
+    // Build permalink
+    const permalink = slackTs
+      ? `https://slack.com/archives/${slackChannel}/p${slackTs.replace(".", "")}`
       : null;
 
     // Get the default board column
@@ -149,15 +183,18 @@ Deno.serve(async (req) => {
         title,
         description: messageText,
         status: defaultStatus,
+        needs_triage: true,
         tags: ["slack-request"],
         custom_fields: {
           _source: "slack",
-          _slack_channel: channel?.id,
-          _slack_ts: message?.ts,
+          _slack_channel: slackChannel,
+          _slack_ts: slackTs,
           _slack_user: message?.user,
           _slack_user_name: authorName,
           _slack_team_id: teamId,
           _slack_added_by: triggeredBy?.id,
+          _slack_via: "message_shortcut",
+          _slack_permalink: permalink,
         },
       })
       .select("id")

@@ -9,9 +9,26 @@ const APP_URL = Deno.env.get("APP_URL") ?? "https://contentedcal.com";
 
 const REDIRECT_URI = `${SUPABASE_URL}/functions/v1/slack-oauth-callback`;
 
-function decodeState(state: string): { workspace_id: string; user_id: string; ts: number } | null {
+async function hmacVerify(data: string, signature: string): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw", encoder.encode(SLACK_CLIENT_SECRET),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+  const expected = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
+  return expected === signature;
+}
+
+async function decodeState(state: string): Promise<{ workspace_id: string; user_id: string; ts: number } | null> {
   try {
-    const padded = state.replace(/-/g, "+").replace(/_/g, "/");
+    const [b64, sig] = state.split(".");
+    if (!b64 || !sig) return null;
+
+    const valid = await hmacVerify(b64, sig);
+    if (!valid) return null;
+
+    const padded = b64.replace(/-/g, "+").replace(/_/g, "/");
     const json = atob(padded);
     const parsed = JSON.parse(json);
     if (Date.now() - parsed.ts > 10 * 60 * 1000) return null;
@@ -36,7 +53,7 @@ Deno.serve(async (req) => {
     return Response.redirect(`${APP_URL}/settings?tab=integrations&slack=error`, 302);
   }
 
-  const state = decodeState(stateParam);
+  const state = await decodeState(stateParam);
   if (!state) {
     return Response.redirect(`${APP_URL}/settings?tab=integrations&slack=error&reason=invalid_state`, 302);
   }
