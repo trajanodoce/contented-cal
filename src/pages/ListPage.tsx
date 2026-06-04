@@ -3,6 +3,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 // UserRole type inferred from workspace context
 import { useContentItems } from '../hooks/useContentItems';
+import { useApp } from '../contexts/AppContext';
 import { parseLocalDate, pillTextColor, PRIORITY_STYLES, getWorkspaceChannels } from '../lib/utils';
 import { getContentType, getBoardColumn, getAssignees, formatDueDateWithStatus, isDoneStatus } from '../lib/itemHelpers';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
@@ -65,6 +66,7 @@ export function ListPage() {
   const canEdit = userRole === 'admin' || userRole === 'editor';
   const { filters, setFilters, isLoaded } = useFilters();
   const { items: rawItems, loading, error, refetch } = useContentItems();
+  const { patchContentItem } = useApp();
   const {
     contentTypes,
     boardColumns,
@@ -569,6 +571,7 @@ export function ListPage() {
                           contentItemId={item.id}
                           isDone={isDone}
                           onUpdate={handleItemUpdated}
+                          patchItem={patchContentItem}
                         />
                       ) : (
                         <span className={`text-sm ${dueDate.isOverdue ? 'text-accent-crimson font-medium' : dueDate.isSoon ? 'text-amber-600' : 'text-slate-600'}`}>
@@ -928,14 +931,19 @@ function InlineDueDateEdit({
   dueDate,
   contentItemId,
   onUpdate,
+  patchItem,
 }: {
   dueDate: string | null;
   contentItemId: string;
   isDone?: boolean;
   onUpdate: () => void;
+  patchItem: (id: string, fields: Record<string, unknown>) => void;
 }) {
   async function handleChange(newDate: string) {
     if (newDate === (dueDate || '')) return;
+
+    // Optimistic update — immediately reflect in UI
+    patchItem(contentItemId, { due_date: newDate || null });
 
     const { error } = await supabase
       .from('content_items')
@@ -943,6 +951,8 @@ function InlineDueDateEdit({
       .eq('id', contentItemId);
 
     if (error) {
+      // Revert on failure
+      patchItem(contentItemId, { due_date: dueDate });
       toast.error('Failed to update due date: ' + error.message);
       return;
     }
