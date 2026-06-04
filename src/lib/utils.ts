@@ -50,6 +50,17 @@ export function getPriorityColor(priority: string): string {
 //   high   → coral       #C4504A  (board palette)
 //   medium → peach       #D98A6B  (board palette)
 //   low    → slate       #64748B  (board palette)
+//
+// Visual weight scales with severity so urgent reads as actually urgent and
+// stacked pills (e.g. the HomePage "By Priority" card) are easy to scan:
+//
+//   urgent  — strongest fill (bg-22 + border-50 + bold text)
+//   high    — medium fill    (bg-15 + border-35)
+//   medium  — soft fill      (bg-10 + border-30)
+//   low     — ghost          (transparent bg + slate-300 border)
+//
+// All four colors stay distinct in the warm-to-cool spectrum, but the
+// gradient in visual weight keeps the urgency hierarchy legible.
 export const PRIORITY_STYLES: Record<string, {
   label: string;
   dot: string;       // small colored dot (bg class)
@@ -61,28 +72,28 @@ export const PRIORITY_STYLES: Record<string, {
     label: 'Urgent',
     dot: 'bg-[#BA2C2C]',
     text: 'text-[#BA2C2C]',
-    pill: 'text-[#BA2C2C] bg-[#BA2C2C08] border-[#BA2C2C30]',
+    pill: 'text-[#BA2C2C] bg-[#BA2C2C22] border-[#BA2C2C50] font-bold',
     hex: '#BA2C2C',
   },
   high: {
     label: 'High',
     dot: 'bg-[#C4504A]',
     text: 'text-[#C4504A]',
-    pill: 'text-[#C4504A] bg-[#C4504A08] border-[#C4504A30]',
+    pill: 'text-[#C4504A] bg-[#C4504A15] border-[#C4504A35]',
     hex: '#C4504A',
   },
   medium: {
     label: 'Medium',
     dot: 'bg-[#D98A6B]',
     text: 'text-[#D98A6B]',
-    pill: 'text-[#D98A6B] bg-[#D98A6B08] border-[#D98A6B30]',
+    pill: 'text-[#D98A6B] bg-[#D98A6B10] border-[#D98A6B30]',
     hex: '#D98A6B',
   },
   low: {
     label: 'Low',
     dot: 'bg-[#64748B]',
     text: 'text-[#64748B]',
-    pill: 'text-[#64748B] bg-[#64748B08] border-[#64748B30]',
+    pill: 'text-[#64748B] bg-transparent border-slate-300',
     hex: '#64748B',
   },
 };
