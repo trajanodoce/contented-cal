@@ -1097,21 +1097,7 @@ export function CalendarPage() {
             onFiltersChange={setFilters}
             totalCount={contentItems.length}
             filteredCount={filteredItems.length}
-            showCompleted={showCompleted}
-            onShowCompletedChange={setShowCompleted}
           />
-          {!showCompleted && (
-            <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg text-xs" style={{ backgroundColor: '#FFF7E0', border: '1px solid #E5B84A40', color: '#7A5A14' }}>
-              <span aria-hidden>📅</span>
-              <span className="font-medium">Finished tasks are hidden.</span>
-              <button
-                onClick={() => setShowCompleted(true)}
-                className="ml-auto underline underline-offset-2 hover:no-underline font-semibold"
-              >
-                Show them
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="px-6 py-3 bg-surface-card border-b border-slate-300 flex items-center justify-between flex-shrink-0">
@@ -1156,6 +1142,28 @@ export function CalendarPage() {
                 Publish Date
               </button>
             </div>
+
+            <button
+              onClick={() => setShowCompleted(!showCompleted)}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+              style={{
+                borderColor: showCompleted ? '#357254' : '#e2e8f0',
+                backgroundColor: showCompleted ? '#EAF4EF' : 'white',
+                color: showCompleted ? '#357254' : '#64748b',
+              }}
+              title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
+            >
+              <div
+                className="relative w-8 h-[18px] rounded-full transition-colors"
+                style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+              >
+                <div
+                  className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
+                  style={{ left: showCompleted ? '18px' : '2px' }}
+                />
+              </div>
+              Done
+            </button>
 
             <button
               onClick={() => {

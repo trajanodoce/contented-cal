@@ -1057,9 +1057,31 @@ function ListTab({
         onFiltersChange={setFilters}
         totalCount={items.length}
         filteredCount={filteredItems.length}
-        showCompleted={showCompleted}
-        onShowCompletedChange={setShowCompleted}
       />
+
+      <div className="flex items-center justify-end gap-2 mt-3 mb-1">
+        <button
+          onClick={() => setShowCompleted(!showCompleted)}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
+          style={{
+            borderColor: showCompleted ? '#357254' : '#e2e8f0',
+            backgroundColor: showCompleted ? '#EAF4EF' : '#F7F9FC',
+            color: showCompleted ? '#357254' : '#64748b',
+          }}
+          title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
+        >
+          <div
+            className="relative w-8 h-[18px] rounded-full transition-colors"
+            style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+          >
+            <div
+              className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
+              style={{ left: showCompleted ? '18px' : '2px' }}
+            />
+          </div>
+          Done
+        </button>
+      </div>
 
       {filteredItems.length === 0 ? (
         <div className="text-center py-12 text-slate-400 text-sm">
