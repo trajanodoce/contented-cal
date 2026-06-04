@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { parseLocalDate } from '../lib/utils';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { StyledSelect } from '../components/ui/StyledSelect';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
@@ -180,18 +181,14 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
         {/* Owner */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Owner</label>
-          <select
+          <StyledSelect
             value={ownerId}
-            onChange={(e) => setOwnerId(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-          >
-            <option value="">No owner</option>
-            {members.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.full_name || m.email}
-              </option>
-            ))}
-          </select>
+            onChange={(v) => setOwnerId(v)}
+            options={[
+              { value: '', label: 'No owner' },
+              ...members.map((m) => ({ value: m.id, label: m.full_name || m.email || 'Unknown' })),
+            ]}
+          />
         </div>
 
         {/* Dates */}

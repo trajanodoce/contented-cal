@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
 import type { PersonalTask } from '../../lib/database.types';
 import { parseLocalDate, formatDate } from '../../lib/utils';
+import { StyledSelect } from '../ui/StyledSelect';
 import { isPast, isToday } from 'date-fns';
 import {
   Plus,
@@ -121,24 +122,20 @@ function AddTaskForm({ workspaceId, onAdded }: { workspaceId: string; onAdded: (
         </button>
       </div>
       <div className="flex items-center gap-3 flex-wrap">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="text-xs text-slate-700 bg-surface-card border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
-        >
-          {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
-            <option key={key} value={key}>{cat.label}</option>
-          ))}
-        </select>
-        <select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          className="text-xs text-slate-700 bg-surface-card border border-slate-200 rounded-md px-2 py-1.5 focus:ring-2 focus:ring-brand-200 outline-none"
-        >
-          {Object.entries(priorityLabels).map(([key, label]) => (
-            <option key={key} value={key}>{label}</option>
-          ))}
-        </select>
+        <div className="min-w-[140px]">
+          <StyledSelect
+            value={category}
+            onChange={(v) => setCategory(v)}
+            options={Object.entries(TASK_CATEGORIES).map(([key, cat]) => ({ value: key, label: cat.label }))}
+          />
+        </div>
+        <div className="min-w-[120px]">
+          <StyledSelect
+            value={priority}
+            onChange={(v) => setPriority(v)}
+            options={Object.entries(priorityLabels).map(([key, label]) => ({ value: key, label }))}
+          />
+        </div>
         <DatePicker
           value={dueDate || null}
           onChange={(val) => setDueDate(val)}
@@ -495,24 +492,20 @@ function TaskRow({
 
         {/* Row 2: Fields */}
         <div className="flex items-center gap-2 flex-wrap mb-3">
-          <select
-            value={editCategory}
-            onChange={(e) => setEditCategory(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-surface-card"
-          >
-            {Object.entries(TASK_CATEGORIES).map(([key, cat]) => (
-              <option key={key} value={key}>{cat.label}</option>
-            ))}
-          </select>
-          <select
-            value={editPriority}
-            onChange={(e) => setEditPriority(e.target.value)}
-            className="text-xs border border-slate-200 rounded-md px-2 py-1.5 text-slate-600 focus:ring-2 focus:ring-brand-200 outline-none bg-surface-card"
-          >
-            {Object.entries(priorityLabels).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+          <div className="min-w-[140px]">
+            <StyledSelect
+              value={editCategory}
+              onChange={(v) => setEditCategory(v)}
+              options={Object.entries(TASK_CATEGORIES).map(([key, cat]) => ({ value: key, label: cat.label }))}
+            />
+          </div>
+          <div className="min-w-[120px]">
+            <StyledSelect
+              value={editPriority}
+              onChange={(v) => setEditPriority(v)}
+              options={Object.entries(priorityLabels).map(([key, label]) => ({ value: key, label }))}
+            />
+          </div>
           <DatePicker
             value={editDueDate || null}
             onChange={(val) => setEditDueDate(val)}

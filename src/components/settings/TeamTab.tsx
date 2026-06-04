@@ -3,6 +3,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useApp } from '../../contexts/AppContext';
 import { supabase } from '../../lib/supabase';
+import { StyledSelect } from '../ui/StyledSelect';
 import { toast } from 'sonner';
 import type { Profile, WorkspaceInvite } from '../../lib/database.types';
 import {
@@ -491,15 +492,15 @@ function AddMemberModal({
         {/* Role selector */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-slate-700 mb-1">Add as role</label>
-          <select
+          <StyledSelect
             value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as Role)}
-            className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
-          >
-            <option value="editor">Editor — can create, edit, and manage content</option>
-            <option value="admin">Admin — full access including settings</option>
-            <option value="viewer">Viewer — read-only access, can comment</option>
-          </select>
+            onChange={(v) => setSelectedRole(v as Role)}
+            options={[
+              { value: 'editor', label: 'Editor — can create, edit, and manage content' },
+              { value: 'admin', label: 'Admin — full access including settings' },
+              { value: 'viewer', label: 'Viewer — read-only access, can comment' },
+            ]}
+          />
         </div>
 
         {/* Search */}
@@ -681,15 +682,15 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
-            <select
+            <StyledSelect
               value={role}
-              onChange={(e) => setRole(e.target.value as Role)}
-              className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-            >
-              <option value="editor">Editor — can create, edit, and manage content</option>
-              <option value="admin">Admin — full access including settings</option>
-              <option value="viewer">Viewer — read-only access, can comment</option>
-            </select>
+              onChange={(v) => setRole(v as Role)}
+              options={[
+                { value: 'editor', label: 'Editor — can create, edit, and manage content' },
+                { value: 'admin', label: 'Admin — full access including settings' },
+                { value: 'viewer', label: 'Viewer — read-only access, can comment' },
+              ]}
+            />
           </div>
 
           {message && (

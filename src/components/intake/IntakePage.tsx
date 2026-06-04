@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import type { IntakeForm, IntakeFormField } from '../../lib/database.types';
 import { CheckCircle, Loader2, Calendar } from 'lucide-react';
 import DatePicker from '../ui/DatePicker';
+import { StyledSelect } from '../ui/StyledSelect';
 
 interface Props {
   slug: string;
@@ -210,12 +211,15 @@ function FieldInput({ field, value, onChange }: {
   }
 
   if (field.field_type === 'single_select') {
-    const options = (field.options as { value: string; label: string }[]) ?? [];
+    const options = (field.options as { value: string; label: string; color?: string }[]) ?? [];
     return (
-      <select value={value} onChange={e => onChange(e.target.value)} className={`${cls} bg-surface-card`}>
-        <option value="">Select...</option>
-        {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-      </select>
+      <StyledSelect
+        value={value}
+        onChange={(v) => onChange(v)}
+        options={options}
+        placeholder="Select..."
+        variant="pill"
+      />
     );
   }
 

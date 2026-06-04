@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { StyledSelect } from '../ui/StyledSelect';
 
 const FIELD_TYPES: { value: CustomFieldType; label: string }[] = [
   { value: 'text', label: 'Text' },
@@ -369,15 +370,11 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-slate-700 mb-1">Icon</label>
-                        <select
+                        <StyledSelect
                           value={formData.icon}
-                          onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                          className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
-                        >
-                          {ICON_OPTIONS.map((icon) => (
-                            <option key={icon.value} value={icon.value}>{icon.label}</option>
-                          ))}
-                        </select>
+                          onChange={(v) => setFormData({ ...formData, icon: v })}
+                          options={ICON_OPTIONS.map((icon) => ({ value: icon.value, label: icon.label }))}
+                        />
                       </div>
                     </div>
                     <div className="mt-4">
@@ -531,15 +528,11 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Icon</label>
-                <select
+                <StyledSelect
                   value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-3 py-2 text-sm text-slate-700 bg-surface-card border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-                >
-                  {ICON_OPTIONS.map((icon) => (
-                    <option key={icon.value} value={icon.value}>{icon.label}</option>
-                  ))}
-                </select>
+                  onChange={(v) => setFormData({ ...formData, icon: v })}
+                  options={ICON_OPTIONS.map((icon) => ({ value: icon.value, label: icon.label }))}
+                />
               </div>
 
               <div>
@@ -712,18 +705,14 @@ function CustomFieldsManager({
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">Type</label>
-              <select
+              <StyledSelect
                 value={newType}
-                onChange={e => {
-                  setNewType(e.target.value as CustomFieldType);
+                onChange={(v) => {
+                  setNewType(v as CustomFieldType);
                   setNewOptions([]);
                 }}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-surface-card"
-              >
-                {FIELD_TYPES.map(ft => (
-                  <option key={ft.value} value={ft.value}>{ft.label}</option>
-                ))}
-              </select>
+                options={FIELD_TYPES.map(ft => ({ value: ft.value, label: ft.label }))}
+              />
             </div>
           </div>
 

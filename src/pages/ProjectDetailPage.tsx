@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { StyledSelect } from '../components/ui/StyledSelect';
 import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { useFilters } from '../contexts/FiltersContext';
@@ -456,20 +457,16 @@ export function ProjectDetailPage() {
           {/* Owner */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">Owner</span>
-            <select
-              value={project.owner_id ?? ''}
-              onChange={(e) =>
-                updateProject({ owner_id: e.target.value || null })
-              }
-              className="text-sm text-slate-700 border border-slate-300 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
-            >
-              <option value="">Unassigned</option>
-              {members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.full_name || m.email}
-                </option>
-              ))}
-            </select>
+            <div className="min-w-[160px]">
+              <StyledSelect
+                value={project.owner_id ?? ''}
+                onChange={(v) => updateProject({ owner_id: v || null })}
+                options={[
+                  { value: '', label: 'Unassigned' },
+                  ...members.map((m) => ({ value: m.id, label: m.full_name || m.email || 'Unknown' })),
+                ]}
+              />
+            </div>
           </div>
 
           <div className="h-5 w-px bg-slate-200" />
@@ -503,15 +500,17 @@ export function ProjectDetailPage() {
           {/* Status */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">Status</span>
-            <select
-              value={project.status}
-              onChange={(e) => updateProject({ status: e.target.value as 'active' | 'completed' | 'archived' })}
-              className="text-sm text-slate-700 border border-slate-300 rounded-lg px-2 py-1 bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-500"
-            >
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="archived">Archived</option>
-            </select>
+            <div className="min-w-[140px]">
+              <StyledSelect
+                value={project.status}
+                onChange={(v) => updateProject({ status: v as 'active' | 'completed' | 'archived' })}
+                options={[
+                  { value: 'active', label: 'Active' },
+                  { value: 'completed', label: 'Completed' },
+                  { value: 'archived', label: 'Archived' },
+                ]}
+              />
+            </div>
           </div>
         </div>
 

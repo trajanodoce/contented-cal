@@ -4,6 +4,7 @@ import {
   Copy, ArrowLeft, Loader2, Link, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { StyledSelect } from '../ui/StyledSelect';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { getWorkspaceChannels } from '../../lib/utils';
@@ -366,12 +367,13 @@ function FormPreview({ form, fields }: { form: IntakeForm; fields: IntakeFormFie
             ) : field.field_type === 'date' ? (
               <input type="date" className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg" disabled />
             ) : field.field_type === 'single_select' ? (
-              <select className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg bg-surface-card" disabled>
-                <option value="">Select...</option>
-                {((field.options as { value: string; label: string }[]) ?? []).map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <StyledSelect
+                value=""
+                onChange={() => {}}
+                options={((field.options as { value: string; label: string }[]) ?? []).map(opt => ({ value: opt.value, label: opt.label }))}
+                placeholder="Select..."
+                disabled
+              />
             ) : (
               <input type="text" className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg" placeholder={field.label} disabled />
             )}
@@ -465,14 +467,14 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Content type (optional)</label>
-            <select
+            <StyledSelect
               value={newFormTypeId}
-              onChange={e => setNewFormTypeId(e.target.value)}
-              className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-300 rounded-lg bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-400"
-            >
-              <option value="">Any type</option>
-              {contentTypes.map(ct => <option key={ct.id} value={ct.id}>{ct.name}</option>)}
-            </select>
+              onChange={(v) => setNewFormTypeId(v)}
+              options={[
+                { value: '', label: 'Any type' },
+                ...contentTypes.map(ct => ({ value: ct.id, label: ct.name })),
+              ]}
+            />
           </div>
           <div className="flex gap-2">
             <button onClick={createForm} disabled={!newFormName.trim() || creating} className="px-4 py-1.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-60 flex items-center gap-1.5">
