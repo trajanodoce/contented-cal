@@ -9,6 +9,7 @@ import { useWorkspaceData } from '../hooks/useWorkspaceData';
 import { BulkActionToolbar } from '../components/list/BulkActionToolbar';
 import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
+import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import { CreateItemModal } from '../components/content/CreateItemModal';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -443,6 +444,7 @@ export function ListPage() {
                     </td>
                     <td className="px-4 py-3 max-w-[400px]">
                       <div className="flex items-center gap-2">
+                        <TaskCategoryIcon category={item.category} />
                         {isUrgentRow && (
                           <AlertTriangle
                             className="w-3.5 h-3.5 shrink-0"

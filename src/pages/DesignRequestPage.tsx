@@ -189,6 +189,7 @@ export function DesignRequestPage() {
       const { data: newItem, error } = await supabase.from('content_items').insert({
         workspace_id: currentWorkspace.id,
         title: title.trim(),
+        category: 'design' as const,
         description: description.trim() || null,
         status: statusId || null,
         assignee_ids: assigneeIds,

@@ -22,6 +22,7 @@ import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
+import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import {
   DndContext,
   DragOverlay,
@@ -124,6 +125,9 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
     >
       {/* Title */}
       <div className="flex items-start gap-1.5 mb-2">
+        <span className="flex-shrink-0 mt-0.5">
+          <TaskCategoryIcon category={item.category} size={12} />
+        </span>
         <h4
           className="text-xs font-medium text-slate-900 line-clamp-2 flex-1"
           title={item.title}

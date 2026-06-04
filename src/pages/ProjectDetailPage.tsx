@@ -73,6 +73,7 @@ import DatePicker from '../components/ui/DatePicker';
 import { BulkActionToolbar, selectedRowClass } from '../components/list/BulkActionToolbar';
 import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
+import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -1158,6 +1159,7 @@ function ListTab({
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-800 max-w-[300px] truncate">
                       <div className="flex items-center gap-2">
+                        <TaskCategoryIcon category={item.category} />
                         {isUrgentRow && (
                           <AlertTriangle
                             className="w-3.5 h-3.5 shrink-0"
@@ -1321,6 +1323,9 @@ function ProjectBoardCard({
       }}
     >
       <div className="flex items-start gap-1.5 mb-2">
+        <span className="flex-shrink-0 mt-0.5">
+          <TaskCategoryIcon category={item.category} size={12} />
+        </span>
         <p className="text-xs font-medium text-slate-900 line-clamp-2 flex-1">
           {item.title}
         </p>

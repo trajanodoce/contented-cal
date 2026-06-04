@@ -374,9 +374,15 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
     setIsSubmitting(true);
 
     try {
+      // Task category: design tasks come in via the +New → "Design Request" path
+      // (which sets initialTags=['design-request']); everything else is content.
+      const taskCategory: 'content' | 'design' =
+        initialTags?.includes('design-request') ? 'design' : 'content';
+
       const { data: newItem, error } = await supabase.from('content_items').insert({
         workspace_id: currentWorkspace.id,
         title: title.trim(),
+        category: taskCategory,
         content_type_id: contentTypeId || null,
         status: statusId || null,
         assignee_ids: assigneeIds,
