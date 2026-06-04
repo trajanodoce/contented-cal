@@ -18,7 +18,7 @@ import { SlackSourceBanner } from './SlackSourceBanner';
 import { SlackThreadsSection } from './SlackThreadsSection';
 import { CommentRow, type CommentWithProfile } from './CommentRow';
 import { MentionAutocomplete } from './MentionAutocomplete';
-import { extractMentionIds } from '../../lib/mentionFormat';
+import { extractMentionIds, renderBodyWithMentions } from '../../lib/mentionFormat';
 import { TaskPresenceChip } from './TaskPresenceChip';
 import { usePresence } from '../../contexts/PresenceContext';
 import { GranolaNotePickerModal } from './GranolaNotePickerModal';
@@ -951,6 +951,33 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     }
                   }}
                 />
+
+                {/* Preview line — only when the draft contains mention syntax.
+                    The composer is a plain textarea (lean v1), so users see
+                    raw `@[Name](uuid)` while typing. This preview shows how
+                    chips will render once the comment is posted. */}
+                {extractMentionIds(commentText).length > 0 && (
+                  <div
+                    className="mt-2 px-3 py-2 rounded-lg text-xs"
+                    style={{ backgroundColor: '#F7F9FC', border: '1px solid #00233918' }}
+                  >
+                    <span className="uppercase tracking-wider font-semibold text-slate-400 mr-2 text-[10px]">
+                      Preview
+                    </span>
+                    <span className="text-slate-700 whitespace-pre-wrap break-words">
+                      {renderBodyWithMentions(commentText, (m) => (
+                        <span
+                          key={`${m.uuid}-${m.start}`}
+                          className="inline-flex items-baseline rounded-full px-1.5 py-0.5 text-xs font-medium"
+                          style={{ backgroundColor: '#005D9712', color: '#005D97' }}
+                          title={`Mentioned: ${m.name}`}
+                        >
+                          @{m.name}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 mt-2">
                   <button
                     onClick={addComment}
