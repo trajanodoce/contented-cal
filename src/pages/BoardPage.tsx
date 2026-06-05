@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   ListChecks,
   Mic,
+  Inbox,
 } from 'lucide-react';
 import { AvatarStack } from '../components/ui/Avatar';
 import { isPast, isToday } from 'date-fns';
@@ -289,10 +290,34 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
 
       {/* Column Content */}
       <div className="cc-board-scrollbar flex-1 p-3 space-y-3 overflow-y-auto max-h-[calc(100vh-280px)] min-h-[100px]">
-        {items.length === 0 && !isOver ? (
-          <p className="text-center py-8 text-slate-400 text-xs italic">
-            Drop items here
-          </p>
+        {items.length === 0 ? (
+          // Empty-column treatment (Phase 3.5). Dashed outline picks up the
+          // column color at low opacity in the idle state; intensifies to a
+          // solid column-tinted fill when an item is being dragged over so
+          // users get clear feedback that the column is a valid drop target.
+          <div
+            className="flex flex-col items-center justify-center py-10 px-4 rounded-lg border-2 border-dashed transition-colors"
+            style={{
+              borderColor: isOver ? colColor : `${colColor}30`,
+              backgroundColor: isOver ? `${colColor}12` : 'transparent',
+            }}
+          >
+            <Inbox
+              className="w-6 h-6 mb-2 transition-colors"
+              style={{ color: isOver ? colColor : '#cbd5e1' }}
+            />
+            <p
+              className="text-xs font-medium transition-colors"
+              style={{ color: isOver ? colColor : '#94a3b8' }}
+            >
+              {isOver ? 'Release to drop' : 'No items yet'}
+            </p>
+            {!isOver && (
+              <p className="text-[10px] text-slate-300 mt-0.5">
+                Drag a task here
+              </p>
+            )}
+          </div>
         ) : (
           items.map((item) => (
             <BoardCard
