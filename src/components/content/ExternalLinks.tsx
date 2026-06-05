@@ -10,8 +10,9 @@ interface Props {
   readOnly?: boolean;
 }
 
-// Platform metadata for display
-const PLATFORM_META: Record<ExternalLinkPlatform, { label: string; bgColor: string; textColor: string; icon: string }> = {
+// Platform metadata for display. Exported so consumers (e.g. project-level
+// ContentLibrary surfacing task assets) can reuse the same chip styling.
+export const PLATFORM_META: Record<ExternalLinkPlatform, { label: string; bgColor: string; textColor: string; icon: string }> = {
   ordinal:      { label: 'Ordinal',      bgColor: '#C4B5D940', textColor: '#5B4F8A', icon: '⬡' },
   figma:        { label: 'Figma',        bgColor: '#F5F3FF', textColor: '#7C3AED', icon: 'F' },
   canva:        { label: 'Canva',        bgColor: '#EFF6FF', textColor: '#2563EB', icon: 'C' },

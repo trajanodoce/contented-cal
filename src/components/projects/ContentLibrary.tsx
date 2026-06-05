@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSelectedItem } from '../../contexts/SelectedItemContext';
+import { PLATFORM_META } from '../content/ExternalLinks';
+import type { ExternalLinkPlatform } from '../../lib/database.types';
 import { toast } from 'sonner';
 import {
   FolderOpen,
@@ -31,10 +34,47 @@ interface LibraryItem {
   created_at: string;
 }
 
+// Read-only mirror of an external_link attached to a task inside this project.
+// Source of truth lives on the task — this view is for discovery only.
+// Edits + deletes route to the parent task via the clickable chip.
+interface TaskAsset {
+  id: string;
+  platform: ExternalLinkPlatform;
+  url: string;
+  title: string | null;
+  thumbnail_url: string | null;
+  created_at: string;
+  parent_task_id: string;
+  parent_task_title: string;
+}
+
 interface Props {
   projectId: string;
   workspaceId: string;
   readOnly?: boolean;
+}
+
+// Pull a readable host name out of a URL — fallback when title is null.
+function urlHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
+// Friendly relative date for "added X ago" attribution.
+function relativeDate(iso: string): string {
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const diff = Math.max(0, now - then);
+  const days = Math.floor(diff / 86_400_000);
+  if (days === 0) return 'today';
+  if (days === 1) return 'yesterday';
+  if (days < 7) return `${days}d ago`;
+  if (days < 30) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
 }
 
 function formatFileSize(bytes: number): string {
@@ -56,7 +96,9 @@ function getFileIcon(mimeType: string | null) {
 
 export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
   const { user } = useAuth();
+  const { setSelectedItemId } = useSelectedItem();
   const [items, setItems] = useState<LibraryItem[]>([]);
+  const [taskAssets, setTaskAssets] = useState<TaskAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [showLinkForm, setShowLinkForm] = useState(false);
@@ -71,17 +113,60 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
   const addMenuRef = useRef<HTMLDivElement>(null);
 
   const fetchItems = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('project_library')
-      .select('*')
-      .eq('project_id', projectId)
-      .order('created_at', { ascending: false });
+    // Fetch project-library items + task-linked external_links in parallel.
+    // Task assets are joined via content_items.project_id so moving/archiving
+    // a task automatically moves/hides its assets from this view — no sync job.
+    const [libraryRes, taskAssetsRes] = await Promise.all([
+      supabase
+        .from('project_library')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('external_links')
+        .select(`
+          id,
+          platform,
+          url,
+          title,
+          thumbnail_url,
+          created_at,
+          content_item_id,
+          content_items!inner ( id, title, project_id, archived )
+        `)
+        .eq('content_items.project_id', projectId)
+        .eq('content_items.archived', false)
+        .order('created_at', { ascending: false }),
+    ]);
 
-    if (error) {
-      console.error('Failed to load library:', error);
+    if (libraryRes.error) {
+      console.error('Failed to load library:', libraryRes.error);
     } else {
-      setItems(data ?? []);
+      setItems(libraryRes.data ?? []);
     }
+
+    if (taskAssetsRes.error) {
+      console.error('Failed to load task assets:', taskAssetsRes.error);
+    } else {
+      // Flatten the joined shape into something the UI can render cleanly.
+      const rows = (taskAssetsRes.data ?? []).map((row): TaskAsset => {
+        // Supabase's inferred type for !inner joins returns the joined row as
+        // an array of one in some versions; normalize either shape.
+        const joined = Array.isArray(row.content_items) ? row.content_items[0] : row.content_items;
+        return {
+          id: row.id,
+          platform: row.platform as ExternalLinkPlatform,
+          url: row.url,
+          title: row.title,
+          thumbnail_url: row.thumbnail_url,
+          created_at: row.created_at,
+          parent_task_id: joined?.id ?? row.content_item_id,
+          parent_task_title: joined?.title ?? 'Untitled task',
+        };
+      });
+      setTaskAssets(rows);
+    }
+
     setLoading(false);
   }, [projectId]);
 
@@ -237,6 +322,8 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
 
   const fileItems = items.filter(i => i.type === 'file');
   const linkItems = items.filter(i => i.type === 'link');
+  const totalCount = items.length + taskAssets.length;
+  const isEmpty = items.length === 0 && taskAssets.length === 0;
 
   return (
     <div className="bg-surface-card rounded-lg border border-slate-200 p-5">
@@ -244,9 +331,9 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
         <div className="flex items-center gap-2">
           <FolderOpen className="w-4 h-4 text-slate-400" />
           <h3 className="text-sm font-semibold text-slate-700">Content Library</h3>
-          {items.length > 0 && (
+          {totalCount > 0 && (
             <span className="text-xs text-slate-400 bg-[#005D9712] px-1.5 py-0.5 rounded-full">
-              {items.length}
+              {totalCount}
             </span>
           )}
         </div>
@@ -348,13 +435,14 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
         </div>
-      ) : items.length === 0 && !showLinkForm ? (
+      ) : isEmpty && !showLinkForm ? (
         <div className="text-center py-8">
           <FolderOpen className="w-8 h-8 text-slate-200 mx-auto mb-2" />
           <p className="text-sm text-slate-400">No files or links yet</p>
           {!readOnly && (
             <p className="text-xs text-slate-400 mt-1">
               Upload documents or add external links to organize project resources.
+              Assets attached to tasks in this project will also show up here.
             </p>
           )}
         </div>
@@ -446,6 +534,18 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Project library subsection header — shown when at least one of
+              files/links exists AND there are task assets too, so the user can
+              tell the two groups apart. When only project items exist, the
+              existing "Documents" / "Links" sub-labels are enough. */}
+          {(fileItems.length > 0 || linkItems.length > 0) && taskAssets.length > 0 && (
+            <div className="-mb-2">
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em]">
+                Project Library
+              </p>
             </div>
           )}
 
@@ -549,6 +649,85 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* From tasks — read-only mirror of external_links attached to
+              any task inside this project. Edits/deletes route to the
+              parent task slide-over via the clickable chip; no inline
+              mutation. Hidden entirely when nothing's linked from tasks. */}
+          {taskAssets.length > 0 && (
+            <div>
+              <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-2">
+                From Tasks ({taskAssets.length})
+              </p>
+              <div className="space-y-1.5">
+                {taskAssets.map(asset => {
+                  const meta = PLATFORM_META[asset.platform] ?? PLATFORM_META.other;
+                  const displayTitle = asset.title || urlHost(asset.url);
+                  return (
+                    <div
+                      key={asset.id}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
+                    >
+                      {/* Platform icon — reuses the same chip styling as
+                          ExternalLinksSection so users recognize it. */}
+                      {asset.thumbnail_url ? (
+                        <img
+                          src={asset.thumbnail_url}
+                          alt=""
+                          className="w-8 h-8 rounded object-cover shrink-0"
+                        />
+                      ) : (
+                        <span
+                          className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold shrink-0"
+                          style={{ backgroundColor: meta.bgColor, color: meta.textColor }}
+                          title={meta.label}
+                        >
+                          {meta.icon}
+                        </span>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <a
+                          href={asset.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-slate-800 hover:text-brand-600 truncate block"
+                        >
+                          {displayTitle}
+                        </a>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
+                          <span>{meta.label}</span>
+                          <span>·</span>
+                          {/* Parent-task chip — clicking opens the task
+                              slide-over so the user can edit/delete the
+                              asset at its source. */}
+                          <button
+                            onClick={() => setSelectedItemId(asset.parent_task_id)}
+                            className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-[#005D9712] text-brand-600 hover:bg-[#005D9722] transition-colors max-w-[180px] truncate"
+                            title={`Open task: ${asset.parent_task_title}`}
+                          >
+                            {asset.parent_task_title}
+                          </button>
+                          <span>·</span>
+                          <span>{relativeDate(asset.created_at)}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <a
+                          href={asset.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1 text-slate-400 hover:text-brand-500 rounded"
+                          title="Open in new tab"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
