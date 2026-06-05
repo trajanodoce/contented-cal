@@ -3,7 +3,8 @@ import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import type { Workspace } from '../lib/database.types';
 
-type UserRole = 'admin' | 'editor' | 'viewer';
+import type { WorkspaceRole } from '../lib/database.types';
+type UserRole = WorkspaceRole;
 
 interface WorkspaceContextValue {
   currentWorkspace: Workspace | null;

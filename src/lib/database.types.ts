@@ -1682,6 +1682,7 @@ export type CustomFieldType = Database['public']['Enums']['field_type'];
 export type ExternalLinkPlatform = Database['public']['Enums']['platform_type'];
 export type TaskCategory = Database['public']['Enums']['task_category'];
 export type FieldAppliesTo = Database['public']['Enums']['field_applies_to'];
+export type WorkspaceRole = Database['public']['Enums']['workspace_role'];
 export type IntegrationPlatform = 'google' | 'notion' | 'linear' | 'claude' | 'ordinal' | 'granola' | 'slack';
 export type AiAction = 'quick_draft' | 'full_workflow' | 'headlines' | 'social_posts' | 'schwartz_diagnosis' | 'stop_slop_audit' | 'improvements' | 'meta_description' | 'custom';
 

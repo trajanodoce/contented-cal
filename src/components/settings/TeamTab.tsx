@@ -5,7 +5,7 @@ import { useApp } from '../../contexts/AppContext';
 import { supabase } from '../../lib/supabase';
 import { StyledSelect } from '../ui/StyledSelect';
 import { toast } from 'sonner';
-import type { Profile, WorkspaceInvite } from '../../lib/database.types';
+import type { Profile, WorkspaceInvite, WorkspaceRole } from '../../lib/database.types';
 import {
   UserPlus,
   UserCheck,
@@ -25,7 +25,7 @@ import {
 import { Avatar } from '../ui/Avatar';
 import { format } from 'date-fns';
 
-type Role = 'admin' | 'editor' | 'viewer';
+type Role = WorkspaceRole;
 
 interface TeamMember {
   user_id: string;

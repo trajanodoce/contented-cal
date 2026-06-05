@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useWorkspace } from './WorkspaceContext';
 import type {
   Workspace, WorkspaceMember, ContentType, BoardColumn,
-  ContentItem, Project, CustomFieldDefinition, IntakeForm
+  ContentItem, Project, CustomFieldDefinition, IntakeForm, WorkspaceRole
 } from '../lib/database.types';
 
 interface AppContextValue {
@@ -12,7 +12,7 @@ interface AppContextValue {
   loading: boolean;
   workspace: Workspace | null;
   workspaces: Workspace[];
-  userRole: 'admin' | 'editor' | 'viewer' | null;
+  userRole: WorkspaceRole | null;
   contentTypes: ContentType[];
   boardColumns: BoardColumn[];
   contentItems: ContentItem[];
@@ -40,7 +40,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [workspace, setWorkspaceState] = useState<Workspace | null>(null);
-  const [userRole, setUserRole] = useState<'admin' | 'editor' | 'viewer' | null>(null);
+  const [userRole, setUserRole] = useState<WorkspaceRole | null>(null);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
@@ -135,7 +135,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (typesRes.data) setContentTypes(typesRes.data);
     if (colsRes.data) setBoardColumns(colsRes.data);
     if (projRes.data) setProjects(projRes.data);
-    if (roleRes.data) setUserRole(roleRes.data.role as 'admin' | 'editor' | 'viewer');
+    if (roleRes.data) setUserRole(roleRes.data.role as WorkspaceRole);
     if (customFieldsRes.data) setCustomFieldDefs(customFieldsRes.data);
 
     if (membersRes.data) {

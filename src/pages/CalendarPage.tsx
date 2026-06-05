@@ -72,6 +72,32 @@ import { CSS } from '@dnd-kit/utilities';
 type CalendarView = 'month' | 'week' | 'day';
 type DateMode = 'due' | 'publish';
 
+// ── Shared date helpers ──────────────────────────────────────────────────────
+// Same helpers were declared inline inside both SingleMonthGrid and WeekView.
+// Lifted to module scope so the two views render identical results without
+// drift if either is edited in isolation.
+
+function getItemsForDate(items: ContentItem[], date: Date, dateMode: DateMode): ContentItem[] {
+  return items.filter((item) => {
+    const dateField = dateMode === 'due' ? item.due_date : item.publish_date;
+    if (!dateField) return false;
+    return isSameDay(parseLocalDate(dateField), date);
+  });
+}
+
+function getProjectMarkersForDate(projects: Project[], date: Date): { project: Project; type: 'start' | 'end' }[] {
+  const markers: { project: Project; type: 'start' | 'end' }[] = [];
+  for (const p of projects) {
+    if (p.start_date && isSameDay(parseLocalDate(p.start_date), date)) {
+      markers.push({ project: p, type: 'start' });
+    }
+    if (p.end_date && isSameDay(parseLocalDate(p.end_date), date)) {
+      markers.push({ project: p, type: 'end' });
+    }
+  }
+  return markers;
+}
+
 // Droppable wrapper for calendar day cells — enables drag-and-drop rescheduling
 function DroppableDayCell({ dateId, children, className, onClick, style }: {
   dateId: string;
@@ -266,26 +292,6 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
   const calendarEnd = endOfWeek(monthEnd);
   const days = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
 
-  const getItemsForDate = (date: Date) => {
-    return items.filter((item) => {
-      const dateField = dateMode === 'due' ? item.due_date : item.publish_date;
-      if (!dateField) return false;
-      return isSameDay(parseLocalDate(dateField), date);
-    });
-  };
-
-  const getProjectMarkersForDate = (date: Date) => {
-    const markers: { project: Project; type: 'start' | 'end' }[] = [];
-    for (const p of projects) {
-      if (p.start_date && isSameDay(parseLocalDate(p.start_date), date)) {
-        markers.push({ project: p, type: 'start' });
-      }
-      if (p.end_date && isSameDay(parseLocalDate(p.end_date), date)) {
-        markers.push({ project: p, type: 'end' });
-      }
-    }
-    return markers;
-  };
 
   const getSubtasksForDate = (date: Date) => {
     return subtasks.filter((st) => st.due_date && isSameDay(parseLocalDate(st.due_date), date));
@@ -329,8 +335,8 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             );
           }
 
-          const dayItems = getItemsForDate(day);
-          const dayProjectMarkers = getProjectMarkersForDate(day);
+          const dayItems = getItemsForDate(items, day, dateMode);
+          const dayProjectMarkers = getProjectMarkersForDate(projects, day);
           const daySubtasks = getSubtasksForDate(day);
           const isTodayDate = isToday(day);
           const totalSlots = dayItems.length + dayProjectMarkers.length + daySubtasks.length;
@@ -499,26 +505,6 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
   const weekEnd = endOfWeek(currentDate);
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
 
-  const getItemsForDate = (date: Date) => {
-    return items.filter((item) => {
-      const dateField = dateMode === 'due' ? item.due_date : item.publish_date;
-      if (!dateField) return false;
-      return isSameDay(parseLocalDate(dateField), date);
-    });
-  };
-
-  const getProjectMarkersForDate = (date: Date) => {
-    const markers: { project: Project; type: 'start' | 'end' }[] = [];
-    for (const p of projects) {
-      if (p.start_date && isSameDay(parseLocalDate(p.start_date), date)) {
-        markers.push({ project: p, type: 'start' });
-      }
-      if (p.end_date && isSameDay(parseLocalDate(p.end_date), date)) {
-        markers.push({ project: p, type: 'end' });
-      }
-    }
-    return markers;
-  };
 
   const getSubtasksForDate = (date: Date) => {
     return subtasks.filter((st) => st.due_date && isSameDay(parseLocalDate(st.due_date), date));
@@ -559,8 +545,8 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
 
       <div className="grid auto-rows-fr min-h-[400px]" style={{ gridTemplateColumns: gridCols }}>
         {visibleDays.map((day) => {
-          const dayItems = getItemsForDate(day);
-          const dayProjectMarkers = getProjectMarkersForDate(day);
+          const dayItems = getItemsForDate(items, day, dateMode);
+          const dayProjectMarkers = getProjectMarkersForDate(projects, day);
           const daySubtasks = getSubtasksForDate(day);
           const isTodayDate = isToday(day);
 
