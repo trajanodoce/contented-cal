@@ -13,7 +13,6 @@ import {
   Layout,
   FileText,
   Settings,
-  AlertTriangle,
   X,
 } from 'lucide-react';
 import { ConfirmModal } from '../ui/ConfirmModal';

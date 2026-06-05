@@ -1,5 +1,5 @@
 import { lazy, Suspense, Component } from 'react';
-import type { ReactNode, ErrorInfo } from 'react';
+import type { ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';

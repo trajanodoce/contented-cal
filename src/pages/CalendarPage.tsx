@@ -5,7 +5,7 @@ import { useApp } from '../contexts/AppContext';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, Profile, BoardColumn, Project, Subtask } from '../lib/database.types';
-import { parseLocalDate, getWorkspaceChannels } from '../lib/utils';
+import { parseLocalDate, getWorkspaceChannels, PRIORITY_STYLES } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
@@ -71,13 +71,6 @@ import { CSS } from '@dnd-kit/utilities';
 
 type CalendarView = 'month' | 'week' | 'day';
 type DateMode = 'due' | 'publish';
-
-const priorityColors: Record<string, string> = {
-  urgent: '#ef4444',
-  high: '#f97316',
-  medium: '#fbbf24',
-  low: 'transparent',
-};
 
 // Droppable wrapper for calendar day cells — enables drag-and-drop rescheduling
 function DroppableDayCell({ dateId, children, className, onClick, style }: {
@@ -261,13 +254,12 @@ interface SingleMonthGridProps {
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
   weekendsCollapsed: boolean;
-  onToggleWeekends: () => void;
   onItemClick: (item: ContentItem) => void;
   onDateClick: (date: Date) => void;
   onShowMore: (date: Date) => void;
 }
 
-function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends: _onToggleWeekends, onItemClick, onDateClick, onShowMore }: SingleMonthGridProps) {
+function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick, onShowMore }: SingleMonthGridProps) {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
   const calendarStart = startOfWeek(monthStart);
@@ -421,13 +413,12 @@ interface MonthViewProps {
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
   weekendsCollapsed: boolean;
-  onToggleWeekends: () => void;
   onItemClick: (item: ContentItem) => void;
   onDateClick: (date: Date) => void;
   onShowMore: (date: Date) => void;
 }
 
-function MonthView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends, onItemClick, onDateClick, onShowMore }: MonthViewProps) {
+function MonthView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick, onShowMore }: MonthViewProps) {
   const [expanded, setExpanded] = useState(false);
   const monthCount = expanded ? 6 : 3;
   const months = Array.from({ length: monthCount }, (_, i) => addMonths(currentDate, i));
@@ -455,7 +446,6 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
             subtasks={subtasks}
             granolaItemIds={granolaItemIds}
             weekendsCollapsed={weekendsCollapsed}
-            onToggleWeekends={onToggleWeekends}
             onItemClick={onItemClick}
             onDateClick={onDateClick}
             onShowMore={onShowMore}
@@ -500,12 +490,11 @@ interface WeekViewProps {
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
   weekendsCollapsed: boolean;
-  onToggleWeekends: () => void;
   onItemClick: (item: ContentItem) => void;
   onDateClick: (date: Date) => void;
 }
 
-function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onToggleWeekends: _onToggleWeekends, onItemClick, onDateClick }: WeekViewProps) {
+function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick }: WeekViewProps) {
   const weekStart = startOfWeek(currentDate);
   const weekEnd = endOfWeek(currentDate);
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -647,7 +636,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                       {item.priority && item.priority !== 'low' && (
                         <span
                           className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: priorityColors[item.priority] }}
+                          style={{ backgroundColor: PRIORITY_STYLES[item.priority ?? 'low']?.hex }}
                         />
                       )}
                     </div>
@@ -850,7 +839,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
       <div className="flex items-start gap-3">
         <div
           className="w-1 h-full min-h-[40px] rounded-full flex-shrink-0"
-          style={{ backgroundColor: isOverdue ? '#ef4444' : (priorityColors[item.priority ?? 'low'] || 'transparent') }}
+          style={{ backgroundColor: isOverdue ? '#BA2C2C' : (PRIORITY_STYLES[item.priority ?? 'low']?.hex ?? 'transparent') }}
         />
 
         <div className="flex-1 min-w-0">
@@ -1254,7 +1243,6 @@ export function CalendarPage() {
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
               weekendsCollapsed={weekendsCollapsed}
-              onToggleWeekends={toggleWeekends}
               onItemClick={(item: ContentItem) => setSelectedItemId(item.id)}
               onDateClick={handleDateClick}
               onShowMore={(date) => {
@@ -1277,7 +1265,6 @@ export function CalendarPage() {
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
               weekendsCollapsed={weekendsCollapsed}
-              onToggleWeekends={toggleWeekends}
               onItemClick={(item: ContentItem) => setSelectedItemId(item.id)}
               onDateClick={handleDateClick}
             />

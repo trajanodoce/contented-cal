@@ -40,14 +40,11 @@ import {
   DropAnimation,
 } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { DropTarget, DragGhost, BoardSourcePlaceholder } from '../components/dnd/DndPrimitives';
+import { DragGhost, BoardSourcePlaceholder } from '../components/dnd/DndPrimitives';
+import { PRIORITY_STYLES } from '../lib/utils';
 
-const priorityColors: Record<string, string> = {
-  urgent: '#ef4444',
-  high: '#f97316',
-  medium: '#fbbf24',
-  low: 'transparent',
-};
+// Priority colors sourced from canonical PRIORITY_STYLES (lib/utils.ts) so
+// board cards, list rows, calendar event chips, and detail pills all match.
 
 const LINK_PLATFORM_META: Record<string, { label: string; bg: string; color: string; icon: string }> = {
   ordinal:      { label: 'Ordinal',      bg: '#C4B5D940', color: '#5B4F8A', icon: '⬡' },
@@ -164,7 +161,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
           {item.priority && item.priority !== 'medium' && (
             <span
               className="text-[10px] font-semibold uppercase tracking-wide"
-              style={{ color: priorityColors[item.priority] }}
+              style={{ color: PRIORITY_STYLES[item.priority ?? 'low']?.hex }}
             >
               {item.priority}
             </span>

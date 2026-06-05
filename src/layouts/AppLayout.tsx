@@ -127,7 +127,6 @@ export function AppLayout() {
       const search = params.toString();
       window.history.replaceState(null, '', `${window.location.pathname}${search ? `?${search}` : ''}`);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItemId]);
 
   // Close create menus on outside click

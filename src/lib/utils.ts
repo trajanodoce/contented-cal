@@ -37,10 +37,6 @@ export function isOverdue(dateStr: string | null | undefined): boolean {
   return isPast(d) && !isToday(d);
 }
 
-export function getPriorityColor(priority: string): string {
-  return PRIORITY_STYLES[priority]?.pill ?? PRIORITY_STYLES.low.pill;
-}
-
 // ── Centralized priority palette ────────────────────────────────────────────
 // Single source of truth — every page imports from here.
 
@@ -134,16 +130,6 @@ export function pillTextColor(hex: string): string {
 
 export function getPriorityDot(priority: string): string {
   return PRIORITY_STYLES[priority]?.dot ?? PRIORITY_STYLES.low.dot;
-}
-
-export function getUserInitials(email?: string, fullName?: string): string {
-  if (fullName) return fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-  if (email) return email.slice(0, 2).toUpperCase();
-  return '?';
-}
-
-export function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
 /** Default channel list for new workspaces or when none are configured */

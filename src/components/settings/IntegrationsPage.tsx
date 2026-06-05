@@ -476,7 +476,7 @@ export function IntegrationsPage({ addToast }: Props) {
     addToast('Integration disconnected');
   }
 
-  function startOAuth(_platform: IntegrationPlatform) {
+  function startOAuth() {
     if (!workspace || !user) return;
     const oauthUrl = `${SUPABASE_URL}/functions/v1/slack-oauth?action=authorize&workspace_id=${workspace.id}&user_id=${user.id}`;
     window.location.href = oauthUrl;
@@ -544,7 +544,7 @@ export function IntegrationsPage({ addToast }: Props) {
                 meta={meta}
                 integration={getIntegration(meta.id)}
                 onConnect={(config) => connect(meta.id, config)}
-                onOAuthConnect={meta.setupType === 'oauth' ? () => startOAuth(meta.id) : undefined}
+                onOAuthConnect={meta.setupType === 'oauth' ? () => startOAuth() : undefined}
                 onDisconnect={() => disconnect(meta.id)}
                 onTest={() => testConnection(meta.id)}
                 saving={saving === meta.id}

@@ -7,7 +7,6 @@ import {
   Plus,
   Trash2,
   GripVertical,
-  AlertTriangle,
   X,
   Radio,
 } from 'lucide-react';

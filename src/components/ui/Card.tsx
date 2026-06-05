@@ -13,11 +13,12 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
  * bg-surface-card, rounded-xl, shadow-sm, 1px #00233930 border.
  */
 export function Card({ children, className = '', as: Tag = 'div', style, ...rest }: CardProps) {
+  // Polymorphic component — Tag is a union of element types, so spread is
+  // typed loosely as Record<string, unknown> to satisfy the JSX-runtime check.
   return (
     <Tag
       className={`bg-surface-card rounded-xl shadow-sm overflow-hidden ${className}`}
       style={{ border: '1px solid #00233930', ...style }}
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- polymorphic component; Tag is a union of element types */}
       {...(rest as Record<string, unknown>)}
     >
       {children}

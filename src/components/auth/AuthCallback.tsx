@@ -27,6 +27,7 @@ export function AuthCallback() {
 
         // Set up auth state listener
 
+        // eslint-disable-next-line prefer-const -- reassigned via closure at line below
         let timeoutId: ReturnType<typeof setTimeout>;
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {

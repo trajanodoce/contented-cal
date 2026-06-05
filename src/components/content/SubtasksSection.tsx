@@ -348,15 +348,6 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
     return members.find(m => m.id === id);
   };
 
-  // Helper: member initials
-  const getInitials = (name: string): string => {
-    return name
-      .split(' ')
-      .map(p => p[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   return (
     <div className="bg-surface-card border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>

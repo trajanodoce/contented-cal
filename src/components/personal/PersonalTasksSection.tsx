@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
 import type { PersonalTask } from '../../lib/database.types';
-import { parseLocalDate, formatDate } from '../../lib/utils';
+import { parseLocalDate, formatDate, PRIORITY_STYLES } from '../../lib/utils';
 import { StyledSelect } from '../ui/StyledSelect';
 import { isPast, isToday } from 'date-fns';
 import {
@@ -39,12 +39,7 @@ export const TASK_CATEGORIES: Record<string, { label: string; icon: typeof Brief
   general:   { label: 'General',    icon: FolderOpen,     color: '#94a3b8' },
 };
 
-const priorityColors: Record<string, string> = {
-  urgent: '#ef4444',
-  high: '#f97316',
-  medium: '#fbbf24',
-  low: '#94a3b8',
-};
+// Priority colors sourced from canonical PRIORITY_STYLES (lib/utils.ts).
 
 const priorityLabels: Record<string, string> = {
   urgent: 'Urgent',
@@ -575,7 +570,7 @@ function TaskRow({
       {!task.completed && task.priority !== 'medium' && (
         <span
           className="w-2 h-2 rounded-full flex-shrink-0"
-          style={{ backgroundColor: priorityColors[task.priority] }}
+          style={{ backgroundColor: PRIORITY_STYLES[task.priority ?? 'low']?.hex }}
           title={priorityLabels[task.priority]}
         />
       )}

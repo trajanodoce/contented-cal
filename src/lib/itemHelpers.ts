@@ -1,4 +1,4 @@
-import type { ContentType, BoardColumn, Profile, ContentItem } from './database.types';
+import type { ContentType, BoardColumn, Profile } from './database.types';
 import { parseLocalDate, formatDate } from './utils';
 import { isPast, isToday, isTomorrow } from 'date-fns';
 
@@ -64,8 +64,3 @@ export function formatDueDateWithStatus(
   };
 }
 
-// ── Channel extraction ──────────────────────────────────────────────────────
-
-export function extractChannels(items: ContentItem[]): string[] {
-  return [...new Set(items.map((i) => i.channel).filter(Boolean))] as string[];
-}
