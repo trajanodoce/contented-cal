@@ -37,28 +37,29 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
-      // Auto-accept any pending invites for this user's email
+      // Auto-accept any pending invites for this user's email. The actual
+      // membership insert + accepted_at update happen server-side inside
+      // the accept_invite() SECURITY DEFINER function — we only pass the
+      // invite ID. The server re-reads the row and uses the role AS STORED,
+      // so even if the invitee tampered with the row pre-acceptance (e.g.
+      // tried to flip viewer → admin), the function ignores the local
+      // mutation. RLS now also blocks invitees from writing to
+      // workspace_invites at all. See migration 20260605000000.
       if (user.email) {
         const { data: pendingInvites } = await supabase
           .from('workspace_invites')
-          .select('*')
+          .select('id')
           .eq('email', user.email.toLowerCase())
           .is('accepted_at', null);
 
         if (pendingInvites && pendingInvites.length > 0) {
           for (const invite of pendingInvites) {
-            // Add as member (ignore if already exists)
-            await supabase
-              .from('workspace_members')
-              .upsert(
-                { workspace_id: invite.workspace_id, user_id: user.id, role: invite.role },
-                { onConflict: 'workspace_id,user_id' }
-              );
-            // Mark invite accepted
-            await supabase
-              .from('workspace_invites')
-              .update({ accepted_at: new Date().toISOString() })
-              .eq('id', invite.id);
+            const { error: acceptError } = await supabase.rpc('accept_invite', {
+              p_invite_id: invite.id,
+            });
+            if (acceptError) {
+              console.error('Failed to accept invite', invite.id, acceptError);
+            }
           }
         }
       }
