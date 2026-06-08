@@ -267,8 +267,11 @@ export function ListPage() {
     );
   }
 
-  // Empty state
-  if (items.length === 0) {
+  // Empty state — only when workspace has zero raw items. If raw > 0 but
+  // filtered = 0, fall through to render the FilterBar so users can clear
+  // their filters (otherwise they'd see "Create your first item" CTA with
+  // 106 items hiding behind an active filter — confusing).
+  if (rawItems.length === 0) {
     return (
       <div className="p-8">
         <div className="flex items-center justify-center h-[60vh]">
@@ -412,6 +415,32 @@ export function ListPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
+              {sortedItems.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="text-center py-12">
+                    <p className="text-sm text-slate-500 font-medium mb-2">No items match your filters</p>
+                    <p className="text-xs text-slate-400 mb-4">{rawItems.length} item{rawItems.length === 1 ? '' : 's'} hidden by the current filters</p>
+                    <button
+                      onClick={() => {
+                        setFilters({
+                          search: '',
+                          contentTypes: [],
+                          statuses: [],
+                          assignees: [],
+                          priorities: [],
+                          channels: [],
+                          projects: [],
+                          linkedPlatforms: [],
+                        });
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg text-accent-crimson hover:bg-[#BA2C2C08] transition-colors"
+                      style={{ border: '1px solid #BA2C2C30' }}
+                    >
+                      Clear filters
+                    </button>
+                  </td>
+                </tr>
+              )}
               {sortedItems.map((item, idx) => {
                 const isSelected = selectedItems.has(item.id);
                 const isFocused = focusedIndex === idx;

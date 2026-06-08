@@ -300,6 +300,20 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
     [members]
   );
 
+  // Blur whatever element had focus before the modal opened — guards against
+  // stray keystrokes leaking to inputs underneath (e.g. the FilterBar search
+  // box) during the brief window before the modal's title field receives
+  // autoFocus. Caught 2026-06-05 when a "social copy" title typo'd into the
+  // workspace-wide search filter and hid 106 items behind a "spcoa" query.
+  useEffect(() => {
+    if (isOpen) {
+      const active = document.activeElement;
+      if (active && active instanceof HTMLElement && active !== document.body) {
+        active.blur();
+      }
+    }
+  }, [isOpen]);
+
   // Pre-fill due date when opened from calendar date click
   useEffect(() => {
     if (isOpen && initialDate) {
