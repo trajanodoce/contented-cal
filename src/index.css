@@ -153,14 +153,26 @@ body {
 .cc-dnd-snap { transition: transform 200ms ease-out; }
 
 /* ── Softened board scrollbar (canonical Draft 5.2) ── */
-/* Used on board view's horizontal + per-column vertical scrolls. Lighter
-   than the global navy pill so dense board layouts don't read as busy. */
+/* Used on board view's horizontal + per-column vertical scrolls. The
+   per-column vertical scroll stays subtle (6px transparent track) so
+   dense card stacks don't read as busy. The horizontal board scroll
+   gets a chunkier, more visible treatment because it's the only signal
+   that more columns extend off-screen — on macOS with auto-hide
+   scrollbars the previous 6px transparent version was effectively
+   invisible until the user actively scrolled. */
 .cc-board-scrollbar::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
+}
+.cc-board-scrollbar::-webkit-scrollbar:horizontal {
+  height: 12px;
 }
 .cc-board-scrollbar::-webkit-scrollbar-track {
   background: transparent;
+}
+.cc-board-scrollbar::-webkit-scrollbar:horizontal::-webkit-scrollbar-track,
+.cc-board-scrollbar::-webkit-scrollbar-track:horizontal {
+  background: rgba(0, 93, 151, 0.06);
+  border-radius: 999px;
 }
 .cc-board-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(0, 93, 151, 0.45);
@@ -168,16 +180,26 @@ body {
   border: 2px solid transparent;
   background-clip: padding-box;
 }
+.cc-board-scrollbar::-webkit-scrollbar-thumb:horizontal {
+  background: rgba(0, 93, 151, 0.55);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+}
 .cc-board-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 93, 151, 0.60);
   background-clip: padding-box;
+}
+.cc-board-scrollbar::-webkit-scrollbar-thumb:horizontal:hover {
+  background: rgba(0, 93, 151, 0.75);
+  background-clip: padding-box;
+  border: 3px solid transparent;
 }
 .cc-board-scrollbar::-webkit-scrollbar-corner {
   background: transparent;
 }
 .cc-board-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 93, 151, 0.45) transparent;
+  scrollbar-color: rgba(0, 93, 151, 0.55) rgba(0, 93, 151, 0.06);
 }
 
 /* ── Banner Tokens (canonical) ── */
