@@ -174,7 +174,7 @@ export function FilterBar({
 
         {/* Assignee filter */}
         <FilterDropdown
-          label="Assignee"
+          label="Owner"
           count={activeFilterCounts.assignees}
           options={members.map((m) => ({ id: m.id, label: m.full_name || m.email, avatarUrl: m.avatar_url }))}
           selectedIds={filters.assignees}
@@ -313,7 +313,7 @@ function FilterDropdown({
       const plural: Record<string, string> = {
         Type: 'Types',
         Status: 'Statuses',
-        Assignee: 'Assignees',
+        Owner: 'Owners',
         Priority: 'Priorities',
         Channel: 'Channels',
         Project: 'Projects',

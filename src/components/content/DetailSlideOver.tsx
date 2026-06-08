@@ -649,17 +649,17 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {/* 1. Assignee */}
               <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                 <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-1.5">
-                  <User className="w-3.5 h-3.5" /> Assignee
+                  <User className="w-3.5 h-3.5" /> Owner
                 </label>
                 <StyledSelect
                   value={item.assignee_ids?.[0] ?? ''}
                   onChange={val => updateField('assignee_ids', val ? [val] : [])}
                   disabled={isReadOnly}
                   options={[
-                    { value: '', label: 'Unassigned' },
+                    { value: '', label: 'Unowned' },
                     ...members.map(m => ({ value: m.user_id, label: m.full_name || m.email || 'Unknown member' })),
                   ]}
-                  placeholder="Unassigned"
+                  placeholder="Unowned"
                 />
               </div>
 

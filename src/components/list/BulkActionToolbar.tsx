@@ -152,7 +152,7 @@ export function BulkActionToolbar({
 
       await Promise.all(updates);
 
-      toast.success(`Assigned ${selectedCount} item(s) to ${member?.full_name || member?.email}`);
+      toast.success(`Set ${member?.full_name || member?.email} as owner of ${selectedCount} item(s)`);
       onUpdate();
       onClear();
     } catch (err) {

@@ -82,26 +82,29 @@ export function parseActivityAction(action: string, metadata?: unknown): ParsedA
     };
   }
 
-  // "assigned to X" / "assigned X"
+  // "assigned to X" / "assigned X" — legacy action verb stored in DB;
+  // displayed with the canonical "set as owner" phrasing.
   m = raw.match(/^assigned(?: to)? (.+)$/i);
   if (m) {
     return {
       type: 'assignment',
       parts: [
-        { kind: 'text', value: 'assigned ' },
+        { kind: 'text', value: 'set ' },
         { kind: 'bold', value: m[1] },
+        { kind: 'text', value: ' as owner' },
       ],
     };
   }
 
-  // "unassigned X"
+  // "unassigned X" — legacy verb; displayed as "removed X as owner".
   m = raw.match(/^unassigned (.+)$/i);
   if (m) {
     return {
       type: 'assignment',
       parts: [
-        { kind: 'text', value: 'unassigned ' },
+        { kind: 'text', value: 'removed ' },
         { kind: 'bold', value: m[1] },
+        { kind: 'text', value: ' as owner' },
       ],
     };
   }

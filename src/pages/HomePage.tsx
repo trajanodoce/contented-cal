@@ -47,7 +47,7 @@ const ACTIVITY_FIELD_LABELS: Record<string, string> = {
   due_date: 'Changed due date',
   status: 'Changed status',
   priority: 'Changed priority',
-  assignee_ids: 'Changed assignees',
+  assignee_ids: 'Changed owners',
   content_type_id: 'Changed content type',
   description: 'Edited description',
   title: 'Renamed task',

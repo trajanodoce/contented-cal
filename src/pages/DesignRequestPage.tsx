@@ -287,9 +287,9 @@ export function DesignRequestPage() {
               </div>
             </div>
 
-            {/* Assignees */}
+            {/* Owners */}
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-1.5">Assignees</label>
+              <label className="block text-sm font-bold text-slate-700 mb-1.5">Owners</label>
               <AssigneeMultiSelect members={members} value={assigneeIds} onChange={setAssigneeIds} />
             </div>
 

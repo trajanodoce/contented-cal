@@ -407,7 +407,7 @@ export function ListPage() {
                 <SortHeader label="Title" field="title" sort={sort} onSort={handleSort} />
                 <SortHeader label="Type" field="content_type" sort={sort} onSort={handleSort} />
                 <SortHeader label="Status" field="status" sort={sort} onSort={handleSort} />
-                <SortHeader label="Assignee" field="assignee" sort={sort} onSort={handleSort} />
+                <SortHeader label="Owner" field="assignee" sort={sort} onSort={handleSort} />
                 <SortHeader label="Due Date" field="due_date" sort={sort} onSort={handleSort} />
                 <SortHeader label="Priority" field="priority" sort={sort} onSort={handleSort} />
                 <SortHeader label="Channel" field="channel" sort={sort} onSort={handleSort} />
