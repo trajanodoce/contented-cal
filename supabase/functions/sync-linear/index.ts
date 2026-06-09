@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
     // Get Linear credentials from user_integrations (personal integration)
     const { data: integration, error: intError } = await supabase
       .from("user_integrations")
-      .select("*")
+      .select("id, access_token, config")
       .eq("workspace_id", workspace_id)
       .eq("user_id", user_id)
       .eq("platform", "linear")

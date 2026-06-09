@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
           .eq("workspace_id", wsId)
           .maybeSingle();
 
-        if (error) return err(error.message, 500);
+        if (error) { console.error("[api] GET item error:", error.message); return err("Internal error", 500, "INTERNAL"); }
         if (!data) return err("Item not found", 404, "NOT_FOUND");
         return json({ data });
       }
@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
       query = query.order("created_at", { ascending: false }).range(offset, offset + limit - 1);
 
       const { data, error, count } = await query;
-      if (error) return err(error.message, 500);
+      if (error) { console.error("[api] list items error:", error.message); return err("Internal error", 500, "INTERNAL"); }
       return json({ data, count, limit, offset });
     }
 
@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
       };
 
       const { data, error } = await sb.from("content_items").insert(insert).select().single();
-      if (error) return err(error.message, 500);
+      if (error) { console.error("[api] create item error:", error.message); return err("Internal error", 500, "INTERNAL"); }
       return json({ data }, 201);
     }
 
@@ -202,19 +202,19 @@ Deno.serve(async (req) => {
       if (Object.keys(updates).length === 0) return err("No valid fields to update", 400, "VALIDATION");
 
       const { data, error } = await sb.from("content_items").update(updates).eq("id", resourceId).select().single();
-      if (error) return err(error.message, 500);
+      if (error) { console.error("[api] update item error:", error.message); return err("Internal error", 500, "INTERNAL"); }
       return json({ data });
     }
 
-    // DELETE /items/:id
+    // DELETE /items/:id — soft-delete (archives the item; matches app behavior)
     if (method === "DELETE" && resourceId) {
       if (!hasScope(scope, "full")) return err("Insufficient scope — requires full access", 403, "SCOPE_DENIED");
 
       const { data: existing } = await sb.from("content_items").select("id").eq("id", resourceId).eq("workspace_id", wsId).maybeSingle();
       if (!existing) return err("Item not found", 404, "NOT_FOUND");
 
-      const { error } = await sb.from("content_items").delete().eq("id", resourceId);
-      if (error) return err(error.message, 500);
+      const { error } = await sb.from("content_items").update({ archived: true }).eq("id", resourceId);
+      if (error) { console.error("[api] archive item error:", error.message); return err("Internal error", 500, "INTERNAL"); }
       return new Response(null, { status: 204, headers: corsHeaders });
     }
   }
@@ -223,7 +223,7 @@ Deno.serve(async (req) => {
   if (resource === "types" && method === "GET") {
     if (!hasScope(scope, "read")) return err("Insufficient scope", 403, "SCOPE_DENIED");
     const { data, error } = await sb.from("content_types").select("id, name, icon, color").eq("workspace_id", wsId).order("name");
-    if (error) return err(error.message, 500);
+    if (error) { console.error("[api] list types error:", error.message); return err("Internal error", 500, "INTERNAL"); }
     return json({ data });
   }
 
@@ -231,7 +231,7 @@ Deno.serve(async (req) => {
   if (resource === "statuses" && method === "GET") {
     if (!hasScope(scope, "read")) return err("Insufficient scope", 403, "SCOPE_DENIED");
     const { data, error } = await sb.from("board_columns").select("id, name, color, position").eq("workspace_id", wsId).order("position");
-    if (error) return err(error.message, 500);
+    if (error) { console.error("[api] list statuses error:", error.message); return err("Internal error", 500, "INTERNAL"); }
     return json({ data });
   }
 

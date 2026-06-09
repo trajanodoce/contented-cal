@@ -37,7 +37,7 @@ async function fetchFigmaMetadata(url: string): Promise<{ title: string; thumbna
         description: data.author_name ? `By ${data.author_name}` : "",
       };
     }
-  } catch {}
+  } catch { /* Figma oEmbed is best-effort; fall through to OG scraping */ }
   return { title: "", thumbnail_url: "", description: "" };
 }
 
@@ -159,8 +159,9 @@ Deno.serve(async (req: Request) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
+    console.error("[fetch-link-metadata] Unhandled error:", (err as Error).message);
     return new Response(
-      JSON.stringify({ error: (err as Error).message }),
+      JSON.stringify({ error: "Internal error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

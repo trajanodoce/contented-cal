@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
     // Look up the connected workspace
     const { data: integration, error: lookupError } = await supabase
       .from("integrations")
-      .select("*")
+      .select("id, workspace_id, access_token")
       .eq("platform", "slack")
       .eq("status", "connected")
       .filter("config->>slack_team_id", "eq", teamId)
@@ -246,7 +246,6 @@ Deno.serve(async (req) => {
   ) {
     const teamId: string = payload.team?.id ?? "";
     const message = payload.message;
-    const triggeredBy = payload.user;
     const channel = payload.channel;
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -254,7 +253,7 @@ Deno.serve(async (req) => {
     // Look up the connected workspace
     const { data: integration, error: lookupError } = await supabase
       .from("integrations")
-      .select("*")
+      .select("id, workspace_id, access_token")
       .eq("platform", "slack")
       .eq("status", "connected")
       .filter("config->>slack_team_id", "eq", teamId)
@@ -284,7 +283,7 @@ Deno.serve(async (req) => {
       : null;
 
     // Create the project
-    const { data: newProject, error: insertError } = await supabase
+    const { error: insertError } = await supabase
       .from("projects")
       .insert({
         workspace_id: integration.workspace_id,

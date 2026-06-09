@@ -418,7 +418,7 @@ Deno.serve(async (req) => {
     // Look up connected workspace
     const { data: integration, error: lookupError } = await supabase
       .from("integrations")
-      .select("*")
+      .select("id, workspace_id, access_token, config")
       .eq("platform", "slack")
       .eq("status", "connected")
       .filter("config->>slack_team_id", "eq", teamId)
@@ -497,7 +497,7 @@ Deno.serve(async (req) => {
 
     if (isProject) {
       // ── Create a project ───────────────────────────────────────────────
-      const { data: newProject, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from("projects")
         .insert({ workspace_id: integration.workspace_id, title, description, status: "active" })
         .select("id")

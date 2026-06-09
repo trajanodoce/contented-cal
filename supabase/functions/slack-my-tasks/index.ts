@@ -69,7 +69,7 @@ Deno.serve(async (req) => {
   // Look up the connected workspace
   const { data: integration, error: lookupError } = await supabase
     .from("integrations")
-    .select("*")
+    .select("id, workspace_id, access_token")
     .eq("platform", "slack")
     .eq("status", "connected")
     .filter("config->>slack_team_id", "eq", teamId)
