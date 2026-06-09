@@ -111,7 +111,7 @@ function TitleInput({ title, onSave }: { title: string; onSave: (val: string) =>
 }
 
 export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
-  const { contentTypes, boardColumns, user, customFieldDefs, projects, members, contentItems } = useApp();
+  const { contentTypes, boardColumns, user, customFieldDefs, projects, members, contentItems, patchContentItem } = useApp();
   const { setSelectedItemId } = useSelectedItem();
   const { linkedTasks, loading: linkedTasksLoading, linkTo, unlinkFrom } = useTaskLinks(item.id);
   const navigate = useNavigate();
@@ -262,6 +262,15 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         .update(payload)
         .eq('id', item.id);
       if (error) throw error;
+
+      // Optimistically patch AppContext.contentItems so Board/List/Calendar
+      // reflect the change instantly. Realtime postgres_changes will follow
+      // up (idempotent — same row, same data), but realtime can lag or drop
+      // events on slow connections; without this patch the Calendar's card
+      // would stay rendered in the day cell matching its OLD due_date until
+      // realtime caught up. patchContentItem applies the same payload we
+      // just persisted (including any synced fields like completed_at).
+      patchContentItem(item.id, payload as Partial<ContentItem>);
 
       await supabase.from('activity_log').insert({
         content_item_id: item.id,
