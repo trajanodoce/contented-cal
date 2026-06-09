@@ -50,6 +50,9 @@ import {
   X,
   UserPlus,
   Link2,
+  ListChecks,
+  Paperclip,
+  Mic,
 } from 'lucide-react';
 import { Avatar } from '../components/ui/Avatar';
 import { formatDate, getPriorityDot } from '../lib/utils';
@@ -76,7 +79,11 @@ import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import { useShowCompleted } from '../hooks/useShowCompleted';
+import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
+import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
+import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { isDoneStatus } from '../lib/itemHelpers';
+import { GRANOLA_TEXT } from '../lib/ordinal';
 import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -88,6 +95,9 @@ export function ProjectDetailPage() {
   const { members, boardColumns, contentTypes } = useWorkspaceData(
     currentWorkspace?.id ?? null
   );
+  const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id ?? null);
+  const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id ?? null);
+  const granolaItemIds = useGranolaItemIds(currentWorkspace?.id ?? null);
   const { setSelectedItemId } = useSelectedItem();
   const { filters, setFilters } = useFilters();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -559,6 +569,9 @@ export function ProjectDetailPage() {
             boardColumns={boardColumns}
             contentTypes={contentTypes}
             members={members}
+            subtaskCounts={subtaskCounts}
+            linkCounts={linkCounts}
+            granolaItemIds={granolaItemIds}
             filters={filters}
             setFilters={setFilters}
             workspaceId={currentWorkspace?.id ?? null}
@@ -572,6 +585,9 @@ export function ProjectDetailPage() {
             boardColumns={boardColumns}
             contentTypes={contentTypes}
             members={members}
+            subtaskCounts={subtaskCounts}
+            linkCounts={linkCounts}
+            granolaItemIds={granolaItemIds}
             onItemClick={setSelectedItemId}
             onItemMoved={fetchItems}
           />
@@ -952,6 +968,9 @@ function ListTab({
   boardColumns,
   contentTypes,
   members,
+  subtaskCounts,
+  linkCounts,
+  granolaItemIds,
   filters,
   setFilters,
   workspaceId,
@@ -962,6 +981,9 @@ function ListTab({
   boardColumns: BoardColumn[];
   contentTypes: ContentType[];
   members: Profile[];
+  subtaskCounts: Map<string, { completed: number; total: number }>;
+  linkCounts: Map<string, { count: number; platforms: string[] }>;
+  granolaItemIds: Set<string>;
   filters: import('../components/FilterBar').FilterState;
   setFilters: (f: import('../components/FilterBar').FilterState) => void;
   workspaceId: string | null;
@@ -1210,6 +1232,25 @@ function ListTab({
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : ''} truncate`}>
                           {item.title}
                         </span>
+                        {granolaItemIds.has(item.id) && (
+                          <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
+                        )}
+                        {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: '#005D97' }}>
+                            <ListChecks className="w-3.5 h-3.5" />
+                            {subtaskCounts.get(item.id)!.completed}/{subtaskCounts.get(item.id)!.total}
+                          </span>
+                        )}
+                        {linkCounts.get(item.id) && linkCounts.get(item.id)!.count > 0 && (
+                          <span
+                            className="inline-flex items-center gap-1 text-xs font-semibold"
+                            style={{ color: '#005D97' }}
+                            title={`${linkCounts.get(item.id)!.count} attachment${linkCounts.get(item.id)!.count !== 1 ? 's' : ''}`}
+                          >
+                            <Paperclip className="w-3.5 h-3.5" />
+                            {linkCounts.get(item.id)!.count}
+                          </span>
+                        )}
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />
                       </div>
                     </td>
@@ -1310,6 +1351,9 @@ function ProjectBoardCard({
   isDone,
   onClick,
   isOverlay,
+  subtaskCount,
+  linkInfo,
+  hasGranolaNotes,
 }: {
   item: ContentItem;
   contentTypes: ContentType[];
@@ -1317,6 +1361,9 @@ function ProjectBoardCard({
   isDone?: boolean;
   onClick: () => void;
   isOverlay?: boolean;
+  subtaskCount?: { completed: number; total: number };
+  linkInfo?: { count: number };
+  hasGranolaNotes?: boolean;
 }) {
   const ct = contentTypes.find((c) => c.id === item.content_type_id);
   const assignee = members.find((m) => item.assignee_ids?.includes(m.id));
@@ -1382,7 +1429,7 @@ function ProjectBoardCard({
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-[11px]">
           {ct && (
             <span
               className="w-1.5 h-1.5 rounded-full"
@@ -1391,6 +1438,32 @@ function ProjectBoardCard({
           )}
           {assignee && (
             <Avatar src={assignee.avatar_url} name={assignee.full_name} size="xs-inline" />
+          )}
+          {/* Card indicators — subtask progress · attachment count · Granola */}
+          {subtaskCount && subtaskCount.total > 0 && (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-semibold"
+              style={{ color: '#005D97' }}
+              title={`${subtaskCount.completed} of ${subtaskCount.total} subtasks complete`}
+            >
+              <ListChecks className="w-3.5 h-3.5" />
+              {subtaskCount.completed}/{subtaskCount.total}
+            </span>
+          )}
+          {linkInfo && linkInfo.count > 0 && (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-semibold"
+              style={{ color: '#005D97' }}
+              title={`${linkInfo.count} attachment${linkInfo.count !== 1 ? 's' : ''}`}
+            >
+              <Paperclip className="w-3.5 h-3.5" />
+              {linkInfo.count}
+            </span>
+          )}
+          {hasGranolaNotes && (
+            <span title="Has meeting notes">
+              <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
+            </span>
           )}
         </div>
         {item.due_date && (
@@ -1409,12 +1482,18 @@ function ProjectBoardColumn({
   items,
   contentTypes,
   members,
+  subtaskCounts,
+  linkCounts,
+  granolaItemIds,
   onItemClick,
 }: {
   column: BoardColumn;
   items: ContentItem[];
   contentTypes: ContentType[];
   members: Profile[];
+  subtaskCounts: Map<string, { completed: number; total: number }>;
+  linkCounts: Map<string, { count: number; platforms: string[] }>;
+  granolaItemIds: Set<string>;
   onItemClick: (id: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
@@ -1463,6 +1542,9 @@ function ProjectBoardColumn({
             contentTypes={contentTypes}
             members={members}
             isDone={isDoneCol}
+            subtaskCount={subtaskCounts.get(item.id)}
+            linkInfo={linkCounts.get(item.id)}
+            hasGranolaNotes={granolaItemIds.has(item.id)}
             onClick={() => onItemClick(item.id)}
           />
         ))}
@@ -1482,6 +1564,9 @@ function BoardTab({
   boardColumns,
   contentTypes,
   members,
+  subtaskCounts,
+  linkCounts,
+  granolaItemIds,
   onItemClick,
   onItemMoved,
 }: {
@@ -1489,6 +1574,9 @@ function BoardTab({
   boardColumns: BoardColumn[];
   contentTypes: ContentType[];
   members: Profile[];
+  subtaskCounts: Map<string, { completed: number; total: number }>;
+  linkCounts: Map<string, { count: number; platforms: string[] }>;
+  granolaItemIds: Set<string>;
   onItemClick: (id: string) => void;
   onItemMoved: () => void;
 }) {
@@ -1593,6 +1681,9 @@ function BoardTab({
               items={itemsByColumn.get(col.id) ?? []}
               contentTypes={contentTypes}
               members={members}
+              subtaskCounts={subtaskCounts}
+              linkCounts={linkCounts}
+              granolaItemIds={granolaItemIds}
               onItemClick={onItemClick}
             />
           ))}
