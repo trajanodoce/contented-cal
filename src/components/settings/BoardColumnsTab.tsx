@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { BoardColumn } from '../../lib/database.types';
 import {
-  Plus, Trash2, Layout, Save,
+  Plus, Trash2, Layout, Edit2,
   ChevronDown, ChevronUp, GripVertical, AlertTriangle,
 } from 'lucide-react';
 import { BOARD_COLUMN_PALETTE } from '../../lib/colors';
@@ -274,8 +274,9 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
                           setShowForm(true);
                         }}
                         className="p-1 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded ml-2"
+                        title="Edit column"
                       >
-                        <Save className="w-4 h-4" />
+                        <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setShowDeleteConfirm(column.id)}
