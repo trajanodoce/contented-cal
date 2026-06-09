@@ -37,7 +37,7 @@ import {
   Check,
   CheckCircle2,
   ListChecks,
-  Link2,
+  Paperclip,
   Mic,
 } from 'lucide-react';
 import { Avatar, AvatarStack } from '../components/ui/Avatar';
@@ -520,18 +520,19 @@ export function ListPage() {
                           <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
                         )}
                         {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: '#005D97' }}>
                             <ListChecks className="w-3.5 h-3.5" />
                             <span>{subtaskCounts.get(item.id)!.completed}/{subtaskCounts.get(item.id)!.total}</span>
                           </span>
                         )}
                         {linkCounts.get(item.id) && linkCounts.get(item.id)!.count > 0 && (
                           <span
-                            className="inline-flex items-center gap-0.5 text-xs text-slate-400"
-                            title={`${linkCounts.get(item.id)!.count} linked asset${linkCounts.get(item.id)!.count !== 1 ? 's' : ''}`}
+                            className="inline-flex items-center gap-1 text-xs font-semibold"
+                            style={{ color: '#005D97' }}
+                            title={`${linkCounts.get(item.id)!.count} attachment${linkCounts.get(item.id)!.count !== 1 ? 's' : ''}`}
                           >
-                            <Link2 className="w-3.5 h-3.5" />
-                            {linkCounts.get(item.id)!.count > 1 && <span>{linkCounts.get(item.id)!.count}</span>}
+                            <Paperclip className="w-3.5 h-3.5" />
+                            {linkCounts.get(item.id)!.count}
                           </span>
                         )}
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />

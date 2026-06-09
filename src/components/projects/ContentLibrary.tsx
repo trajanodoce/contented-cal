@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSelectedItem } from '../../contexts/SelectedItemContext';
 import { PLATFORM_META } from '../content/ExternalLinks';
+import { PlatformIcon } from '../ui/PlatformIcon';
 import type { ExternalLinkPlatform } from '../../lib/database.types';
 import { toast } from 'sonner';
 import {
@@ -671,22 +672,18 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                       key={asset.id}
                       className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
                     >
-                      {/* Platform icon — reuses the same chip styling as
-                          ExternalLinksSection so users recognize it. */}
+                      {/* Platform icon — uses the canonical PlatformIcon
+                          tile so brand recognition stays consistent with
+                          the slide-over Assets section. Thumbnail wins if
+                          one was fetched (Figma file previews, etc.). */}
                       {asset.thumbnail_url ? (
                         <img
                           src={asset.thumbnail_url}
                           alt=""
-                          className="w-8 h-8 rounded object-cover shrink-0"
+                          className="w-8 h-8 rounded-lg object-cover shrink-0"
                         />
                       ) : (
-                        <span
-                          className="w-8 h-8 rounded flex items-center justify-center text-sm font-bold shrink-0"
-                          style={{ backgroundColor: meta.bgColor, color: meta.textColor }}
-                          title={meta.label}
-                        >
-                          {meta.icon}
-                        </span>
+                        <PlatformIcon platform={asset.platform} size={32} />
                       )}
                       <div className="flex-1 min-w-0">
                         <a

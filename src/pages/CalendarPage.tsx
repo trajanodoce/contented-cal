@@ -27,6 +27,7 @@ import {
   List,
   Plus,
   Link2,
+  Paperclip,
   FolderOpen,
   CheckSquare,
   CheckCircle2,
@@ -201,8 +202,13 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
         />
       )}
       {linkInfo && linkInfo.count > 0 && (
-        <span title={`${linkInfo.count} linked asset${linkInfo.count !== 1 ? 's' : ''}`}>
-          <Link2 className="w-3 h-3 text-slate-400 flex-shrink-0" />
+        <span
+          className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
+          style={{ color: '#005D97' }}
+          title={`${linkInfo.count} attachment${linkInfo.count !== 1 ? 's' : ''}`}
+        >
+          <Paperclip className="w-3 h-3" />
+          {linkInfo.count > 1 && linkInfo.count}
         </span>
       )}
       {hasGranolaNotes && (

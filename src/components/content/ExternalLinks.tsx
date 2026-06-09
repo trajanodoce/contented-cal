@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link2, Plus, ExternalLink as ExternalLinkIcon, Loader2, X, Image, Upload, FileText, FileImage, FileVideo, FileArchive, File, Edit2, Check } from 'lucide-react';
+import { Link2, Plus, Paperclip, ExternalLink as ExternalLinkIcon, Loader2, X, Image, Upload, FileText, FileImage, FileVideo, FileArchive, File, Edit2, Check } from 'lucide-react';
+import { PlatformIcon } from '../ui/PlatformIcon';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import type { ExternalLink, ExternalLinkPlatform } from '../../lib/database.types';
@@ -370,9 +371,9 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
       )}
 
       <div className="flex items-center justify-between mb-3">
-        <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
-          <Link2 className="w-3.5 h-3.5" />
-          Linked Assets {links.length > 0 && `(${links.length})`}
+        <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1.5">
+          <Paperclip className="w-3.5 h-3.5" style={{ color: '#005D97' }} />
+          <span style={{ color: '#005D97' }}>Assets {links.length > 0 && `(${links.length})`}</span>
         </label>
         {!readOnly && (
           <div className="flex items-center gap-2">
@@ -386,9 +387,10 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
             {!adding && (
               <button
                 onClick={() => setAdding(true)}
-                className="flex items-center gap-1 text-xs text-brand-500 hover:text-brand-500 transition-colors font-medium"
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md transition-colors"
+                style={{ color: '#005D97', border: '1px solid #005D9740', backgroundColor: 'white' }}
               >
-                <Plus className="w-3.5 h-3.5" /> Add link
+                <Link2 className="w-3 h-3" /> Add link
               </button>
             )}
           </div>
@@ -476,7 +478,6 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
             <div>
               <div className="space-y-1">
                 {urlLinks.map(link => {
-                  const meta = PLATFORM_META[link.platform] ?? PLATFORM_META.other;
                   const isEditing = editingLinkId === link.id;
 
                   if (isEditing) {
@@ -513,14 +514,9 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                   return (
                     <div
                       key={link.id}
-                      className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[#005D9718] transition-colors"
+                      className="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] transition-colors"
                     >
-                      <span
-                        className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold leading-none shrink-0"
-                        style={{ backgroundColor: meta.bgColor, color: meta.textColor }}
-                      >
-                        {meta.icon}
-                      </span>
+                      <PlatformIcon platform={link.platform} size={28} />
                       <a
                         href={link.url}
                         target="_blank"

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   X, Calendar, MessageSquare,
-  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, User, Trash2, Copy
+  Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, Trash2, Copy, ChevronDown, FolderOpen
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
@@ -133,6 +133,30 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
   const [showSavedCheck, setShowSavedCheck] = useState(false);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Status section collapse — per-user persistence via localStorage.
+  // Default: collapsed (per design decision 2026-06-05). Status fields are
+  // operational state (dates, channel, type) — most users want them out
+  // of the way until they need to change something.
+  const [statusCollapsed, setStatusCollapsed] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('cc-status-collapsed');
+      return stored === null ? true : stored === 'true';
+    } catch {
+      return true;
+    }
+  });
+  const toggleStatusCollapsed = useCallback(() => {
+    setStatusCollapsed(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('cc-status-collapsed', String(next));
+      } catch {
+        // localStorage unavailable — toggle still works in-session
+      }
+      return next;
+    });
+  }, []);
   const [deleting, setDeleting] = useState(false);
 
   const contentType = contentTypes.find(ct => ct.id === item.content_type_id);
@@ -646,151 +670,204 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   Lighter than the prior text-sm headings; matches the spec.
                   ────────────────────────────────────────────────────────── */}
 
-              {/* 1. Assignee */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
-                <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-1.5">
-                  <User className="w-3.5 h-3.5" /> Owner
-                </label>
-                <StyledSelect
-                  value={item.assignee_ids?.[0] ?? ''}
-                  onChange={val => updateField('assignee_ids', val ? [val] : [])}
-                  disabled={isReadOnly}
-                  options={[
-                    { value: '', label: 'Unowned' },
-                    ...members.map(m => ({ value: m.user_id, label: m.full_name || m.email || 'Unknown member' })),
-                  ]}
-                  placeholder="Unowned"
-                />
-              </div>
-
-              {/* 2. Key fields */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
-              <div className="grid grid-cols-2 gap-4">
-                {/* Status */}
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Status</label>
-                  <StyledSelect
-                    value={item.status ?? ''}
-                    onChange={val => updateField('status', val || null)}
-                    disabled={isReadOnly}
-                    options={[
-                      { value: '', label: 'None' },
-                      ...allowedStatuses.map(col => ({ value: col.id, label: col.name, color: col.color ?? undefined })),
-                    ]}
-                    placeholder="None"
-                  />
-                </div>
-
-                {/* Priority */}
-                {fieldVisibility.priority && (
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Priority</label>
-                    <StyledSelect
-                      value={item.priority ?? 'medium'}
-                      onChange={val => updateField('priority', val)}
-                      disabled={isReadOnly}
-                      options={PRIORITIES.map(p => ({
-                        value: p,
-                        label: p.charAt(0).toUpperCase() + p.slice(1),
-                        color: PRIORITY_STYLES[p]?.hex ?? '#94a3b8',
-                      }))}
-                    />
-                  </div>
-                )}
-
-                {/* Due date */}
-                {fieldVisibility.dueDate && (
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-1.5">
-                      <Calendar className="w-3 h-3" /> Due date
-                    </label>
-                    <DatePicker
-                      value={item.due_date}
-                      onChange={val => updateField('due_date', val || null)}
-                      disabled={isReadOnly}
-                    />
-                  </div>
-                )}
-
-                {/* Publish date */}
-                {fieldVisibility.publishDate && (
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-1.5">
-                      <Calendar className="w-3 h-3" /> Publish date
-                    </label>
-                    <DatePicker
-                      value={item.publish_date}
-                      onChange={val => updateField('publish_date', val || null)}
-                      disabled={isReadOnly}
-                    />
-                  </div>
-                )}
-
-                {/* Channel */}
-                {fieldVisibility.channel && (
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Channel</label>
-                    <StyledSelect
-                      value={item.channel ?? ''}
-                      onChange={val => updateField('channel', val)}
-                      disabled={isReadOnly}
-                      options={[
-                        { value: '', label: 'None' },
-                        ...channels.map(c => ({ value: c, label: c })),
-                      ]}
-                      placeholder="None"
-                    />
-                  </div>
-                )}
-
-                {/* Content type */}
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Content type</label>
-                  <StyledSelect
-                    value={item.content_type_id ?? ''}
-                    onChange={val => updateField('content_type_id', val || null)}
-                    disabled={isReadOnly}
-                    options={[
-                      { value: '', label: 'None' },
-                      ...contentTypes.map(ct => ({ value: ct.id, label: ct.name, color: ct.color ?? undefined })),
-                    ]}
-                    placeholder="None"
-                  />
-                </div>
-
-                {/* Project */}
-                {projects.length > 0 && (
-                  <div className="col-span-2">
-                    <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Project</label>
-                    <StyledSelect
-                      value={item.project_id ?? ''}
-                      onChange={val => updateField('project_id', val || null)}
-                      disabled={isReadOnly}
-                      options={[
-                        { value: '', label: 'No project' },
-                        ...projects.map(p => ({ value: p.id, label: p.title })),
-                      ]}
-                      placeholder="No project"
-                    />
-                  </div>
-                )}
-
-              </div>
-
-              {/* Tags */}
-              {fieldVisibility.tags && item.tags && item.tags.length > 0 && (
-                <div>
-                  <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-2">
-                    <Hash className="w-3 h-3" /> Tags
+              {/* 1. Context row — Owner + Project, two info tiles side-by-side.
+                  Project gets ~40% more width since project names run longer
+                  than personal names. Locked 2026-06-05. */}
+              <div className="grid grid-cols-[1fr_1.4fr] gap-3">
+                {/* Owner tile */}
+                <div className="bg-surface-card rounded-xl shadow-sm p-3" style={{ border: '1px solid #00233930' }}>
+                  <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.06em] flex items-center gap-1.5 mb-1.5">
+                    <span className="w-4 h-4 rounded-full inline-block" style={{ background: 'linear-gradient(135deg, #005D97, #D4729E)' }} aria-hidden />
+                    Owner
                   </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {item.tags.map(tag => (
-                      <span key={tag} className="text-xs px-2.5 py-1 bg-[#005D9712] text-slate-600 rounded-full">{tag}</span>
-                    ))}
-                  </div>
+                  <StyledSelect
+                    value={item.assignee_ids?.[0] ?? ''}
+                    onChange={val => updateField('assignee_ids', val ? [val] : [])}
+                    disabled={isReadOnly}
+                    options={[
+                      { value: '', label: 'Unowned' },
+                      ...members.map(m => ({ value: m.user_id, label: m.full_name || m.email || 'Unknown member' })),
+                    ]}
+                    placeholder="Unowned"
+                  />
                 </div>
-              )}
 
+                {/* Project tile (renders even when empty so the grid stays balanced) */}
+                <div className="bg-surface-card rounded-xl shadow-sm p-3" style={{ border: '1px solid #00233930' }}>
+                  <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.06em] flex items-center gap-1.5 mb-1.5">
+                    <FolderOpen className="w-3.5 h-3.5" style={{ color: '#C4504A' }} />
+                    Project
+                  </label>
+                  <StyledSelect
+                    value={item.project_id ?? ''}
+                    onChange={val => updateField('project_id', val || null)}
+                    disabled={isReadOnly || projects.length === 0}
+                    options={[
+                      { value: '', label: 'No project' },
+                      ...projects.map(p => ({ value: p.id, label: p.title })),
+                    ]}
+                    placeholder={projects.length === 0 ? 'No projects yet' : 'No project'}
+                  />
+                </div>
+              </div>
+
+              {/* 2. Status (collapsible). Default collapsed per-user via
+                  localStorage. Collapsed shows a one-line summary; expanded
+                  shows the full field grid. */}
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+                {/* Section header — clickable to toggle */}
+                <button
+                  type="button"
+                  onClick={toggleStatusCollapsed}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#005D9710] transition-colors"
+                  title={statusCollapsed ? 'Expand status fields' : 'Collapse status fields'}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex-shrink-0">Status</span>
+                    {/* Collapsed one-line summary */}
+                    {statusCollapsed && (
+                      <div className="flex items-center gap-2 text-xs text-slate-500 min-w-0 truncate">
+                        {(() => {
+                          const status = boardColumns.find(c => c.id === item.status);
+                          const priority = item.priority ?? 'medium';
+                          const dueLabel = item.due_date ? formatDateFull(item.due_date) : null;
+                          return (
+                            <>
+                              {status && (
+                                <span
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold flex-shrink-0"
+                                  style={{
+                                    color: status.color ?? '#64748B',
+                                    backgroundColor: `${status.color ?? '#64748B'}15`,
+                                    border: `1px solid ${status.color ?? '#64748B'}`,
+                                  }}
+                                >
+                                  {status.name}
+                                </span>
+                              )}
+                              <span className="text-slate-300">·</span>
+                              <span className="inline-flex items-center gap-1 text-[11px] font-medium flex-shrink-0" style={{ color: PRIORITY_STYLES[priority]?.hex ?? '#64748B' }}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: PRIORITY_STYLES[priority]?.hex ?? '#64748B' }} />
+                                {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                              </span>
+                              {dueLabel && (
+                                <>
+                                  <span className="text-slate-300">·</span>
+                                  <span className="text-[11px] text-slate-500 flex-shrink-0">Due {dueLabel}</span>
+                                </>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ml-2 ${statusCollapsed ? '' : 'rotate-180'}`}
+                  />
+                </button>
+
+                {/* Section body — only rendered when expanded */}
+                {!statusCollapsed && (
+                  <div className="px-4 pb-4 pt-1">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Status</label>
+                        <StyledSelect
+                          value={item.status ?? ''}
+                          onChange={val => updateField('status', val || null)}
+                          disabled={isReadOnly}
+                          options={[
+                            { value: '', label: 'None' },
+                            ...allowedStatuses.map(col => ({ value: col.id, label: col.name, color: col.color ?? undefined })),
+                          ]}
+                          placeholder="None"
+                        />
+                      </div>
+                      {fieldVisibility.priority && (
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Priority</label>
+                          <StyledSelect
+                            value={item.priority ?? 'medium'}
+                            onChange={val => updateField('priority', val)}
+                            disabled={isReadOnly}
+                            options={PRIORITIES.map(p => ({
+                              value: p,
+                              label: p.charAt(0).toUpperCase() + p.slice(1),
+                              color: PRIORITY_STYLES[p]?.hex ?? '#94a3b8',
+                            }))}
+                          />
+                        </div>
+                      )}
+                      {fieldVisibility.dueDate && (
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-1.5">
+                            <Calendar className="w-3 h-3" /> Due date
+                          </label>
+                          <DatePicker
+                            value={item.due_date}
+                            onChange={val => updateField('due_date', val || null)}
+                            disabled={isReadOnly}
+                          />
+                        </div>
+                      )}
+                      {fieldVisibility.publishDate && (
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-1.5">
+                            <Calendar className="w-3 h-3" /> Publish date
+                          </label>
+                          <DatePicker
+                            value={item.publish_date}
+                            onChange={val => updateField('publish_date', val || null)}
+                            disabled={isReadOnly}
+                          />
+                        </div>
+                      )}
+                      {fieldVisibility.channel && (
+                        <div>
+                          <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Channel</label>
+                          <StyledSelect
+                            value={item.channel ?? ''}
+                            onChange={val => updateField('channel', val)}
+                            disabled={isReadOnly}
+                            options={[
+                              { value: '', label: 'None' },
+                              ...channels.map(c => ({ value: c, label: c })),
+                            ]}
+                            placeholder="None"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] mb-1.5 block">Content type</label>
+                        <StyledSelect
+                          value={item.content_type_id ?? ''}
+                          onChange={val => updateField('content_type_id', val || null)}
+                          disabled={isReadOnly}
+                          options={[
+                            { value: '', label: 'None' },
+                            ...contentTypes.map(ct => ({ value: ct.id, label: ct.name, color: ct.color ?? undefined })),
+                          ]}
+                          placeholder="None"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Tags — inside Status section so they collapse with the rest */}
+                    {fieldVisibility.tags && item.tags && item.tags.length > 0 && (
+                      <div className="mt-4">
+                        <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1 mb-2">
+                          <Hash className="w-3 h-3" /> Tags
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {item.tags.map(tag => (
+                            <span key={tag} className="text-xs px-2.5 py-1 bg-[#005D9712] text-slate-600 rounded-full">{tag}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* 3. Subtasks — what's left to do takes priority over context */}

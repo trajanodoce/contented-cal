@@ -16,6 +16,7 @@ import {
   ListChecks,
   Mic,
   Inbox,
+  Paperclip,
 } from 'lucide-react';
 import { AvatarStack } from '../components/ui/Avatar';
 import { isPast, isToday } from 'date-fns';
@@ -173,8 +174,8 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       {/* Subtask progress */}
       {subtaskCount && subtaskCount.total > 0 && (
         <div className="flex items-center gap-2 mb-2">
-          <div className="flex items-center gap-1 text-[10px] text-slate-500">
-            <ListChecks className="w-3 h-3" />
+          <div className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#005D97' }}>
+            <ListChecks className="w-3.5 h-3.5" />
             <span>{subtaskCount.completed}/{subtaskCount.total}</span>
           </div>
           <div className="flex-1 h-1 bg-[#005D9712] rounded-full overflow-hidden">
@@ -191,8 +192,8 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
 
       {/* Footer: Assignees, Links, and Due Date */}
       <div className="flex items-center justify-between">
-        {/* Assignees + link platform icons */}
-        <div className="flex items-center gap-1.5">
+        {/* Assignees + unified paperclip indicator (platform breakdown moved to slide-over) */}
+        <div className="flex items-center gap-[11px]">
           <AvatarStack
             users={itemMembers.map(m => ({ src: m.avatar_url, name: m.full_name }))}
             size="xs-inline"
@@ -200,23 +201,14 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
           />
 
           {linkInfo && linkInfo.count > 0 && (
-            <div className="flex items-center gap-0.5" title={`${linkInfo.count} linked asset${linkInfo.count !== 1 ? 's' : ''}`}>
-              {linkInfo.platforms.slice(0, 3).map((p) => {
-                const meta = LINK_PLATFORM_META[p] ?? LINK_PLATFORM_META.other;
-                return (
-                  <span
-                    key={p}
-                    className="w-3.5 h-3.5 rounded text-[8px] font-bold flex items-center justify-center leading-none"
-                    style={{ backgroundColor: meta.bg, color: meta.color }}
-                  >
-                    {meta.icon}
-                  </span>
-                );
-              })}
-              {linkInfo.platforms.length > 3 && (
-                <span className="text-[8px] text-slate-400 font-medium">+{linkInfo.platforms.length - 3}</span>
-              )}
-            </div>
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-semibold"
+              style={{ color: '#005D97' }}
+              title={`${linkInfo.count} attachment${linkInfo.count !== 1 ? 's' : ''}: ${linkInfo.platforms.map(p => LINK_PLATFORM_META[p]?.label ?? p).join(' · ')}`}
+            >
+              <Paperclip className="w-3.5 h-3.5" />
+              {linkInfo.count}
+            </span>
           )}
         </div>
 
