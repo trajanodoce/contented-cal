@@ -113,9 +113,11 @@ export function LinkedTasksSection({
           tasks={workspaceTasks}
           excludedIds={excludedIds}
           boardColumns={boardColumns}
-          // Default the picker filter to the opposite category so design tasks
-          // suggest content peers and vice versa — most common link case.
-          defaultCategoryFilter={category === 'design' ? 'content' : 'design'}
+          // Default to "All". Earlier version defaulted to the opposite
+          // category (assumption: most links are content↔design), but that
+          // makes the picker look empty in workspaces with few/no tasks of
+          // the opposite category. User can still narrow with the chips.
+          defaultCategoryFilter="all"
           onClose={() => setPickerOpen(false)}
           onPick={async (pickedId) => {
             const result = await onLinkTo(pickedId);

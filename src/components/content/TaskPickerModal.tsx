@@ -141,12 +141,34 @@ export function TaskPickerModal({
         {/* Task list */}
         <div className="flex-1 overflow-y-auto">
           {filteredTasks.length === 0 ? (
-            <div className="text-center py-12 text-sm text-slate-400">
-              {search
-                ? 'No tasks match your search'
-                : excludedIds.size > 1
-                  ? 'No more tasks available to link'
-                  : 'No tasks in this workspace yet'}
+            <div className="text-center py-12 px-6 text-sm text-slate-400 space-y-2">
+              {(() => {
+                // Available = everything except self + already-linked.
+                // Different exhaustion sources have different copy + fixes.
+                const available = tasks.filter((t) => !excludedIds.has(t.id) && !t.archived);
+                if (available.length === 0) {
+                  return <div>No other tasks in this workspace yet to link to.</div>;
+                }
+                if (search) {
+                  return <div>No tasks match &ldquo;{search}&rdquo;.</div>;
+                }
+                if (categoryFilter !== 'all') {
+                  return (
+                    <>
+                      <div>No {categoryFilter} tasks available to link.</div>
+                      <button
+                        type="button"
+                        onClick={() => setCategoryFilter('all')}
+                        className="text-xs font-medium underline"
+                        style={{ color: BERRY }}
+                      >
+                        Show all categories
+                      </button>
+                    </>
+                  );
+                }
+                return <div>No more tasks available to link.</div>;
+              })()}
             </div>
           ) : (
             <div className="divide-y divide-slate-50">
