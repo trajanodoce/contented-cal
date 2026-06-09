@@ -22,6 +22,7 @@ import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
+import { useTaskLinkCounts } from '../hooks/useTaskLinkCounts';
 import { useShowCompleted } from '../hooks/useShowCompleted';
 import {
   CheckSquare,
@@ -38,6 +39,7 @@ import {
   CheckCircle2,
   ListChecks,
   Paperclip,
+  Link2,
   Mic,
 } from 'lucide-react';
 import { Avatar, AvatarStack } from '../components/ui/Avatar';
@@ -81,6 +83,7 @@ export function ListPage() {
   const { setSelectedItemId } = useSelectedItem();
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
   const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id || null);
+  const { counts: taskLinkCounts } = useTaskLinkCounts(currentWorkspace?.id || null);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
   // Channels: workspace settings merged with any orphaned values from items
   const channels = useMemo(() => {
@@ -533,6 +536,16 @@ export function ListPage() {
                           >
                             <Paperclip className="w-3.5 h-3.5" />
                             {linkCounts.get(item.id)!.count}
+                          </span>
+                        )}
+                        {taskLinkCounts.get(item.id) && taskLinkCounts.get(item.id)! > 0 && (
+                          <span
+                            className="inline-flex items-center gap-1 text-xs font-semibold"
+                            style={{ color: '#B8447A' }}
+                            title={`${taskLinkCounts.get(item.id)} linked task${taskLinkCounts.get(item.id) !== 1 ? 's' : ''}`}
+                          >
+                            <Link2 className="w-3.5 h-3.5" />
+                            {taskLinkCounts.get(item.id)}
                           </span>
                         )}
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />

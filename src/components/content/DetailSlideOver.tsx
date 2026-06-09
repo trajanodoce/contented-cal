@@ -3,6 +3,7 @@ import {
   X, Calendar, MessageSquare,
   Activity, Loader2, Edit2, Check, Hash, Zap, ExternalLink, Link2, Trash2, Copy, ChevronDown, FolderOpen
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -13,6 +14,9 @@ import { SubtasksSection } from './SubtasksSection';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, LINEAR_TEXT, DRAFT_COLOR, getOrdinalProfile, getLinearIssueInfo, PLATFORM_META } from '../../lib/ordinal';
 import { useOrdinalPost } from '../../hooks/useOrdinalPost';
 import { ExternalLinksSection } from './ExternalLinks';
+import { LinkedTasksSection } from './LinkedTasksSection';
+import { useTaskLinks } from '../../hooks/useTaskLinks';
+import { useSelectedItem } from '../../contexts/SelectedItemContext';
 import { GranolaNoteSection } from './GranolaNoteSection';
 import { SlackSourceBanner } from './SlackSourceBanner';
 import { SlackThreadsSection } from './SlackThreadsSection';
@@ -107,7 +111,10 @@ function TitleInput({ title, onSave }: { title: string; onSave: (val: string) =>
 }
 
 export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
-  const { contentTypes, boardColumns, user, customFieldDefs, projects, members } = useApp();
+  const { contentTypes, boardColumns, user, customFieldDefs, projects, members, contentItems } = useApp();
+  const { setSelectedItemId } = useSelectedItem();
+  const { linkedTasks, loading: linkedTasksLoading, linkTo, unlinkFrom } = useTaskLinks(item.id);
+  const navigate = useNavigate();
   const { userRole, currentWorkspace } = useWorkspace();
   const channels = useMemo(() => getWorkspaceChannels(currentWorkspace?.settings), [currentWorkspace?.settings]);
   const subtaskTemplates = useMemo(() => getWorkspaceSubtaskTemplates(currentWorkspace?.settings), [currentWorkspace?.settings]);
@@ -870,7 +877,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 )}
               </div>
 
-              {/* 3. Subtasks — what's left to do takes priority over context */}
+              {/* 3. Subtasks — what's left to do takes priority over context.
+                  "+ Design request" button only on content tasks (don't
+                  recursively request design from a design task). */}
               <SubtasksSection
                 contentItemId={item.id}
                 userId={user?.id ?? null}
@@ -878,9 +887,31 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 addToast={addToast}
                 templates={subtaskTemplates}
                 userRole={userRole}
+                onDesignRequest={
+                  item.category === 'content'
+                    ? () => navigate(`/design-request?linkTo=${item.id}`)
+                    : undefined
+                }
               />
 
-              {/* 4. Linked Assets */}
+              {/* 4. Linked Tasks — peer-task relationships (Phase 7 / 2026-06-05).
+                  Berry-tinted zone distinct from Subtasks (white) and Assets
+                  (white with navy header). Click a row → swap the slide-over
+                  to that task. "+ Link a task" opens the workspace picker. */}
+              <LinkedTasksSection
+                itemId={item.id}
+                category={item.category}
+                linkedTasks={linkedTasks}
+                loading={linkedTasksLoading}
+                workspaceTasks={contentItems}
+                members={memberProfiles}
+                boardColumns={boardColumns}
+                onLinkTo={linkTo}
+                onUnlinkFrom={unlinkFrom}
+                onSelectTask={(taskId) => setSelectedItemId(taskId)}
+              />
+
+              {/* 5. Assets (renamed from Linked Assets — see workshop notes) */}
               <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>

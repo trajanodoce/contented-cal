@@ -10,6 +10,7 @@ import { isDoneStatus } from '../lib/itemHelpers';
 import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_TEXT } from '../lib/ordinal';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts';
+import { useTaskLinkCounts } from '../hooks/useTaskLinkCounts';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useFilters } from '../contexts/FiltersContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
@@ -134,11 +135,12 @@ interface CalendarItemPillProps {
   dateMode: DateMode;
   subtaskCount?: SubtaskCount;
   linkInfo?: LinkInfo;
+  taskLinkCount?: number;
   hasGranolaNotes?: boolean;
   onClick: (e: React.MouseEvent) => void;
 }
 
-function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode, subtaskCount, linkInfo, hasGranolaNotes, onClick }: CalendarItemPillProps) {
+function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode, subtaskCount, linkInfo, taskLinkCount, hasGranolaNotes, onClick }: CalendarItemPillProps) {
   const contentType = contentTypes.find((ct) => ct.id === item.content_type_id);
   const itemMembers = members.filter((m) => item.assignee_ids?.includes(m.id));
 
@@ -209,6 +211,16 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
         >
           <Paperclip className="w-3 h-3" />
           {linkInfo.count > 1 && linkInfo.count}
+        </span>
+      )}
+      {taskLinkCount && taskLinkCount > 0 && (
+        <span
+          className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
+          style={{ color: '#B8447A' }}
+          title={`${taskLinkCount} linked task${taskLinkCount !== 1 ? 's' : ''}`}
+        >
+          <Link2 className="w-3 h-3" />
+          {taskLinkCount > 1 && taskLinkCount}
         </span>
       )}
       {hasGranolaNotes && (
@@ -282,6 +294,7 @@ interface SingleMonthGridProps {
   dateMode: DateMode;
   subtaskCounts: Map<string, SubtaskCount>;
   linkCounts: Map<string, LinkInfo>;
+  taskLinkCounts: Map<string, number>;
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
@@ -291,7 +304,7 @@ interface SingleMonthGridProps {
   onShowMore: (date: Date) => void;
 }
 
-function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick, onShowMore }: SingleMonthGridProps) {
+function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, taskLinkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick, onShowMore }: SingleMonthGridProps) {
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
   const calendarStart = startOfWeek(monthStart);
@@ -381,6 +394,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
                     dateMode={dateMode}
                     subtaskCount={subtaskCounts.get(item.id)}
                     linkInfo={linkCounts.get(item.id)}
+                    taskLinkCount={taskLinkCounts.get(item.id)}
                     hasGranolaNotes={granolaItemIds.has(item.id)}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -421,6 +435,7 @@ interface MonthViewProps {
   dateMode: DateMode;
   subtaskCounts: Map<string, SubtaskCount>;
   linkCounts: Map<string, LinkInfo>;
+  taskLinkCounts: Map<string, number>;
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
@@ -430,7 +445,7 @@ interface MonthViewProps {
   onShowMore: (date: Date) => void;
 }
 
-function MonthView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick, onShowMore }: MonthViewProps) {
+function MonthView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, taskLinkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick, onShowMore }: MonthViewProps) {
   const [expanded, setExpanded] = useState(false);
   const monthCount = expanded ? 6 : 3;
   const months = Array.from({ length: monthCount }, (_, i) => addMonths(currentDate, i));
@@ -454,6 +469,7 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
             dateMode={dateMode}
             subtaskCounts={subtaskCounts}
             linkCounts={linkCounts}
+            taskLinkCounts={taskLinkCounts}
             projects={projects}
             subtasks={subtasks}
             granolaItemIds={granolaItemIds}
@@ -498,6 +514,7 @@ interface WeekViewProps {
   dateMode: DateMode;
   subtaskCounts: Map<string, SubtaskCount>;
   linkCounts: Map<string, LinkInfo>;
+  taskLinkCounts: Map<string, number>;
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
@@ -506,7 +523,7 @@ interface WeekViewProps {
   onDateClick: (date: Date) => void;
 }
 
-function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick }: WeekViewProps) {
+function WeekView({ currentDate, items, contentTypes, boardColumns, members, dateMode, subtaskCounts, linkCounts, taskLinkCounts, projects, subtasks, granolaItemIds, weekendsCollapsed, onItemClick, onDateClick }: WeekViewProps) {
   const weekStart = startOfWeek(currentDate);
   const weekEnd = endOfWeek(currentDate);
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
@@ -614,8 +631,26 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                         {(() => {
                           const li = linkCounts.get(item.id);
                           return li && li.count > 0 ? (
-                            <span title={`${li.count} linked asset${li.count !== 1 ? 's' : ''}`}>
-                              <Link2 className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                            <span
+                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
+                              style={{ color: '#005D97' }}
+                              title={`${li.count} attachment${li.count !== 1 ? 's' : ''}`}
+                            >
+                              <Paperclip className="w-3 h-3" />
+                              {li.count > 1 && li.count}
+                            </span>
+                          ) : null;
+                        })()}
+                        {(() => {
+                          const tlc = taskLinkCounts.get(item.id);
+                          return tlc && tlc > 0 ? (
+                            <span
+                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
+                              style={{ color: '#B8447A' }}
+                              title={`${tlc} linked task${tlc !== 1 ? 's' : ''}`}
+                            >
+                              <Link2 className="w-3 h-3" />
+                              {tlc > 1 && tlc}
                             </span>
                           ) : null;
                         })()}
@@ -657,6 +692,7 @@ interface DayViewProps {
   dateMode: DateMode;
   subtaskCounts: Map<string, SubtaskCount>;
   linkCounts: Map<string, LinkInfo>;
+  taskLinkCounts: Map<string, number>;
   projects: Project[];
   subtasks: SubtaskWithParent[];
   granolaItemIds: Set<string>;
@@ -881,6 +917,7 @@ export function CalendarPage() {
   const { setSelectedItemId } = useSelectedItem();
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
   const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id || null);
+  const { counts: taskLinkCounts } = useTaskLinkCounts(currentWorkspace?.id || null);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createModalInitialDate, setCreateModalInitialDate] = useState<Date | null>(null);
@@ -1231,6 +1268,7 @@ export function CalendarPage() {
               dateMode={dateMode}
               subtaskCounts={subtaskCounts}
               linkCounts={linkCounts}
+              taskLinkCounts={taskLinkCounts}
               projects={projects}
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
@@ -1253,6 +1291,7 @@ export function CalendarPage() {
               dateMode={dateMode}
               subtaskCounts={subtaskCounts}
               linkCounts={linkCounts}
+              taskLinkCounts={taskLinkCounts}
               projects={projects}
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}
@@ -1271,6 +1310,7 @@ export function CalendarPage() {
               dateMode={dateMode}
               subtaskCounts={subtaskCounts}
               linkCounts={linkCounts}
+              taskLinkCounts={taskLinkCounts}
               projects={projects}
               subtasks={subtasksWithParent}
               granolaItemIds={granolaItemIds}

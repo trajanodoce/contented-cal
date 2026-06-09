@@ -9,6 +9,7 @@ import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/data
 import { FilterBar, applyFilters } from '../components/FilterBar';
 import { useSubtaskCounts, SubtaskCount } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts, LinkInfo } from '../hooks/useExternalLinkCounts';
+import { useTaskLinkCounts } from '../hooks/useTaskLinkCounts';
 import {
   Calendar as CalendarIcon,
   AlertCircle,
@@ -17,6 +18,7 @@ import {
   Mic,
   Inbox,
   Paperclip,
+  Link2,
 } from 'lucide-react';
 import { AvatarStack } from '../components/ui/Avatar';
 import { isPast, isToday } from 'date-fns';
@@ -67,12 +69,13 @@ interface BoardCardProps {
   members: Profile[];
   subtaskCount?: SubtaskCount;
   linkInfo?: LinkInfo;
+  taskLinkCount?: number;
   hasGranolaNotes?: boolean;
   isOverlay?: boolean;
   onClick: () => void;
 }
 
-function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, linkInfo, hasGranolaNotes, isOverlay, onClick }: BoardCardProps) {
+function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, linkInfo, taskLinkCount, hasGranolaNotes, isOverlay, onClick }: BoardCardProps) {
   const contentType = contentTypes.find((ct) => ct.id === item.content_type_id);
   const itemMembers = members.filter((m) => item.assignee_ids?.includes(m.id));
 
@@ -210,6 +213,20 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
               {linkInfo.count}
             </span>
           )}
+
+          {/* Linked tasks (peer relationships) — berry to distinguish from
+              navy assets-paperclip. Shape (chain) vs color (berry) make
+              the two metadata families unambiguous at a glance. */}
+          {taskLinkCount && taskLinkCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-semibold"
+              style={{ color: '#B8447A' }}
+              title={`${taskLinkCount} linked task${taskLinkCount !== 1 ? 's' : ''}`}
+            >
+              <Link2 className="w-3.5 h-3.5" />
+              {taskLinkCount}
+            </span>
+          )}
         </div>
 
         {/* Due date */}
@@ -239,11 +256,12 @@ interface BoardColumnContainerProps {
   members: Profile[];
   subtaskCounts: Map<string, SubtaskCount>;
   linkCounts: Map<string, LinkInfo>;
+  taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   onCardClick: (item: ContentItem) => void;
 }
 
-function BoardColumnContainer({ column, items, contentTypes, boardColumns, members, subtaskCounts, linkCounts, granolaItemIds, onCardClick }: BoardColumnContainerProps) {
+function BoardColumnContainer({ column, items, contentTypes, boardColumns, members, subtaskCounts, linkCounts, taskLinkCounts, granolaItemIds, onCardClick }: BoardColumnContainerProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
     data: { column },
@@ -320,6 +338,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
               members={members}
               subtaskCount={subtaskCounts.get(item.id)}
               linkInfo={linkCounts.get(item.id)}
+              taskLinkCount={taskLinkCounts.get(item.id)}
               hasGranolaNotes={granolaItemIds.has(item.id)}
               onClick={() => onCardClick(item)}
             />
@@ -343,6 +362,7 @@ export function BoardPage() {
   const { setSelectedItemId } = useSelectedItem();
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id || null);
   const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id || null);
+  const { counts: taskLinkCounts } = useTaskLinkCounts(currentWorkspace?.id || null);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id || null);
 
   const handleCardClick = useCallback((item: ContentItem) => {
@@ -580,6 +600,7 @@ export function BoardPage() {
                 members={members}
                 subtaskCounts={subtaskCounts}
                 linkCounts={linkCounts}
+                taskLinkCounts={taskLinkCounts}
                 granolaItemIds={granolaItemIds}
                 onCardClick={handleCardClick}
               />

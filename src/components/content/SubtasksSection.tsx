@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { GripVertical, Check, Plus, X, Calendar, ChevronDown, ClipboardCheck, Settings } from 'lucide-react';
+import { GripVertical, Check, Plus, X, Calendar, ChevronDown, ClipboardCheck, Settings, Palette } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { supabase } from '../../lib/supabase';
 import { formatDate } from '../../lib/utils';
@@ -16,9 +16,16 @@ interface SubtasksSectionProps {
   addToast: (msg: string, type?: 'success' | 'error' | 'info') => void;
   templates?: SubtaskTemplate[];
   userRole?: string;
+  /**
+   * When provided, renders a berry-pink "+ Design request" button in the
+   * header that opens DesignRequestPage prepopped to auto-link back to
+   * this task. Caller decides whether to show it (content tasks yes,
+   * design tasks no — don't recursively request design on a design task).
+   */
+  onDesignRequest?: () => void;
 }
 
-export function SubtasksSection({ contentItemId, userId, members, addToast, templates = [], userRole }: SubtasksSectionProps) {
+export function SubtasksSection({ contentItemId, userId, members, addToast, templates = [], userRole, onDesignRequest }: SubtasksSectionProps) {
   const navigate = useNavigate();
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [newTitle, setNewTitle] = useState('');
@@ -361,6 +368,26 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
         )}
 
         <div className="flex-1" />
+
+        {/* + Design request — content tasks only. Opens DesignRequestPage
+            with linkTo=this task so the new design task auto-links back
+            and the "Request design" subtask gets created or checked off. */}
+        {onDesignRequest && (
+          <button
+            type="button"
+            onClick={onDesignRequest}
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors hover:bg-[#B8447A12]"
+            style={{
+              color: '#B8447A',
+              border: '1px solid #B8447A40',
+              backgroundColor: 'transparent',
+            }}
+            title="Create a linked design task"
+          >
+            <Palette className="w-3 h-3" />
+            Design request
+          </button>
+        )}
 
         {/* Template picker — only shown when templates exist */}
         {templates.length > 0 && (

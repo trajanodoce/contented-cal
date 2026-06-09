@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -137,10 +137,21 @@ function AssigneeMultiSelect({ members, value, onChange }: {
 
 export function DesignRequestPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Optional parent-task ID. When set, the new design task gets auto-linked
+  // to the parent and the "Request design" subtask is auto-managed on the
+  // parent (created or checked off — see handleSubmit). Comes from the
+  // "+ Design request" button in a content task's slide-over.
+  const linkToParentId = searchParams.get('linkTo');
   const { user } = useAuth();
   const { currentWorkspace } = useWorkspace();
   const { boardColumns, members } = useWorkspaceData(currentWorkspace?.id || null);
-  const { projects } = useApp();
+  const { projects, contentItems } = useApp();
+
+  // Look up the parent task so we can show its title in the linked-to banner
+  const linkedParentTask = linkToParentId
+    ? contentItems.find((t) => t.id === linkToParentId) ?? null
+    : null;
 
   // Form state
   const [title, setTitle] = useState('');
@@ -218,8 +229,71 @@ export function DesignRequestPage() {
         await supabase.from('subtasks').insert(subtaskRows);
       }
 
-      toast.success('Design request created!');
-      navigate('/list');
+      // Auto-link to parent task + manage "Request design" subtask on parent
+      // when this page was opened from the "+ Design request" button. Errors
+      // in this block are logged + toasted but don't roll back the create —
+      // the design task itself succeeded, the linking is best-effort.
+      if (linkToParentId && newItem) {
+        const { error: linkErr } = await supabase.rpc('link_tasks', {
+          p_task_a: linkToParentId,
+          p_task_b: newItem.id,
+        });
+        if (linkErr) {
+          console.warn('[design-request] auto-link failed:', linkErr.message);
+          toast.error(`Design task created, but linking failed: ${linkErr.message}`);
+        } else {
+          // Manage the "Request design" subtask on the parent.
+          //
+          // Spec (workshop 2026-06-05): if a subtask titled "Request design"
+          // (case-insensitive) already exists on the parent, check it off.
+          // Otherwise create a new completed one. Position goes at the end
+          // so it doesn't shift the user's existing subtask order.
+          const { data: existing } = await supabase
+            .from('subtasks')
+            .select('id, completed, position')
+            .eq('content_item_id', linkToParentId)
+            .ilike('title', 'request design')
+            .limit(1);
+
+          if (existing && existing.length > 0) {
+            const sub = existing[0];
+            if (!sub.completed) {
+              await supabase
+                .from('subtasks')
+                .update({ completed: true })
+                .eq('id', sub.id);
+            }
+            // If already completed, leave it alone (idempotent).
+          } else {
+            // Find the max position so the new auto-managed subtask sits
+            // at the bottom of the list, out of the way of manual ones.
+            const { data: positions } = await supabase
+              .from('subtasks')
+              .select('position')
+              .eq('content_item_id', linkToParentId)
+              .order('position', { ascending: false })
+              .limit(1);
+            const nextPos = (positions?.[0]?.position ?? -1) + 1;
+            await supabase.from('subtasks').insert({
+              content_item_id: linkToParentId,
+              title: 'Request design',
+              completed: true,
+              position: nextPos,
+            });
+          }
+          toast.success('Design request created and linked to source task');
+        }
+      } else {
+        toast.success('Design request created!');
+      }
+
+      // If we came from a specific task, navigate back to it so the slide-over
+      // can be reopened. Otherwise fall back to /list (default behavior).
+      if (linkToParentId) {
+        navigate(-1);
+      } else {
+        navigate('/list');
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to create request');
     } finally {
@@ -240,6 +314,29 @@ export function DesignRequestPage() {
             <p className="text-sm text-slate-500">Submit a new design request for the team.</p>
           </div>
         </div>
+
+        {/* Linked-to banner — shown when this page was opened via the
+            "+ Design request" button on a content task. Tells the user the
+            new design task will be auto-linked + the parent's "Request design"
+            subtask will be checked off on submit. */}
+        {linkToParentId && (
+          <div
+            className="mb-6 rounded-xl px-4 py-3 flex items-center gap-2.5"
+            style={{
+              background: '#B8447A0A',
+              border: '1px solid #B8447A30',
+            }}
+          >
+            <LinkIcon className="w-4 h-4 flex-shrink-0" style={{ color: '#B8447A' }} />
+            <div className="text-sm leading-snug">
+              <span className="text-slate-700">This design task will be linked to </span>
+              <span className="font-semibold" style={{ color: '#B8447A' }}>
+                {linkedParentTask?.title ?? 'the source task'}
+              </span>
+              <span className="text-slate-500"> · the source task&rsquo;s &ldquo;Request design&rdquo; subtask will be checked off automatically.</span>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="bg-surface-card rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 space-y-5">

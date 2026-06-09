@@ -184,6 +184,52 @@ export type Database = {
           },
         ]
       }
+      content_item_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          item_a_id: string
+          item_b_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_a_id: string
+          item_b_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_a_id?: string
+          item_b_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_item_links_item_a_id_fkey"
+            columns: ["item_a_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_item_links_item_b_id_fkey"
+            columns: ["item_b_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_item_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_items: {
         Row: {
           archived: boolean
@@ -1365,6 +1411,10 @@ export type Database = {
       }
       get_workspace_stats: { Args: { ws_id: string }; Returns: Json }
       is_workspace_member: { Args: { ws_id: string }; Returns: boolean }
+      link_tasks: {
+        Args: { p_task_a: string; p_task_b: string }
+        Returns: string
+      }
       record_sync_result: {
         Args: { p_platform: string; p_result: Json; p_workspace_id: string }
         Returns: undefined
@@ -1397,6 +1447,10 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      unlink_tasks: {
+        Args: { p_task_a: string; p_task_b: string }
+        Returns: boolean
       }
       upsert_granola_note:
         | {
@@ -1658,6 +1712,7 @@ export type Integration = Database['public']['Tables']['integrations']['Row'];
 export type AiInteraction = Database['public']['Tables']['ai_interactions']['Row'];
 export type OrdinalPostLink = Database['public']['Tables']['ordinal_post_links']['Row'];
 export type GranolaNoteLink = Database['public']['Tables']['granola_note_links']['Row'];
+export type ContentItemLink = Database['public']['Tables']['content_item_links']['Row'];
 export type UserIntegration = Database['public']['Tables']['user_integrations']['Row'];
 export type UserAlert = Database['public']['Tables']['user_alerts']['Row'];
 

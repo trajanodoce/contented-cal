@@ -81,6 +81,7 @@ import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import { useShowCompleted } from '../hooks/useShowCompleted';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
 import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
+import { useTaskLinkCounts } from '../hooks/useTaskLinkCounts';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { isDoneStatus } from '../lib/itemHelpers';
 import { GRANOLA_TEXT } from '../lib/ordinal';
@@ -97,6 +98,7 @@ export function ProjectDetailPage() {
   );
   const { counts: subtaskCounts } = useSubtaskCounts(currentWorkspace?.id ?? null);
   const { links: linkCounts } = useExternalLinkCounts(currentWorkspace?.id ?? null);
+  const { counts: taskLinkCounts } = useTaskLinkCounts(currentWorkspace?.id ?? null);
   const granolaItemIds = useGranolaItemIds(currentWorkspace?.id ?? null);
   const { setSelectedItemId } = useSelectedItem();
   const { filters, setFilters } = useFilters();
@@ -571,6 +573,7 @@ export function ProjectDetailPage() {
             members={members}
             subtaskCounts={subtaskCounts}
             linkCounts={linkCounts}
+            taskLinkCounts={taskLinkCounts}
             granolaItemIds={granolaItemIds}
             filters={filters}
             setFilters={setFilters}
@@ -587,6 +590,7 @@ export function ProjectDetailPage() {
             members={members}
             subtaskCounts={subtaskCounts}
             linkCounts={linkCounts}
+            taskLinkCounts={taskLinkCounts}
             granolaItemIds={granolaItemIds}
             onItemClick={setSelectedItemId}
             onItemMoved={fetchItems}
@@ -970,6 +974,7 @@ function ListTab({
   members,
   subtaskCounts,
   linkCounts,
+  taskLinkCounts,
   granolaItemIds,
   filters,
   setFilters,
@@ -983,6 +988,7 @@ function ListTab({
   members: Profile[];
   subtaskCounts: Map<string, { completed: number; total: number }>;
   linkCounts: Map<string, { count: number; platforms: string[] }>;
+  taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   filters: import('../components/FilterBar').FilterState;
   setFilters: (f: import('../components/FilterBar').FilterState) => void;
@@ -1251,6 +1257,16 @@ function ListTab({
                             {linkCounts.get(item.id)!.count}
                           </span>
                         )}
+                        {taskLinkCounts.get(item.id) && taskLinkCounts.get(item.id)! > 0 && (
+                          <span
+                            className="inline-flex items-center gap-1 text-xs font-semibold"
+                            style={{ color: '#B8447A' }}
+                            title={`${taskLinkCounts.get(item.id)} linked task${taskLinkCounts.get(item.id) !== 1 ? 's' : ''}`}
+                          >
+                            <Link2 className="w-3.5 h-3.5" />
+                            {taskLinkCounts.get(item.id)}
+                          </span>
+                        )}
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />
                       </div>
                     </td>
@@ -1353,6 +1369,7 @@ function ProjectBoardCard({
   isOverlay,
   subtaskCount,
   linkInfo,
+  taskLinkCount,
   hasGranolaNotes,
 }: {
   item: ContentItem;
@@ -1363,6 +1380,7 @@ function ProjectBoardCard({
   isOverlay?: boolean;
   subtaskCount?: { completed: number; total: number };
   linkInfo?: { count: number };
+  taskLinkCount?: number;
   hasGranolaNotes?: boolean;
 }) {
   const ct = contentTypes.find((c) => c.id === item.content_type_id);
@@ -1460,6 +1478,16 @@ function ProjectBoardCard({
               {linkInfo.count}
             </span>
           )}
+          {taskLinkCount && taskLinkCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-semibold"
+              style={{ color: '#B8447A' }}
+              title={`${taskLinkCount} linked task${taskLinkCount !== 1 ? 's' : ''}`}
+            >
+              <Link2 className="w-3.5 h-3.5" />
+              {taskLinkCount}
+            </span>
+          )}
           {hasGranolaNotes && (
             <span title="Has meeting notes">
               <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
@@ -1484,6 +1512,7 @@ function ProjectBoardColumn({
   members,
   subtaskCounts,
   linkCounts,
+  taskLinkCounts,
   granolaItemIds,
   onItemClick,
 }: {
@@ -1493,6 +1522,7 @@ function ProjectBoardColumn({
   members: Profile[];
   subtaskCounts: Map<string, { completed: number; total: number }>;
   linkCounts: Map<string, { count: number; platforms: string[] }>;
+  taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   onItemClick: (id: string) => void;
 }) {
@@ -1544,6 +1574,7 @@ function ProjectBoardColumn({
             isDone={isDoneCol}
             subtaskCount={subtaskCounts.get(item.id)}
             linkInfo={linkCounts.get(item.id)}
+            taskLinkCount={taskLinkCounts.get(item.id)}
             hasGranolaNotes={granolaItemIds.has(item.id)}
             onClick={() => onItemClick(item.id)}
           />
@@ -1566,6 +1597,7 @@ function BoardTab({
   members,
   subtaskCounts,
   linkCounts,
+  taskLinkCounts,
   granolaItemIds,
   onItemClick,
   onItemMoved,
@@ -1576,6 +1608,7 @@ function BoardTab({
   members: Profile[];
   subtaskCounts: Map<string, { completed: number; total: number }>;
   linkCounts: Map<string, { count: number; platforms: string[] }>;
+  taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   onItemClick: (id: string) => void;
   onItemMoved: () => void;
@@ -1683,6 +1716,7 @@ function BoardTab({
               members={members}
               subtaskCounts={subtaskCounts}
               linkCounts={linkCounts}
+              taskLinkCounts={taskLinkCounts}
               granolaItemIds={granolaItemIds}
               onItemClick={onItemClick}
             />
