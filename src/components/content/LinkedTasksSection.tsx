@@ -3,7 +3,7 @@ import { Link2, X } from 'lucide-react';
 import type { ContentItem, BoardColumn, Profile } from '../../lib/database.types';
 import { TaskCategoryIcon } from './TaskCategoryIcon';
 import { AvatarStack } from '../ui/Avatar';
-import { parseLocalDate, formatDate } from '../../lib/utils';
+import { formatDate } from '../../lib/utils';
 import { TaskPickerModal } from './TaskPickerModal';
 
 const BERRY = '#B8447A';
@@ -205,7 +205,7 @@ function LinkedTaskRow({ task, members, boardColumns, onClick, onUnlink }: Linke
 
       {task.due_date && (
         <span className="text-[11px] text-slate-400 flex-shrink-0" title={`Due ${formatDate(task.due_date)}`}>
-          {formatDate(parseLocalDate(task.due_date))}
+          {formatDate(task.due_date)}
         </span>
       )}
 

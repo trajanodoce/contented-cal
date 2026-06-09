@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { X, Search, Link2 } from 'lucide-react';
 import type { ContentItem, BoardColumn, TaskCategory } from '../../lib/database.types';
 import { TaskCategoryIcon } from './TaskCategoryIcon';
-import { parseLocalDate, formatDate } from '../../lib/utils';
+import { formatDate } from '../../lib/utils';
 
 const BERRY = '#B8447A';
 const BERRY_TINT = '#B8447A15';
@@ -199,7 +199,7 @@ export function TaskPickerModal({
                     )}
                     {task.due_date && (
                       <span className="text-[11px] text-slate-400 flex-shrink-0">
-                        {formatDate(parseLocalDate(task.due_date))}
+                        {formatDate(task.due_date)}
                       </span>
                     )}
                   </button>
