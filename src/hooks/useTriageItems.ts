@@ -82,13 +82,16 @@ export function useTriageItems() {
             .eq('is_origin', true)
             .maybeSingle()
             .then(({ data: link }) => {
-              if (link?.channel_name) {
-                setChannelMap((prev) => {
-                  const next = new Map(prev);
-                  next.set(link.content_item_id, link.channel_name);
-                  return next;
-                });
-              }
+              // Capture the narrowed values into locals so TS keeps the
+              // non-null narrowing through the nested setChannelMap closure.
+              const channelName = link?.channel_name;
+              const itemId = link?.content_item_id;
+              if (!channelName || !itemId) return;
+              setChannelMap((prev) => {
+                const next = new Map(prev);
+                next.set(itemId, channelName);
+                return next;
+              });
             });
         } else if (payload.eventType === 'UPDATE') {
           const row = payload.new as ContentItem;

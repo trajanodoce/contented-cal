@@ -880,7 +880,9 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
             )}
             <h4 className={`font-medium truncate ${isDone ? 'text-slate-500' : 'text-slate-900'}`}>{item.title}</h4>
             {hasGranolaNotes && (
-              <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
+              <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
+                <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
+              </span>
             )}
           </div>
 
@@ -908,7 +910,7 @@ export function CalendarPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
   const { calendarViewType, setCalendarViewType } = useViewPersistence();
-  const { contentItems, contentItemsLoading, patchContentItem, members } = useApp();
+  const { contentItems, contentItemsLoading, patchContentItem, memberProfiles: members } = useApp();
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [boardColumns, setBoardColumns] = useState<BoardColumn[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);

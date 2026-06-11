@@ -10,13 +10,16 @@ export function useGranolaItemIds(workspaceId: string | null): Set<string> {
 
   useEffect(() => {
     if (!workspaceId) return;
+    // Bind the narrowed value into a parameter so TS knows it's a string
+    // inside the async function (closure narrowing doesn't propagate).
+    const wsId = workspaceId;
 
     async function fetchGranolaLinks() {
       // Join through content_items to filter by workspace
       const { data } = await supabase
         .from('granola_note_links')
         .select('content_item_id, content_items!inner(workspace_id)')
-        .eq('content_items.workspace_id', workspaceId);
+        .eq('content_items.workspace_id', wsId);
 
       if (data) {
         setGranolaItemIds(new Set(data.map(d => d.content_item_id)));

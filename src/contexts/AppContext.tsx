@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useWorkspace } from './WorkspaceContext';
 import type {
   Workspace, WorkspaceMember, ContentType, BoardColumn,
-  ContentItem, Project, CustomFieldDefinition, IntakeForm, WorkspaceRole
+  ContentItem, Project, CustomFieldDefinition, IntakeForm, WorkspaceRole, Profile
 } from '../lib/database.types';
 
 interface AppContextValue {
@@ -22,6 +22,15 @@ interface AppContextValue {
   customFieldDefs: CustomFieldDefinition[];
   intakeForms: IntakeForm[];
   members: (WorkspaceMember & { id: string; email?: string; full_name?: string; avatar_url?: string })[];
+  /**
+   * Profile-shaped projection of `members` for UI components that expect
+   * the canonical Profile contract (email/full_name/avatar_url as
+   * `string | null`, not `string | undefined`). Use this when passing
+   * member data into FilterBar, BoardCard, CalendarItemPill, etc. The
+   * raw `members` array remains the source for code that needs role,
+   * workspace_id, or other WorkspaceMember-only fields.
+   */
+  memberProfiles: Profile[];
   linkedItemIds: Map<string, string[]>;
   setWorkspace: (w: Workspace) => void;
   refreshWorkspaces: () => Promise<void>;
@@ -225,11 +234,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('lastWorkspaceId');
   }, []);
 
+  // Profile-shaped projection — coerce optional ?: undefined to nullable
+  // `| null` so the array matches the canonical Profile type. Memoized so
+  // identity is stable across renders that don't touch members.
+  const memberProfiles: Profile[] = useMemo(
+    () => members.map(m => ({
+      id: m.id,
+      email: m.email ?? null,
+      full_name: m.full_name ?? null,
+      avatar_url: m.avatar_url ?? null,
+    })),
+    [members]
+  );
+
   return (
     <AppContext.Provider value={{
       user, loading, workspace, workspaces, userRole,
       contentTypes, boardColumns, contentItems, contentItemsLoading, projects,
-      customFieldDefs, intakeForms, members, linkedItemIds,
+      customFieldDefs, intakeForms, members, memberProfiles, linkedItemIds,
       setWorkspace, refreshWorkspaces, refreshContentItems, patchContentItem, refreshWorkspaceData, refreshIntakeForms, refreshProjects, refreshLinkedItems, signOut,
     }}>
       {children}

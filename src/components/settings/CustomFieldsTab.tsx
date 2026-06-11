@@ -536,7 +536,7 @@ function FieldForm({
 
 function parseOptions(raw: Json | null): SelectOption[] {
   if (!raw) return [];
-  if (Array.isArray(raw)) return raw as SelectOption[];
+  if (Array.isArray(raw)) return raw as unknown as SelectOption[];
   if (typeof raw === 'string') {
     try {
       const p = JSON.parse(raw);

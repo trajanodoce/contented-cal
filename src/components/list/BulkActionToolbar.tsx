@@ -336,7 +336,7 @@ export function BulkActionToolbar({
     icon: React.ReactNode;
     label: string;
     onClick: () => void;
-    btnRef?: React.RefObject<HTMLButtonElement | null>;
+    btnRef?: React.RefObject<HTMLButtonElement>;
     style?: React.CSSProperties;
     isActive?: boolean;
   }) {

@@ -3,6 +3,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { getWorkspaceSubtaskTemplates, type SubtaskTemplate } from '../../lib/utils';
+import type { Json } from '../../lib/database.types';
 import {
   Plus, Trash2, GripVertical, ClipboardCheck, Copy, Edit2, X,
 } from 'lucide-react';
@@ -71,7 +72,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
       const { error } = await supabase
         .from('workspaces')
         .update({
-          settings: { ...currentSettings, subtask_templates: updated },
+          settings: { ...currentSettings, subtask_templates: updated } as unknown as Json,
         })
         .eq('id', workspaceId);
       setIsSaving(false);

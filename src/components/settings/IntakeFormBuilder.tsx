@@ -8,7 +8,7 @@ import { StyledSelect } from '../ui/StyledSelect';
 import { useApp } from '../../contexts/AppContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { getWorkspaceChannels } from '../../lib/utils';
-import type { IntakeForm, IntakeFormField } from '../../lib/database.types';
+import type { IntakeForm, IntakeFormField, Database } from '../../lib/database.types';
 
 function getStandardFields(channels: string[]) {
   return [
@@ -128,7 +128,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
 
   async function addField(fieldKey: string, label: string, fieldType: string, options?: string[]) {
     const maxPos = fields.length;
-    const insertData: Record<string, unknown> = {
+    const insertData: Database['public']['Tables']['intake_form_fields']['Insert'] = {
       form_id: form.id,
       field_key: fieldKey,
       label,

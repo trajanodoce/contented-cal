@@ -144,7 +144,9 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
           {item.title}
         </h4>
         {hasGranolaNotes && (
-          <Mic className="w-3 h-3 flex-shrink-0 mt-0.5" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
+          <span title="Has meeting notes" className="flex-shrink-0 mt-0.5 inline-flex">
+            <Mic className="w-3 h-3" style={{ color: GRANOLA_TEXT }} />
+          </span>
         )}
         <span className="flex-shrink-0 mt-0.5">
           <TaskPresenceChip taskId={item.id} variant="inline-dot" />
@@ -355,7 +357,7 @@ export function BoardPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
   const { filters, setFilters, isLoaded } = useFilters();
-  const { contentItems, contentItemsLoading, patchContentItem, members } = useApp();
+  const { contentItems, contentItemsLoading, patchContentItem, memberProfiles: members } = useApp();
   const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
   const [loading, setLoading] = useState(true);

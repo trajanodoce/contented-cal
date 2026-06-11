@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Trash2,
   Sun,
+  type LucideIcon,
 } from 'lucide-react';
 import { formatRelativeTime } from '../../lib/relativeTime';
 import { parseActivityAction, type ActionPart } from './parseActivityAction';
@@ -36,7 +37,7 @@ export interface ActivityLogProps {
 type IconStyle = {
   background: string;
   color: string;
-  Icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  Icon: LucideIcon;
 };
 
 const ICON_STYLES: Record<ActivityType, IconStyle> = {

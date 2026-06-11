@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "prepush": "npm run typecheck && npm run lint"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

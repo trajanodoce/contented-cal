@@ -520,7 +520,9 @@ export function ListPage() {
                         )}
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : 'text-slate-900'} truncate max-w-[320px]`}>{item.title}</span>
                         {granolaItemIds.has(item.id) && (
-                          <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} title="Has meeting notes" />
+                          <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
+                            <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
+                          </span>
                         )}
                         {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: '#005D97' }}>
@@ -772,7 +774,7 @@ function InlinePriorityEdit({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const currentPriority = PRIORITY_STYLES[priority] ?? PRIORITY_STYLES.medium;
+  const currentPriority = PRIORITY_STYLES[priority ?? 'medium'] ?? PRIORITY_STYLES.medium;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

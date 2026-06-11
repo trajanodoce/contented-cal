@@ -270,7 +270,7 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
                       <button
                         onClick={() => {
                           setEditingColumn(column);
-                          setFormData({ name: column.name, color: column.color ?? COLOR_PALETTE[0], position: column.position });
+                          setFormData({ name: column.name, color: (column.color ?? COLOR_PALETTE[0]) as typeof COLOR_PALETTE[number], position: column.position });
                           setShowForm(true);
                         }}
                         className="p-1 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded ml-2"

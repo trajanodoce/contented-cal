@@ -143,7 +143,21 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
     if (libraryRes.error) {
       console.error('Failed to load library:', libraryRes.error);
     } else {
-      setItems(libraryRes.data ?? []);
+      // Map explicitly into LibraryItem[] — the DB `type` column is `string`
+      // but LibraryItem.type is `'file' | 'link'`. Anything else is treated
+      // as a link (the legacy default before the type column existed).
+      const rows = (libraryRes.data ?? []).map((row): LibraryItem => ({
+        id: row.id,
+        type: row.type === 'file' ? 'file' : 'link',
+        title: row.title,
+        url: row.url,
+        file_name: row.file_name,
+        file_size: row.file_size,
+        file_type: row.file_type,
+        storage_path: row.storage_path,
+        created_at: row.created_at,
+      }));
+      setItems(rows);
     }
 
     if (taskAssetsRes.error) {
