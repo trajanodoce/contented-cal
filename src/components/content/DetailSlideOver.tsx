@@ -286,7 +286,6 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
       addToast((err as Error).message, 'error');
     } finally {
       setSavingField(null);
-      setEditingField(null);
     }
   }
 
