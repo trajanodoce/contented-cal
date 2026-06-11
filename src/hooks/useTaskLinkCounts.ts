@@ -19,9 +19,9 @@ export function useTaskLinkCounts(workspaceId: string | null) {
     }
     setLoading(true);
 
-    // Filter by workspace through both join sides — a row only counts if
-    // BOTH item_a and item_b are in the requested workspace (they always
-    // are by RPC contract, but RLS allows belt-and-suspenders here).
+    // Filter by workspace via item_a's joined content_items row. Pairs are
+    // always same-workspace (link_tasks enforces it), so filtering one side
+    // is sufficient — no need to join item_b as well.
     const { data, error } = await supabase
       .from('content_item_links')
       .select(

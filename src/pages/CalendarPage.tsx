@@ -34,6 +34,7 @@ import {
   CheckCircle2,
   Flag,
   Mic,
+  ListChecks,
 } from 'lucide-react';
 import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import { useShowCompleted } from '../hooks/useShowCompleted';
@@ -197,11 +198,15 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
         </span>
       )}
       <span className={`truncate flex-1 font-medium ${isDone ? 'text-slate-500' : 'text-slate-700'}`}>{item.title}</span>
-      {subtaskCount && subtaskCount.total > 0 && subtaskCount.completed < subtaskCount.total && (
+      {subtaskCount && subtaskCount.total > 0 && (
         <span
-          className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"
+          className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
+          style={{ color: '#005D97' }}
           title={`${subtaskCount.completed}/${subtaskCount.total} subtasks done`}
-        />
+        >
+          <ListChecks className="w-3 h-3" />
+          {subtaskCount.completed}/{subtaskCount.total}
+        </span>
       )}
       {linkInfo && linkInfo.count > 0 && (
         <span
@@ -621,11 +626,15 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                         />
                         {(() => {
                           const sc = subtaskCounts.get(item.id);
-                          return sc && sc.total > 0 && sc.completed < sc.total ? (
+                          return sc && sc.total > 0 ? (
                             <span
-                              className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0"
+                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
+                              style={{ color: '#005D97' }}
                               title={`${sc.completed}/${sc.total} subtasks done`}
-                            />
+                            >
+                              <ListChecks className="w-3 h-3" />
+                              {sc.completed}/{sc.total}
+                            </span>
                           ) : null;
                         })()}
                         {(() => {

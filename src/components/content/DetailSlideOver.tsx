@@ -923,7 +923,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>
 
-              {/* 5. Optional Details (canonical Batch 5 v2): category-tinted
+              {/* 6. Optional Details (canonical Batch 5 v2): category-tinted
                   zone housing all custom field affordances. Tint + label
                   color match the task's category (navy for content, berry
                   for design). Heading is 11px to match the unified canonical
@@ -951,14 +951,14 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                       values={customFieldValues}
                       onChange={updateCustomField}
                       compact
-                      members={members.map(m => ({ id: m.user_id, email: m.email ?? '', full_name: m.full_name ?? '', avatar_url: m.avatar_url ?? null }))}
+                      members={memberProfiles}
                       taskCategory={item.category}
                     />
                   </div>
                 );
               })()}
 
-              {/* 6. Description — usually base-level context only, so sits
+              {/* 7. Description — usually base-level context only, so sits
                   below structured task data (subtasks, links, custom fields). */}
               {fieldVisibility.description && (
                 <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
@@ -1009,7 +1009,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 </div>
               )}
 
-              {/* 7. Granola Meeting Notes (conditional — section hides itself
+              {/* 8. Granola Meeting Notes (conditional — section hides itself
                   when no note is linked and not in admin view) */}
               <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
               <GranolaNoteSection
@@ -1025,7 +1025,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 onLinked={() => setGranolaRefreshKey((k) => k + 1)}
               />
 
-              {/* 8. Slack Threads (conditional — section hides itself when no
+              {/* 9. Slack Threads (conditional — section hides itself when no
                   thread is linked) */}
               <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
                 <SlackThreadsSection
@@ -1035,7 +1035,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 />
               </div>
 
-              {/* 9. AI Assistant — canonical bottom-of-panel slot, collapsed
+              {/* 10. AI Assistant — canonical bottom-of-panel slot, collapsed
                   by default; component owns the cool-wash + chevron + teal
                   accent styling per Path 1 doc alignment. */}
               <AiAssistant

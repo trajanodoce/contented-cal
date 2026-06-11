@@ -1441,7 +1441,7 @@ function ProjectBoardCard({
             <CheckCircle2 className="w-3 h-3" style={{ color: '#357254' }} />
           </span>
         )}
-        <p className={`text-xs font-medium ${isDone ? 'text-slate-500' : 'text-slate-900'} line-clamp-2 flex-1`}>
+        <p className={`text-xs font-medium ${isDone ? 'text-slate-500' : 'text-slate-900'} line-clamp-2 flex-1`} title={item.title}>
           {item.title}
         </p>
         <span className="flex-shrink-0 mt-0.5">

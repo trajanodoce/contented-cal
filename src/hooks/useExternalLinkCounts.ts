@@ -54,26 +54,3 @@ export function useExternalLinkCounts(workspaceId: string | null) {
 
   return { links, loading, refresh: fetchLinks };
 }
-
-/**
- * Returns a Set of content_item_ids that have external links,
- * optionally filtered by platform.
- */
-export function useItemsWithLinks(workspaceId: string | null) {
-  const { links, loading, refresh } = useExternalLinkCounts(workspaceId);
-
-  const getItemIdsWithLinks = useCallback(
-    (platform?: ExternalLinkPlatform): Set<string> => {
-      const ids = new Set<string>();
-      links.forEach((info, itemId) => {
-        if (!platform || info.platforms.includes(platform)) {
-          ids.add(itemId);
-        }
-      });
-      return ids;
-    },
-    [links]
-  );
-
-  return { links, loading, refresh, getItemIdsWithLinks };
-}

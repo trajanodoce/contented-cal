@@ -23,8 +23,9 @@ type CategoryFilter = 'all' | TaskCategory;
  *
  * - Excludes self + already-linked tasks (filtered server-side would be
  *   ideal but caller already has the full list — cheap client filter).
- * - Default category filter is the opposite of the current task's category
- *   (most common link case: content task ↔ design task). User can flip it.
+ * - Default category filter is "all" (caller passes defaultCategoryFilter;
+ *   LinkedTasksSection sends "all" so the picker never looks empty in
+ *   workspaces dominated by one category). User can narrow with the chips.
  * - Search is title-substring case-insensitive.
  */
 export function TaskPickerModal({
@@ -183,7 +184,7 @@ export function TaskPickerModal({
                     className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9710] transition-colors text-left disabled:opacity-50"
                   >
                     <TaskCategoryIcon category={task.category} size={14} />
-                    <span className="text-[13px] font-medium text-slate-900 flex-1 truncate">
+                    <span className="text-[13px] font-medium text-slate-900 flex-1 truncate" title={task.title}>
                       {task.title}
                     </span>
                     {statusCol && (

@@ -31,14 +31,12 @@ interface AppContextValue {
    * workspace_id, or other WorkspaceMember-only fields.
    */
   memberProfiles: Profile[];
-  linkedItemIds: Map<string, string[]>;
   setWorkspace: (w: Workspace) => void;
   refreshWorkspaces: () => Promise<void>;
   refreshContentItems: () => Promise<void>;
   refreshWorkspaceData: () => Promise<void>;
   refreshIntakeForms: () => Promise<void>;
   refreshProjects: () => Promise<void>;
-  refreshLinkedItems: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -59,7 +57,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [intakeForms, setIntakeForms] = useState<IntakeForm[]>([]);
   const [members, setMembers] = useState<(WorkspaceMember & { id: string; email?: string; full_name?: string; avatar_url?: string })[]>([]);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [linkedItemIds, setLinkedItemIds] = useState<Map<string, string[]>>(new Map());
 
   const refreshWorkspaces = useCallback(async () => {
     if (!user) return;
@@ -96,24 +93,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setWorkspaceState(w);
     localStorage.setItem('lastWorkspaceId', w.id);
   }, []);
-
-  const refreshLinkedItems = useCallback(async () => {
-    if (!workspace) return;
-    // Single query: join external_links through content_items via FK
-    const { data } = await supabase
-      .from('external_links')
-      .select('content_item_id, platform, content_items!inner(workspace_id)')
-      .eq('content_items.workspace_id', workspace.id);
-    if (data) {
-      const map = new Map<string, string[]>();
-      for (const row of data) {
-        const existing = map.get(row.content_item_id) ?? [];
-        if (!existing.includes(row.platform)) existing.push(row.platform);
-        map.set(row.content_item_id, existing);
-      }
-      setLinkedItemIds(map);
-    }
-  }, [workspace]);
 
   const refreshProjects = useCallback(async () => {
     if (!workspace) return;
@@ -183,9 +162,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (workspace) {
       refreshWorkspaceData();
       refreshContentItems();
-      refreshLinkedItems();
     }
-  }, [workspace, refreshWorkspaceData, refreshContentItems, refreshLinkedItems]);
+  }, [workspace, refreshWorkspaceData, refreshContentItems]);
 
   const workspaceId = workspace?.id;
   useEffect(() => {
@@ -230,7 +208,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setMembers([]);
     setCustomFieldDefs([]);
     setIntakeForms([]);
-    setLinkedItemIds(new Map());
     localStorage.removeItem('lastWorkspaceId');
   }, []);
 
@@ -251,8 +228,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider value={{
       user, loading, workspace, workspaces, userRole,
       contentTypes, boardColumns, contentItems, contentItemsLoading, projects,
-      customFieldDefs, intakeForms, members, memberProfiles, linkedItemIds,
-      setWorkspace, refreshWorkspaces, refreshContentItems, patchContentItem, refreshWorkspaceData, refreshIntakeForms, refreshProjects, refreshLinkedItems, signOut,
+      customFieldDefs, intakeForms, members, memberProfiles,
+      setWorkspace, refreshWorkspaces, refreshContentItems, patchContentItem, refreshWorkspaceData, refreshIntakeForms, refreshProjects, signOut,
     }}>
       {children}
     </AppContext.Provider>
