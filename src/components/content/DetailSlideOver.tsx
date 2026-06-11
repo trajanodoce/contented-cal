@@ -894,7 +894,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 members={subtaskMembers}
                 addToast={addToast}
                 templates={subtaskTemplates}
-                userRole={userRole}
+                userRole={userRole ?? undefined}
                 onDesignRequest={
                   item.category === 'content'
                     ? () => navigate(`/design-request?linkTo=${item.id}`)
@@ -908,7 +908,6 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   to that task. "+ Link a task" opens the workspace picker. */}
               <LinkedTasksSection
                 itemId={item.id}
-                category={item.category}
                 linkedTasks={linkedTasks}
                 loading={linkedTasksLoading}
                 workspaceTasks={contentItems}

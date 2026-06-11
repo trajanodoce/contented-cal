@@ -101,6 +101,53 @@ export type Database = {
           },
         ]
       }
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          scope: Database["public"]["Enums"]["api_key_scope"]
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          scope?: Database["public"]["Enums"]["api_key_scope"]
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          scope?: Database["public"]["Enums"]["api_key_scope"]
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       board_columns: {
         Row: {
           color: string | null
@@ -176,6 +223,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comments_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "comments_user_id_profiles_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -208,6 +262,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "content_item_links_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "content_item_links_item_a_id_fkey"
             columns: ["item_a_id"]
             isOneToOne: false
@@ -219,13 +280,6 @@ export type Database = {
             columns: ["item_b_id"]
             isOneToOne: false
             referencedRelation: "content_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "content_item_links_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -922,6 +976,66 @@ export type Database = {
           },
         ]
       }
+      personal_tasks: {
+        Row: {
+          category: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          priority: string
+          title: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          category?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          category?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_tasks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_tasks_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -948,6 +1062,95 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      project_library: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          file_name: string | null
+          file_size: number | null
+          file_type: string | null
+          id: string
+          project_id: string
+          storage_path: string | null
+          title: string
+          type: string
+          url: string | null
+          workspace_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          project_id: string
+          storage_path?: string | null
+          title: string
+          type: string
+          url?: string | null
+          workspace_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          id?: string
+          project_id?: string
+          storage_path?: string | null
+          title?: string
+          type?: string
+          url?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_library_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_library_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_members: {
+        Row: {
+          added_at: string
+          id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
@@ -996,6 +1199,99 @@ export type Database = {
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slack_processed_events: {
+        Row: {
+          event_id: string
+          processed_at: string
+        }
+        Insert: {
+          event_id: string
+          processed_at?: string
+        }
+        Update: {
+          event_id?: string
+          processed_at?: string
+        }
+        Relationships: []
+      }
+      slack_thread_links: {
+        Row: {
+          added_by: string | null
+          captured_at: string
+          channel_name: string | null
+          content_item_id: string
+          created_at: string
+          id: string
+          is_origin: boolean
+          parent_author_id: string | null
+          parent_author_name: string | null
+          parent_message: string | null
+          participant_count: number | null
+          permalink: string
+          raw_thread_snapshot: Json | null
+          requester_id: string | null
+          requester_name: string | null
+          slack_channel_id: string
+          slack_thread_ts: string
+          thread_start_at: string | null
+        }
+        Insert: {
+          added_by?: string | null
+          captured_at?: string
+          channel_name?: string | null
+          content_item_id: string
+          created_at?: string
+          id?: string
+          is_origin?: boolean
+          parent_author_id?: string | null
+          parent_author_name?: string | null
+          parent_message?: string | null
+          participant_count?: number | null
+          permalink: string
+          raw_thread_snapshot?: Json | null
+          requester_id?: string | null
+          requester_name?: string | null
+          slack_channel_id: string
+          slack_thread_ts: string
+          thread_start_at?: string | null
+        }
+        Update: {
+          added_by?: string | null
+          captured_at?: string
+          channel_name?: string | null
+          content_item_id?: string
+          created_at?: string
+          id?: string
+          is_origin?: boolean
+          parent_author_id?: string | null
+          parent_author_name?: string | null
+          parent_message?: string | null
+          participant_count?: number | null
+          permalink?: string
+          raw_thread_snapshot?: Json | null
+          requester_id?: string | null
+          requester_name?: string | null
+          slack_channel_id?: string
+          slack_thread_ts?: string
+          thread_start_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slack_thread_links_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slack_thread_links_content_item_id_fkey"
+            columns: ["content_item_id"]
+            isOneToOne: false
+            referencedRelation: "content_items"
             referencedColumns: ["id"]
           },
         ]
@@ -1396,10 +1692,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invite: { Args: { p_invite_id: string }; Returns: string }
+      authenticate_api_key: {
+        Args: { p_key_hash: string }
+        Returns: {
+          scope: Database["public"]["Enums"]["api_key_scope"]
+          workspace_id: string
+        }[]
+      }
       check_and_mark_sync_due: {
         Args: { p_platform: string; p_workspace_id: string }
         Returns: boolean
       }
+      cleanup_slack_processed_events: { Args: never; Returns: undefined }
       duplicate_content_item: { Args: { item_id: string }; Returns: string }
       get_ordinal_sync_status: {
         Args: { p_workspace_id: string }
@@ -1422,8 +1727,12 @@ export type Database = {
       search_content_items: {
         Args: { search_query: string; ws_id: string }
         Returns: {
+          archived: boolean
           assignee_ids: string[] | null
+          category: Database["public"]["Enums"]["task_category"]
           channel: string | null
+          completed: boolean
+          completed_at: string | null
           content_type_id: string | null
           created_at: string
           created_by: string | null
@@ -1432,6 +1741,7 @@ export type Database = {
           due_date: string | null
           fts: unknown
           id: string
+          needs_triage: boolean
           priority: Database["public"]["Enums"]["priority_level"] | null
           project_id: string | null
           publish_date: string | null
@@ -1448,6 +1758,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      soft_delete_comment: { Args: { comment_id: string }; Returns: undefined }
       unlink_tasks: {
         Args: { p_task_a: string; p_task_b: string }
         Returns: boolean
@@ -1503,6 +1814,7 @@ export type Database = {
       }
     }
     Enums: {
+      api_key_scope: "read" | "read_write" | "full"
       field_applies_to: "content" | "design" | "both"
       field_type:
         | "text"
@@ -1657,6 +1969,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      api_key_scope: ["read", "read_write", "full"],
       field_applies_to: ["content", "design", "both"],
       field_type: [
         "text",
@@ -1715,22 +2028,9 @@ export type GranolaNoteLink = Database['public']['Tables']['granola_note_links']
 export type ContentItemLink = Database['public']['Tables']['content_item_links']['Row'];
 export type UserIntegration = Database['public']['Tables']['user_integrations']['Row'];
 export type UserAlert = Database['public']['Tables']['user_alerts']['Row'];
-
-// Personal tasks (manually typed until next type generation)
-export interface PersonalTask {
-  id: string;
-  user_id: string;
-  workspace_id: string;
-  title: string;
-  notes: string | null;
-  category: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  due_date: string | null;
-  completed: boolean;
-  completed_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type PersonalTask = Database['public']['Tables']['personal_tasks']['Row'];
+export type ProjectMember = Database['public']['Tables']['project_members']['Row'];
+export type SlackThreadLink = Database['public']['Tables']['slack_thread_links']['Row'];
 
 // Enum type aliases for backward compatibility
 export type CustomFieldType = Database['public']['Enums']['field_type'];

@@ -288,8 +288,11 @@ export function DesignRequestPage() {
       }
 
       // If we came from a specific task, navigate back to it so the slide-over
-      // can be reopened. Otherwise fall back to /list (default behavior).
-      if (linkToParentId) {
+      // can be reopened. window.history.length === 1 means we landed on this
+      // page directly (bookmark, pasted URL, etc.) with nothing to go back to —
+      // fall back to /list in that case so we don't strand the user on a blank
+      // history state.
+      if (linkToParentId && window.history.length > 1) {
         navigate(-1);
       } else {
         navigate('/list');

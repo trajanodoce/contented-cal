@@ -13,7 +13,6 @@ const BERRY_TINT = '#B8447A15';
 
 interface Props {
   itemId: string;
-  category: ContentItem['category'];
   linkedTasks: ContentItem[];
   loading: boolean;
   /** All workspace tasks — passed in so the picker can filter without re-querying */
@@ -39,7 +38,6 @@ interface Props {
  */
 export function LinkedTasksSection({
   itemId,
-  category,
   linkedTasks,
   loading,
   workspaceTasks,

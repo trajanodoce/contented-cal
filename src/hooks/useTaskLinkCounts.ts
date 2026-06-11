@@ -50,5 +50,29 @@ export function useTaskLinkCounts(workspaceId: string | null) {
     fetchCounts();
   }, [fetchCounts]);
 
+  // Realtime: refresh counts when any content_item_links row changes for
+  // this workspace. content_item_links doesn't have a workspace_id column
+  // (workspace is enforced via the joined content_items rows + RLS), so
+  // there's no server-side filter we can apply — we subscribe to all
+  // INSERT/DELETE events on the table and let fetchCounts() re-scope by
+  // workspace on the next query. Cheap: the table is small and the query
+  // already joins through content_items.workspace_id.
+  useEffect(() => {
+    if (!workspaceId) return;
+    const channel = supabase
+      .channel(`task_link_counts:${workspaceId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'content_item_links',
+      }, () => {
+        fetchCounts();
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [workspaceId, fetchCounts]);
+
   return { counts, loading, refresh: fetchCounts };
 }
