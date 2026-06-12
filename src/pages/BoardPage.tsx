@@ -23,7 +23,7 @@ import { AssetIndicator, LinkedTaskIndicator } from '../components/content/CardI
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useShowCompleted } from '../hooks/useShowCompleted';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
@@ -339,11 +339,6 @@ export function BoardPage() {
     setSelectedItemId(item.id);
   }, [setSelectedItemId]);
 
-  const [showOrdinal, setShowOrdinal] = useState(() => {
-    const saved = localStorage.getItem('cc-show-ordinal');
-    return saved !== null ? saved === 'true' : true;
-  });
-
   const [activeDragItem, setActiveDragItem] = useState<ContentItem | null>(null);
   const channels = useMemo(() => {
     const configured = getWorkspaceChannels(currentWorkspace?.settings);
@@ -383,15 +378,16 @@ export function BoardPage() {
 
   const filteredItems = useMemo(() => {
     let result = isLoaded ? applyFilters(contentItems, filters, linkCounts) : contentItems;
-    if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    // Ordinal posts are view-only reference (what posted / what's scheduled) and
+    // live only on the Calendar — never on the task board, where everything is a
+    // movable task. Always exclude them here.
+    result = result.filter(i => !isOrdinalItem(i));
     if (!showCompleted) {
       const colById = new Map(columns.map(c => [c.id, c]));
-      // Ordinal posts are view-only reference, not tasks — exempt from the Done
-      // filter; the Ordinal toggle (showOrdinal above) governs their visibility.
-      result = result.filter(i => isOrdinalItem(i) || !isDoneStatus(colById.get(i.status ?? '')?.name));
+      result = result.filter(i => !isDoneStatus(colById.get(i.status ?? '')?.name));
     }
     return result;
-  }, [contentItems, filters, isLoaded, linkCounts, showOrdinal, showCompleted, columns]);
+  }, [contentItems, filters, isLoaded, linkCounts, showCompleted, columns]);
 
   const itemsByColumn = useMemo(() => {
     const grouped: Record<string, ContentItem[]> = {};
@@ -524,33 +520,6 @@ export function BoardPage() {
               />
             </div>
             Done
-          </button>
-          <button
-            onClick={() => {
-              setShowOrdinal(prev => {
-                const next = !prev;
-                localStorage.setItem('cc-show-ordinal', String(next));
-                return next;
-              });
-            }}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-            style={{
-              borderColor: showOrdinal ? '#C4B5FD' : 'rgb(var(--color-slate-200))',
-              backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
-              color: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-500))',
-            }}
-            title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
-          >
-            <div
-              className="relative w-8 h-[18px] rounded-full transition-colors"
-              style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-300))' }}
-            >
-              <div
-                className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
-                style={{ left: showOrdinal ? '18px' : '2px' }}
-              />
-            </div>
-            Ordinal
           </button>
         </div>
       </div>

@@ -17,7 +17,7 @@ import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, BoardColumn, Profile } from '../lib/database.types';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, LINEAR_COLOR, GRANOLA_COLOR, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
@@ -89,10 +89,6 @@ export function ListPage() {
     return [...new Set([...configured, ...fromItems])];
   }, [currentWorkspace?.settings, rawItems]);
 
-  const [showOrdinal, setShowOrdinal] = useState(() => {
-    const saved = localStorage.getItem('cc-show-ordinal');
-    return saved !== null ? saved === 'true' : true;
-  });
   // Clean up stale localStorage key from old Granola toggle
   useEffect(() => {
     localStorage.removeItem('cc-show-granola');
@@ -103,14 +99,14 @@ export function ListPage() {
   // Apply filters to items
   const items = useMemo(() => {
     let result = isLoaded ? applyFilters(rawItems, filters, linkCounts) : rawItems;
-    if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
+    // Ordinal posts are view-only reference (what posted / what's scheduled) and
+    // live only on the Calendar — never on the task list. Always exclude them.
+    result = result.filter(i => !isOrdinalItem(i));
     if (!showCompleted) {
-      // Ordinal posts are view-only reference, not tasks — exempt from the Done
-      // filter; the Ordinal toggle (showOrdinal above) governs their visibility.
-      result = result.filter(i => isOrdinalItem(i) || !isDoneStatus(getBoardColumn(i.status, boardColumns)?.name));
+      result = result.filter(i => !isDoneStatus(getBoardColumn(i.status, boardColumns)?.name));
     }
     return result;
-  }, [rawItems, filters, isLoaded, linkCounts, showOrdinal, showCompleted, boardColumns]);
+  }, [rawItems, filters, isLoaded, linkCounts, showCompleted, boardColumns]);
 
   // Sort items
   const sortedItems = useMemo(() => {
@@ -334,33 +330,6 @@ export function ListPage() {
             />
           </div>
           Done
-        </button>
-        <button
-          onClick={() => {
-            setShowOrdinal(prev => {
-              const next = !prev;
-              localStorage.setItem('cc-show-ordinal', String(next));
-              return next;
-            });
-          }}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-          style={{
-            borderColor: showOrdinal ? '#C4B5FD' : 'rgb(var(--color-slate-200))',
-            backgroundColor: showOrdinal ? '#F5F3FF' : 'rgb(var(--color-surface-card))',
-            color: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-500))',
-          }}
-          title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
-        >
-          <div
-            className="relative w-8 h-[18px] rounded-full transition-colors"
-            style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-300))' }}
-          >
-            <div
-              className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
-              style={{ left: showOrdinal ? '18px' : '2px' }}
-            />
-          </div>
-          Ordinal
         </button>
       </div>
 
