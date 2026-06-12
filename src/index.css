@@ -76,7 +76,7 @@ body {
 }
 
 /* ── Navy Pill Scrollbar (canonical) ── */
-/* 8px wide · navy #005D97 thumb · 2px white inset border (floating pill
+/* 8px wide · navy rgb(var(--color-brand-600)) thumb · 2px white inset border (floating pill
    effect) · transparent track. background-clip: padding-box keeps the
    white inset visible instead of being covered by the thumb fill. */
 *::-webkit-scrollbar {
@@ -87,13 +87,13 @@ body {
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: #005D97;
+  background: rgb(var(--color-brand-600));
   border-radius: 999px;
   border: 2px solid white;
   background-clip: padding-box;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #003d66;
+  background: rgb(var(--color-brand-700));
   background-clip: padding-box;
 }
 *::-webkit-scrollbar-corner {
@@ -102,20 +102,20 @@ body {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #005D97 transparent;
+  scrollbar-color: rgb(var(--color-brand-600)) transparent;
 }
 
 /* Detail panel form fields */
 .field-select {
-  border-color: #94a3b8;
-  background-color: #F7F9FC;
+  border-color: rgb(var(--color-slate-400));
+  background-color: rgb(var(--color-surface-card));
 }
 .field-select:focus {
-  border-color: #005D97;
+  border-color: rgb(var(--color-brand-600));
 }
 .field-select option {
-  background-color: #F7F9FC;
-  color: #1e293b;
+  background-color: rgb(var(--color-surface-card));
+  color: rgb(var(--color-slate-800));
 }
 
 /* ── Avatar Upload Ring Sweep ── */
@@ -137,13 +137,13 @@ body {
   100% { background-position: -120% 0; }
 }
 .cc-skel {
-  background: linear-gradient(100deg, #DDE9F2 0%, #DDE9F2 38%, #FBE7F1 50%, #DDE9F2 62%, #DDE9F2 100%);
+  background: linear-gradient(100deg, #DDE9F2 0%, #DDE9F2 38%, rgb(var(--color-accent-pink)) 50%, #DDE9F2 62%, #DDE9F2 100%);
   background-size: 220% 100%;
   border-radius: 4px;
   animation: cc-skel-wave 2.4s linear infinite;
 }
 .cc-skel-strong {
-  background: linear-gradient(100deg, #C5D8E8 0%, #C5D8E8 38%, #FBE7F1 50%, #C5D8E8 62%, #C5D8E8 100%);
+  background: linear-gradient(100deg, #C5D8E8 0%, #C5D8E8 38%, rgb(var(--color-accent-pink)) 50%, #C5D8E8 62%, #C5D8E8 100%);
   background-size: 220% 100%;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -173,26 +173,26 @@ body {
 }
 .cc-board-scrollbar::-webkit-scrollbar:horizontal::-webkit-scrollbar-track,
 .cc-board-scrollbar::-webkit-scrollbar-track:horizontal {
-  background: rgba(0, 93, 151, 0.06);
+  background: rgb(var(--color-brand-600) / 0.06);
   border-radius: 999px;
 }
 .cc-board-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 93, 151, 0.45);
+  background: rgb(var(--color-brand-600) / 0.45);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 .cc-board-scrollbar::-webkit-scrollbar-thumb:horizontal {
-  background: rgba(0, 93, 151, 0.55);
+  background: rgb(var(--color-brand-600) / 0.55);
   background-clip: padding-box;
   border: 3px solid transparent;
 }
 .cc-board-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 93, 151, 0.60);
+  background: rgb(var(--color-brand-600) / 0.60);
   background-clip: padding-box;
 }
 .cc-board-scrollbar::-webkit-scrollbar-thumb:horizontal:hover {
-  background: rgba(0, 93, 151, 0.75);
+  background: rgb(var(--color-brand-600) / 0.75);
   background-clip: padding-box;
   border: 3px solid transparent;
 }
@@ -201,7 +201,7 @@ body {
 }
 .cc-board-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 93, 151, 0.55) rgba(0, 93, 151, 0.06);
+  scrollbar-color: rgb(var(--color-brand-600) / 0.55) rgb(var(--color-brand-600) / 0.06);
 }
 
 /* ── Banner Tokens (canonical) ── */
@@ -211,7 +211,7 @@ body {
 /* page-header-bar — top of every page; full-bleed, no rounding */
 .cc-banner-page-header {
   background:
-    linear-gradient(135deg, #005D9722 0%, #005D9720 30%, #0F8B8D18 50%, #0F8B8D10 70%, #D4729E0C 85%, #D4729E10 100%),
+    linear-gradient(135deg, rgb(var(--color-brand-600) / 0.133) 0%, rgb(var(--color-brand-600) / 0.125) 30%, #0F8B8D18 50%, #0F8B8D10 70%, #D4729E0C 85%, #D4729E10 100%),
     linear-gradient(to top right, #9B2D5E0A 0%, transparent 25%);
   padding: 14px 24px;
 }
@@ -219,7 +219,7 @@ body {
 /* section-header — content-width section/panel headers; rounded top corners */
 .cc-banner-section-header {
   background:
-    linear-gradient(160deg, #005D9790 0%, #005D9788 25%, #0F8B8D60 45%, #0F8B8D40 75%, #0F8B8D30 100%),
+    linear-gradient(160deg, rgb(var(--color-brand-600) / 0.565) 0%, rgb(var(--color-brand-600) / 0.533) 25%, #0F8B8D60 45%, #0F8B8D40 75%, #0F8B8D30 100%),
     linear-gradient(to top, #D4729E18 0%, #D4729E06 40%, transparent 65%);
   padding: 10px 20px;
   border-top-left-radius: 12px;
@@ -229,14 +229,14 @@ body {
 /* calendar-month-header — month/week labels on calendar surfaces; rounded-lg */
 .cc-banner-calendar-month {
   background:
-    linear-gradient(160deg, #005D9790 0%, #005D9788 25%, #0F8B8D60 45%, #0F8B8D40 75%, #0F8B8D30 100%),
+    linear-gradient(160deg, rgb(var(--color-brand-600) / 0.565) 0%, rgb(var(--color-brand-600) / 0.533) 25%, #0F8B8D60 45%, #0F8B8D40 75%, #0F8B8D30 100%),
     linear-gradient(to top, #D4729E18 0%, #D4729E06 40%, transparent 65%);
   padding: 8px 20px;
   border-radius: 8px;
 }
 
 /* ── Sonner Toast Theming ── */
-.cc-toast-success { border-left: 3px solid #92D1B2 !important; box-shadow: 0 2px 4px rgba(146,209,178,.35) !important; }
-.cc-toast-error   { border-left: 3px solid #BA2C2C !important; box-shadow: 0 2px 4px rgba(186,44,44,.25) !important; }
-.cc-toast-warning { border-left: 3px solid #FFC3B8 !important; box-shadow: 0 2px 4px rgba(255,195,184,.45) !important; }
-.cc-toast-info    { border-left: 3px solid #005D97 !important; box-shadow: 0 2px 4px rgba(0,93,151,.22) !important; }
+.cc-toast-success { border-left: 3px solid rgb(var(--color-accent-mint)) !important; box-shadow: 0 2px 4px rgba(146,209,178,.35) !important; }
+.cc-toast-error   { border-left: 3px solid rgb(var(--color-accent-crimson)) !important; box-shadow: 0 2px 4px rgba(186,44,44,.25) !important; }
+.cc-toast-warning { border-left: 3px solid rgb(var(--color-accent-coral)) !important; box-shadow: 0 2px 4px rgba(255,195,184,.45) !important; }
+.cc-toast-info    { border-left: 3px solid rgb(var(--color-brand-600)) !important; box-shadow: 0 2px 4px rgb(var(--color-brand-600) / .22) !important; }
