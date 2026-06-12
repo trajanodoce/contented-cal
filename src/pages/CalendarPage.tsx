@@ -933,7 +933,10 @@ export function CalendarPage() {
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
     if (!showCompleted) {
       const colById = new Map(boardColumns.map(c => [c.id, c]));
-      result = result.filter(i => !isDoneStatus(colById.get(i.status ?? '')?.name));
+      // Ordinal posts are view-only reference, not tasks — "Published" is their
+      // normal state, not a "done" to hide. Visibility is governed solely by the
+      // Ordinal toggle (showOrdinal above), so exempt them from the Done filter.
+      result = result.filter(i => isOrdinalItem(i) || !isDoneStatus(colById.get(i.status ?? '')?.name));
     }
     return result;
   }, [contentItems, filters, isLoaded, linkCounts, showOrdinal, showCompleted, boardColumns]);

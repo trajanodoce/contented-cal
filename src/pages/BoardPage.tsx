@@ -386,7 +386,9 @@ export function BoardPage() {
     if (!showOrdinal) result = result.filter(i => !isOrdinalItem(i));
     if (!showCompleted) {
       const colById = new Map(columns.map(c => [c.id, c]));
-      result = result.filter(i => !isDoneStatus(colById.get(i.status ?? '')?.name));
+      // Ordinal posts are view-only reference, not tasks — exempt from the Done
+      // filter; the Ordinal toggle (showOrdinal above) governs their visibility.
+      result = result.filter(i => isOrdinalItem(i) || !isDoneStatus(colById.get(i.status ?? '')?.name));
     }
     return result;
   }, [contentItems, filters, isLoaded, linkCounts, showOrdinal, showCompleted, columns]);
