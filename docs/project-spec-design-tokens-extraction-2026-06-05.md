@@ -7,6 +7,22 @@
 
 ---
 
+## ⏳ STATUS (updated 2026-06-12)
+
+**Phase 1 — Foundation: SHIPPED** (commit `efdbe69`).
+
+Two deviations from the plan below, both intentional after a fresh audit:
+
+1. **Naming — wired existing tokens instead of inventing new semantic names.** The audit found the codebase already standardized on the numeric Tailwind scale (`brand-600` = #005D97, `brand-900` = #002339, plus `surface-*` / `accent-*`) across *hundreds* of usages, and `colors.ts` `BRAND`/`SURFACE` were dead. So rather than introduce `brand-navy`/`brand-darker` (a second naming scheme), `tailwind.config.js` now resolves every existing token to `rgb(var(--color-X) / <alpha-value>)`. This made all those existing class usages white-label/dark-mode-ready with **zero call-site changes** — a bigger immediate win than the spec assumed. Added `accent-teal` (#2F8889) and `accent-berry` (#B8447A, post-dates this spec) as the two semantic colors that were inline-only.
+
+2. **Scope is ~2× the spec.** Inline hexes in `components`/`pages` are now ~1,044 (not ~521) after the feature work since 2026-06-05. The inline-hex sweep (Steps 2–4 below) is therefore split into its own follow-up commit(s) rather than folded into the foundation commit.
+
+**⚠️ Correction to the opacity mapping in Steps 2 & 5 below:** `#005D9712 → /12` is WRONG. The `12` is a hex alpha byte (0x12 = 18/255 ≈ **7%**), not 12%. The sweep must decode each 8-digit hex's alpha byte to its true decimal (e.g. `#005D9712` → `bg-brand-600/[0.07]`) to preserve exact rendering. Common bytes: `08`≈0.03, `10`≈0.06, `12`≈0.07, `18`≈0.09, `1F`≈0.12, `30`≈0.19.
+
+**Remaining:** the ~450 inline brand-hex edits (Step 2), then surface/neutral (Step 3) and state/source (Step 4) sweeps.
+
+---
+
 ## Problem
 
 There are ~521 hardcoded hex color values inline across the ContentedCal codebase (e.g., `style={{ color: '#005D97' }}`, `className="bg-[#005D9712]"`). Some are already centralized (`BRAND` and `SURFACE` in `lib/colors.ts`, `PRIORITY_STYLES` in `lib/utils.ts`, `BOARD_COLUMN_PALETTE`, source colors in `ordinal.ts`) — but most aren't.
