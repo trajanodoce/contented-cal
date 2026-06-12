@@ -286,15 +286,15 @@ export function MyWorkPage() {
           onClick={() => setShowCompleted(!showCompleted)}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
           style={{
-            borderColor: showCompleted ? '#357254' : '#e2e8f0',
-            backgroundColor: showCompleted ? '#EAF4EF' : '#F7F9FC',
-            color: showCompleted ? '#357254' : '#64748b',
+            borderColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-200))',
+            backgroundColor: showCompleted ? '#EAF4EF' : 'rgb(var(--color-surface-card))',
+            color: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-500))',
           }}
           title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
         >
           <div
             className="relative w-8 h-[18px] rounded-full transition-colors"
-            style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+            style={{ backgroundColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-300))' }}
           >
             <div
               className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -395,7 +395,7 @@ export function MyWorkPage() {
                               <TaskCategoryIcon category={item.category} />
                               {done && (
                                 <span title="Completed" className="inline-flex flex-shrink-0">
-                                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
                                 </span>
                               )}
                               <span className={`text-sm font-medium ${done ? 'text-slate-500' : 'text-slate-900'}`}>
@@ -424,9 +424,9 @@ export function MyWorkPage() {
                               <span
                                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
                                 style={{
-                                  backgroundColor: `${status.color ?? '#94a3b8'}55`,
-                                  color: pillTextColor(status.color ?? '#94a3b8'),
-                                  border: `0.5px solid ${pillTextColor(status.color ?? '#94a3b8')}`,
+                                  backgroundColor: `${status.color ?? 'rgb(var(--color-slate-400))'}55`,
+                                  color: pillTextColor(status.color ?? 'rgb(var(--color-slate-400))'),
+                                  border: `0.5px solid ${pillTextColor(status.color ?? 'rgb(var(--color-slate-400))')}`,
                                 }}
                               >
                                 {status.name}

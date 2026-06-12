@@ -31,12 +31,12 @@ import DatePicker from '../ui/DatePicker';
 
 export const TASK_CATEGORIES: Record<string, { label: string; icon: typeof Briefcase; color: string }> = {
   meetings:  { label: 'Meetings',   icon: Users,          color: '#6366f1' },
-  admin:     { label: 'Admin',      icon: Briefcase,      color: '#64748b' },
+  admin:     { label: 'Admin',      icon: Briefcase,      color: 'rgb(var(--color-slate-500))' },
   strategy:  { label: 'Strategy',   icon: Lightbulb,      color: '#f59e0b' },
   creative:  { label: 'Creative',   icon: Palette,        color: '#ec4899' },
   reviews:   { label: 'Reviews',    icon: ClipboardCheck, color: '#10b981' },
   research:  { label: 'Research',   icon: Search,         color: '#3b82f6' },
-  general:   { label: 'General',    icon: FolderOpen,     color: '#94a3b8' },
+  general:   { label: 'General',    icon: FolderOpen,     color: 'rgb(var(--color-slate-400))' },
 };
 
 // Priority colors sourced from canonical PRIORITY_STYLES (lib/utils.ts).

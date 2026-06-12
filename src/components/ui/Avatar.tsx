@@ -136,9 +136,9 @@ export function Avatar({
       <span
         role="img"
         aria-label="User avatar"
-        style={{ ...base, background: '#e2e8f0' }}
+        style={{ ...base, background: 'rgb(var(--color-slate-200))' }}
       >
-        <User size={iconPx} color="#94a3b8" strokeWidth={2} />
+        <User size={iconPx} color="rgb(var(--color-slate-400))" strokeWidth={2} />
       </span>
     );
   }
@@ -285,8 +285,8 @@ export function AvatarStack({ users, size = 'md', max = 3 }: AvatarStackProps) {
             height: px,
             borderRadius: '50%',
             border: borderStyle,
-            background: '#cbd5e1',
-            color: '#475569',
+            background: 'rgb(var(--color-slate-300))',
+            color: 'rgb(var(--color-slate-600))',
             fontSize: FONT[size],
             fontWeight: 700,
             display: 'inline-flex',

@@ -146,7 +146,7 @@ export function AvatarUploadModal({
           >
             Update photo
           </h2>
-          <p style={{ fontSize: 12, color: '#64748b', margin: '4px 0 0' }}>
+          <p style={{ fontSize: 12, color: 'rgb(var(--color-slate-500))', margin: '4px 0 0' }}>
             JPG, PNG, or GIF · 2MB max
           </p>
         </div>
@@ -161,7 +161,7 @@ export function AvatarUploadModal({
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             style={{
-              background: '#F4F8FB',
+              background: 'rgb(var(--color-surface-page))',
               border: isDragging
                 ? '1.5px dashed rgb(var(--color-brand-600))'
                 : '1.5px dashed rgb(var(--color-brand-900) / 0.188)',
@@ -185,7 +185,7 @@ export function AvatarUploadModal({
               />
             </div>
 
-            <p style={{ fontSize: 13, color: '#475569', margin: 0 }}>
+            <p style={{ fontSize: 13, color: 'rgb(var(--color-slate-600))', margin: 0 }}>
               Drop an image or
             </p>
             <button
@@ -232,7 +232,7 @@ export function AvatarUploadModal({
         <div
           className="flex justify-end"
           style={{
-            backgroundColor: '#F7F9FC',
+            backgroundColor: 'rgb(var(--color-surface-card))',
             borderTop: '1px solid rgb(var(--color-brand-900) / 0.094)',
             padding: '14px 22px',
             gap: 8,
@@ -244,8 +244,8 @@ export function AvatarUploadModal({
             disabled={uploading}
             style={{
               backgroundColor: '#fff',
-              border: '1px solid #cbd5e1',
-              color: '#475569',
+              border: '1px solid rgb(var(--color-slate-300))',
+              color: 'rgb(var(--color-slate-600))',
               fontSize: 13,
               fontWeight: 600,
               padding: '8px 16px',

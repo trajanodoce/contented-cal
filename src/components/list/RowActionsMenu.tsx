@@ -16,9 +16,9 @@ interface RowActionsMenuProps {
  * Always-visible ghosted 3-dot row actions menu (canonical Draft 5.1).
  *
  * Color ladder via parent's `group` class:
- *   default        → slate-300 (#cbd5e1)
- *   row hover      → slate-500 (#64748b) via group-hover
- *   icon hover     → slate-700 (#334155)
+ *   default        → slate-300 (rgb(var(--color-slate-300)))
+ *   row hover      → slate-500 (rgb(var(--color-slate-500))) via group-hover
+ *   icon hover     → slate-700 (rgb(var(--color-slate-700)))
  *   menu open      → slate-700 + brand-navy wash bg
  *
  * v1 actions: Open · Archive · Delete.

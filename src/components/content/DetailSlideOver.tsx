@@ -534,7 +534,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{ color: ORDINAL_TEXT, borderColor: `${ORDINAL_COLOR}60`, backgroundColor: '#F7F9FC' }}
+                    style={{ color: ORDINAL_TEXT, borderColor: `${ORDINAL_COLOR}60`, backgroundColor: 'rgb(var(--color-surface-card))' }}
                   >
                     <span>Open in Ordinal</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -546,7 +546,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-                    style={{ color: LINEAR_TEXT, borderColor: `${LINEAR_COLOR}60`, backgroundColor: '#F7F9FC' }}
+                    style={{ color: LINEAR_TEXT, borderColor: `${LINEAR_COLOR}60`, backgroundColor: 'rgb(var(--color-surface-card))' }}
                   >
                     <span>Open in Linear</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -564,7 +564,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
         {/* Header */}
         {(() => {
-          const titleColor = contentType?.color ?? '#64748b';
+          const titleColor = contentType?.color ?? 'rgb(var(--color-slate-500))';
           return (
             <div style={{ borderBottom: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               {/* Action buttons row */}
@@ -752,17 +752,17 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                                 <span
                                   className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold flex-shrink-0"
                                   style={{
-                                    color: status.color ?? '#64748B',
-                                    backgroundColor: `${status.color ?? '#64748B'}15`,
-                                    border: `1px solid ${status.color ?? '#64748B'}`,
+                                    color: status.color ?? 'rgb(var(--color-slate-500))',
+                                    backgroundColor: `${status.color ?? 'rgb(var(--color-slate-500))'}15`,
+                                    border: `1px solid ${status.color ?? 'rgb(var(--color-slate-500))'}`,
                                   }}
                                 >
                                   {status.name}
                                 </span>
                               )}
                               <span className="text-slate-300">·</span>
-                              <span className="inline-flex items-center gap-1 text-[11px] font-medium flex-shrink-0" style={{ color: PRIORITY_STYLES[priority]?.hex ?? '#64748B' }}>
-                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: PRIORITY_STYLES[priority]?.hex ?? '#64748B' }} />
+                              <span className="inline-flex items-center gap-1 text-[11px] font-medium flex-shrink-0" style={{ color: PRIORITY_STYLES[priority]?.hex ?? 'rgb(var(--color-slate-500))' }}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ background: PRIORITY_STYLES[priority]?.hex ?? 'rgb(var(--color-slate-500))' }} />
                                 {priority.charAt(0).toUpperCase() + priority.slice(1)}
                               </span>
                               {dueLabel && (
@@ -809,7 +809,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                             options={PRIORITIES.map(p => ({
                               value: p,
                               label: p.charAt(0).toUpperCase() + p.slice(1),
-                              color: PRIORITY_STYLES[p]?.hex ?? '#94a3b8',
+                              color: PRIORITY_STYLES[p]?.hex ?? 'rgb(var(--color-slate-400))',
                             }))}
                           />
                         </div>
@@ -1097,7 +1097,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {extractMentionIds(commentText).length > 0 && (
                   <div
                     className="mt-2 px-3 py-2 rounded-lg text-xs"
-                    style={{ backgroundColor: '#F7F9FC', border: '1px solid rgb(var(--color-brand-900) / 0.094)' }}
+                    style={{ backgroundColor: 'rgb(var(--color-surface-card))', border: '1px solid rgb(var(--color-brand-900) / 0.094)' }}
                   >
                     <span className="uppercase tracking-wider font-semibold text-slate-400 mr-2 text-[10px]">
                       Preview

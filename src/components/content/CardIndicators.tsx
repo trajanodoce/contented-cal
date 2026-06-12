@@ -16,7 +16,7 @@ import type { LinkInfo } from '../../hooks/useExternalLinkCounts';
  *   - Subtasks    → ListChecks · navy  rgb(var(--color-brand-600)) · {done}/{total}
  *   - Assets      → Paperclip  · navy  rgb(var(--color-brand-600)) · count + platform tooltip
  *   - Linked tasks→ Link2      · berry rgb(var(--color-accent-berry)) · count
- *   - Granola     → Mic        · green #357254 · presence only
+ *   - Granola     → Mic        · green rgb(var(--color-state-success)) · presence only
  *
  * Size scale:
  *   - 'sm' = cards / list rows (14px icon, 11px text)

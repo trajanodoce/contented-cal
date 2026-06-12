@@ -700,7 +700,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
                   ? 'bg-accent-crimson/[0.031] text-accent-crimson border border-accent-crimson/[0.188]'
                   : message.type === 'info'
                   ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                  : 'bg-[#92D1B218] text-accent-teal border border-[#92D1B240]'
+                  : 'bg-accent-mint/[0.094] text-accent-teal border border-accent-mint/[0.251]'
               }`}
             >
               {message.text}

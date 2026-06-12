@@ -214,7 +214,7 @@ export const MentionAutocomplete = forwardRef<MentionAutocompleteHandle, Props>(
           className="absolute z-50 mt-1 left-0 right-0 max-w-md bg-white rounded-lg shadow-lg overflow-hidden"
           style={{
             border: '1px solid rgb(var(--color-brand-900) / 0.125)',
-            background: 'linear-gradient(135deg, #F7F9FC 0%, #FFFFFF 100%)',
+            background: 'linear-gradient(135deg, rgb(var(--color-surface-card)) 0%, #FFFFFF 100%)',
           }}
         >
           <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-slate-400 border-b" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.063)' }}>

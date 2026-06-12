@@ -460,8 +460,8 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                   disabled={atMax}
                   className="w-full mt-2 py-2 text-sm font-medium rounded-lg transition-colors"
                   style={{
-                    border: atMax ? '1.5px dashed #cbd5e1' : '1.5px dashed rgb(var(--color-brand-600) / 0.188)',
-                    color: atMax ? '#94a3b8' : 'rgb(var(--color-brand-600))',
+                    border: atMax ? '1.5px dashed rgb(var(--color-slate-300))' : '1.5px dashed rgb(var(--color-brand-600) / 0.188)',
+                    color: atMax ? 'rgb(var(--color-slate-400))' : 'rgb(var(--color-brand-600))',
                     cursor: atMax ? 'not-allowed' : 'pointer',
                     backgroundColor: 'transparent',
                   }}
@@ -476,13 +476,13 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
             <div
               className="flex items-center justify-between px-6 py-3.5"
               style={{
-                backgroundColor: '#F7F9FC',
+                backgroundColor: 'rgb(var(--color-surface-card))',
                 borderTop: '1px solid rgb(var(--color-brand-900) / 0.094)',
               }}
             >
               <span
                 className="text-xs font-medium"
-                style={{ color: atMax ? 'rgb(var(--color-accent-crimson))' : '#64748b' }}
+                style={{ color: atMax ? 'rgb(var(--color-accent-crimson))' : 'rgb(var(--color-slate-500))' }}
               >
                 {atMax ? `${modalItems.length} / ${MAX_ITEMS} — max` : `${modalItems.length} / ${MAX_ITEMS} items`}
               </span>

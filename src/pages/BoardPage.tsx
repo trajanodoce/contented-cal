@@ -121,7 +121,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
         </span>
         {isDone && (
           <span title="Completed" className="inline-flex flex-shrink-0 mt-0.5">
-            <CheckCircle2 className="w-3 h-3" style={{ color: '#357254' }} />
+            <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-success))' }} />
           </span>
         )}
         <h4
@@ -175,7 +175,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
               className="h-full rounded-full transition-all"
               style={{
                 width: `${(subtaskCount.completed / subtaskCount.total) * 100}%`,
-                backgroundColor: subtaskCount.completed === subtaskCount.total ? '#92D1B2' : 'rgb(var(--color-brand-600))',
+                backgroundColor: subtaskCount.completed === subtaskCount.total ? 'rgb(var(--color-accent-mint))' : 'rgb(var(--color-brand-600))',
               }}
             />
           </div>
@@ -237,7 +237,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
     data: { column },
   });
 
-  const colColor = column.color ?? '#94a3b8';
+  const colColor = column.color ?? 'rgb(var(--color-slate-400))';
 
   return (
     <div
@@ -284,11 +284,11 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
           >
             <Inbox
               className="w-6 h-6 mb-2 transition-colors"
-              style={{ color: isOver ? colColor : '#cbd5e1' }}
+              style={{ color: isOver ? colColor : 'rgb(var(--color-slate-300))' }}
             />
             <p
               className="text-xs font-medium transition-colors"
-              style={{ color: isOver ? colColor : '#94a3b8' }}
+              style={{ color: isOver ? colColor : 'rgb(var(--color-slate-400))' }}
             >
               {isOver ? 'Release to drop' : 'No items yet'}
             </p>
@@ -506,15 +506,15 @@ export function BoardPage() {
             onClick={() => setShowCompleted(!showCompleted)}
             className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
             style={{
-              borderColor: showCompleted ? '#357254' : '#e2e8f0',
+              borderColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-200))',
               backgroundColor: showCompleted ? '#EAF4EF' : 'white',
-              color: showCompleted ? '#357254' : '#64748b',
+              color: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-500))',
             }}
             title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
           >
             <div
               className="relative w-8 h-[18px] rounded-full transition-colors"
-              style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+              style={{ backgroundColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-300))' }}
             >
               <div
                 className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -533,15 +533,15 @@ export function BoardPage() {
             }}
             className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
             style={{
-              borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
+              borderColor: showOrdinal ? '#C4B5FD' : 'rgb(var(--color-slate-200))',
               backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
-              color: showOrdinal ? ORDINAL_TEXT : '#64748b',
+              color: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-500))',
             }}
             title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
           >
             <div
               className="relative w-8 h-[18px] rounded-full transition-colors"
-              style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : '#CBD5E1' }}
+              style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-300))' }}
             >
               <div
                 className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"

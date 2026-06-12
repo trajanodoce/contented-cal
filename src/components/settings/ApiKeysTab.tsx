@@ -46,7 +46,7 @@ function generateRawKey(): string {
 type Scope = 'read' | 'read_write' | 'full';
 
 const SCOPE_CHIP: Record<Scope, { label: string; bg: string; color: string; border: string }> = {
-  read:       { label: 'Read only',   bg: '#94A3B820', color: '#475569', border: '#94A3B840' },
+  read:       { label: 'Read only',   bg: 'rgb(var(--color-slate-400) / 0.125)', color: 'rgb(var(--color-slate-600))', border: 'rgb(var(--color-slate-400) / 0.251)' },
   read_write: { label: 'Read+Write',  bg: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))', border: 'rgb(var(--color-brand-600) / 0.188)' },
   full:       { label: 'Full admin',  bg: 'rgb(var(--color-accent-crimson) / 0.082)', color: 'rgb(var(--color-accent-crimson))', border: 'rgb(var(--color-accent-crimson) / 0.188)' },
 };
@@ -173,7 +173,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>API Keys</h3>
-          <p className="text-sm mt-0.5" style={{ color: '#64748b' }}>
+          <p className="text-sm mt-0.5" style={{ color: 'rgb(var(--color-slate-500))' }}>
             Create keys to let external tools connect to your workspace
           </p>
         </div>
@@ -200,15 +200,15 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
       <button
         onClick={() => setShowDocs(!showDocs)}
         className="flex items-center gap-2 mb-4 text-sm font-medium transition-colors"
-        style={{ color: '#475569' }}
+        style={{ color: 'rgb(var(--color-slate-600))' }}
       >
         {showDocs ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         API Documentation
       </button>
 
       {showDocs && (
-        <div className="mb-6 rounded-xl p-5" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: '#F7F9FC' }}>
-          <div className="space-y-4 text-sm" style={{ color: '#475569' }}>
+        <div className="mb-6 rounded-xl p-5" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'rgb(var(--color-surface-card))' }}>
+          <div className="space-y-4 text-sm" style={{ color: 'rgb(var(--color-slate-600))' }}>
             <div>
               <p className="font-semibold mb-1" style={{ color: 'rgb(var(--color-brand-900))' }}>Base URL</p>
               <code className="block rounded-lg px-4 py-2 text-xs font-mono" style={{ background: 'rgb(var(--color-brand-900))', color: '#c8dde8' }}>
@@ -217,7 +217,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
             </div>
             <div>
               <p className="font-semibold mb-1" style={{ color: 'rgb(var(--color-brand-900))' }}>Authentication</p>
-              <p className="mb-2" style={{ color: '#64748b' }}>Include your API key in the Authorization header:</p>
+              <p className="mb-2" style={{ color: 'rgb(var(--color-slate-500))' }}>Include your API key in the Authorization header:</p>
               <code className="block rounded-lg px-4 py-2 text-xs font-mono" style={{ background: 'rgb(var(--color-brand-900))', color: '#c8dde8' }}>
                 Authorization: Bearer cc_sk_your_key_here
               </code>
@@ -227,14 +227,14 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="text-left" style={{ color: '#64748b' }}>
+                    <tr className="text-left" style={{ color: 'rgb(var(--color-slate-500))' }}>
                       <th className="pb-2 pr-4 font-medium">Method</th>
                       <th className="pb-2 pr-4 font-medium">Path</th>
                       <th className="pb-2 pr-4 font-medium">Scope</th>
                       <th className="pb-2 font-medium">Description</th>
                     </tr>
                   </thead>
-                  <tbody className="font-mono" style={{ color: '#475569' }}>
+                  <tbody className="font-mono" style={{ color: 'rgb(var(--color-slate-600))' }}>
                     <tr><td className="py-1 pr-4 text-green-700">GET</td><td className="pr-4">/items</td><td className="pr-4">read</td><td className="font-sans">List items (filterable)</td></tr>
                     <tr><td className="py-1 pr-4 text-green-700">GET</td><td className="pr-4">/items/:id</td><td className="pr-4">read</td><td className="font-sans">Get single item</td></tr>
                     <tr><td className="py-1 pr-4 text-blue-700">POST</td><td className="pr-4">/items</td><td className="pr-4">read_write</td><td className="font-sans">Create item</td></tr>
@@ -292,11 +292,11 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
               gridTemplateColumns: '1.5fr 1.8fr 110px 110px 130px 90px',
               gap: 12,
               padding: '10px 16px',
-              background: '#F7F9FC',
+              background: 'rgb(var(--color-surface-card))',
               borderBottom: '1px solid rgb(var(--color-brand-900) / 0.094)',
               fontSize: 10,
               fontWeight: 700,
-              color: '#64748b',
+              color: 'rgb(var(--color-slate-500))',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
             }}
@@ -327,7 +327,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 }}
               >
                 <div style={{ color: 'rgb(var(--color-brand-900))', fontWeight: 500 }}>{key.name}</div>
-                <div style={{ fontFamily: 'ui-monospace, monospace', color: '#64748b' }}>
+                <div style={{ fontFamily: 'ui-monospace, monospace', color: 'rgb(var(--color-slate-500))' }}>
                   {formatKeyPreview(key.key_prefix)}
                 </div>
                 <span
@@ -344,8 +344,8 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 >
                   {chip.label}
                 </span>
-                <div style={{ color: '#64748b' }}>{formatRelativeTime(key.created_at)}</div>
-                <div style={{ color: key.last_used_at ? '#64748b' : '#94a3b8' }}>
+                <div style={{ color: 'rgb(var(--color-slate-500))' }}>{formatRelativeTime(key.created_at)}</div>
+                <div style={{ color: key.last_used_at ? 'rgb(var(--color-slate-500))' : 'rgb(var(--color-slate-400))' }}>
                   {key.last_used_at ? formatRelativeTime(key.last_used_at) : 'Never'}
                 </div>
                 <button
@@ -401,7 +401,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
               <button
                 onClick={() => setShowCreate(false)}
                 aria-label="Close"
-                style={{ padding: 4, background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+                style={{ padding: 4, background: 'transparent', border: 'none', cursor: 'pointer', color: 'rgb(var(--color-slate-400))' }}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -413,7 +413,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#64748b',
+                  color: 'rgb(var(--color-slate-500))',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                   marginBottom: 6,
@@ -431,14 +431,14 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                   width: '100%',
                   padding: '11px 13px',
                   fontSize: 13,
-                  color: '#334155',
+                  color: 'rgb(var(--color-slate-700))',
                   background: 'white',
-                  border: '1px solid #cbd5e1',
+                  border: '1px solid rgb(var(--color-slate-300))',
                   borderRadius: 8,
                   outline: 'none',
                 }}
               />
-              <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: 'rgb(var(--color-slate-400))', marginTop: 4 }}>
                 A human-readable label. Doesn't affect permissions.
               </div>
             </div>
@@ -449,7 +449,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#64748b',
+                  color: 'rgb(var(--color-slate-500))',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                   marginBottom: 8,
@@ -461,7 +461,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 <ScopeRadioCard
                   selected={newScope === 'read'}
                   onSelect={() => setNewScope('read')}
-                  icon={<Eye size={13} strokeWidth={2} color="#64748b" />}
+                  icon={<Eye size={13} strokeWidth={2} color="rgb(var(--color-slate-500))" />}
                   label="Read"
                   description="List items, fetch single items, list types and statuses. No writes."
                 />
@@ -490,9 +490,9 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                   padding: '8px 16px',
                   fontSize: 13,
                   fontWeight: 600,
-                  color: '#475569',
+                  color: 'rgb(var(--color-slate-600))',
                   background: 'white',
-                  border: '1px solid #cbd5e1',
+                  border: '1px solid rgb(var(--color-slate-300))',
                   borderRadius: 8,
                   cursor: 'pointer',
                 }}
@@ -544,14 +544,14 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                   width: 36,
                   height: 36,
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #92D1B228 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
+                  background: 'linear-gradient(135deg, rgb(var(--color-accent-mint) / 0.157) 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <Check size={18} strokeWidth={2.5} color="#357254" />
+                <Check size={18} strokeWidth={2.5} color="rgb(var(--color-state-success))" />
               </div>
               <div style={{ flex: 1 }}>
                 <div
@@ -565,7 +565,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 >
                   Key created
                 </div>
-                <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>
+                <div style={{ fontSize: 12, color: 'rgb(var(--color-slate-500))', lineHeight: 1.5 }}>
                   Copy this key and store it somewhere safe.{' '}
                   <strong style={{ color: 'rgb(var(--color-accent-crimson))' }}>It won't be shown again.</strong>
                 </div>
@@ -673,7 +673,7 @@ function ScopeRadioCard({ selected, onSelect, icon, label, description, sensitiv
         gap: 10,
         padding: '12px 14px',
         background: selected ? 'rgb(var(--color-brand-600) / 0.031)' : 'white',
-        border: selected ? '1.5px solid rgb(var(--color-brand-600))' : '1px solid #cbd5e1',
+        border: selected ? '1.5px solid rgb(var(--color-brand-600))' : '1px solid rgb(var(--color-slate-300))',
         borderRadius: 10,
         cursor: 'pointer',
       }}
@@ -685,7 +685,7 @@ function ScopeRadioCard({ selected, onSelect, icon, label, description, sensitiv
           justifyContent: 'center',
           width: 14,
           height: 14,
-          border: `1.5px solid ${selected ? 'rgb(var(--color-brand-600))' : '#cbd5e1'}`,
+          border: `1.5px solid ${selected ? 'rgb(var(--color-brand-600))' : 'rgb(var(--color-slate-300))'}`,
           borderRadius: '50%',
           flexShrink: 0,
           marginTop: 2,
@@ -724,7 +724,7 @@ function ScopeRadioCard({ selected, onSelect, icon, label, description, sensitiv
             </span>
           )}
         </div>
-        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.4 }}>{description}</div>
+        <div style={{ fontSize: 11, color: 'rgb(var(--color-slate-500))', lineHeight: 1.4 }}>{description}</div>
       </div>
     </label>
   );

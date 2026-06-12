@@ -72,8 +72,8 @@ interface ProjectMiniStats {
 }
 
 function projectHealthColor(project: Project, ps?: ProjectMiniStats): string {
-  if (project.status === 'completed') return '#357254'; // green
-  if (project.status === 'archived') return '#64748B'; // slate
+  if (project.status === 'completed') return 'rgb(var(--color-state-success))'; // green
+  if (project.status === 'archived') return 'rgb(var(--color-slate-500))'; // slate
 
   // Active: derive timeline health from end_date + completion ratio
   if (!project.end_date) return 'rgb(var(--color-brand-600))'; // navy default — no due date
@@ -84,7 +84,7 @@ function projectHealthColor(project: Project, ps?: ProjectMiniStats): string {
   const completion = ps && ps.total > 0 ? ps.completed / ps.total : 0;
   if (daysToEnd < 0) return 'rgb(var(--color-accent-crimson))'; // overdue
   if (daysToEnd <= 7 && completion < 0.8) return '#C4504A'; // due soon, under-done
-  return '#357254'; // on track
+  return 'rgb(var(--color-state-success))'; // on track
 }
 
 // "Due This Week" badge — graduated color treatment by how close the
@@ -127,8 +127,8 @@ function projectDueMeta(due: string | null): { label: string; color: string } | 
   }
   if (days === 0) return { label: 'Due today', color: '#C4504A' };
   if (days <= 3) return { label: `Due in ${days}d`, color: '#D98A6B' };
-  if (days <= 7) return { label: `Due in ${days}d`, color: '#64748B' };
-  return { label: `Due ${formatDate(due)}`, color: '#64748B' };
+  if (days <= 7) return { label: `Due in ${days}d`, color: 'rgb(var(--color-slate-500))' };
+  return { label: `Due ${formatDate(due)}`, color: 'rgb(var(--color-slate-500))' };
 }
 
 function humanizeActivityAction(action: string): string {
@@ -329,7 +329,7 @@ export function HomePage() {
 
             {highPriorityItems.length === 0 ? (
               <div className="px-5 py-10 text-center text-slate-400">
-                <CheckCircle2 className="w-10 h-10 mx-auto mb-2 text-[#92D1B2]" />
+                <CheckCircle2 className="w-10 h-10 mx-auto mb-2 text-accent-mint" />
                 <p className="font-medium text-slate-600">All clear!</p>
                 <p className="text-sm">No urgent or high-priority items right now.</p>
               </div>
@@ -523,7 +523,7 @@ export function HomePage() {
                           className="h-full rounded-full transition-all duration-500"
                           style={{
                             width: `${pct}%`,
-                            backgroundColor: s.color || '#64748B',
+                            backgroundColor: s.color || 'rgb(var(--color-slate-500))',
                           }}
                         />
                       </div>

@@ -90,7 +90,7 @@ function PlatformIcon({ meta, size = 'md' }: { meta: PlatformMeta; size?: 'sm' |
 function StatusBadge({ status }: { status: string | null }) {
   if (!status) return null;
   const map: Record<string, { icon: typeof CheckCircle2; label: string; cls: string }> = {
-    connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-accent-teal bg-[#92D1B218] border-[#92D1B240]' },
+    connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-accent-teal bg-accent-mint/[0.094] border-accent-mint/[0.251]' },
     error: { icon: AlertCircle, label: 'Error', cls: 'text-accent-crimson bg-accent-crimson/[0.031] border-accent-crimson/[0.188]' },
     disconnected: { icon: Clock, label: 'Disconnected', cls: 'text-slate-600 bg-surface-nested border-slate-200' },
   };
@@ -734,7 +734,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       id: 'linear',
       name: 'Linear',
       description: 'Sync your assigned Linear issues into ContentedCal. Each person connects their own Linear key.',
-      iconBg: '#FFC3B840',
+      iconBg: 'rgb(var(--color-accent-coral) / 0.251)',
       iconText: 'L',
       iconColor: '#A05042',
       tag: 'Engineering',
@@ -758,9 +758,9 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
       id: 'granola',
       name: 'Granola',
       description: 'Link your meeting notes to content items. Each person connects their own Granola account — your notes stay private to you.',
-      iconBg: '#92D1B240',
+      iconBg: 'rgb(var(--color-accent-mint) / 0.251)',
       iconText: '🎙️',
-      iconColor: '#357254',
+      iconColor: 'rgb(var(--color-state-success))',
       tag: 'Meetings',
       placeholder: 'gra_...',
       docsUrl: 'https://granola.ai/settings',
@@ -796,7 +796,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       <h3 className="text-sm font-semibold text-slate-900">{platform.name}</h3>
                       <span className="text-xs text-slate-400 bg-brand-600/[0.071] px-2 py-0.5 rounded-full">{platform.tag}</span>
                       {isConnected && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-accent-teal bg-[#92D1B218] border-[#92D1B240]">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-accent-teal bg-accent-mint/[0.094] border-accent-mint/[0.251]">
                           <CheckCircle2 className="w-3 h-3" />
                           Connected
                         </span>
@@ -911,7 +911,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       )}
                       {platform.id === 'granola' && (
                         <>
-                          <span className="text-[#357254] font-medium">● Connected</span>
+                          <span className="text-state-success font-medium">● Connected</span>
                           {integration?.connected_at && <span>Connected {new Date(integration.connected_at).toLocaleDateString()}</span>}
                           <span>Meeting notes linking enabled</span>
                         </>

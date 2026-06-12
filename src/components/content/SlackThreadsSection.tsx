@@ -50,7 +50,7 @@ interface SlackThreadLink {
 // Author colors for transcript rows. Slack-red for the requester; navy for the
 // CC user (if we can spot them). Otherwise slate. We can't reliably map Slack
 // user IDs to roles client-side — best effort using the requester_id we have.
-const TRANSCRIPT_AUTHOR_COLOR_DEFAULT = '#334155';
+const TRANSCRIPT_AUTHOR_COLOR_DEFAULT = 'rgb(var(--color-slate-700))';
 const TRANSCRIPT_AUTHOR_COLOR_REQUESTER = SLACK_COLOR;
 
 /**
@@ -160,7 +160,7 @@ export function SlackThreadsSection({ contentItemId, refreshKey, onUnlink }: Pro
               key={link.id}
               className="bg-surface-card rounded-xl"
               style={{
-                border: isExpanded ? '1.5px solid #cbd5e1' : '1px solid #cbd5e1',
+                border: isExpanded ? '1.5px solid rgb(var(--color-slate-300))' : '1px solid rgb(var(--color-slate-300))',
                 padding: isExpanded ? '14px 16px' : '12px 14px',
                 transition: 'border 150ms ease',
               }}
@@ -346,7 +346,7 @@ function SectionHeader({ count }: { count: number }) {
         style={{
           fontFamily: 'Faune-Text_Bold, sans-serif',
           fontSize: 11,
-          color: '#64748b',
+          color: 'rgb(var(--color-slate-500))',
           letterSpacing: '0.06em',
         }}
       >
@@ -425,7 +425,7 @@ function TranscriptPreview({ link, replyCount }: { link: SlackThreadLink; replyC
       <div
         className="rounded-lg"
         style={{
-          backgroundColor: '#F4F8FB',
+          backgroundColor: 'rgb(var(--color-surface-page))',
           padding: 12,
           fontFamily: 'ui-monospace, monospace',
           fontSize: 11,
@@ -439,9 +439,9 @@ function TranscriptPreview({ link, replyCount }: { link: SlackThreadLink; replyC
           const color = isParent ? SLACK_COLOR : colorFor(msg);
           return (
             <div key={`${msg.ts ?? idx}`} className={idx > 0 ? 'mt-2' : undefined}>
-              {time && <span style={{ color: '#94a3b8' }}>[{time}] </span>}
+              {time && <span style={{ color: 'rgb(var(--color-slate-400))' }}>[{time}] </span>}
               <strong style={{ color }}>{author}:</strong>{' '}
-              <span style={{ color: '#334155' }}>{msg.text}</span>
+              <span style={{ color: 'rgb(var(--color-slate-700))' }}>{msg.text}</span>
             </div>
           );
         })}
@@ -478,8 +478,8 @@ function Chip({
       className="inline-flex items-center gap-1 text-[10px] font-semibold rounded-full"
       style={{
         padding: '2px 7px',
-        backgroundColor: isSlack ? `${color}15` : '#F4F8FB',
-        color: isSlack ? color : '#64748b',
+        backgroundColor: isSlack ? `${color}15` : 'rgb(var(--color-surface-page))',
+        color: isSlack ? color : 'rgb(var(--color-slate-500))',
         border: isSlack ? `1px solid ${color}30` : '1px solid rgb(var(--color-brand-900) / 0.094)',
       }}
     >

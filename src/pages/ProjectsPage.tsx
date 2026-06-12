@@ -38,7 +38,7 @@ interface ContentItemStub {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-[#92D1B218] text-accent-teal',
+  active: 'bg-accent-mint/[0.094] text-accent-teal',
   completed: 'bg-brand-100 text-brand-700',
   archived: 'bg-brand-600/[0.071] text-slate-500',
 };
@@ -446,7 +446,7 @@ export function ProjectsPage() {
                             className="h-full transition-all"
                             style={{
                               width: `${widthPct}%`,
-                              backgroundColor: col.color ?? '#94A3B8',
+                              backgroundColor: col.color ?? 'rgb(var(--color-slate-400))',
                             }}
                             title={`${col.name}: ${count}`}
                           />
@@ -464,7 +464,7 @@ export function ProjectsPage() {
                           <div key={col.id} className="flex items-center gap-1 text-[10px]">
                             <span
                               className="w-1.5 h-1.5 rounded-full shrink-0"
-                              style={{ backgroundColor: col.color ?? '#94A3B8' }}
+                              style={{ backgroundColor: col.color ?? 'rgb(var(--color-slate-400))' }}
                             />
                             <span className="text-slate-500">{col.name}</span>
                             <span className="font-medium text-slate-700">{count}</span>

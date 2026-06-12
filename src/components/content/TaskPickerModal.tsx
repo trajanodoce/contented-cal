@@ -114,8 +114,8 @@ export function TaskPickerModal({
                       ? { background: BERRY }
                       : c === 'content'
                         ? { background: 'rgb(var(--color-brand-600))' }
-                        : { background: '#0F172A' }
-                    : { background: '#f1f5f9' }
+                        : { background: 'rgb(var(--color-slate-900))' }
+                    : { background: 'rgb(var(--color-slate-100))' }
                 }
               >
                 {c === 'all' ? 'All' : c}
@@ -191,8 +191,8 @@ export function TaskPickerModal({
                       <span
                         className="text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
                         style={{
-                          color: statusCol.color ?? '#64748b',
-                          background: statusCol.color ? `${statusCol.color}1F` : '#f1f5f9',
+                          color: statusCol.color ?? 'rgb(var(--color-slate-500))',
+                          background: statusCol.color ? `${statusCol.color}1F` : 'rgb(var(--color-slate-100))',
                         }}
                       >
                         {statusCol.name}

@@ -104,8 +104,8 @@ export function ArchivePage() {
     <div className="p-6 max-w-5xl mx-auto space-y-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#64748B12' }}>
-          <ArchiveIcon className="w-5 h-5" style={{ color: '#64748B' }} />
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgb(var(--color-slate-500) / 0.071)' }}>
+          <ArchiveIcon className="w-5 h-5" style={{ color: 'rgb(var(--color-slate-500))' }} />
         </div>
         <div>
           <h1 className="text-3xl font-display text-slate-900 leading-none">Archive</h1>
@@ -158,7 +158,7 @@ export function ArchivePage() {
                       )}
                       {ct && status && <span className="text-slate-300">·</span>}
                       {status && (() => {
-                        const base = status.color ?? '#94a3b8';
+                        const base = status.color ?? 'rgb(var(--color-slate-400))';
                         const dark = pillTextColor(base);
                         return (
                           <span
@@ -187,7 +187,7 @@ export function ArchivePage() {
                     disabled={isRestoring}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors disabled:opacity-50"
                     style={{
-                      backgroundColor: '#357254',
+                      backgroundColor: 'rgb(var(--color-state-success))',
                       color: 'white',
                     }}
                   >

@@ -100,7 +100,7 @@ export default function SettingsTabs({
               lineHeight: 1,
 
               /* Color + underline */
-              color: isActive ? 'rgb(var(--color-brand-600))' : '#475569',
+              color: isActive ? 'rgb(var(--color-brand-600))' : 'rgb(var(--color-slate-600))',
               background: 'transparent',
               borderBottom: isActive ? '2px solid rgb(var(--color-brand-600))' : '2px solid transparent',
 
@@ -109,13 +109,13 @@ export default function SettingsTabs({
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.color = '#334155';
+                e.currentTarget.style.color = 'rgb(var(--color-slate-700))';
                 e.currentTarget.style.background = 'rgb(var(--color-brand-600) / 0.031)';
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
-                e.currentTarget.style.color = '#475569';
+                e.currentTarget.style.color = 'rgb(var(--color-slate-600))';
                 e.currentTarget.style.background = 'transparent';
               }
             }}

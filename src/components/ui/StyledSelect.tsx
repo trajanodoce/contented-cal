@@ -122,7 +122,7 @@ export function StyledSelect({
         </div>
         <ChevronDown
           className={`w-3.5 h-3.5 shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          style={isPillMode && pillColor ? { color: pillColor, opacity: 0.7 } : { color: '#94a3b8' }}
+          style={isPillMode && pillColor ? { color: pillColor, opacity: 0.7 } : { color: 'rgb(var(--color-slate-400))' }}
         />
       </button>
 

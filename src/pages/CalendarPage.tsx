@@ -153,7 +153,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
   const isDone = isDoneStatus(statusCol?.name);
   const isOverdue = dateField && isPast(parseLocalDate(dateField)) && !isToday(parseLocalDate(dateField)) && !isDone;
 
-  const borderColor = isOverdue ? '#ef4444' : contentType?.color || '#e2e8f0';
+  const borderColor = isOverdue ? '#ef4444' : contentType?.color || 'rgb(var(--color-slate-200))';
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
 
@@ -192,7 +192,7 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {!isLinear && <TaskCategoryIcon category={item.category} />}
       {isDone && (
         <span title="Completed" className="inline-flex flex-shrink-0">
-          <CheckCircle2 className="w-3 h-3" style={{ color: '#357254' }} />
+          <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-success))' }} />
         </span>
       )}
       <span className={`truncate flex-1 font-medium ${isDone ? 'text-slate-500' : 'text-slate-700'}`}>{item.title}</span>
@@ -343,7 +343,7 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-[11px] ${isTodayDate ? 'font-bold text-brand-600' : 'font-semibold text-[#334155]'}`}
+                  className={`text-[11px] ${isTodayDate ? 'font-bold text-brand-600' : 'font-semibold text-slate-700'}`}
                 >
                   {format(day, 'd')}
                 </span>
@@ -425,7 +425,7 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
   return (
     <div className="space-y-0">
       {months.map((monthDate, idx) => (
-        <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid rgb(var(--color-brand-900))', marginTop: idx > 0 ? '16px' : 0 }}>
+        <div key={monthDate.toISOString()} className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1.5px solid rgb(var(--color-brand-900))', marginTop: idx > 0 ? '16px' : 0 }}>
           {/* Month header bar — canonical calendar-month-header token */}
           <div className="cc-banner-calendar-month border-b border-brand-900" style={{ borderRadius: 0 }}>
             <h3 className="text-sm font-heading tracking-wide" style={{ color: 'rgb(var(--color-brand-900))' }}>
@@ -511,7 +511,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
   const gridCols = weekendsCollapsed ? GRID_COLS_COLLAPSED : GRID_COLS_EXPANDED;
 
   return (
-    <div className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid rgb(var(--color-brand-900))' }}>
+    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1.5px solid rgb(var(--color-brand-900))' }}>
       {/* Week header — canonical calendar-month-header token (applied via grid bg) */}
       <div
         className="cc-banner-calendar-month grid"
@@ -564,7 +564,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                   const isDone = statusName === 'published' || statusName === 'completed';
                   const itemDate = dateMode === 'due' ? item.due_date : item.publish_date;
                   const isOverdue = itemDate && isPast(parseLocalDate(itemDate)) && !isToday(parseLocalDate(itemDate)) && !isDone;
-                  const ctColor = contentTypes.find(ct => ct.id === item.content_type_id)?.color || '#e2e8f0';
+                  const ctColor = contentTypes.find(ct => ct.id === item.content_type_id)?.color || 'rgb(var(--color-slate-200))';
                   const borderColor = isOverdue ? '#ef4444' : ctColor;
 
                   return (
@@ -575,7 +575,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                       onItemClick(item);
                     }}
                     className="bg-surface-card rounded p-2 hover:shadow-sm transition-shadow cursor-pointer"
-                    style={{ border: '1px solid #e2e8f0', borderLeftColor: borderColor, borderLeftWidth: '2px' }}
+                    style={{ border: '1px solid rgb(var(--color-slate-200))', borderLeftColor: borderColor, borderLeftWidth: '2px' }}
                   >
                     <div className="flex items-start gap-2">
                       <span
@@ -813,7 +813,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
             <TaskCategoryIcon category={item.category} />
             {isDone && (
               <span title="Completed" className="inline-flex flex-shrink-0">
-                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
               </span>
             )}
             <h4 className={`font-medium truncate ${isDone ? 'text-slate-500' : 'text-slate-900'}`}>{item.title}</h4>
@@ -1101,15 +1101,15 @@ export function CalendarPage() {
               onClick={() => setShowCompleted(!showCompleted)}
               className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
               style={{
-                borderColor: showCompleted ? '#357254' : '#e2e8f0',
+                borderColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-200))',
                 backgroundColor: showCompleted ? '#EAF4EF' : 'white',
-                color: showCompleted ? '#357254' : '#64748b',
+                color: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-500))',
               }}
               title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
             >
               <div
                 className="relative w-8 h-[18px] rounded-full transition-colors"
-                style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+                style={{ backgroundColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-300))' }}
               >
                 <div
                   className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -1129,15 +1129,15 @@ export function CalendarPage() {
               }}
               className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
               style={{
-                borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
+                borderColor: showOrdinal ? '#C4B5FD' : 'rgb(var(--color-slate-200))',
                 backgroundColor: showOrdinal ? '#F5F3FF' : 'white',
-                color: showOrdinal ? ORDINAL_TEXT : '#64748b',
+                color: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-500))',
               }}
               title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
             >
               <div
                 className="relative w-8 h-[18px] rounded-full transition-colors"
-                style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : '#CBD5E1' }}
+                style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-300))' }}
               >
                 <div
                   className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"

@@ -44,7 +44,7 @@ export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
         className="shrink-0 py-[18px] px-3"
         style={{
           width: 220,
-          backgroundColor: '#F7F9FC',
+          backgroundColor: 'rgb(var(--color-surface-card))',
           borderRight: '1px solid rgb(var(--color-brand-900) / 0.094)',
         }}
       >
@@ -53,7 +53,7 @@ export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
           style={{
             fontSize: 10,
             fontWeight: 700,
-            color: '#64748b',
+            color: 'rgb(var(--color-slate-500))',
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
           }}
@@ -76,7 +76,7 @@ export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
                 borderRadius: 6,
                 fontSize: 13,
                 fontWeight: 600,
-                color: isActive ? 'rgb(var(--color-brand-600))' : '#334155',
+                color: isActive ? 'rgb(var(--color-brand-600))' : 'rgb(var(--color-slate-700))',
                 backgroundColor: isActive ? 'rgb(var(--color-brand-600) / 0.063)' : 'transparent',
               }}
               onMouseEnter={e => {

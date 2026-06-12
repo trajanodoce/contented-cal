@@ -41,15 +41,15 @@ type IconStyle = {
 };
 
 const ICON_STYLES: Record<ActivityType, IconStyle> = {
-  status:     { background: '#92D1B220', color: '#357254', Icon: Check },
+  status:     { background: 'rgb(var(--color-accent-mint) / 0.125)', color: 'rgb(var(--color-state-success))', Icon: Check },
   assignment: { background: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))', Icon: Users },
-  comment:    { background: '#FFC3B830', color: '#A05042', Icon: MessageCircle },
+  comment:    { background: 'rgb(var(--color-accent-coral) / 0.188)', color: '#A05042', Icon: MessageCircle },
   subtask:    { background: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))', Icon: Plus },
-  move:       { background: '#94A3B820', color: '#64748b', Icon: ChevronRight },
+  move:       { background: 'rgb(var(--color-slate-400) / 0.125)', color: 'rgb(var(--color-slate-500))', Icon: ChevronRight },
   delete:     { background: 'rgb(var(--color-accent-crimson) / 0.082)', color: 'rgb(var(--color-accent-crimson))', Icon: Trash2 },
   create:     {
-    background: 'linear-gradient(135deg, #92D1B228 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
-    color: '#357254',
+    background: 'linear-gradient(135deg, rgb(var(--color-accent-mint) / 0.157) 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
+    color: 'rgb(var(--color-state-success))',
     Icon: Sun,
   },
 };
@@ -111,7 +111,7 @@ export function ActivityLogRow({ type, actor, timestamp, action, metadata, child
         <div style={{ fontSize: 13, lineHeight: 1.45, color: 'rgb(var(--color-brand-900))' }}>
           <Actor name={actor.name} /> {content}
         </div>
-        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+        <div style={{ fontSize: 11, color: 'rgb(var(--color-slate-400))', marginTop: 2 }}>
           {formatRelativeTime(timestamp)}
         </div>
       </div>
@@ -124,14 +124,14 @@ function RenderedParts({ parts }: { parts: ActionPart[] }) {
     <>
       {parts.map((part, i) => {
         if (part.kind === 'text') {
-          return <span key={i} style={{ color: '#475569' }}>{part.value}</span>;
+          return <span key={i} style={{ color: 'rgb(var(--color-slate-600))' }}>{part.value}</span>;
         }
         if (part.kind === 'quote') {
           return (
             <span
               key={i}
               style={{
-                color: '#334155',
+                color: 'rgb(var(--color-slate-700))',
                 fontStyle: part.italic ? 'italic' : 'normal',
                 fontWeight: part.italic ? 400 : 500,
               }}

@@ -26,20 +26,20 @@ export interface EmptyStateProps {
 
 const stateStyles = {
   success: {
-    color: '#357254',
-    bg: 'linear-gradient(135deg, #92D1B228 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
+    color: 'rgb(var(--color-state-success))',
+    bg: 'linear-gradient(135deg, rgb(var(--color-accent-mint) / 0.157) 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
   },
   info: {
     color: 'rgb(var(--color-brand-600))',
     bg: 'rgb(var(--color-brand-600) / 0.071)',
   },
   neutral: {
-    color: '#64748b',
-    bg: '#94A3B820',
+    color: 'rgb(var(--color-slate-500))',
+    bg: 'rgb(var(--color-slate-400) / 0.125)',
   },
   waiting: {
     color: '#A05042',
-    bg: '#FFC3B820',
+    bg: 'rgb(var(--color-accent-coral) / 0.125)',
   },
 } as const;
 
@@ -64,7 +64,7 @@ export function EmptyState({
     // Level 3: plain icon, no container
     if (level === 3) {
       return (
-        <div style={{ color: '#cbd5e1' }} className="flex justify-center mb-2">
+        <div style={{ color: 'rgb(var(--color-slate-300))' }} className="flex justify-center mb-2">
           {icon}
         </div>
       );
@@ -120,7 +120,7 @@ export function EmptyState({
           borderRadius: 12,
           padding: 32,
           textAlign: 'center' as const,
-          backgroundColor: '#F7F9FC',
+          backgroundColor: 'rgb(var(--color-surface-card))',
         }
       : level === 2
         ? {
@@ -128,7 +128,7 @@ export function EmptyState({
             borderRadius: 10,
             padding: '22px 28px',
             textAlign: 'center' as const,
-            backgroundColor: '#F7F9FC',
+            backgroundColor: 'rgb(var(--color-surface-card))',
           }
         : {
             padding: '16px 22px',
@@ -147,12 +147,12 @@ export function EmptyState({
           margin: 0,
         }
       : level === 2
-        ? { fontSize: 13, fontWeight: 600, color: '#334155', margin: 0 }
-        : { fontSize: 12, color: '#94a3b8', margin: 0 };
+        ? { fontSize: 13, fontWeight: 600, color: 'rgb(var(--color-slate-700))', margin: 0 }
+        : { fontSize: 12, color: 'rgb(var(--color-slate-400))', margin: 0 };
 
   const descriptionStyle: React.CSSProperties = {
     fontSize: level === 2 ? 11 : 12,
-    color: '#94a3b8',
+    color: 'rgb(var(--color-slate-400))',
     lineHeight: 1.5,
     marginTop: 4,
   };

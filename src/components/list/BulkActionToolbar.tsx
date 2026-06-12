@@ -311,7 +311,7 @@ export function BulkActionToolbar({
     padding: '7px 11px',
     fontSize: 12,
     fontWeight: 600,
-    color: '#334155',
+    color: 'rgb(var(--color-slate-700))',
     display: 'inline-flex',
     alignItems: 'center',
     gap: 5,
@@ -323,7 +323,7 @@ export function BulkActionToolbar({
 
   const deleteBtnStyle: React.CSSProperties = { ...actionBtnBase, color: 'rgb(var(--color-accent-crimson))' };
 
-  const clearBtnStyle: React.CSSProperties = { ...actionBtnBase, color: '#64748b' };
+  const clearBtnStyle: React.CSSProperties = { ...actionBtnBase, color: 'rgb(var(--color-slate-500))' };
 
   function ActionButton({
     icon,

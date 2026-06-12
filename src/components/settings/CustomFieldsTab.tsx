@@ -36,7 +36,7 @@ const fieldTypeLabels: Record<string, string> = Object.fromEntries(
 const SCOPE_META: Record<'content' | 'design' | 'both', { label: string; color: string }> = {
   content: { label: 'Content', color: 'rgb(var(--color-brand-600))' },
   design: { label: 'Design', color: 'rgb(var(--color-accent-berry))' },
-  both: { label: 'Both', color: '#64748B' },
+  both: { label: 'Both', color: 'rgb(var(--color-slate-500))' },
 };
 
 const SCOPE_OPTIONS = [
@@ -83,7 +83,7 @@ export function CustomFieldsTab({ workspaceId }: Props) {
     contentTypes.find(ct => ct.id === id)?.name || 'Unknown';
 
   const getContentTypeColor = (id: string) =>
-    contentTypes.find(ct => ct.id === id)?.color || '#94a3b8';
+    contentTypes.find(ct => ct.id === id)?.color || 'rgb(var(--color-slate-400))';
 
   const handleDeleteConfirmed = async () => {
     if (!deleteTarget) return;

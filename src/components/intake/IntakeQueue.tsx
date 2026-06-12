@@ -772,7 +772,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700',
-    converted: 'bg-[#92D1B218] text-accent-teal',
+    converted: 'bg-accent-mint/[0.094] text-accent-teal',
     rejected: 'bg-accent-crimson/[0.071] text-accent-crimson',
   };
   return (
@@ -851,7 +851,7 @@ function SubmissionDetail({
           </div>
         )}
         {sub.status === 'converted' && (
-          <div className="px-6 py-4 bg-[#92D1B218] border-t border-[#92D1B230] flex items-center gap-2 text-sm text-accent-teal">
+          <div className="px-6 py-4 bg-accent-mint/[0.094] border-t border-accent-mint/[0.188] flex items-center gap-2 text-sm text-accent-teal">
             <Check className="w-4 h-4" />
             Converted to a content item
           </div>

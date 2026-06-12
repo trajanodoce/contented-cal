@@ -283,7 +283,7 @@ export function ProjectDetailPage() {
   // Status badge colors
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      active: 'bg-[#92D1B218] text-accent-teal',
+      active: 'bg-accent-mint/[0.094] text-accent-teal',
       completed: 'bg-brand-100 text-brand-700',
       archived: 'bg-brand-600/[0.071] text-slate-500',
     };
@@ -302,7 +302,7 @@ export function ProjectDetailPage() {
     const daysToEnd = Math.ceil((endDate.getTime() - today.getTime()) / 86400000);
     if (daysToEnd < 0) return 'rgb(var(--color-accent-crimson))'; // overdue
     if (daysToEnd <= 7 && completion < 0.8) return '#A05042'; // approaching due, under-done
-    return '#357254'; // on track
+    return 'rgb(var(--color-state-success))'; // on track
   }, [project?.status, project?.end_date, items.length, completedCount]);
 
   if (loading) {
@@ -401,7 +401,7 @@ export function ProjectDetailPage() {
                   ? 'Overdue'
                   : timelineHealthColor === '#A05042'
                     ? 'Approaching due — under 80% complete'
-                    : timelineHealthColor === '#357254'
+                    : timelineHealthColor === 'rgb(var(--color-state-success))'
                       ? 'On track'
                       : undefined
               }
@@ -1089,15 +1089,15 @@ function ListTab({
           onClick={() => setShowCompleted(!showCompleted)}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
           style={{
-            borderColor: showCompleted ? '#357254' : '#e2e8f0',
-            backgroundColor: showCompleted ? '#EAF4EF' : '#F7F9FC',
-            color: showCompleted ? '#357254' : '#64748b',
+            borderColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-200))',
+            backgroundColor: showCompleted ? '#EAF4EF' : 'rgb(var(--color-surface-card))',
+            color: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-500))',
           }}
           title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
         >
           <div
             className="relative w-8 h-[18px] rounded-full transition-colors"
-            style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+            style={{ backgroundColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-300))' }}
           >
             <div
               className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -1122,7 +1122,7 @@ function ListTab({
           <table className="w-full">
             <thead
               className="sticky top-0 z-10"
-              style={{ background: '#F7F9FC', borderBottom: '1.5px solid rgb(var(--color-brand-900) / 0.502)' }}
+              style={{ background: 'rgb(var(--color-surface-card))', borderBottom: '1.5px solid rgb(var(--color-brand-900) / 0.502)' }}
             >
               <tr>
                 <th className="px-4 py-3 w-12">
@@ -1223,7 +1223,7 @@ function ListTab({
                         <TaskCategoryIcon category={item.category} />
                         {isDone && (
                           <span title="Completed" className="inline-flex flex-shrink-0">
-                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
                           </span>
                         )}
                         {isUrgentRow && (
@@ -1262,9 +1262,9 @@ function ListTab({
                         <span
                           className="text-xs font-semibold px-2 py-0.5 rounded-full"
                           style={{
-                            backgroundColor: `${col.color ?? '#94a3b8'}55`,
-                            color: pillTextColor(col.color ?? '#94a3b8'),
-                            border: `0.5px solid ${pillTextColor(col.color ?? '#94a3b8')}`,
+                            backgroundColor: `${col.color ?? 'rgb(var(--color-slate-400))'}55`,
+                            color: pillTextColor(col.color ?? 'rgb(var(--color-slate-400))'),
+                            border: `0.5px solid ${pillTextColor(col.color ?? 'rgb(var(--color-slate-400))')}`,
                           }}
                         >
                           {col.name}
@@ -1408,7 +1408,7 @@ function ProjectBoardCard({
         </span>
         {isDone && (
           <span title="Completed" className="inline-flex flex-shrink-0 mt-0.5">
-            <CheckCircle2 className="w-3 h-3" style={{ color: '#357254' }} />
+            <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-success))' }} />
           </span>
         )}
         <p className={`text-xs font-medium ${isDone ? 'text-slate-500' : 'text-slate-900'} line-clamp-2 flex-1`} title={item.title}>
@@ -1472,7 +1472,7 @@ function ProjectBoardColumn({
     data: { column },
   });
 
-  const colColor = column.color ?? '#94a3b8';
+  const colColor = column.color ?? 'rgb(var(--color-slate-400))';
   const isDoneCol = column.name.toLowerCase() === 'published' || column.name.toLowerCase() === 'completed';
 
   return (
@@ -1777,7 +1777,7 @@ function ProjectMonthGrid({
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-[11px] ${today ? 'font-bold text-brand-600' : 'font-semibold text-[#334155]'}`}
+                  className={`text-[11px] ${today ? 'font-bold text-brand-600' : 'font-semibold text-slate-700'}`}
                 >
                   {format(day, 'd')}
                 </span>
@@ -1798,11 +1798,11 @@ function ProjectMonthGrid({
                       style={{
                         backgroundColor: ct
                           ? `${ct.color}15`
-                          : '#f1f5f9',
+                          : 'rgb(var(--color-slate-100))',
                         // Slim 1px tinted outline + 2px solid left border for emphasis.
-                        border: `1px solid ${ct?.color ?? '#94a3b8'}30`,
-                        borderLeft: `2px solid ${ct?.color ?? '#94a3b8'}`,
-                        color: ct?.color ?? '#475569',
+                        border: `1px solid ${ct?.color ?? 'rgb(var(--color-slate-400))'}30`,
+                        borderLeft: `2px solid ${ct?.color ?? 'rgb(var(--color-slate-400))'}`,
+                        color: ct?.color ?? 'rgb(var(--color-slate-600))',
                       }}
                       title={item.title}
                     >
@@ -1906,7 +1906,7 @@ function CalendarTab({
         {months.map((monthDate, idx) => (
           <div
             key={monthDate.toISOString()}
-            className="bg-[#F7F9FC] rounded-xl overflow-hidden"
+            className="bg-surface-card rounded-xl overflow-hidden"
             style={{ border: '1.5px solid rgb(var(--color-brand-900))', marginTop: idx > 0 ? '16px' : 0 }}
           >
             {/* Month header bar — canonical calendar-month-header token */}

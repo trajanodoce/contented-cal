@@ -151,8 +151,8 @@ function CustomFieldInput({ field, value, onChange, compact, members = [], taskC
               };
               const inactiveStyle = {
                 backgroundColor: 'transparent',
-                color: '#475569',
-                borderColor: '#cbd5e1',
+                color: 'rgb(var(--color-slate-600))',
+                borderColor: 'rgb(var(--color-slate-300))',
               };
               return (
                 <button
@@ -207,7 +207,7 @@ function CustomFieldInput({ field, value, onChange, compact, members = [], taskC
                   }
                 : {
                     backgroundColor: 'transparent',
-                    color: '#475569',
+                    color: 'rgb(var(--color-slate-600))',
                     borderColor: `${safeColor}55`,
                   }
               : undefined;

@@ -316,15 +316,15 @@ export function ListPage() {
           onClick={() => setShowCompleted(!showCompleted)}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
           style={{
-            borderColor: showCompleted ? '#357254' : '#e2e8f0',
-            backgroundColor: showCompleted ? '#EAF4EF' : '#F7F9FC',
-            color: showCompleted ? '#357254' : '#64748b',
+            borderColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-200))',
+            backgroundColor: showCompleted ? '#EAF4EF' : 'rgb(var(--color-surface-card))',
+            color: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-500))',
           }}
           title={showCompleted ? 'Hide completed/published tasks' : 'Show completed/published tasks'}
         >
           <div
             className="relative w-8 h-[18px] rounded-full transition-colors"
-            style={{ backgroundColor: showCompleted ? '#357254' : '#CBD5E1' }}
+            style={{ backgroundColor: showCompleted ? 'rgb(var(--color-state-success))' : 'rgb(var(--color-slate-300))' }}
           >
             <div
               className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -343,15 +343,15 @@ export function ListPage() {
           }}
           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
           style={{
-            borderColor: showOrdinal ? '#C4B5FD' : '#e2e8f0',
-            backgroundColor: showOrdinal ? '#F5F3FF' : '#F7F9FC',
-            color: showOrdinal ? ORDINAL_TEXT : '#64748b',
+            borderColor: showOrdinal ? '#C4B5FD' : 'rgb(var(--color-slate-200))',
+            backgroundColor: showOrdinal ? '#F5F3FF' : 'rgb(var(--color-surface-card))',
+            color: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-500))',
           }}
           title={showOrdinal ? 'Hide Ordinal posts' : 'Show Ordinal posts'}
         >
           <div
             className="relative w-8 h-[18px] rounded-full transition-colors"
-            style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : '#CBD5E1' }}
+            style={{ backgroundColor: showOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-300))' }}
           >
             <div
               className="absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform"
@@ -385,7 +385,7 @@ export function ListPage() {
           <table className="w-full">
             <thead
               className="sticky top-0 z-10"
-              style={{ background: '#F7F9FC', borderBottom: '1.5px solid rgb(var(--color-brand-900) / 0.502)' }}
+              style={{ background: 'rgb(var(--color-surface-card))', borderBottom: '1.5px solid rgb(var(--color-brand-900) / 0.502)' }}
             >
               <tr>
                 <th className="px-4 py-3 w-12">
@@ -506,7 +506,7 @@ export function ListPage() {
                         <TaskCategoryIcon category={item.category} />
                         {isDone && (
                           <span title="Completed" className="inline-flex flex-shrink-0">
-                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: '#357254' }} />
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
                           </span>
                         )}
                         {isUrgentRow && (
@@ -544,7 +544,7 @@ export function ListPage() {
                         />
                       ) : (
                         status && (() => {
-                          const base = status.color ?? '#94a3b8';
+                          const base = status.color ?? 'rgb(var(--color-slate-400))';
                           const dark = pillTextColor(base);
                           return (
                           <span
@@ -692,8 +692,8 @@ function InlineStatusEdit({
         }}
         className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold hover:opacity-80 transition-opacity"
         style={{
-          backgroundColor: currentColumn?.color ? `${currentColumn.color}55` : '#f1f5f9',
-          color: currentColumn?.color ? pillTextColor(currentColumn.color) : '#64748b',
+          backgroundColor: currentColumn?.color ? `${currentColumn.color}55` : 'rgb(var(--color-slate-100))',
+          color: currentColumn?.color ? pillTextColor(currentColumn.color) : 'rgb(var(--color-slate-500))',
           border: currentColumn?.color ? `0.5px solid ${pillTextColor(currentColumn.color)}` : undefined,
         }}
       >

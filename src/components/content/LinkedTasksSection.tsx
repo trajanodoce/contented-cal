@@ -165,7 +165,7 @@ function LinkedTaskRow({ task, members, boardColumns, onClick, onUnlink }: Linke
       }}
       className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors hover:bg-slate-100"
       style={{
-        background: '#F7F9FC',
+        background: 'rgb(var(--color-surface-card))',
         border: '1px solid rgb(var(--color-brand-900) / 0.094)',
       }}
     >
@@ -182,8 +182,8 @@ function LinkedTaskRow({ task, members, boardColumns, onClick, onUnlink }: Linke
         <span
           className="text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
           style={{
-            color: statusCol.color ?? '#64748b',
-            background: statusCol.color ? `${statusCol.color}1F` : '#f1f5f9',
+            color: statusCol.color ?? 'rgb(var(--color-slate-500))',
+            background: statusCol.color ? `${statusCol.color}1F` : 'rgb(var(--color-slate-100))',
           }}
           title={statusCol.name}
         >

@@ -125,7 +125,7 @@ function AlertRow({ alert, onOpen, onDismiss }: AlertRowProps) {
         return {
           actionLabel: 'updated',
           Icon: AtSign,
-          iconColor: '#64748B',
+          iconColor: 'rgb(var(--color-slate-500))',
         };
     }
   })();

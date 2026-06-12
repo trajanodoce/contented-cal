@@ -122,7 +122,7 @@ export function ListPlaceholderSlot({
         background: PINK_50,
         borderLeft: `2px solid ${NAVY}`,
         padding: '7px 10px',
-        color: '#94a3b8', // slate-400
+        color: 'rgb(var(--color-slate-400))', // slate-400
         fontSize: 13,
         height,
         display: 'flex',
