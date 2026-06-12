@@ -193,6 +193,8 @@ function LinkedTaskRow({ task, members, boardColumns, onClick, onUnlink }: Linke
 
       {taskMembers.length > 0 && (
         <div className="flex-shrink-0">
+          {/* max=2 here (vs 3 on full Board/List cards) — slide-over rows are
+              a denser context; intentional, not an inconsistency. */}
           <AvatarStack
             users={taskMembers.map((m) => ({ src: m.avatar_url, name: m.full_name }))}
             size="xs-inline"

@@ -17,7 +17,7 @@ import { FilterBar, applyFilters } from '../components/FilterBar';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, BoardColumn, Profile } from '../lib/database.types';
-import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, GRANOLA_TEXT, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
+import { isOrdinalItem, isLinearItem, ORDINAL_COLOR, ORDINAL_TEXT, LINEAR_COLOR, GRANOLA_COLOR, SLACK_COLOR, INTERNAL_COLOR } from '../lib/ordinal';
 import DatePicker from '../components/ui/DatePicker';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
@@ -37,12 +37,9 @@ import {
   ChevronDown,
   Check,
   CheckCircle2,
-  ListChecks,
-  Paperclip,
-  Link2,
-  Mic,
 } from 'lucide-react';
 import { Avatar, AvatarStack } from '../components/ui/Avatar';
+import { SubtaskIndicator, AssetIndicator, LinkedTaskIndicator, GranolaIndicator } from '../components/content/CardIndicators';
 
 type SortField =
   | 'title'
@@ -519,37 +516,10 @@ export function ListPage() {
                           />
                         )}
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : 'text-slate-900'} truncate max-w-[320px]`}>{item.title}</span>
-                        {granolaItemIds.has(item.id) && (
-                          <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
-                            <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
-                          </span>
-                        )}
-                        {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: '#005D97' }}>
-                            <ListChecks className="w-3.5 h-3.5" />
-                            <span>{subtaskCounts.get(item.id)!.completed}/{subtaskCounts.get(item.id)!.total}</span>
-                          </span>
-                        )}
-                        {linkCounts.get(item.id) && linkCounts.get(item.id)!.count > 0 && (
-                          <span
-                            className="inline-flex items-center gap-1 text-xs font-semibold"
-                            style={{ color: '#005D97' }}
-                            title={`${linkCounts.get(item.id)!.count} attachment${linkCounts.get(item.id)!.count !== 1 ? 's' : ''}`}
-                          >
-                            <Paperclip className="w-3.5 h-3.5" />
-                            {linkCounts.get(item.id)!.count}
-                          </span>
-                        )}
-                        {taskLinkCounts.get(item.id) && taskLinkCounts.get(item.id)! > 0 && (
-                          <span
-                            className="inline-flex items-center gap-1 text-xs font-semibold"
-                            style={{ color: '#B8447A' }}
-                            title={`${taskLinkCounts.get(item.id)} linked task${taskLinkCounts.get(item.id) !== 1 ? 's' : ''}`}
-                          >
-                            <Link2 className="w-3.5 h-3.5" />
-                            {taskLinkCounts.get(item.id)}
-                          </span>
-                        )}
+                        {granolaItemIds.has(item.id) && <GranolaIndicator size="sm" />}
+                        <SubtaskIndicator count={subtaskCounts.get(item.id)} size="sm" />
+                        <AssetIndicator info={linkCounts.get(item.id)} size="sm" />
+                        <LinkedTaskIndicator count={taskLinkCounts.get(item.id)} size="sm" />
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />
                       </div>
                     </td>

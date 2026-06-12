@@ -50,9 +50,6 @@ import {
   X,
   UserPlus,
   Link2,
-  ListChecks,
-  Paperclip,
-  Mic,
 } from 'lucide-react';
 import { Avatar } from '../components/ui/Avatar';
 import { formatDate, getPriorityDot } from '../lib/utils';
@@ -79,12 +76,12 @@ import { RowActionsMenu } from '../components/list/RowActionsMenu';
 import { TaskPresenceChip } from '../components/content/TaskPresenceChip';
 import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
 import { useShowCompleted } from '../hooks/useShowCompleted';
-import { useSubtaskCounts } from '../hooks/useSubtaskCounts';
-import { useExternalLinkCounts } from '../hooks/useExternalLinkCounts';
+import { useSubtaskCounts, type SubtaskCount } from '../hooks/useSubtaskCounts';
+import { useExternalLinkCounts, type LinkInfo } from '../hooks/useExternalLinkCounts';
+import { SubtaskIndicator, AssetIndicator, LinkedTaskIndicator, GranolaIndicator } from '../components/content/CardIndicators';
 import { useTaskLinkCounts } from '../hooks/useTaskLinkCounts';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { isDoneStatus } from '../lib/itemHelpers';
-import { GRANOLA_TEXT } from '../lib/ordinal';
 import { CheckSquare, Square } from 'lucide-react';
 
 type TabId = 'overview' | 'list' | 'board' | 'calendar';
@@ -986,8 +983,8 @@ function ListTab({
   boardColumns: BoardColumn[];
   contentTypes: ContentType[];
   members: Profile[];
-  subtaskCounts: Map<string, { completed: number; total: number }>;
-  linkCounts: Map<string, { count: number; platforms: string[] }>;
+  subtaskCounts: Map<string, SubtaskCount>;
+  linkCounts: Map<string, LinkInfo>;
   taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   filters: import('../components/FilterBar').FilterState;
@@ -1238,37 +1235,10 @@ function ListTab({
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : ''} truncate`}>
                           {item.title}
                         </span>
-                        {granolaItemIds.has(item.id) && (
-                          <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
-                            <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
-                          </span>
-                        )}
-                        {subtaskCounts.get(item.id) && subtaskCounts.get(item.id)!.total > 0 && (
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: '#005D97' }}>
-                            <ListChecks className="w-3.5 h-3.5" />
-                            {subtaskCounts.get(item.id)!.completed}/{subtaskCounts.get(item.id)!.total}
-                          </span>
-                        )}
-                        {linkCounts.get(item.id) && linkCounts.get(item.id)!.count > 0 && (
-                          <span
-                            className="inline-flex items-center gap-1 text-xs font-semibold"
-                            style={{ color: '#005D97' }}
-                            title={`${linkCounts.get(item.id)!.count} attachment${linkCounts.get(item.id)!.count !== 1 ? 's' : ''}`}
-                          >
-                            <Paperclip className="w-3.5 h-3.5" />
-                            {linkCounts.get(item.id)!.count}
-                          </span>
-                        )}
-                        {taskLinkCounts.get(item.id) && taskLinkCounts.get(item.id)! > 0 && (
-                          <span
-                            className="inline-flex items-center gap-1 text-xs font-semibold"
-                            style={{ color: '#B8447A' }}
-                            title={`${taskLinkCounts.get(item.id)} linked task${taskLinkCounts.get(item.id) !== 1 ? 's' : ''}`}
-                          >
-                            <Link2 className="w-3.5 h-3.5" />
-                            {taskLinkCounts.get(item.id)}
-                          </span>
-                        )}
+                        {granolaItemIds.has(item.id) && <GranolaIndicator size="sm" />}
+                        <SubtaskIndicator count={subtaskCounts.get(item.id)} size="sm" />
+                        <AssetIndicator info={linkCounts.get(item.id)} size="sm" />
+                        <LinkedTaskIndicator count={taskLinkCounts.get(item.id)} size="sm" />
                         <TaskPresenceChip taskId={item.id} variant="inline-dot" />
                       </div>
                     </td>
@@ -1380,8 +1350,8 @@ function ProjectBoardCard({
   isDone?: boolean;
   onClick: () => void;
   isOverlay?: boolean;
-  subtaskCount?: { completed: number; total: number };
-  linkInfo?: { count: number };
+  subtaskCount?: SubtaskCount;
+  linkInfo?: LinkInfo;
   taskLinkCount?: number;
   hasGranolaNotes?: boolean;
 }) {
@@ -1459,42 +1429,11 @@ function ProjectBoardCard({
           {assignee && (
             <Avatar src={assignee.avatar_url} name={assignee.full_name} size="xs-inline" />
           )}
-          {/* Card indicators — subtask progress · attachment count · Granola */}
-          {subtaskCount && subtaskCount.total > 0 && (
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-semibold"
-              style={{ color: '#005D97' }}
-              title={`${subtaskCount.completed} of ${subtaskCount.total} subtasks complete`}
-            >
-              <ListChecks className="w-3.5 h-3.5" />
-              {subtaskCount.completed}/{subtaskCount.total}
-            </span>
-          )}
-          {linkInfo && linkInfo.count > 0 && (
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-semibold"
-              style={{ color: '#005D97' }}
-              title={`${linkInfo.count} attachment${linkInfo.count !== 1 ? 's' : ''}`}
-            >
-              <Paperclip className="w-3.5 h-3.5" />
-              {linkInfo.count}
-            </span>
-          )}
-          {taskLinkCount && taskLinkCount > 0 && (
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-semibold"
-              style={{ color: '#B8447A' }}
-              title={`${taskLinkCount} linked task${taskLinkCount !== 1 ? 's' : ''}`}
-            >
-              <Link2 className="w-3.5 h-3.5" />
-              {taskLinkCount}
-            </span>
-          )}
-          {hasGranolaNotes && (
-            <span title="Has meeting notes">
-              <Mic className="w-3.5 h-3.5 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
-            </span>
-          )}
+          {/* Card indicators — subtasks · assets · linked tasks · Granola */}
+          <SubtaskIndicator count={subtaskCount} size="sm" />
+          <AssetIndicator info={linkInfo} size="sm" />
+          <LinkedTaskIndicator count={taskLinkCount} size="sm" />
+          {hasGranolaNotes && <GranolaIndicator size="sm" />}
         </div>
         {item.due_date && (
           <span className="text-[10px] text-slate-400">
@@ -1522,8 +1461,8 @@ function ProjectBoardColumn({
   items: ContentItem[];
   contentTypes: ContentType[];
   members: Profile[];
-  subtaskCounts: Map<string, { completed: number; total: number }>;
-  linkCounts: Map<string, { count: number; platforms: string[] }>;
+  subtaskCounts: Map<string, SubtaskCount>;
+  linkCounts: Map<string, LinkInfo>;
   taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   onItemClick: (id: string) => void;
@@ -1608,8 +1547,8 @@ function BoardTab({
   boardColumns: BoardColumn[];
   contentTypes: ContentType[];
   members: Profile[];
-  subtaskCounts: Map<string, { completed: number; total: number }>;
-  linkCounts: Map<string, { count: number; platforms: string[] }>;
+  subtaskCounts: Map<string, SubtaskCount>;
+  linkCounts: Map<string, LinkInfo>;
   taskLinkCounts: Map<string, number>;
   granolaItemIds: Set<string>;
   onItemClick: (id: string) => void;

@@ -17,10 +17,9 @@ import {
   ListChecks,
   Mic,
   Inbox,
-  Paperclip,
-  Link2,
 } from 'lucide-react';
 import { AvatarStack } from '../components/ui/Avatar';
+import { AssetIndicator, LinkedTaskIndicator } from '../components/content/CardIndicators';
 import { isPast, isToday } from 'date-fns';
 import { parseLocalDate, formatDate, getWorkspaceChannels } from '../lib/utils';
 import { isDoneStatus } from '../lib/itemHelpers';
@@ -49,18 +48,6 @@ import { PRIORITY_STYLES } from '../lib/utils';
 
 // Priority colors sourced from canonical PRIORITY_STYLES (lib/utils.ts) so
 // board cards, list rows, calendar event chips, and detail pills all match.
-
-const LINK_PLATFORM_META: Record<string, { label: string; bg: string; color: string; icon: string }> = {
-  ordinal:      { label: 'Ordinal',      bg: '#C4B5D940', color: '#5B4F8A', icon: '⬡' },
-  figma:        { label: 'Figma',        bg: '#F5F3FF', color: '#7C3AED', icon: 'F' },
-  canva:        { label: 'Canva',        bg: '#EFF6FF', color: '#2563EB', icon: 'C' },
-  miro:         { label: 'Miro',         bg: '#FFFBEB', color: '#D97706', icon: 'M' },
-  google_docs:  { label: 'Google Docs',  bg: '#F0FDF4', color: '#15803D', icon: 'G' },
-  google_drive: { label: 'Google Drive', bg: '#F0FDF4', color: '#15803D', icon: 'G' },
-  notion:       { label: 'Notion',       bg: '#F9FAFB', color: '#374151', icon: 'N' },
-  linear:       { label: 'Linear',       bg: '#FFC3B840', color: '#A05042', icon: 'L' },
-  other:        { label: 'Link',         bg: '#F9FAFB', color: '#4B5563', icon: '↗' },
-};
 
 interface BoardCardProps {
   item: ContentItem;
@@ -205,30 +192,11 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
             max={3}
           />
 
-          {linkInfo && linkInfo.count > 0 && (
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-semibold"
-              style={{ color: '#005D97' }}
-              title={`${linkInfo.count} attachment${linkInfo.count !== 1 ? 's' : ''}: ${linkInfo.platforms.map(p => LINK_PLATFORM_META[p]?.label ?? p).join(' · ')}`}
-            >
-              <Paperclip className="w-3.5 h-3.5" />
-              {linkInfo.count}
-            </span>
-          )}
-
-          {/* Linked tasks (peer relationships) — berry to distinguish from
-              navy assets-paperclip. Shape (chain) vs color (berry) make
-              the two metadata families unambiguous at a glance. */}
-          {taskLinkCount && taskLinkCount > 0 && (
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-semibold"
-              style={{ color: '#B8447A' }}
-              title={`${taskLinkCount} linked task${taskLinkCount !== 1 ? 's' : ''}`}
-            >
-              <Link2 className="w-3.5 h-3.5" />
-              {taskLinkCount}
-            </span>
-          )}
+          {/* Assets (navy paperclip) + linked tasks (berry chain) — see
+              CardIndicators. Subtask progress renders as a bar above; the
+              Granola mic sits in the title row. */}
+          <AssetIndicator info={linkInfo} size="sm" />
+          <LinkedTaskIndicator count={taskLinkCount} size="sm" />
         </div>
 
         {/* Due date */}

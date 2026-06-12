@@ -27,16 +27,14 @@ import {
   Columns,
   List,
   Plus,
-  Link2,
-  Paperclip,
   FolderOpen,
   CheckSquare,
   CheckCircle2,
   Flag,
   Mic,
-  ListChecks,
 } from 'lucide-react';
 import { TaskCategoryIcon } from '../components/content/TaskCategoryIcon';
+import { SubtaskIndicator, AssetIndicator, LinkedTaskIndicator, GranolaIndicator } from '../components/content/CardIndicators';
 import { useShowCompleted } from '../hooks/useShowCompleted';
 import { Avatar, AvatarStack } from '../components/ui/Avatar';
 import {
@@ -198,41 +196,10 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
         </span>
       )}
       <span className={`truncate flex-1 font-medium ${isDone ? 'text-slate-500' : 'text-slate-700'}`}>{item.title}</span>
-      {subtaskCount && subtaskCount.total > 0 && (
-        <span
-          className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
-          style={{ color: '#005D97' }}
-          title={`${subtaskCount.completed}/${subtaskCount.total} subtasks done`}
-        >
-          <ListChecks className="w-3 h-3" />
-          {subtaskCount.completed}/{subtaskCount.total}
-        </span>
-      )}
-      {linkInfo && linkInfo.count > 0 && (
-        <span
-          className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
-          style={{ color: '#005D97' }}
-          title={`${linkInfo.count} attachment${linkInfo.count !== 1 ? 's' : ''}`}
-        >
-          <Paperclip className="w-3 h-3" />
-          {linkInfo.count > 1 && linkInfo.count}
-        </span>
-      )}
-      {taskLinkCount && taskLinkCount > 0 && (
-        <span
-          className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
-          style={{ color: '#B8447A' }}
-          title={`${taskLinkCount} linked task${taskLinkCount !== 1 ? 's' : ''}`}
-        >
-          <Link2 className="w-3 h-3" />
-          {taskLinkCount > 1 && taskLinkCount}
-        </span>
-      )}
-      {hasGranolaNotes && (
-        <span title="Has meeting notes">
-          <Mic className="w-3 h-3 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
-        </span>
-      )}
+      <SubtaskIndicator count={subtaskCount} size="xs" />
+      <AssetIndicator info={linkInfo} size="xs" />
+      <LinkedTaskIndicator count={taskLinkCount} size="xs" />
+      {hasGranolaNotes && <GranolaIndicator size="xs" />}
       {itemMembers[0] && (
         <Avatar src={itemMembers[0].avatar_url} name={itemMembers[0].full_name} size="xs" />
       )}
@@ -619,55 +586,17 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-1.5">
+                        {/* max=2 here (vs 3 on full Board/List cards) — calendar
+                            week-cards are a denser context; intentional. */}
                         <AvatarStack
                           users={members.filter(m => item.assignee_ids?.includes(m.id)).map(m => ({ src: m.avatar_url, name: m.full_name }))}
                           size="sm"
                           max={2}
                         />
-                        {(() => {
-                          const sc = subtaskCounts.get(item.id);
-                          return sc && sc.total > 0 ? (
-                            <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
-                              style={{ color: '#005D97' }}
-                              title={`${sc.completed}/${sc.total} subtasks done`}
-                            >
-                              <ListChecks className="w-3 h-3" />
-                              {sc.completed}/{sc.total}
-                            </span>
-                          ) : null;
-                        })()}
-                        {(() => {
-                          const li = linkCounts.get(item.id);
-                          return li && li.count > 0 ? (
-                            <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
-                              style={{ color: '#005D97' }}
-                              title={`${li.count} attachment${li.count !== 1 ? 's' : ''}`}
-                            >
-                              <Paperclip className="w-3 h-3" />
-                              {li.count > 1 && li.count}
-                            </span>
-                          ) : null;
-                        })()}
-                        {(() => {
-                          const tlc = taskLinkCounts.get(item.id);
-                          return tlc && tlc > 0 ? (
-                            <span
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold flex-shrink-0"
-                              style={{ color: '#B8447A' }}
-                              title={`${tlc} linked task${tlc !== 1 ? 's' : ''}`}
-                            >
-                              <Link2 className="w-3 h-3" />
-                              {tlc > 1 && tlc}
-                            </span>
-                          ) : null;
-                        })()}
-                        {granolaItemIds.has(item.id) && (
-                          <span title="Has meeting notes">
-                            <Mic className="w-3 h-3 flex-shrink-0" style={{ color: GRANOLA_TEXT }} />
-                          </span>
-                        )}
+                        <SubtaskIndicator count={subtaskCounts.get(item.id)} size="xs" />
+                        <AssetIndicator info={linkCounts.get(item.id)} size="xs" />
+                        <LinkedTaskIndicator count={taskLinkCounts.get(item.id)} size="xs" />
+                        {granolaItemIds.has(item.id) && <GranolaIndicator size="xs" />}
                       </div>
                       {item.priority && item.priority !== 'low' && (
                         <span
@@ -888,11 +817,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
               </span>
             )}
             <h4 className={`font-medium truncate ${isDone ? 'text-slate-500' : 'text-slate-900'}`}>{item.title}</h4>
-            {hasGranolaNotes && (
-              <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
-                <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
-              </span>
-            )}
+            {hasGranolaNotes && <GranolaIndicator size="sm" />}
           </div>
 
           {contentType && (
