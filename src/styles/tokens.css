@@ -1,0 +1,55 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Design tokens — CSS variables (RGB channel format)
+   ───────────────────────────────────────────────────────────────────────
+   Single source of truth for theme-level colors. Values are space-separated
+   RGB channels (NOT hex) so Tailwind's `rgb(var(--x) / <alpha-value>)`
+   pattern can apply opacity modifiers natively (e.g. `bg-brand-600/12`).
+
+   Why channels + vars:
+   - Runtime white-labeling — swap a workspace's brand color by overriding
+     `--color-brand-600` on a wrapper element; every token-driven class +
+     style follows. Tailwind classes are compile-time, so the var layer is
+     what makes per-workspace overrides possible.
+   - Dark mode — flip semantic values in the `.dark` block (empty for now;
+     light values cascade until the dark-mode color pass populates it).
+
+   These values reproduce the pre-token palette EXACTLY — no visual change.
+   The Tailwind config (tailwind.config.js) references every one of these.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand ramp (primary blue → dark navy) ──────────────────────────── */
+  --color-brand-50: 244 248 251;   /* #F4F8FB */
+  --color-brand-100: 224 239 248;  /* #E0EFF8 */
+  --color-brand-200: 183 206 236;  /* #B7CEEC */
+  --color-brand-300: 123 192 232;  /* #7BC0E8 */
+  --color-brand-400: 59 157 212;   /* #3B9DD4 */
+  --color-brand-500: 0 112 181;    /* #0070B5 */
+  --color-brand-600: 0 93 151;     /* #005D97 — primary brand ("navy" in design doc) */
+  --color-brand-700: 0 61 102;     /* #003D66 */
+  --color-brand-800: 0 51 80;      /* #003350 */
+  --color-brand-900: 0 35 57;      /* #002339 — darkest navy (borders, deep text) */
+  --color-brand-950: 0 26 43;      /* #001A2B */
+
+  /* ── Surfaces ───────────────────────────────────────────────────────── */
+  --color-surface-page: 244 248 251;   /* #F4F8FB */
+  --color-surface-card: 247 249 252;   /* #F7F9FC */
+  --color-surface-nested: 249 247 251; /* #F9F7FB */
+
+  /* ── Accents / state ────────────────────────────────────────────────── */
+  --color-accent-pink: 251 231 241;     /* #FBE7F1 — banner/gradient pink */
+  --color-accent-coral: 255 195 184;    /* #FFC3B8 */
+  --color-accent-lavender: 211 205 236; /* #D3CDEC */
+  --color-accent-mint: 146 209 178;     /* #92D1B2 — success tint */
+  --color-accent-crimson: 186 44 44;    /* #BA2C2C — error / overdue / destructive */
+  --color-accent-teal: 47 136 137;      /* #2F8889 — AI Assistant accent */
+  --color-accent-berry: 184 68 122;     /* #B8447A — design category + linked-task relationships (Commit B) */
+}
+
+/* Reserved for the dark-mode color pass (follow-up project). Empty body is
+   intentional — light :root values cascade until dark equivalents are
+   chosen. The structure being here means dark mode is a values-only change,
+   no refactor. */
+.dark {
+  /* e.g. --color-surface-page: 15 20 25;  (populated by the dark-mode pass) */
+}

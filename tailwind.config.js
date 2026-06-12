@@ -3,35 +3,41 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      // Colors reference CSS variables (src/styles/tokens.css) in RGB-channel
+      // format so opacity modifiers (e.g. bg-brand-600/12) work natively and
+      // the values are runtime-swappable for white-labeling / dark mode.
+      // Channel values reproduce the prior hex palette exactly.
       colors: {
         brand: {
-          50: '#F4F8FB',
-          100: '#E0EFF8',
-          200: '#B7CEEC',
-          300: '#7BC0E8',
-          400: '#3B9DD4',
-          500: '#0070B5',
-          600: '#005D97',
-          700: '#003d66',
-          800: '#003350',
-          900: '#002339',
-          950: '#001a2b',
+          50: 'rgb(var(--color-brand-50) / <alpha-value>)',
+          100: 'rgb(var(--color-brand-100) / <alpha-value>)',
+          200: 'rgb(var(--color-brand-200) / <alpha-value>)',
+          300: 'rgb(var(--color-brand-300) / <alpha-value>)',
+          400: 'rgb(var(--color-brand-400) / <alpha-value>)',
+          500: 'rgb(var(--color-brand-500) / <alpha-value>)',
+          600: 'rgb(var(--color-brand-600) / <alpha-value>)',
+          700: 'rgb(var(--color-brand-700) / <alpha-value>)',
+          800: 'rgb(var(--color-brand-800) / <alpha-value>)',
+          900: 'rgb(var(--color-brand-900) / <alpha-value>)',
+          950: 'rgb(var(--color-brand-950) / <alpha-value>)',
         },
         surface: {
-          DEFAULT: '#F7F9FC',
-          page: '#F4F8FB',
-          card: '#F7F9FC',
-          nested: '#F9F7FB',
+          DEFAULT: 'rgb(var(--color-surface-card) / <alpha-value>)',
+          page: 'rgb(var(--color-surface-page) / <alpha-value>)',
+          card: 'rgb(var(--color-surface-card) / <alpha-value>)',
+          nested: 'rgb(var(--color-surface-nested) / <alpha-value>)',
         },
         accent: {
-          pink: '#FBE7F1',
-          coral: '#FFC3B8',
-          lavender: '#D3CDEC',
-          mint: '#92D1B2',
-          crimson: '#BA2C2C',
+          pink: 'rgb(var(--color-accent-pink) / <alpha-value>)',
+          coral: 'rgb(var(--color-accent-coral) / <alpha-value>)',
+          lavender: 'rgb(var(--color-accent-lavender) / <alpha-value>)',
+          mint: 'rgb(var(--color-accent-mint) / <alpha-value>)',
+          crimson: 'rgb(var(--color-accent-crimson) / <alpha-value>)',
+          teal: 'rgb(var(--color-accent-teal) / <alpha-value>)',
+          berry: 'rgb(var(--color-accent-berry) / <alpha-value>)',
         },
         navy: {
-          DEFAULT: '#002339',
+          DEFAULT: 'rgb(var(--color-brand-900) / <alpha-value>)',
           border: '#00233930',
         },
       },
