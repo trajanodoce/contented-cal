@@ -255,11 +255,11 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               <button
                 onClick={onSync}
                 disabled={syncing}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50"
-                title="Sync issues"
+                className="flex items-center gap-1 px-3 py-1.5 text-xs text-white bg-brand-600 rounded-lg hover:bg-brand-500 transition-colors disabled:opacity-50"
+                title="Pull the latest posts now"
               >
                 {syncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                {syncing ? 'Syncing...' : 'Sync Issues'}
+                {syncing ? 'Syncing...' : 'Sync now'}
               </button>
             )}
             {connected && (
@@ -385,6 +385,7 @@ export function IntegrationsPage({ addToast }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<IntegrationPlatform | null>(null);
   const [testing, setTesting] = useState<IntegrationPlatform | null>(null);
+  const [syncing, setSyncing] = useState<IntegrationPlatform | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const isAdmin = userRole === 'admin';
@@ -489,6 +490,23 @@ export function IntegrationsPage({ addToast }: Props) {
     addToast('Connection is working', 'success');
   }
 
+  // Force a fresh pull of the Ordinal social calendar (bypasses the throttle).
+  // The calendar also auto-pulls on load; this is for an on-demand refresh.
+  async function syncOrdinal() {
+    setSyncing('ordinal');
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-ordinal-posts', { body: { force: true } });
+      if (error) throw error;
+      const r = data as { synced?: number; created?: number; updated?: number; error?: string };
+      if (r?.error) throw new Error(r.error);
+      addToast(`Synced ${r.synced ?? 0} Ordinal posts (${r.created ?? 0} new, ${r.updated ?? 0} updated)`, 'success');
+    } catch (err: unknown) {
+      addToast(`Ordinal sync failed: ${(err as Error).message}`, 'error');
+    } finally {
+      setSyncing(null);
+    }
+  }
+
   const categories = Array.from(new Set(PLATFORMS.map(p => p.category)));
 
   if (loading) {
@@ -547,8 +565,10 @@ export function IntegrationsPage({ addToast }: Props) {
                 onOAuthConnect={meta.setupType === 'oauth' ? () => startOAuth() : undefined}
                 onDisconnect={() => disconnect(meta.id)}
                 onTest={() => testConnection(meta.id)}
+                onSync={meta.id === 'ordinal' ? syncOrdinal : undefined}
                 saving={saving === meta.id}
                 testing={testing === meta.id}
+                syncing={syncing === meta.id}
               />
             ))}
           </div>

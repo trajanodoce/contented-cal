@@ -926,6 +926,19 @@ export function CalendarPage() {
     fetchData();
   }, [fetchData]);
 
+  // Live-pull the Ordinal social calendar when the calendar opens. The edge
+  // function throttles server-side (every sync_interval_minutes), so this is
+  // safe to fire on every mount — most loads are a cheap no-op. Newly
+  // upserted posts arrive via the content_items realtime subscription, so no
+  // manual refresh is needed. Best-effort: a throttle-skip, non-member, or
+  // network error is non-fatal and silently ignored (Ordinal is view-only).
+  const workspaceId = currentWorkspace?.id;
+  useEffect(() => {
+    if (!workspaceId) return;
+    supabase.functions.invoke('fetch-ordinal-posts', { body: { force: false } })
+      .catch(() => { /* non-fatal */ });
+  }, [workspaceId]);
+
   const [showCompleted, setShowCompleted] = useShowCompleted('calendar');
 
   const filteredItems = useMemo(() => {
