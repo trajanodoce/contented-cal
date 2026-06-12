@@ -44,6 +44,45 @@
   --color-accent-crimson: 186 44 44;    /* #BA2C2C — error / overdue / destructive */
   --color-accent-teal: 47 136 137;      /* #2F8889 — AI Assistant accent */
   --color-accent-berry: 184 68 122;     /* #B8447A — design category + linked-task relationships (Commit B) */
+
+  /* ── Neutral ramp (slate) ───────────────────────────────────────────── */
+  /* Reproduces Tailwind's default `slate` scale. Overriding the scale with
+     vars (see tailwind.config.js) makes every existing `text-slate-*` /
+     `bg-slate-*` / `border-slate-*` class themeable for dark mode with zero
+     call-site changes — the dark-mode pass redefines these in `.dark`. */
+  --color-slate-50: 248 250 252;
+  --color-slate-100: 241 245 249;
+  --color-slate-200: 226 232 240;
+  --color-slate-300: 203 213 225;
+  --color-slate-400: 148 163 184;
+  --color-slate-500: 100 116 139;
+  --color-slate-600: 71 85 105;
+  --color-slate-700: 51 65 85;
+  --color-slate-800: 30 41 59;
+  --color-slate-900: 15 23 42;
+  --color-slate-950: 2 6 23;
+
+  /* ── Semantic text roles ────────────────────────────────────────────── */
+  /* Role-named aliases over the neutral ramp. Preferred for new code +
+     portable to other apps — dark mode swaps the *meaning*, not just shade. */
+  --color-text-primary: 15 23 42;    /* slate-900 — headings, primary copy */
+  --color-text-secondary: 51 65 85;  /* slate-700 — body */
+  --color-text-muted: 100 116 139;   /* slate-500 — secondary/meta */
+  --color-text-subtle: 148 163 184;  /* slate-400 — placeholders, faint */
+  --color-text-inverse: 255 255 255; /* on dark/brand fills */
+
+  /* ── Semantic borders ───────────────────────────────────────────────── */
+  --color-border-subtle: 226 232 240;  /* slate-200 — hairlines, dividers */
+  --color-border-default: 0 35 57;     /* brand-900, used at low alpha */
+  --color-border-strong: 100 116 139;  /* slate-500 — emphasized */
+
+  /* ── State ──────────────────────────────────────────────────────────── */
+  --color-state-success: 53 114 84;       /* #357254 */
+  --color-state-success-tint: 146 209 178; /* #92D1B2 (mint) */
+  --color-state-error: 186 44 44;          /* #BA2C2C (= accent-crimson) */
+  --color-state-warning: 245 158 11;       /* #F59E0B (amber-500) */
+  --color-state-warning-tint: 255 195 184; /* #FFC3B8 (coral/peach) */
+  --color-state-info: 0 93 151;            /* #005D97 (= brand-600) */
 }
 
 /* Reserved for the dark-mode color pass (follow-up project). Empty body is
