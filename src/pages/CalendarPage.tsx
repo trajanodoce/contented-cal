@@ -112,7 +112,7 @@ function DroppableDayCell({ dateId, children, className, onClick, style }: {
   // Mirrors <DropTarget> from DndPrimitives — applied inline so we don't
   // wrap an extra layout box that would break grid/calendar cell sizing.
   const overStyle: React.CSSProperties | undefined = isOver
-    ? { ...style, border: '2px dashed #005D97', backgroundColor: '#005D9710' }
+    ? { ...style, border: '2px dashed rgb(var(--color-brand-600))', backgroundColor: 'rgb(var(--color-brand-600) / 0.063)' }
     : style;
   return (
     <div
@@ -337,13 +337,13 @@ function SingleMonthGrid({ monthDate, items, contentTypes, boardColumns, members
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
               className={`min-h-[140px] px-2 pt-2 pb-2.5 border-b border-r border-slate-300 ${
-                isTodayDate ? 'bg-[#005D970A]' : ''
+                isTodayDate ? 'bg-brand-600/[0.039]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
               onClick={() => onDateClick(day)}
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-[11px] ${isTodayDate ? 'font-bold text-[#005D97]' : 'font-semibold text-[#334155]'}`}
+                  className={`text-[11px] ${isTodayDate ? 'font-bold text-brand-600' : 'font-semibold text-[#334155]'}`}
                 >
                   {format(day, 'd')}
                 </span>
@@ -425,10 +425,10 @@ function MonthView({ currentDate, items, contentTypes, boardColumns, members, da
   return (
     <div className="space-y-0">
       {months.map((monthDate, idx) => (
-        <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '16px' : 0 }}>
+        <div key={monthDate.toISOString()} className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid rgb(var(--color-brand-900))', marginTop: idx > 0 ? '16px' : 0 }}>
           {/* Month header bar — canonical calendar-month-header token */}
-          <div className="cc-banner-calendar-month border-b border-[#002339]" style={{ borderRadius: 0 }}>
-            <h3 className="text-sm font-heading tracking-wide" style={{ color: '#002339' }}>
+          <div className="cc-banner-calendar-month border-b border-brand-900" style={{ borderRadius: 0 }}>
+            <h3 className="text-sm font-heading tracking-wide" style={{ color: 'rgb(var(--color-brand-900))' }}>
               {format(monthDate, 'MMMM yyyy')}
             </h3>
           </div>
@@ -511,7 +511,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
   const gridCols = weekendsCollapsed ? GRID_COLS_COLLAPSED : GRID_COLS_EXPANDED;
 
   return (
-    <div className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid #002339' }}>
+    <div className="bg-[#F7F9FC] rounded-xl overflow-hidden" style={{ border: '1.5px solid rgb(var(--color-brand-900))' }}>
       {/* Week header — canonical calendar-month-header token (applied via grid bg) */}
       <div
         className="cc-banner-calendar-month grid"
@@ -529,7 +529,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
               </div>
               <div
                 className={`text-base font-bold ${isTodayDate ? 'inline-flex items-center justify-center w-7 h-7 rounded-full bg-white' : ''}`}
-                style={{ color: '#002339' }}
+                style={{ color: 'rgb(var(--color-brand-900))' }}
               >
                 {format(day, 'd')}
               </div>
@@ -550,7 +550,7 @@ function WeekView({ currentDate, items, contentTypes, boardColumns, members, dat
               key={day.toISOString()}
               dateId={format(day, 'yyyy-MM-dd')}
               className={`p-2 border-r border-slate-300 last:border-r-0 border-b border-slate-300 min-h-[100px] ${
-                isTodayDate ? 'bg-[#005D970A]' : ''
+                isTodayDate ? 'bg-brand-600/[0.039]' : ''
               }`}
               onClick={() => onDateClick(day)}
             >
@@ -665,7 +665,7 @@ function DayView({ currentDate, items, contentTypes, boardColumns, members, date
   const hasAnyContent = dayItems.length > 0 || dayProjectMarkers.length > 0 || daySubtasks.length > 0;
 
   return (
-    <DroppableDayCell dateId={format(currentDate, 'yyyy-MM-dd')} className="bg-surface-card rounded-lg p-6" style={{ border: '1.5px solid #002339' }}>
+    <DroppableDayCell dateId={format(currentDate, 'yyyy-MM-dd')} className="bg-surface-card rounded-lg p-6" style={{ border: '1.5px solid rgb(var(--color-brand-900))' }}>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-2xl font-semibold text-slate-900">
@@ -805,7 +805,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
       <div className="flex items-start gap-3">
         <div
           className="w-1 h-full min-h-[40px] rounded-full flex-shrink-0"
-          style={{ backgroundColor: isOverdue ? '#BA2C2C' : (PRIORITY_STYLES[item.priority ?? 'low']?.hex ?? 'transparent') }}
+          style={{ backgroundColor: isOverdue ? 'rgb(var(--color-accent-crimson))' : (PRIORITY_STYLES[item.priority ?? 'low']?.hex ?? 'transparent') }}
         />
 
         <div className="flex-1 min-w-0">

@@ -4,8 +4,8 @@ import type { ContentItem, BoardColumn, TaskCategory } from '../../lib/database.
 import { TaskCategoryIcon } from './TaskCategoryIcon';
 import { formatDate } from '../../lib/utils';
 
-const BERRY = '#B8447A';
-const BERRY_TINT = '#B8447A15';
+const BERRY = 'rgb(var(--color-accent-berry))';
+const BERRY_TINT = 'rgb(var(--color-accent-berry) / 0.082)';
 
 interface Props {
   tasks: ContentItem[];
@@ -65,12 +65,12 @@ export function TaskPickerModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: '#00233960' }}
+      style={{ background: 'rgb(var(--color-brand-900) / 0.376)' }}
       onClick={onClose}
     >
       <div
         className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden"
-        style={{ border: '1px solid #00233930' }}
+        style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -89,7 +89,7 @@ export function TaskPickerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[#005D9710] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-brand-600/[0.063] transition-colors"
             aria-label="Close"
           >
             <X className="w-4 h-4 text-slate-500" />
@@ -113,7 +113,7 @@ export function TaskPickerModal({
                     ? c === 'design'
                       ? { background: BERRY }
                       : c === 'content'
-                        ? { background: '#005D97' }
+                        ? { background: 'rgb(var(--color-brand-600))' }
                         : { background: '#0F172A' }
                     : { background: '#f1f5f9' }
                 }
@@ -181,7 +181,7 @@ export function TaskPickerModal({
                     type="button"
                     onClick={() => handlePick(task.id)}
                     disabled={picking === task.id}
-                    className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9710] transition-colors text-left disabled:opacity-50"
+                    className="w-full flex items-center gap-3 px-5 py-3 hover:bg-brand-600/[0.063] transition-colors text-left disabled:opacity-50"
                   >
                     <TaskCategoryIcon category={task.category} size={14} />
                     <span className="text-[13px] font-medium text-slate-900 flex-1 truncate" title={task.title}>

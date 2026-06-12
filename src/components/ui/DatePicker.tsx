@@ -63,19 +63,19 @@ export function DatePickerPanel({
         classNames={{
           root: 'cc-datepicker',
           months: '',
-          month_caption: 'flex items-center justify-center font-semibold text-sm text-[#002339] mb-2 py-2 -mx-3 px-3 rounded-t-xl [background:#005D9712] [border-bottom:1px_solid_#005D9720]',
+          month_caption: 'flex items-center justify-center font-semibold text-sm text-brand-900 mb-2 py-2 -mx-3 px-3 rounded-t-xl [background:rgb(var(--color-brand-600) / 0.071)] [border-bottom:1px_solid_rgb(var(--color-brand-600) / 0.125)]',
           nav: 'flex items-center justify-between absolute top-3 left-3 right-3',
-          button_previous: 'p-1 rounded-md hover:bg-[#005D9710] text-[#005D97] hover:text-[#003d66] transition-colors',
-          button_next: 'p-1 rounded-md hover:bg-[#005D9710] text-[#005D97] hover:text-[#003d66] transition-colors',
+          button_previous: 'p-1 rounded-md hover:bg-brand-600/[0.063] text-brand-600 hover:text-[#003d66] transition-colors',
+          button_next: 'p-1 rounded-md hover:bg-brand-600/[0.063] text-brand-600 hover:text-[#003d66] transition-colors',
           weekdays: 'grid grid-cols-7 mb-1',
           weekday: 'text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center py-1',
           weeks: '',
           week: 'grid grid-cols-7',
           day: 'text-center',
-          day_button: 'w-8 h-8 text-[12px] rounded-lg transition-colors hover:bg-[#005D9710] text-slate-700 font-medium',
+          day_button: 'w-8 h-8 text-[12px] rounded-lg transition-colors hover:bg-brand-600/[0.063] text-slate-700 font-medium',
           // Framed, soft-edged square — not a solid blue fill.
-          selected: '!bg-transparent !text-[#005D97] !font-bold !ring-2 !ring-inset !ring-[#005D97] hover:!bg-[#005D9710]',
-          today: 'bg-[#005D9710] rounded-lg font-semibold',
+          selected: '!bg-transparent !text-brand-600 !font-bold !ring-2 !ring-inset !ring-brand-600 hover:!bg-brand-600/[0.063]',
+          today: 'bg-brand-600/[0.063] rounded-lg font-semibold',
           outside: '!text-slate-300',
           disabled: '!text-slate-200 !cursor-not-allowed',
           hidden: 'invisible',
@@ -88,7 +88,7 @@ export function DatePickerPanel({
             onChange('');
             onClose?.();
           }}
-          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-[#005D9718] transition-colors"
+          className="text-[11px] font-medium text-slate-400 hover:text-slate-600 px-2 py-1 rounded hover:bg-brand-600/[0.094] transition-colors"
         >
           Clear
         </button>
@@ -98,7 +98,7 @@ export function DatePickerPanel({
             onChange(toDateString(new Date()));
             onClose?.();
           }}
-          className="text-[11px] font-semibold text-[#005D97] hover:text-[#003d66] px-2 py-1 rounded hover:bg-[#005D9718] transition-colors"
+          className="text-[11px] font-semibold text-brand-600 hover:text-[#003d66] px-2 py-1 rounded hover:bg-brand-600/[0.094] transition-colors"
         >
           Today
         </button>
@@ -112,7 +112,7 @@ export const datePickerPopoverStyle: React.CSSProperties = {
   position: 'fixed',
   width: POPOVER_WIDTH,
   zIndex: 9999,
-  border: '1.5px solid #002339',
+  border: '1.5px solid rgb(var(--color-brand-900))',
   boxShadow: '0 4px 20px rgba(0,35,57,.08)',
 };
 
@@ -211,11 +211,11 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
         onClick={() => !disabled && setOpen(!open)}
         className={`
           w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-colors text-left
-          ${disabled ? 'bg-surface-nested text-slate-400 cursor-not-allowed border-slate-200' : 'bg-surface-card border-slate-300 hover:border-[#005D97] text-slate-700 cursor-pointer'}
-          ${open ? '!border-[#005D97] ring-2 ring-[#005D9725]' : ''}
+          ${disabled ? 'bg-surface-nested text-slate-400 cursor-not-allowed border-slate-200' : 'bg-surface-card border-slate-300 hover:border-brand-600 text-slate-700 cursor-pointer'}
+          ${open ? '!border-brand-600 ring-2 ring-brand-600/[0.145]' : ''}
         `}
       >
-        <svg className="w-4 h-4 text-[#005D97] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <svg className="w-4 h-4 text-brand-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
         </svg>
         <span className={selected ? '' : 'text-slate-400'}>{displayText}</span>
@@ -227,7 +227,7 @@ export default function DatePicker({ value, onChange, disabled, placeholder = 'P
               onChange('');
               setOpen(false);
             }}
-            className="ml-auto p-0.5 rounded hover:bg-[#005D9710] text-slate-400 hover:text-slate-600"
+            className="ml-auto p-0.5 rounded hover:bg-brand-600/[0.063] text-slate-400 hover:text-slate-600"
             aria-label="Clear date"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -114,7 +114,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
         <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
           <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_GREEN }} />
           Meeting Notes
-          <span className="text-xs bg-[#005D9712] text-slate-500 px-1.5 py-0.5 rounded-full font-normal">
+          <span className="text-xs bg-brand-600/[0.071] text-slate-500 px-1.5 py-0.5 rounded-full font-normal">
             {notes.length}
           </span>
         </label>
@@ -218,7 +218,7 @@ export function GranolaNoteSection({ contentItemId, onLinkNote }: Props) {
                         {attendees.map((a, i) => (
                           <span
                             key={i}
-                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-[#005D9712] text-slate-700"
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-brand-600/[0.071] text-slate-700"
                           >
                             {a.name || a.email || 'Unknown'}
                           </span>

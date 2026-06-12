@@ -216,9 +216,9 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
           </button>
         </div>
       ) : (
-        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
+        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
           <table className="w-full">
-            <thead className="bg-[#005D9712]">
+            <thead className="bg-brand-600/[0.071]">
               <tr>
                 <th className="px-2 py-3 w-10" />
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Color</th>
@@ -235,7 +235,7 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragLeave={handleDragLeave}
                   onDrop={(e) => handleDrop(e, index)}
-                  className={`hover:bg-[#005D9718] ${dragOverIndex === index ? 'bg-brand-50' : ''} ${draggedItem?.id === column.id ? 'opacity-50' : ''}`}
+                  className={`hover:bg-brand-600/[0.094] ${dragOverIndex === index ? 'bg-brand-50' : ''} ${draggedItem?.id === column.id ? 'opacity-50' : ''}`}
                 >
                   <td className="px-2 py-3">
                     <div className="cursor-move text-slate-400">
@@ -280,7 +280,7 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
                       </button>
                       <button
                         onClick={() => setShowDeleteConfirm(column.id)}
-                        className="p-1 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded"
+                        className="p-1 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -295,7 +295,7 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
 
       {/* Create/Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowForm(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={() => setShowForm(false)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-900 mb-4">
               {editingColumn ? 'Edit Column' : 'Create Column'}
@@ -333,7 +333,7 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -351,10 +351,10 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowDeleteConfirm(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={() => setShowDeleteConfirm(null)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#BA2C2C12] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-accent-crimson/[0.071] flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-accent-crimson" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900">Delete Column?</h3>
@@ -373,7 +373,7 @@ export function BoardColumnsTab({ workspaceId }: BoardColumnsTabProps) {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
               >
                 Cancel
               </button>

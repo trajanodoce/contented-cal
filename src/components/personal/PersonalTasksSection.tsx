@@ -254,16 +254,16 @@ export function PersonalTasksSection({ workspaceId }: Props) {
   if (loading) return null;
 
   return (
-    <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       {/* Header */}
       <div className="cc-banner-section-header flex items-center justify-between border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <Briefcase className="w-3.5 h-3.5" style={{ color: '#002339' }} />
-          <h2 className="text-base font-heading" style={{ color: '#002339' }}>Personal Tasks</h2>
+          <Briefcase className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-brand-900))' }} />
+          <h2 className="text-base font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>Personal Tasks</h2>
           {activeTasks.length > 0 && (
             <span
               className="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: 'rgba(0,35,57,.12)', color: '#002339' }}
+              style={{ backgroundColor: 'rgba(0,35,57,.12)', color: 'rgb(var(--color-brand-900))' }}
             >
               {activeTasks.length}
             </span>
@@ -294,7 +294,7 @@ export function PersonalTasksSection({ workspaceId }: Props) {
                 <div key={catKey} className="border border-slate-200 rounded-lg overflow-hidden">
                   <button
                     onClick={() => toggleCategory(catKey)}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-[#005D9718] transition-colors"
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left hover:bg-brand-600/[0.094] transition-colors"
                   >
                     {isCollapsed ? (
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
@@ -473,7 +473,7 @@ function TaskRow({
             className={`p-1.5 rounded-full transition-all flex-shrink-0 ${
               showSavedCheck
                 ? 'bg-green-100 text-green-600'
-                : 'text-slate-400 hover:text-slate-600 hover:bg-[#005D9710]'
+                : 'text-slate-400 hover:text-slate-600 hover:bg-brand-600/[0.063]'
             }`}
             title="Close (auto-saves)"
           >
@@ -534,7 +534,7 @@ function TaskRow({
 
   return (
     <div
-      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#005D9718] transition-colors group cursor-pointer"
+      className="flex items-center gap-3 px-4 py-2.5 hover:bg-brand-600/[0.094] transition-colors group cursor-pointer"
       onClick={() => !task.completed && onStartEdit()}
     >
       {/* Checkbox */}

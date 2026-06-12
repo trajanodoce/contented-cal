@@ -53,9 +53,9 @@ function getInitials(name: string, size: Size): string {
 
 /** 3 avatar gradients — all anchored from brand navy. Assigned per user by name hash. */
 const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg, #005D97, #D4729E)', // navy → rose
-  'linear-gradient(135deg, #005D97, #0F8B8D)', // navy → teal
-  'linear-gradient(135deg, #005D97, #7C3AED)', // navy → amethyst
+  'linear-gradient(135deg, rgb(var(--color-brand-600)), #D4729E)', // navy → rose
+  'linear-gradient(135deg, rgb(var(--color-brand-600)), #0F8B8D)', // navy → teal
+  'linear-gradient(135deg, rgb(var(--color-brand-600)), #7C3AED)', // navy → amethyst
 ];
 
 function getAvatarGradient(name: string): string {
@@ -229,7 +229,7 @@ export function Avatar({
             cy={px / 2}
             r={ringStrokeRadius}
             fill="none"
-            stroke="#005D97"
+            stroke="rgb(var(--color-brand-600))"
             strokeWidth={3}
             strokeLinecap="round"
             strokeDasharray="40 200"

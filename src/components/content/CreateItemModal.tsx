@@ -129,7 +129,7 @@ function CustomSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {options.map((option) => (
             <button
               key={option.value}
@@ -138,7 +138,7 @@ function CustomSelect({
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 ${
                 option.value === value ? 'bg-brand-50 text-brand-900' : 'text-slate-700'
               }`}
             >
@@ -216,7 +216,7 @@ function AssigneeMultiSelect({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {members.length === 0 ? (
             <div className="px-3 py-2 text-sm text-slate-500">No members found</div>
           ) : (
@@ -227,7 +227,7 @@ function AssigneeMultiSelect({
                   key={member.id}
                   type="button"
                   onClick={() => toggleMember(member.id)}
-                  className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-3 ${
+                  className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-3 ${
                     isSelected ? 'bg-brand-50' : ''
                   }`}
                 >
@@ -474,8 +474,8 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
   }
 
   const modal = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]">
-      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col" style={{ border: '1px solid #00233930' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]">
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -633,7 +633,7 @@ export function CreateItemModal({ isOpen, onClose, initialDate, initialProjectId
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-[#005D9715] rounded-lg transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-brand-600/[0.082] rounded-lg transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

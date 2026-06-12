@@ -471,7 +471,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
       <div
         className="w-full max-w-2xl bg-surface-card h-full flex flex-col"
         style={{
-          borderLeft: '1.5px solid #002339',
+          borderLeft: '1.5px solid rgb(var(--color-brand-900))',
           boxShadow: isLinearIssue
             ? '-8px 0 30px -5px rgba(255, 228, 214, 0.4), -2px 0 10px -2px rgba(255, 228, 214, 0.25)'
             : isOrdinalPost
@@ -566,7 +566,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
         {(() => {
           const titleColor = contentType?.color ?? '#64748b';
           return (
-            <div style={{ borderBottom: '1px solid #00233930' }}>
+            <div style={{ borderBottom: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               {/* Action buttons row */}
               <div className="flex items-center justify-between px-6 pt-3 pb-0">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -597,7 +597,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     className={`p-1.5 rounded-full transition-all ${
                       showSavedCheck
                         ? 'bg-green-100 text-green-600'
-                        : 'text-slate-400 hover:text-slate-600 hover:bg-[#005D9718]'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-brand-600/[0.094]'
                     }`}
                   >
                     {showSavedCheck ? (
@@ -656,7 +656,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
             >
               {tab}
               {tab === 'comments' && comments.length > 0 && (
-                <span className="ml-1.5 text-xs bg-[#005D9712] text-slate-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
+                <span className="ml-1.5 text-xs bg-brand-600/[0.071] text-slate-600 px-1.5 py-0.5 rounded-full">{comments.length}</span>
               )}
             </button>
           ))}
@@ -690,9 +690,9 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   than personal names. Locked 2026-06-05. */}
               <div className="grid grid-cols-[1fr_1.4fr] gap-3">
                 {/* Owner tile */}
-                <div className="bg-surface-card rounded-xl shadow-sm p-3" style={{ border: '1px solid #00233930' }}>
+                <div className="bg-surface-card rounded-xl shadow-sm p-3" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                   <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.06em] flex items-center gap-1.5 mb-1.5">
-                    <span className="w-4 h-4 rounded-full inline-block" style={{ background: 'linear-gradient(135deg, #005D97, #D4729E)' }} aria-hidden />
+                    <span className="w-4 h-4 rounded-full inline-block" style={{ background: 'linear-gradient(135deg, rgb(var(--color-brand-600)), #D4729E)' }} aria-hidden />
                     Owner
                   </label>
                   <StyledSelect
@@ -708,7 +708,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 </div>
 
                 {/* Project tile (renders even when empty so the grid stays balanced) */}
-                <div className="bg-surface-card rounded-xl shadow-sm p-3" style={{ border: '1px solid #00233930' }}>
+                <div className="bg-surface-card rounded-xl shadow-sm p-3" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                   <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.06em] flex items-center gap-1.5 mb-1.5">
                     <FolderOpen className="w-3.5 h-3.5" style={{ color: '#C4504A' }} />
                     Project
@@ -729,12 +729,12 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {/* 2. Status (collapsible). Default collapsed per-user via
                   localStorage. Collapsed shows a one-line summary; expanded
                   shows the full field grid. */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                 {/* Section header — clickable to toggle */}
                 <button
                   type="button"
                   onClick={toggleStatusCollapsed}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#005D9710] transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-brand-600/[0.063] transition-colors"
                   title={statusCollapsed ? 'Expand status fields' : 'Collapse status fields'}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -876,7 +876,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         </label>
                         <div className="flex flex-wrap gap-1.5">
                           {item.tags.map(tag => (
-                            <span key={tag} className="text-xs px-2.5 py-1 bg-[#005D9712] text-slate-600 rounded-full">{tag}</span>
+                            <span key={tag} className="text-xs px-2.5 py-1 bg-brand-600/[0.071] text-slate-600 rounded-full">{tag}</span>
                           ))}
                         </div>
                       </div>
@@ -919,7 +919,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               />
 
               {/* 5. Assets (renamed from Linked Assets — see workshop notes) */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                 <ExternalLinksSection contentItemId={item.id} addToast={addToast} readOnly={isReadOnly} />
               </div>
 
@@ -930,8 +930,8 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   treatment; color stays category-tinted for context. */}
               {activeCustomFields.length > 0 && (() => {
                 const isDesign = item.category === 'design';
-                const categoryColor = isDesign ? '#B8447A' : '#005D97';
-                const tintBg = isDesign ? '#FDF3F8' : '#005D9708';
+                const categoryColor = isDesign ? 'rgb(var(--color-accent-berry))' : 'rgb(var(--color-brand-600))';
+                const tintBg = isDesign ? '#FDF3F8' : 'rgb(var(--color-brand-600) / 0.031)';
                 return (
                   <div
                     className="rounded-xl overflow-hidden p-4"
@@ -961,7 +961,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
               {/* 7. Description — usually base-level context only, so sits
                   below structured task data (subtasks, links, custom fields). */}
               {fieldVisibility.description && (
-                <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
+                <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                   <div className="flex items-center justify-between mb-2">
                     <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em]">Description</label>
                     {!editingDescription && !isReadOnly && (
@@ -992,7 +992,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         </button>
                         <button
                           onClick={() => { setEditingDescription(false); setDescription(item.description); }}
-                          className="px-3 py-1.5 text-slate-600 text-xs rounded-lg hover:bg-[#005D9718]" style={{ border: '1px solid #00233930' }}
+                          className="px-3 py-1.5 text-slate-600 text-xs rounded-lg hover:bg-brand-600/[0.094]" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
                         >
                           Cancel
                         </button>
@@ -1000,7 +1000,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                     </div>
                   ) : (
                     <div
-                      className={`text-sm text-slate-700 whitespace-pre-wrap min-h-[60px] p-3 bg-surface-nested rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-[#005D9710]'}`}
+                      className={`text-sm text-slate-700 whitespace-pre-wrap min-h-[60px] p-3 bg-surface-nested rounded-lg transition-colors ${isReadOnly ? '' : 'cursor-pointer hover:bg-brand-600/[0.063]'}`}
                       onClick={() => !isReadOnly && setEditingDescription(true)}
                     >
                       {item.description || <span className="text-slate-400 italic">{isReadOnly ? 'No description' : 'Click to add description...'}</span>}
@@ -1011,7 +1011,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* 8. Granola Meeting Notes (conditional — section hides itself
                   when no note is linked and not in admin view) */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <GranolaNoteSection
                 key={granolaRefreshKey}
                 contentItemId={item.id}
@@ -1027,7 +1027,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
 
               {/* 9. Slack Threads (conditional — section hides itself when no
                   thread is linked) */}
-              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid #00233930' }}>
+              <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                 <SlackThreadsSection
                   key={slackRefreshKey}
                   contentItemId={item.id}
@@ -1073,7 +1073,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 />
               ))}
 
-              <div className="pt-2" style={{ borderTop: '1px solid #00233930' }}>
+              <div className="pt-2" style={{ borderTop: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
                 <MentionAutocomplete
                   value={commentText}
                   onChange={setCommentText}
@@ -1081,7 +1081,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                   placeholder="Add a comment… (type @ to mention)"
                   rows={3}
                   className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
-                  style={{ border: '1px solid #00233930' }}
+                  style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                       e.preventDefault();
@@ -1097,7 +1097,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                 {extractMentionIds(commentText).length > 0 && (
                   <div
                     className="mt-2 px-3 py-2 rounded-lg text-xs"
-                    style={{ backgroundColor: '#F7F9FC', border: '1px solid #00233918' }}
+                    style={{ backgroundColor: '#F7F9FC', border: '1px solid rgb(var(--color-brand-900) / 0.094)' }}
                   >
                     <span className="uppercase tracking-wider font-semibold text-slate-400 mr-2 text-[10px]">
                       Preview
@@ -1107,7 +1107,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
                         <span
                           key={`${m.uuid}-${m.start}`}
                           className="inline-flex items-baseline rounded-full px-1.5 py-0.5 text-xs font-medium"
-                          style={{ backgroundColor: '#005D9712', color: '#005D97' }}
+                          style={{ backgroundColor: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))' }}
                           title={`Mentioned: ${m.name}`}
                         >
                           @{m.name}
@@ -1214,7 +1214,7 @@ export function DetailSlideOver({ item, onClose, onUpdated, addToast }: Props) {
           onClose={() => setShowDeleteConfirm(false)}
           onConfirm={deleteItem}
           variant="destructive"
-          icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+          icon={<Trash2 className="w-5 h-5" style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
           title="Are you sure?"
           description="Once it's gone, it's gone for good."
           confirmLabel="Delete item"

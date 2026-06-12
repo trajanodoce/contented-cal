@@ -37,7 +37,7 @@ function TabBadge({ count }: { count: number }) {
         fontWeight: 700,
         lineHeight: 1,
         color: '#fff',
-        background: '#005D97',
+        background: 'rgb(var(--color-brand-600))',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -63,7 +63,7 @@ export default function SettingsTabs({
       style={{
         display: 'flex',
         gap: 4,
-        borderBottom: '1px solid #00233918',
+        borderBottom: '1px solid rgb(var(--color-brand-900) / 0.094)',
       }}
     >
       {tabs.map((tab) => {
@@ -100,9 +100,9 @@ export default function SettingsTabs({
               lineHeight: 1,
 
               /* Color + underline */
-              color: isActive ? '#005D97' : '#475569',
+              color: isActive ? 'rgb(var(--color-brand-600))' : '#475569',
               background: 'transparent',
-              borderBottom: isActive ? '2px solid #005D97' : '2px solid transparent',
+              borderBottom: isActive ? '2px solid rgb(var(--color-brand-600))' : '2px solid transparent',
 
               /* Transition — color + bg only, underline is instant */
               transition: 'color 150ms, background 150ms',
@@ -110,7 +110,7 @@ export default function SettingsTabs({
             onMouseEnter={(e) => {
               if (!isActive) {
                 e.currentTarget.style.color = '#334155';
-                e.currentTarget.style.background = '#005D9708';
+                e.currentTarget.style.background = 'rgb(var(--color-brand-600) / 0.031)';
               }
             }}
             onMouseLeave={(e) => {

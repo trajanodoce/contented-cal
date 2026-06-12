@@ -307,11 +307,11 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
               className={`rounded-lg overflow-hidden transition-all ${
                 expandedType === type.id ? 'border border-brand-300 ring-1 ring-brand-300' : ''
               }`}
-              style={expandedType !== type.id ? { border: '1px solid #00233930' } : undefined}
+              style={expandedType !== type.id ? { border: '1px solid rgb(var(--color-brand-900) / 0.188)' } : undefined}
             >
               {/* Header - Always visible */}
               <div
-                className="flex items-center justify-between px-4 py-3 bg-surface-nested cursor-pointer hover:bg-[#005D9710] transition-colors"
+                className="flex items-center justify-between px-4 py-3 bg-surface-nested cursor-pointer hover:bg-brand-600/[0.063] transition-colors"
                 onClick={() => {
                   if (expandedType === type.id) {
                     setExpandedType(null);
@@ -336,7 +336,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                       e.stopPropagation();
                       setShowDeleteConfirm(type.id);
                     }}
-                    className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
+                    className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -487,7 +487,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
                   <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
                     <button
                       onClick={() => setExpandedType(null)}
-                      className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
                     >
                       Cancel
                     </button>
@@ -509,7 +509,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setShowCreateModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={() => setShowCreateModal(false)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Create Content Type</h3>
 
@@ -554,7 +554,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -576,7 +576,7 @@ export function ContentTypeEditor({ workspaceId }: ContentTypeEditorProps) {
         onClose={() => setShowDeleteConfirm(null)}
         onConfirm={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
         variant="destructive"
-        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        icon={<Trash2 className="w-5 h-5" style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
         title="Delete Content Type?"
         description="This action cannot be undone. Content items using this type will lose their type assignment."
         confirmLabel="Delete content type"
@@ -680,7 +680,7 @@ function CustomFieldsManager({
               </div>
               <button
                 onClick={() => handleDelete(field.id)}
-                className="p-1 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
+                className="p-1 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -750,7 +750,7 @@ function CustomFieldsManager({
           <div className="flex gap-2 pt-1">
             <button
               onClick={() => setAdding(false)}
-              className="px-3 py-1.5 text-sm text-slate-600 hover:bg-[#005D9710] rounded-lg"
+              className="px-3 py-1.5 text-sm text-slate-600 hover:bg-brand-600/[0.063] rounded-lg"
             >
               Cancel
             </button>

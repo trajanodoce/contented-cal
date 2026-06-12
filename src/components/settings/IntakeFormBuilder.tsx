@@ -58,7 +58,7 @@ function FieldRow({ field, onDelete, onToggleRequired, onDragStart, onDragOver, 
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onToggleRequired}
-          className="text-xs px-2 py-1 rounded border transition-colors text-slate-500 border-slate-200 hover:bg-[#005D9718]"
+          className="text-xs px-2 py-1 rounded border transition-colors text-slate-500 border-slate-200 hover:bg-brand-600/[0.094]"
           title={field.required ? 'Make optional' : 'Make required'}
         >
           {field.required ? 'Required' : 'Optional'}
@@ -220,7 +220,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           <button
             onClick={() => setPreviewMode(!previewMode)}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg transition-colors
-              ${previewMode ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:bg-[#005D9718]'}`}
+              ${previewMode ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:bg-brand-600/[0.094]'}`}
           >
             {previewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             {previewMode ? 'Edit' : 'Preview'}
@@ -235,7 +235,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           {/* Left: fields */}
           <div className="col-span-2 space-y-4">
             {/* Field list */}
-            <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid #00233930' }}>
+            <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Form fields</h3>
               {loading ? (
                 <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-slate-400" /></div>
@@ -263,7 +263,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
           {/* Right: settings + add fields */}
           <div className="space-y-4">
             {/* Form settings */}
-            <div className="bg-surface-card rounded-xl p-4 space-y-3" style={{ border: '1px solid #00233930' }}>
+            <div className="bg-surface-card rounded-xl p-4 space-y-3" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <h3 className="text-sm font-semibold text-slate-700">Settings</h3>
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Form name</label>
@@ -317,7 +317,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
             )}
 
             {/* Add standard fields */}
-            <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid #00233930' }}>
+            <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <h3 className="text-sm font-semibold text-slate-700 mb-3">Standard fields</h3>
               <div className="space-y-1">
                 {STANDARD_FIELDS.map(f => {
@@ -328,7 +328,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
                       onClick={() => !added && addField(f.key, f.label, f.type, (f as { options?: string[] }).options)}
                       disabled={added}
                       className={`w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-lg transition-colors
-                        ${added ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-[#005D9718] cursor-pointer'}`}
+                        ${added ? 'text-slate-300 cursor-not-allowed' : 'text-slate-700 hover:bg-brand-600/[0.094] cursor-pointer'}`}
                     >
                       <span>{f.label}</span>
                       {added ? (
@@ -350,7 +350,7 @@ export function FormBuilder({ form, onBack, addToast }: FormBuilderProps) {
 
 function FormPreview({ form, fields }: { form: IntakeForm; fields: IntakeFormField[] }) {
   return (
-    <div className="bg-surface-card rounded-xl max-w-lg mx-auto p-8" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl max-w-lg mx-auto p-8" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">{form.name}</h1>
         {form.description && <p className="text-slate-500 mt-1 text-sm">{form.description}</p>}
@@ -480,17 +480,17 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
             <button onClick={createForm} disabled={!newFormName.trim() || creating} className="px-4 py-1.5 bg-brand-600 text-white text-sm rounded-lg hover:bg-brand-500 disabled:opacity-60 flex items-center gap-1.5">
               {creating && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Create
             </button>
-            <button onClick={() => setAddingForm(false)} className="px-3 py-1.5 text-slate-600 text-sm border border-slate-200 rounded-lg hover:bg-[#005D9718]">Cancel</button>
+            <button onClick={() => setAddingForm(false)} className="px-3 py-1.5 text-slate-600 text-sm border border-slate-200 rounded-lg hover:bg-brand-600/[0.094]">Cancel</button>
           </div>
         </div>
       )}
 
       {intakeForms.length === 0 && !addingForm ? (
-        <div className="bg-surface-card rounded-xl p-8 text-center text-slate-400" style={{ border: '1px solid #00233930' }}>
+        <div className="bg-surface-card rounded-xl p-8 text-center text-slate-400" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
           <p className="text-sm">No intake forms yet.</p>
         </div>
       ) : (
-        <div className="bg-surface-card rounded-xl divide-y divide-slate-100" style={{ border: '1px solid #00233930' }}>
+        <div className="bg-surface-card rounded-xl divide-y divide-slate-100" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
           {intakeForms.map(form => {
             const ct = contentTypes.find(c => c.id === form.content_type_id);
             return (
@@ -498,7 +498,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-slate-800">{form.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${form.is_public ? 'bg-green-50 text-green-700' : 'bg-[#005D9712] text-slate-500'}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${form.is_public ? 'bg-green-50 text-green-700' : 'bg-brand-600/[0.071] text-slate-500'}`}>
                       {form.is_public ? 'Public' : 'Private'}
                     </span>
                   </div>
@@ -512,7 +512,7 @@ export function IntakeFormsList({ addToast }: IntakeFormsListProps) {
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setEditingForm(form)}
-                    className="px-3 py-1 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718]"
+                    className="px-3 py-1 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-brand-600/[0.094]"
                   >
                     Edit
                   </button>

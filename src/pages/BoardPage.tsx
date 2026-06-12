@@ -110,7 +110,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       style={{
         ...style,
         padding: '10px 12px',
-        borderColor: '#00233930',
+        borderColor: 'rgb(var(--color-brand-900) / 0.188)',
         borderLeft: `3px solid ${sourceLeftBarColor}`,
       }}
     >
@@ -166,16 +166,16 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
       {/* Subtask progress */}
       {subtaskCount && subtaskCount.total > 0 && (
         <div className="flex items-center gap-2 mb-2">
-          <div className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#005D97' }}>
+          <div className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: 'rgb(var(--color-brand-600))' }}>
             <ListChecks className="w-3.5 h-3.5" />
             <span>{subtaskCount.completed}/{subtaskCount.total}</span>
           </div>
-          <div className="flex-1 h-1 bg-[#005D9712] rounded-full overflow-hidden">
+          <div className="flex-1 h-1 bg-brand-600/[0.071] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{
                 width: `${(subtaskCount.completed / subtaskCount.total) * 100}%`,
-                backgroundColor: subtaskCount.completed === subtaskCount.total ? '#92D1B2' : '#005D97',
+                backgroundColor: subtaskCount.completed === subtaskCount.total ? '#92D1B2' : 'rgb(var(--color-brand-600))',
               }}
             />
           </div>
@@ -205,7 +205,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
             className={`flex items-center gap-1 text-[10px] ${
               isOverdue ? 'font-medium' : 'text-slate-400'
             }`}
-            style={isOverdue ? { color: '#BA2C2C' } : undefined}
+            style={isOverdue ? { color: 'rgb(var(--color-accent-crimson))' } : undefined}
           >
             {isOverdue && <AlertCircle className="w-3 h-3" />}
             <CalendarIcon className="w-3 h-3" />
@@ -244,8 +244,8 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
       ref={setNodeRef}
       className={`flex-shrink-0 w-[300px] flex flex-col rounded-xl transition-all`}
       style={{
-        backgroundColor: isOver ? '#005D9710' : `${colColor}06`,
-        border: isOver ? '2px dashed #005D97' : '1px solid #00233930',
+        backgroundColor: isOver ? 'rgb(var(--color-brand-600) / 0.063)' : `${colColor}06`,
+        border: isOver ? '2px dashed rgb(var(--color-brand-600))' : '1px solid rgb(var(--color-brand-900) / 0.188)',
       }}
     >
       {/* Column Header — 4px color band + 12-alpha tinted header zone */}
@@ -488,7 +488,7 @@ export function BoardPage() {
 
   return (
     <div className="h-full flex flex-col min-h-0 bg-surface-page">
-      <div className="px-6 py-4 bg-surface-card flex-shrink-0" style={{ borderBottom: '1px solid #00233930' }}>
+      <div className="px-6 py-4 bg-surface-card flex-shrink-0" style={{ borderBottom: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         <FilterBar
           workspaceId={currentWorkspace?.id || null}
           contentTypes={contentTypes}

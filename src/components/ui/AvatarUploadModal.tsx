@@ -131,7 +131,7 @@ export function AvatarUploadModal({
           maxWidth: 380,
           width: '100%',
           backgroundColor: '#fff',
-          border: '1.5px solid #002339',
+          border: '1.5px solid rgb(var(--color-brand-900))',
           borderRadius: 16,
           boxShadow: '0 20px 40px -8px rgba(0,35,57,.22)',
           overflow: 'hidden',
@@ -142,7 +142,7 @@ export function AvatarUploadModal({
           <h2
             id="avatar-upload-title"
             className="font-heading"
-            style={{ fontSize: 16, color: '#002339', margin: 0, fontWeight: 700 }}
+            style={{ fontSize: 16, color: 'rgb(var(--color-brand-900))', margin: 0, fontWeight: 700 }}
           >
             Update photo
           </h2>
@@ -163,8 +163,8 @@ export function AvatarUploadModal({
             style={{
               background: '#F4F8FB',
               border: isDragging
-                ? '1.5px dashed #005D97'
-                : '1.5px dashed #00233930',
+                ? '1.5px dashed rgb(var(--color-brand-600))'
+                : '1.5px dashed rgb(var(--color-brand-900) / 0.188)',
               borderRadius: 12,
               padding: 20,
               textAlign: 'center',
@@ -195,9 +195,9 @@ export function AvatarUploadModal({
               style={{
                 fontSize: 12,
                 fontWeight: 600,
-                color: '#005D97',
+                color: 'rgb(var(--color-brand-600))',
                 backgroundColor: '#fff',
-                border: '1px solid #005D9730',
+                border: '1px solid rgb(var(--color-brand-600) / 0.188)',
                 borderRadius: 6,
                 padding: '6px 12px',
                 cursor: uploading ? 'not-allowed' : 'pointer',
@@ -219,7 +219,7 @@ export function AvatarUploadModal({
               role="alert"
               style={{
                 fontSize: 12,
-                color: '#BA2C2C',
+                color: 'rgb(var(--color-accent-crimson))',
                 margin: '10px 0 0',
               }}
             >
@@ -233,7 +233,7 @@ export function AvatarUploadModal({
           className="flex justify-end"
           style={{
             backgroundColor: '#F7F9FC',
-            borderTop: '1px solid #00233918',
+            borderTop: '1px solid rgb(var(--color-brand-900) / 0.094)',
             padding: '14px 22px',
             gap: 8,
           }}
@@ -260,7 +260,7 @@ export function AvatarUploadModal({
             onClick={handleSave}
             disabled={!file || uploading}
             style={{
-              backgroundColor: '#005D97',
+              backgroundColor: 'rgb(var(--color-brand-600))',
               border: 'none',
               color: '#fff',
               fontSize: 13,

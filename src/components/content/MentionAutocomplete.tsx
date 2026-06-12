@@ -213,11 +213,11 @@ export const MentionAutocomplete = forwardRef<MentionAutocompleteHandle, Props>(
         <div
           className="absolute z-50 mt-1 left-0 right-0 max-w-md bg-white rounded-lg shadow-lg overflow-hidden"
           style={{
-            border: '1px solid #00233920',
+            border: '1px solid rgb(var(--color-brand-900) / 0.125)',
             background: 'linear-gradient(135deg, #F7F9FC 0%, #FFFFFF 100%)',
           }}
         >
-          <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-slate-400 border-b" style={{ borderColor: '#00233910' }}>
+          <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-slate-400 border-b" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.063)' }}>
             {trigger?.query ? `Mention: "${trigger.query}"` : 'Mention someone'}
           </div>
           <ul role="listbox" className="max-h-56 overflow-y-auto py-1">
@@ -236,7 +236,7 @@ export const MentionAutocomplete = forwardRef<MentionAutocompleteHandle, Props>(
                   onMouseEnter={() => setHighlight(i)}
                   className="flex items-center gap-2 px-3 py-1.5 cursor-pointer text-sm"
                   style={{
-                    backgroundColor: isActive ? '#005D9712' : 'transparent',
+                    backgroundColor: isActive ? 'rgb(var(--color-brand-600) / 0.071)' : 'transparent',
                   }}
                 >
                   <Avatar src={m.avatar_url} name={name} size="sm" />
@@ -250,7 +250,7 @@ export const MentionAutocomplete = forwardRef<MentionAutocompleteHandle, Props>(
               );
             })}
           </ul>
-          <div className="px-3 py-1 text-[10px] text-slate-400 border-t" style={{ borderColor: '#00233910' }}>
+          <div className="px-3 py-1 text-[10px] text-slate-400 border-t" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.063)' }}>
             ↑↓ navigate · ↵ select · Esc dismiss
           </div>
         </div>

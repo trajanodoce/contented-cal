@@ -6,8 +6,8 @@ import { pillTextColor } from '../../lib/utils';
 // Category colors used by pill-row rendering (single_select with ≤5 options).
 // Aligned with TaskCategoryIcon + Optional Details zone tint.
 const CATEGORY_COLOR: Record<TaskCategory, string> = {
-  content: '#005D97',
-  design: '#B8447A',
+  content: 'rgb(var(--color-brand-600))',
+  design: 'rgb(var(--color-accent-berry))',
 };
 
 // Single-select fields with this many or fewer options render as a pill row

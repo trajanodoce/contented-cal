@@ -6,10 +6,10 @@ import { AvatarStack } from '../ui/Avatar';
 import { formatDate } from '../../lib/utils';
 import { TaskPickerModal } from './TaskPickerModal';
 
-const BERRY = '#B8447A';
-const BERRY_BORDER = '#B8447A40';
-const BERRY_GLOW = '#B8447A08';
-const BERRY_TINT = '#B8447A15';
+const BERRY = 'rgb(var(--color-accent-berry))';
+const BERRY_BORDER = 'rgb(var(--color-accent-berry) / 0.251)';
+const BERRY_GLOW = 'rgb(var(--color-accent-berry) / 0.031)';
+const BERRY_TINT = 'rgb(var(--color-accent-berry) / 0.082)';
 
 interface Props {
   itemId: string;
@@ -166,7 +166,7 @@ function LinkedTaskRow({ task, members, boardColumns, onClick, onUnlink }: Linke
       className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-colors hover:bg-slate-100"
       style={{
         background: '#F7F9FC',
-        border: '1px solid #00233918',
+        border: '1px solid rgb(var(--color-brand-900) / 0.094)',
       }}
     >
       <TaskCategoryIcon category={task.category} size={14} />

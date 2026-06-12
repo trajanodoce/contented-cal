@@ -13,9 +13,9 @@ import type { LinkInfo } from '../../hooks/useExternalLinkCounts';
  * not reorder anything).
  *
  * Family logic (design system §Card Indicator Family — Shape + Color Split):
- *   - Subtasks    → ListChecks · navy  #005D97 · {done}/{total}
- *   - Assets      → Paperclip  · navy  #005D97 · count + platform tooltip
- *   - Linked tasks→ Link2      · berry #B8447A · count
+ *   - Subtasks    → ListChecks · navy  rgb(var(--color-brand-600)) · {done}/{total}
+ *   - Assets      → Paperclip  · navy  rgb(var(--color-brand-600)) · count + platform tooltip
+ *   - Linked tasks→ Link2      · berry rgb(var(--color-accent-berry)) · count
  *   - Granola     → Mic        · green #357254 · presence only
  *
  * Size scale:
@@ -23,8 +23,8 @@ import type { LinkInfo } from '../../hooks/useExternalLinkCounts';
  *   - 'xs' = calendar chips    (12px icon, 10px text, count omitted when 1)
  */
 
-const NAVY = '#005D97';
-const BERRY = '#B8447A';
+const NAVY = 'rgb(var(--color-brand-600))';
+const BERRY = 'rgb(var(--color-accent-berry))';
 
 type Size = 'sm' | 'xs';
 

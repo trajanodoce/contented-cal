@@ -283,11 +283,11 @@ export function ProjectDetailPage() {
   // Status badge colors
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      active: 'bg-[#92D1B218] text-[#2F8889]',
+      active: 'bg-[#92D1B218] text-accent-teal',
       completed: 'bg-brand-100 text-brand-700',
-      archived: 'bg-[#005D9712] text-slate-500',
+      archived: 'bg-brand-600/[0.071] text-slate-500',
     };
-    return map[status] ?? 'bg-[#005D9712] text-slate-500';
+    return map[status] ?? 'bg-brand-600/[0.071] text-slate-500';
   };
 
   // Timeline-health dot color for the status pill (canonical Draft 5.3).
@@ -300,7 +300,7 @@ export function ProjectDetailPage() {
     today.setHours(0, 0, 0, 0);
     const endDate = parseLocalDate(project.end_date);
     const daysToEnd = Math.ceil((endDate.getTime() - today.getTime()) / 86400000);
-    if (daysToEnd < 0) return '#BA2C2C'; // overdue
+    if (daysToEnd < 0) return 'rgb(var(--color-accent-crimson))'; // overdue
     if (daysToEnd <= 7 && completion < 0.8) return '#A05042'; // approaching due, under-done
     return '#357254'; // on track
   }, [project?.status, project?.end_date, items.length, completedCount]);
@@ -351,17 +351,17 @@ export function ProjectDetailPage() {
       <div
         className="px-6 py-4 shrink-0"
         style={{
-          background: 'linear-gradient(to right, #005D9720 0%, #FBE7F118 100%)',
-          borderBottom: '1px solid #00233918',
+          background: 'linear-gradient(to right, rgb(var(--color-brand-600) / 0.125) 0%, rgb(var(--color-accent-pink) / 0.094) 100%)',
+          borderBottom: '1px solid rgb(var(--color-brand-900) / 0.094)',
         }}
       >
         <button
           onClick={() => navigate('/projects')}
-          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-[#005D9710] transition-colors mb-3"
+          className="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-brand-600/[0.063] transition-colors mb-3"
           style={{
             backgroundColor: '#ffffff',
-            color: '#002339',
-            border: '1px solid #00233920',
+            color: 'rgb(var(--color-brand-900))',
+            border: '1px solid rgb(var(--color-brand-900) / 0.125)',
           }}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -397,7 +397,7 @@ export function ProjectDetailPage() {
             <span
               className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusBadge(project.status)}`}
               title={
-                timelineHealthColor === '#BA2C2C'
+                timelineHealthColor === 'rgb(var(--color-accent-crimson))'
                   ? 'Overdue'
                   : timelineHealthColor === '#A05042'
                     ? 'Approaching due — under 80% complete'
@@ -450,7 +450,7 @@ export function ProjectDetailPage() {
                   setDescDraft(project.description ?? '');
                   setEditingDesc(false);
                 }}
-                className="px-3 py-1 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
+                className="px-3 py-1 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-brand-600/[0.094]"
               >
                 Cancel
               </button>
@@ -613,16 +613,16 @@ function RecentActivitySection({ activityLogs, members }: { activityLogs: Activi
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#005D9718] transition-colors"
+        className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-brand-600/[0.094] transition-colors"
       >
         <h3 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
           <Clock className="w-4 h-4 text-slate-400" />
           Recent Activity
           {activityLogs.length > 0 && (
-            <span className="text-xs font-normal text-slate-400 bg-[#005D9712] px-1.5 py-0.5 rounded-full">{activityLogs.length}</span>
+            <span className="text-xs font-normal text-slate-400 bg-brand-600/[0.071] px-1.5 py-0.5 rounded-full">{activityLogs.length}</span>
           )}
         </h3>
         {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
@@ -700,11 +700,11 @@ function OverviewTab({
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       {/* Progress bar by board column */}
-      <div className="bg-surface-card rounded-xl p-5" style={{ border: '1px solid #00233930' }}>
+      <div className="bg-surface-card rounded-xl p-5" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         <h3 className="text-sm font-semibold text-slate-700 mb-4">Progress</h3>
         {totalItems > 0 ? (
           <>
-            <div className="h-3 rounded-full overflow-hidden flex bg-[#005D9712]">
+            <div className="h-3 rounded-full overflow-hidden flex bg-brand-600/[0.071]">
               {boardColumns.map((col) => {
                 const count = columnCounts.get(col.id) ?? 0;
                 if (count === 0) return null;
@@ -871,7 +871,7 @@ function TeamMembersSection({
   const isTaskAssignee = (userId: string) => taskAssigneeIds.includes(userId);
 
   return (
-    <div className="bg-surface-card rounded-xl p-5" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl p-5" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-slate-700">
           Team Members
@@ -886,7 +886,7 @@ function TeamMembersSection({
             Add
           </button>
           {showPicker && (
-            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+            <div className="absolute right-0 mt-1 w-56 bg-surface-card rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
               {availableToAdd.length === 0 ? (
                 <p className="text-xs text-slate-400 text-center py-3">All workspace members are on this project</p>
               ) : (
@@ -894,7 +894,7 @@ function TeamMembersSection({
                   <button
                     key={m.id}
                     onClick={() => addMember(m.id)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-brand-600/[0.094] transition-colors"
                   >
                     <Avatar src={m.avatar_url} name={m.full_name} size="md" />
                     <span className="truncate">{m.full_name || m.email}</span>
@@ -950,7 +950,7 @@ function StatCard({
   value: number;
 }) {
   return (
-    <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl p-4" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <div className="flex items-center gap-2 mb-2">
         {icon}
         <span className="text-xs text-slate-500">{label}</span>
@@ -1115,20 +1115,20 @@ function ListTab({
       ) : (
         <div
           className="bg-surface-card rounded-xl overflow-hidden focus:outline-none"
-          style={{ border: '1px solid #00233930' }}
+          style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
           tabIndex={0}
           onKeyDown={handleTableKeyDown}
         >
           <table className="w-full">
             <thead
               className="sticky top-0 z-10"
-              style={{ background: '#F7F9FC', borderBottom: '1.5px solid #00233980' }}
+              style={{ background: '#F7F9FC', borderBottom: '1.5px solid rgb(var(--color-brand-900) / 0.502)' }}
             >
               <tr>
                 <th className="px-4 py-3 w-12">
                   <button
                     onClick={handleSelectAll}
-                    className="p-1 hover:bg-[#005D9710] rounded transition-colors"
+                    className="p-1 hover:bg-brand-600/[0.063] rounded transition-colors"
                   >
                     {isAllSelected ? (
                       <CheckSquare className="w-5 h-5 text-brand-600" />
@@ -1184,7 +1184,7 @@ function ListTab({
                 const isBlocked = colName === 'blocked';
                 const isOverdue = item.due_date && !isDone && new Date(item.due_date + 'T00:00:00') < new Date(new Date().toDateString());
                 const isUrgentRow = isBlocked || isOverdue;
-                const leftBarColor = isUrgentRow ? '#BA2C2C' : sourceLeftBarColor;
+                const leftBarColor = isUrgentRow ? 'rgb(var(--color-accent-crimson))' : sourceLeftBarColor;
                 const isSelected = selectedItems.has(item.id);
                 return (
                   <tr
@@ -1194,11 +1194,11 @@ function ListTab({
                       setFocusedIndex(idx);
                     }}
                     className={`group cursor-pointer transition-colors ${
-                      isSelected ? selectedRowClass : 'hover:bg-[#005D9718]'
+                      isSelected ? selectedRowClass : 'hover:bg-brand-600/[0.094]'
                     } ${isDone ? 'opacity-60' : ''}`}
                     style={
                       isFocused
-                        ? { outline: '2px solid #005D97', outlineOffset: '-2px' }
+                        ? { outline: '2px solid rgb(var(--color-brand-600))', outlineOffset: '-2px' }
                         : undefined
                     }
                   >
@@ -1209,7 +1209,7 @@ function ListTab({
                     >
                       <button
                         onClick={() => handleSelectItem(item.id)}
-                        className="p-1 hover:bg-[#005D9710] rounded transition-colors"
+                        className="p-1 hover:bg-brand-600/[0.063] rounded transition-colors"
                       >
                         {isSelected ? (
                           <CheckSquare className="w-5 h-5 text-brand-600" />
@@ -1229,7 +1229,7 @@ function ListTab({
                         {isUrgentRow && (
                           <AlertTriangle
                             className="w-3.5 h-3.5 shrink-0"
-                            style={{ color: '#BA2C2C' }}
+                            style={{ color: 'rgb(var(--color-accent-crimson))' }}
                           />
                         )}
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : ''} truncate`}>
@@ -1284,7 +1284,7 @@ function ListTab({
                       className={`px-4 py-3 text-xs ${
                         isOverdue ? 'font-medium' : 'text-slate-500'
                       }`}
-                      style={isOverdue ? { color: '#BA2C2C' } : undefined}
+                      style={isOverdue ? { color: 'rgb(var(--color-accent-crimson))' } : undefined}
                     >
                       {item.due_date ? formatDate(item.due_date) : '--'}
                     </td>
@@ -1398,7 +1398,7 @@ function ProjectBoardCard({
       style={{
         ...style,
         padding: '10px 12px',
-        borderColor: '#00233930',
+        borderColor: 'rgb(var(--color-brand-900) / 0.188)',
         borderLeft: `3px solid ${sourceLeftBarColor}`,
       }}
     >
@@ -1480,8 +1480,8 @@ function ProjectBoardColumn({
       ref={setNodeRef}
       className={`w-72 flex-shrink-0 rounded-xl transition-all`}
       style={{
-        backgroundColor: isOver ? '#005D9710' : `${colColor}06`,
-        border: isOver ? '2px dashed #005D97' : '1px solid #00233930',
+        backgroundColor: isOver ? 'rgb(var(--color-brand-600) / 0.063)' : `${colColor}06`,
+        border: isOver ? '2px dashed rgb(var(--color-brand-600))' : '1px solid rgb(var(--color-brand-900) / 0.188)',
       }}
     >
       {/* Column header — 4px color band + 12-alpha tinted header zone */}
@@ -1772,12 +1772,12 @@ function ProjectMonthGrid({
             <div
               key={dateKey}
               className={`min-h-[140px] px-2 pt-2 pb-2.5 border-b border-r border-slate-300 ${
-                today ? 'bg-[#005D970A]' : ''
+                today ? 'bg-brand-600/[0.039]' : ''
               } ${isLastCol ? 'border-r-0' : ''}`}
             >
               <div className="flex justify-between items-center mb-1">
                 <span
-                  className={`text-[11px] ${today ? 'font-bold text-[#005D97]' : 'font-semibold text-[#334155]'}`}
+                  className={`text-[11px] ${today ? 'font-bold text-brand-600' : 'font-semibold text-[#334155]'}`}
                 >
                   {format(day, 'd')}
                 </span>
@@ -1874,7 +1874,7 @@ function CalendarTab({
             onClick={toggleWeekends}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
               weekendsCollapsed
-                ? 'border-slate-300 text-slate-600 hover:bg-[#005D9718]'
+                ? 'border-slate-300 text-slate-600 hover:bg-brand-600/[0.094]'
                 : 'border-brand-200 bg-brand-50 text-brand-700'
             }`}
           >
@@ -1882,19 +1882,19 @@ function CalendarTab({
           </button>
           <button
             onClick={goToday}
-            className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
+            className="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-brand-600/[0.094]"
           >
             Today
           </button>
           <button
             onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
+            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-brand-600/[0.094]"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-[#005D9718]"
+            className="p-1.5 text-slate-400 hover:text-slate-600 border border-slate-300 rounded-lg hover:bg-brand-600/[0.094]"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -1907,11 +1907,11 @@ function CalendarTab({
           <div
             key={monthDate.toISOString()}
             className="bg-[#F7F9FC] rounded-xl overflow-hidden"
-            style={{ border: '1.5px solid #002339', marginTop: idx > 0 ? '16px' : 0 }}
+            style={{ border: '1.5px solid rgb(var(--color-brand-900))', marginTop: idx > 0 ? '16px' : 0 }}
           >
             {/* Month header bar — canonical calendar-month-header token */}
-            <div className="cc-banner-calendar-month border-b border-[#002339]" style={{ borderRadius: 0 }}>
-              <h3 className="text-sm font-heading tracking-wide" style={{ color: '#002339' }}>
+            <div className="cc-banner-calendar-month border-b border-brand-900" style={{ borderRadius: 0 }}>
+              <h3 className="text-sm font-heading tracking-wide" style={{ color: 'rgb(var(--color-brand-900))' }}>
                 {format(monthDate, 'MMMM yyyy')}
               </h3>
             </div>
@@ -1930,7 +1930,7 @@ function CalendarTab({
         <div className="flex justify-center pt-4">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9718] hover:text-slate-900 transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-slate-600 bg-surface-card border border-slate-300 rounded-lg hover:bg-brand-600/[0.094] hover:text-slate-900 transition-colors shadow-sm"
           >
             {expanded ? (
               <>

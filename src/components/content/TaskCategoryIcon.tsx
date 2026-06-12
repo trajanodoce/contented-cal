@@ -23,7 +23,7 @@ export function TaskCategoryIcon({ category, size = 14 }: Props) {
     return (
       <span title="Design task" className="inline-flex flex-shrink-0">
         <Palette
-          style={{ width: size, height: size, color: '#B8447A' }}
+          style={{ width: size, height: size, color: 'rgb(var(--color-accent-berry))' }}
           aria-label="Design task"
         />
       </span>
@@ -32,7 +32,7 @@ export function TaskCategoryIcon({ category, size = 14 }: Props) {
   return (
     <span title="Content task" className="inline-flex flex-shrink-0">
       <FileText
-        style={{ width: size, height: size, color: '#005D97' }}
+        style={{ width: size, height: size, color: 'rgb(var(--color-brand-600))' }}
         aria-label="Content task"
       />
     </span>

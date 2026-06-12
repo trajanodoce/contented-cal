@@ -9,7 +9,7 @@ import { useApp } from '../../contexts/AppContext';
 import type { ContentItem, AiInteraction, AiAction, CustomFieldDefinition } from '../../lib/database.types';
 
 // Accent color for all AI assistant interactive elements
-const AI_ACCENT = '#2F8889';
+const AI_ACCENT = 'rgb(var(--color-accent-teal))';
 
 interface Props {
   item: ContentItem;
@@ -114,7 +114,7 @@ function InsertModal({
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={onCancel}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={onCancel}>
       <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-sm p-5" onClick={e => e.stopPropagation()}>
         <h3 className="text-sm font-semibold text-slate-900 mb-1">Insert into description</h3>
         <p className="text-xs text-slate-500 mb-4">The description already has content. How should this be added?</p>
@@ -128,7 +128,7 @@ function InsertModal({
           </button>
           <button
             onClick={() => onChoice('append')}
-            className="w-full px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
+            className="w-full px-4 py-2.5 text-sm font-medium text-slate-700 border border-slate-200 rounded-lg hover:bg-brand-600/[0.094] transition-colors"
           >
             Append to description
           </button>
@@ -153,7 +153,7 @@ function ShimmerCard({ action }: { action: AiAction | 'custom' }) {
   return (
     <div
       className="bg-surface-card border rounded-xl overflow-hidden"
-      style={{ borderColor: '#00233918' }}
+      style={{ borderColor: 'rgb(var(--color-brand-900) / 0.094)' }}
       role="status"
       aria-live="polite"
       aria-label={`Generating ${actionMeta?.label ?? action}`}
@@ -194,7 +194,7 @@ function ResponseCard({
   const timeLabel = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="bg-surface-card border rounded-xl overflow-hidden" style={{ borderColor: '#00233918' }}>
+    <div className="bg-surface-card border rounded-xl overflow-hidden" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.094)' }}>
       <div className="flex items-center justify-between px-3 py-2 bg-surface-nested border-b border-slate-100">
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">{actionMeta?.icon ?? <Sparkles className="w-3.5 h-3.5" />}</span>
@@ -354,18 +354,18 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
 
   return (
     <>
-      <div className="border rounded-xl overflow-hidden" style={{ borderColor: '#00233918' }}>
+      <div className="border rounded-xl overflow-hidden" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.094)' }}>
         {/* Header toggle */}
         <button
           onClick={() => setOpen(o => !o)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-surface-nested to-surface-card hover:bg-[#005D9718] transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-surface-nested to-surface-card hover:bg-brand-600/[0.094] transition-colors"
         >
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#2F8889' }}>
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgb(var(--color-accent-teal))' }}>
               <Sparkles className="w-3.5 h-3.5 text-white" />
             </div>
             <span className="text-sm font-semibold text-slate-800">AI Assistant</span>
-            <span className="text-xs text-slate-400 bg-[#005D9712] px-1.5 py-0.5 rounded-full">Bolt.new Writer</span>
+            <span className="text-xs text-slate-400 bg-brand-600/[0.071] px-1.5 py-0.5 rounded-full">Bolt.new Writer</span>
           </div>
           {open ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
         </button>
@@ -391,13 +391,13 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                         key={action.id}
                         onClick={() => runAction(action.id)}
                         disabled={loading !== null}
-                        className="w-full flex items-center gap-3 p-3 text-left border border-slate-200 rounded-lg transition-all group disabled:opacity-50 hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5"
+                        className="w-full flex items-center gap-3 p-3 text-left border border-slate-200 rounded-lg transition-all group disabled:opacity-50 hover:border-accent-teal/30 hover:bg-accent-teal/5"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#005D9712] group-hover:bg-[#2F8889]/10 flex items-center justify-center text-slate-500 group-hover:text-[#2F8889] transition-colors shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-brand-600/[0.071] group-hover:bg-accent-teal/10 flex items-center justify-center text-slate-500 group-hover:text-accent-teal transition-colors shrink-0">
                           {action.icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-slate-800 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
+                          <p className="text-sm font-medium text-slate-800 group-hover:text-accent-teal transition-colors">{action.label}</p>
                           <p className="text-xs text-slate-400 mt-0.5">{action.description}</p>
                         </div>
                         {loading === action.id && (
@@ -417,13 +417,13 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                           key={action.id}
                           onClick={() => runAction(action.id)}
                           disabled={loading !== null}
-                          className="flex items-center gap-2 p-2.5 text-left border border-slate-200 rounded-lg hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5 transition-all group disabled:opacity-50"
+                          className="flex items-center gap-2 p-2.5 text-left border border-slate-200 rounded-lg hover:border-accent-teal/30 hover:bg-accent-teal/5 transition-all group disabled:opacity-50"
                         >
-                          <span className="text-slate-400 group-hover:text-[#2F8889] transition-colors shrink-0">
+                          <span className="text-slate-400 group-hover:text-accent-teal transition-colors shrink-0">
                             {action.icon}
                           </span>
                           <div className="min-w-0">
-                            <p className="text-xs font-medium text-slate-700 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
+                            <p className="text-xs font-medium text-slate-700 group-hover:text-accent-teal transition-colors">{action.label}</p>
                           </div>
                           {loading === action.id && (
                             <Loader2 className="w-3.5 h-3.5 animate-spin ml-auto shrink-0" style={{ color: AI_ACCENT }} />
@@ -451,12 +451,12 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                             key={action.id}
                             onClick={() => runAction(action.id)}
                             disabled={loading !== null}
-                            className="flex items-center gap-2 p-2 text-left border border-slate-100 rounded-lg hover:border-[#2F8889]/30 hover:bg-[#2F8889]/5 transition-all group disabled:opacity-50"
+                            className="flex items-center gap-2 p-2 text-left border border-slate-100 rounded-lg hover:border-accent-teal/30 hover:bg-accent-teal/5 transition-all group disabled:opacity-50"
                           >
-                            <span className="text-slate-400 group-hover:text-[#2F8889] transition-colors shrink-0">
+                            <span className="text-slate-400 group-hover:text-accent-teal transition-colors shrink-0">
                               {action.icon}
                             </span>
-                            <p className="text-xs text-slate-600 group-hover:text-[#2F8889] transition-colors">{action.label}</p>
+                            <p className="text-xs text-slate-600 group-hover:text-accent-teal transition-colors">{action.label}</p>
                             {loading === action.id && (
                               <Loader2 className="w-3 h-3 animate-spin ml-auto shrink-0" style={{ color: AI_ACCENT }} />
                             )}
@@ -477,7 +477,7 @@ export function AiAssistant({ item, onInsertToDescription, addToast }: Props) {
                       onChange={e => setCustomPrompt(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && customPrompt.trim() && runAction('custom', customPrompt)}
                       placeholder="Ask anything about this content..."
-                      className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2F8889]"
+                      className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-teal"
                       disabled={loading !== null}
                     />
                     <button

@@ -347,7 +347,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
           <FolderOpen className="w-4 h-4 text-slate-400" />
           <h3 className="text-sm font-semibold text-slate-700">Content Library</h3>
           {totalCount > 0 && (
-            <span className="text-xs text-slate-400 bg-[#005D9712] px-1.5 py-0.5 rounded-full">
+            <span className="text-xs text-slate-400 bg-brand-600/[0.071] px-1.5 py-0.5 rounded-full">
               {totalCount}
             </span>
           )}
@@ -363,13 +363,13 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
               Add
             </button>
             {showAddMenu && (
-              <div className="absolute right-0 mt-1 w-44 bg-surface-card rounded-xl shadow-lg py-1 z-50" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+              <div className="absolute right-0 mt-1 w-44 bg-surface-card rounded-xl shadow-lg py-1 z-50" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
                 <button
                   onClick={() => {
                     setShowAddMenu(false);
                     fileInputRef.current?.click();
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718]"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-brand-600/[0.094]"
                 >
                   <Upload className="w-4 h-4 text-slate-400" />
                   Upload file
@@ -379,7 +379,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                     setShowAddMenu(false);
                     setShowLinkForm(true);
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718]"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-brand-600/[0.094]"
                 >
                   <Link2 className="w-4 h-4 text-slate-400" />
                   Add link
@@ -473,7 +473,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                 {fileItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-brand-600/[0.094] group transition-colors"
                   >
                     {getFileIcon(item.file_type)}
                     <div className="flex-1 min-w-0">
@@ -574,7 +574,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                 {linkItems.map(item => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-brand-600/[0.094] group transition-colors"
                   >
                     <Link2 className="w-5 h-5 text-brand-400 shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -684,7 +684,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                   return (
                     <div
                       key={asset.id}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] group transition-colors"
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-brand-600/[0.094] group transition-colors"
                     >
                       {/* Platform icon — uses the canonical PlatformIcon
                           tile so brand recognition stays consistent with
@@ -716,7 +716,7 @@ export function ContentLibrary({ projectId, workspaceId, readOnly }: Props) {
                               asset at its source. */}
                           <button
                             onClick={() => setSelectedItemId(asset.parent_task_id)}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-[#005D9712] text-brand-600 hover:bg-[#005D9722] transition-colors max-w-[180px] truncate"
+                            className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-brand-600/[0.071] text-brand-600 hover:bg-brand-600/[0.133] transition-colors max-w-[180px] truncate"
                             title={`Open task: ${asset.parent_task_title}`}
                           >
                             {asset.parent_task_title}

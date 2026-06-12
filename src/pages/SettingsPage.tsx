@@ -118,7 +118,7 @@ export function SettingsPage() {
           id={`settings-tab-panel-${topTab}`}
           aria-labelledby={`settings-tab-${topTab}`}
           className="bg-surface-card rounded-lg p-6"
-          style={{ border: '1px solid #00233930' }}
+          style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
         >
           {topTab === 'general' && <GeneralTab workspace={currentWorkspace} />}
           {topTab === 'team' && <TeamTab />}

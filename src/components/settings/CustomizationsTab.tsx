@@ -38,14 +38,14 @@ export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
   const activeSlug = resolveSubTab(location.pathname);
 
   return (
-    <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       {/* Sub-nav sidebar */}
       <nav
         className="shrink-0 py-[18px] px-3"
         style={{
           width: 220,
           backgroundColor: '#F7F9FC',
-          borderRight: '1px solid #00233918',
+          borderRight: '1px solid rgb(var(--color-brand-900) / 0.094)',
         }}
       >
         <span
@@ -76,12 +76,12 @@ export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
                 borderRadius: 6,
                 fontSize: 13,
                 fontWeight: 600,
-                color: isActive ? '#005D97' : '#334155',
-                backgroundColor: isActive ? '#005D9710' : 'transparent',
+                color: isActive ? 'rgb(var(--color-brand-600))' : '#334155',
+                backgroundColor: isActive ? 'rgb(var(--color-brand-600) / 0.063)' : 'transparent',
               }}
               onMouseEnter={e => {
                 if (!isActive) {
-                  e.currentTarget.style.backgroundColor = '#005D9708';
+                  e.currentTarget.style.backgroundColor = 'rgb(var(--color-brand-600) / 0.031)';
                 }
               }}
               onMouseLeave={e => {
@@ -99,7 +99,7 @@ export function CustomizationsTab({ workspaceId }: CustomizationsTabProps) {
                     bottom: 8,
                     width: 3,
                     borderRadius: 2,
-                    backgroundColor: '#005D97',
+                    backgroundColor: 'rgb(var(--color-brand-600))',
                   }}
                 />
               )}

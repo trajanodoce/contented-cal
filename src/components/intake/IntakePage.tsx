@@ -102,7 +102,7 @@ export function IntakePage({ slug }: Props) {
     return (
       <div className="min-h-screen bg-surface-page flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#BA2C2C12] flex items-center justify-center mx-auto mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-accent-crimson/[0.071] flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-7 h-7 text-accent-crimson" />
           </div>
           <h1 className="text-xl font-semibold text-slate-800">Form not found</h1>
@@ -137,7 +137,7 @@ export function IntakePage({ slug }: Props) {
           <span className="text-sm font-medium text-slate-500">Content Request</span>
         </div>
 
-        <div className="bg-surface-card rounded-2xl shadow-sm p-8" style={{ border: '1px solid #00233930' }}>
+        <div className="bg-surface-card rounded-2xl shadow-sm p-8" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
           <h1 className="text-2xl font-bold text-slate-900 mb-1">{form?.name}</h1>
           {form?.description && (
             <p className="text-slate-500 text-sm mb-6">{form.description}</p>
@@ -159,7 +159,7 @@ export function IntakePage({ slug }: Props) {
             ))}
 
             {error && (
-              <div className="text-sm text-accent-crimson bg-[#BA2C2C08] border border-[#BA2C2C30] rounded-lg px-3 py-2">
+              <div className="text-sm text-accent-crimson bg-accent-crimson/[0.031] border border-accent-crimson/[0.188] rounded-lg px-3 py-2">
                 {error}
               </div>
             )}

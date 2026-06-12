@@ -95,7 +95,7 @@ export function AuthCallback() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface-page">
-        <div className="text-center bg-surface-card p-8 rounded-xl shadow-sm" style={{ border: '1px solid #00233930' }}>
+        <div className="text-center bg-surface-card p-8 rounded-xl shadow-sm" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
           <p className="text-sm text-accent-crimson mb-2 font-medium">Authentication failed</p>
           <p className="text-xs text-slate-500">{error}</p>
           <p className="text-xs text-slate-400 mt-4">Redirecting to login...</p>

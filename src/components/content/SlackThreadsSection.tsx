@@ -303,12 +303,12 @@ export function SlackThreadsSection({ contentItemId, refreshKey, onUnlink }: Pro
                     <button
                       type="button"
                       onClick={() => setConfirmUnlinkId(link.id)}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold rounded-md transition-colors hover:bg-[#BA2C2C08]"
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold rounded-md transition-colors hover:bg-accent-crimson/[0.031]"
                       style={{
                         padding: '5px 10px',
-                        color: '#BA2C2C',
+                        color: 'rgb(var(--color-accent-crimson))',
                         backgroundColor: '#ffffff',
-                        border: '1px solid #BA2C2C30',
+                        border: '1px solid rgb(var(--color-accent-crimson) / 0.188)',
                       }}
                     >
                       <Trash2 className="w-3 h-3" />
@@ -480,7 +480,7 @@ function Chip({
         padding: '2px 7px',
         backgroundColor: isSlack ? `${color}15` : '#F4F8FB',
         color: isSlack ? color : '#64748b',
-        border: isSlack ? `1px solid ${color}30` : '1px solid #00233918',
+        border: isSlack ? `1px solid ${color}30` : '1px solid rgb(var(--color-brand-900) / 0.094)',
       }}
     >
       {children}

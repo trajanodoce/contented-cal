@@ -2,8 +2,8 @@
  * Drag-and-Drop Visual Feedback — canonical primitives.
  *
  * Three-color semantic system:
- *   • Brand navy  #005D97 — drop target / user action
- *   • Delete red  #BA2C2C — invalid drop
+ *   • Brand navy  rgb(var(--color-brand-600)) — drop target / user action
+ *   • Delete red  rgb(var(--color-accent-crimson)) — invalid drop
  *   • Brand pink           — the piece in motion
  *       Pink 50  #FDF2F7 (wash)
  *       Pink 200 #F0BBD0 (dashed border)
@@ -13,10 +13,10 @@
  */
 import { CSSProperties, ReactNode } from 'react';
 
-const NAVY = '#005D97';
-const NAVY_WASH = '#005D9710';
-const RED = '#BA2C2C';
-const RED_WASH = '#BA2C2C06';
+const NAVY = 'rgb(var(--color-brand-600))';
+const NAVY_WASH = 'rgb(var(--color-brand-600) / 0.063)';
+const RED = 'rgb(var(--color-accent-crimson))';
+const RED_WASH = 'rgb(var(--color-accent-crimson) / 0.024)';
 const PINK_50 = '#FDF2F7';
 const PINK_200 = '#F0BBD0';
 

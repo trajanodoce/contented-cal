@@ -34,8 +34,8 @@ const fieldTypeLabels: Record<string, string> = Object.fromEntries(
 // Scope chip rendering — maps `applies_to` value to its visual treatment.
 // Content = brand navy, Design = berry from board palette, Both = neutral slate.
 const SCOPE_META: Record<'content' | 'design' | 'both', { label: string; color: string }> = {
-  content: { label: 'Content', color: '#005D97' },
-  design: { label: 'Design', color: '#B8447A' },
+  content: { label: 'Content', color: 'rgb(var(--color-brand-600))' },
+  design: { label: 'Design', color: 'rgb(var(--color-accent-berry))' },
   both: { label: 'Both', color: '#64748B' },
 };
 
@@ -187,7 +187,7 @@ export function CustomFieldsTab({ workspaceId }: Props) {
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDeleteConfirmed}
         variant="destructive"
-        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        icon={<Trash2 className="w-5 h-5" style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
         title="Delete Custom Field?"
         description={
           deleteTarget
@@ -230,9 +230,9 @@ function FieldTable({
   onDelete: (f: CustomFieldDefinition) => void;
 }) {
   return (
-    <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-lg overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <table className="w-full">
-        <thead className="bg-[#005D9712] border-b border-slate-200">
+        <thead className="bg-brand-600/[0.071] border-b border-slate-200">
           <tr>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Name</th>
             <th className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase">Scope</th>
@@ -247,7 +247,7 @@ function FieldTable({
             const opts = parseOptions(field.options);
             const scopeMeta = SCOPE_META[field.applies_to];
             return (
-              <tr key={field.id} className="hover:bg-[#005D9718] transition-colors">
+              <tr key={field.id} className="hover:bg-brand-600/[0.094] transition-colors">
                 <td className="px-4 py-3">
                   <span className="text-sm font-medium text-slate-900">{field.name}</span>
                 </td>
@@ -279,7 +279,7 @@ function FieldTable({
                   {opts.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {opts.slice(0, 4).map((opt, i) => (
-                        <span key={i} className="text-xs bg-[#005D9712] text-slate-600 px-2 py-0.5 rounded-full">
+                        <span key={i} className="text-xs bg-brand-600/[0.071] text-slate-600 px-2 py-0.5 rounded-full">
                           {opt.label}
                         </span>
                       ))}
@@ -302,7 +302,7 @@ function FieldTable({
                     </button>
                     <button
                       onClick={() => onDelete(field)}
-                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded transition-colors"
                       title="Delete field"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -515,7 +515,7 @@ function FieldForm({
       <div className="flex gap-2 pt-1">
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-slate-600 hover:bg-[#005D9710] rounded-lg transition-colors"
+          className="px-4 py-2 text-sm text-slate-600 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
         >
           Cancel
         </button>

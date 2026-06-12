@@ -313,12 +313,12 @@ export function MyWorkPage() {
 
       {/* My Tasks */}
       {sortedItems.length > 0 && (
-            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <div className="cc-banner-section-header flex items-center gap-2 border-b border-slate-100">
-                <h2 className="text-base font-heading" style={{ color: '#002339' }}>My Tasks</h2>
+                <h2 className="text-base font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>My Tasks</h2>
                 <span
                   className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(0,35,57,.12)', color: '#002339' }}
+                  style={{ backgroundColor: 'rgba(0,35,57,.12)', color: 'rgb(var(--color-brand-900))' }}
                 >
                   {sortedItems.length}
                 </span>
@@ -326,7 +326,7 @@ export function MyWorkPage() {
 
               <div className="overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-[#005D9712] border-b border-slate-200">
+                  <thead className="bg-brand-600/[0.071] border-b border-slate-200">
                     <tr>
                       <th
                         className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
@@ -387,7 +387,7 @@ export function MyWorkPage() {
                         <tr
                           key={item.id}
                           onClick={() => setSelectedItemId(item.id)}
-                          className={`cursor-pointer transition-colors ${done ? 'opacity-60 hover:bg-[#005D970A]' : 'hover:bg-[#005D9718]'}`}
+                          className={`cursor-pointer transition-colors ${done ? 'opacity-60 hover:bg-brand-600/[0.039]' : 'hover:bg-brand-600/[0.094]'}`}
                           style={rowBg ? { backgroundColor: rowBg } : {}}
                         >
                           <td className="px-4 py-3">
@@ -465,13 +465,13 @@ export function MyWorkPage() {
 
           {/* My Subtasks */}
           {subtasks.length > 0 && (
-            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <div className="cc-banner-section-header flex items-center gap-2 border-b border-slate-100">
-                <ListChecks className="w-3.5 h-3.5" style={{ color: '#002339' }} />
-                <h2 className="text-base font-heading" style={{ color: '#002339' }}>My Subtasks</h2>
+                <ListChecks className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-brand-900))' }} />
+                <h2 className="text-base font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>My Subtasks</h2>
                 <span
                   className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(0,35,57,.12)', color: '#002339' }}
+                  style={{ backgroundColor: 'rgba(0,35,57,.12)', color: 'rgb(var(--color-brand-900))' }}
                 >
                   {subtasks.length}
                 </span>
@@ -487,7 +487,7 @@ export function MyWorkPage() {
                   return (
                     <div
                       key={subtask.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-[#005D9718] transition-colors"
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-brand-600/[0.094] transition-colors"
                     >
                       {/* Checkbox */}
                       <button

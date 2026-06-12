@@ -88,8 +88,8 @@ export function RowActionsMenu({ item, onOpen, onUpdate }: RowActionsMenuProps) 
         }}
         className={`p-1 rounded transition-colors ${
           open
-            ? 'text-slate-700 bg-[#005D9710]'
-            : 'text-slate-300 group-hover:text-slate-500 hover:text-slate-700 hover:bg-[#005D9710]'
+            ? 'text-slate-700 bg-brand-600/[0.063]'
+            : 'text-slate-300 group-hover:text-slate-500 hover:text-slate-700 hover:bg-brand-600/[0.063]'
         }`}
         title="Item actions"
         aria-label="Item actions"
@@ -108,8 +108,8 @@ export function RowActionsMenu({ item, onOpen, onUpdate }: RowActionsMenuProps) 
             top: pos.top,
             left: pos.left,
             minWidth: 180,
-            border: '1px solid #00233930',
-            backgroundImage: 'linear-gradient(135deg, #005D9708 0%, transparent 60%)',
+            border: '1px solid rgb(var(--color-brand-900) / 0.188)',
+            backgroundImage: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.031) 0%, transparent 60%)',
           }}
         >
           <button
@@ -119,19 +119,19 @@ export function RowActionsMenu({ item, onOpen, onUpdate }: RowActionsMenuProps) 
               setOpen(false);
               onOpen();
             }}
-            className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors flex items-center gap-2"
+            className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-brand-600/[0.094] transition-colors flex items-center gap-2"
           >
             <Eye className="w-3.5 h-3.5" />
             Open
           </button>
-          <div className="border-t my-1" style={{ borderColor: '#00233918' }} />
+          <div className="border-t my-1" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.094)' }} />
           <button
             role="menuitem"
             onClick={(e) => {
               e.stopPropagation();
               handleArchive();
             }}
-            className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors flex items-center gap-2"
+            className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-brand-600/[0.094] transition-colors flex items-center gap-2"
           >
             <Archive className="w-3.5 h-3.5" />
             Archive
@@ -143,8 +143,8 @@ export function RowActionsMenu({ item, onOpen, onUpdate }: RowActionsMenuProps) 
               setOpen(false);
               setConfirmDelete(true);
             }}
-            className="w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2 hover:bg-[#BA2C2C08]"
-            style={{ color: '#BA2C2C' }}
+            className="w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2 hover:bg-accent-crimson/[0.031]"
+            style={{ color: 'rgb(var(--color-accent-crimson))' }}
           >
             <Trash2 className="w-3.5 h-3.5" />
             Delete
@@ -158,7 +158,7 @@ export function RowActionsMenu({ item, onOpen, onUpdate }: RowActionsMenuProps) 
         onClose={() => setConfirmDelete(false)}
         onConfirm={handleDelete}
         variant="destructive"
-        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        icon={<Trash2 className="w-5 h-5" style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
         title={`Delete "${item.title}"?`}
         description="This permanently removes the item, its comments, subtasks, and activity log. This can't be undone."
         confirmLabel="Delete"

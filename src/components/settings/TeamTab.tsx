@@ -37,7 +37,7 @@ interface TeamMember {
 const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon: typeof Shield }> = {
   admin: { label: 'Admin', color: 'text-purple-700', bg: 'bg-purple-100', icon: ShieldCheck },
   editor: { label: 'Editor', color: 'text-brand-700', bg: 'bg-brand-100', icon: Shield },
-  viewer: { label: 'Viewer', color: 'text-slate-600', bg: 'bg-[#005D9712]', icon: Eye },
+  viewer: { label: 'Viewer', color: 'text-slate-600', bg: 'bg-brand-600/[0.071]', icon: Eye },
 };
 
 export function TeamTab() {
@@ -216,7 +216,7 @@ export function TeamTab() {
                     <button
                       onClick={() => handleCancelInvite(invite.id)}
                       disabled={cancellingInviteId === invite.id}
-                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded-lg transition-colors"
                       title="Cancel invite"
                     >
                       {cancellingInviteId === invite.id ? (
@@ -233,9 +233,9 @@ export function TeamTab() {
         </div>
       )}
 
-      <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #00233930' }}>
+      <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         <table className="w-full">
-          <thead className="bg-[#005D9712]">
+          <thead className="bg-brand-600/[0.071]">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Member</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Role</th>
@@ -253,7 +253,7 @@ export function TeamTab() {
               return (
                 <tr
                   key={member.user_id}
-                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-[#005D9718]'} transition-colors`}
+                  className={`${isCurrentUser ? 'bg-brand-50/50' : 'hover:bg-brand-600/[0.094]'} transition-colors`}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -293,7 +293,7 @@ export function TeamTab() {
                       {!isCurrentUser && (
                         <button
                           onClick={() => setRemovingId(member.user_id)}
-                          className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded-lg transition-colors"
                           title="Remove member"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -329,10 +329,10 @@ export function TeamTab() {
 
       {/* Remove Confirmation */}
       {removingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={() => setRemovingId(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={() => setRemovingId(null)}>
           <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#BA2C2C12] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-accent-crimson/[0.071] flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-accent-crimson" />
               </div>
               <h3 className="text-lg font-semibold text-slate-900">Remove Team Member?</h3>
@@ -343,7 +343,7 @@ export function TeamTab() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setRemovingId(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -384,7 +384,7 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[140px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+          <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[140px]" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
             {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([role, config]) => (
               <button
                 key={role}
@@ -392,7 +392,7 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
                   setIsOpen(false);
                   if (role !== currentRole) onChange(role);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 ${
                   role === currentRole ? 'bg-brand-50' : ''
                 }`}
               >
@@ -476,7 +476,7 @@ function AddMemberModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={onClose}>
       <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-slate-900">Add Existing User</h3>
@@ -533,7 +533,7 @@ function AddMemberModal({
               {filteredUsers.map((profile) => (
                 <div
                   key={profile.id}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-[#005D9718] transition-colors"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-brand-600/[0.094] transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar src={profile.avatar_url} name={profile.full_name} size="lg" />
@@ -663,7 +663,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00233960]" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-900/[0.376]" onClick={onClose}>
       <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Invite Team Member</h3>
 
@@ -697,10 +697,10 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
             <div
               className={`p-3 rounded-lg text-sm ${
                 message.type === 'error'
-                  ? 'bg-[#BA2C2C08] text-accent-crimson border border-[#BA2C2C30]'
+                  ? 'bg-accent-crimson/[0.031] text-accent-crimson border border-accent-crimson/[0.188]'
                   : message.type === 'info'
                   ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                  : 'bg-[#92D1B218] text-[#2F8889] border border-[#92D1B240]'
+                  : 'bg-[#92D1B218] text-accent-teal border border-[#92D1B240]'
               }`}
             >
               {message.text}
@@ -711,7 +711,7 @@ function InviteModal({ workspaceId, onClose, onInvited }: { workspaceId: string;
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors"
           >
             Cancel
           </button>

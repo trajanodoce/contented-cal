@@ -357,12 +357,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
 
 
   return (
-    <div className="bg-surface-card border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: '#002339' }}>
+    <div className="bg-surface-card border rounded-xl shadow-sm overflow-hidden p-4" style={{ borderColor: 'rgb(var(--color-brand-900))' }}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-sm font-medium text-slate-700">Subtasks</span>
         {totalCount > 0 && (
-          <span className="text-xs font-medium text-slate-500 bg-[#005D9712] px-1.5 py-0.5 rounded">
+          <span className="text-xs font-medium text-slate-500 bg-brand-600/[0.071] px-1.5 py-0.5 rounded">
             {completedCount}/{totalCount}
           </span>
         )}
@@ -376,10 +376,10 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
           <button
             type="button"
             onClick={onDesignRequest}
-            className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors hover:bg-[#B8447A12]"
+            className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors hover:bg-accent-berry/[0.071]"
             style={{
-              color: '#B8447A',
-              border: '1px solid #B8447A40',
+              color: 'rgb(var(--color-accent-berry))',
+              border: '1px solid rgb(var(--color-accent-berry) / 0.251)',
               backgroundColor: 'transparent',
             }}
             title="Create a linked design task"
@@ -397,9 +397,9 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
               onClick={() => setTemplatePickerOpen(!templatePickerOpen)}
               className="flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors"
               style={{
-                color: '#005D97',
-                border: '1px solid #00233930',
-                backgroundColor: templatePickerOpen ? '#005D9710' : 'transparent',
+                color: 'rgb(var(--color-brand-600))',
+                border: '1px solid rgb(var(--color-brand-900) / 0.188)',
+                backgroundColor: templatePickerOpen ? 'rgb(var(--color-brand-600) / 0.063)' : 'transparent',
               }}
             >
               <ClipboardCheck className="w-3 h-3" />
@@ -412,15 +412,15 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
                 ref={templatePickerRef}
                 className="absolute right-0 top-full mt-1 min-w-[200px] max-h-[260px] overflow-y-auto bg-white rounded-lg shadow-lg py-1 z-50"
                 style={{
-                  border: '1px solid #00233930',
-                  backgroundImage: 'linear-gradient(135deg, #005D9708 0%, transparent 60%)',
+                  border: '1px solid rgb(var(--color-brand-900) / 0.188)',
+                  backgroundImage: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.031) 0%, transparent 60%)',
                 }}
               >
                 {templates.map((t, i) => (
                   <button
                     key={`${t.name}-${i}`}
                     onClick={() => applyTemplate(t)}
-                    className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-[#005D9718] transition-colors"
+                    className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-brand-600/[0.094] transition-colors"
                   >
                     <span className="font-medium text-slate-900 block">{t.name}</span>
                     <span className="text-xs text-slate-400">
@@ -431,13 +431,13 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
 
                 {userRole === 'admin' && (
                   <>
-                    <div className="border-t my-1" style={{ borderColor: '#00233918' }} />
+                    <div className="border-t my-1" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.094)' }} />
                     <button
                       onClick={() => {
                         setTemplatePickerOpen(false);
                         navigate('/settings/customizations/subtask-templates');
                       }}
-                      className="w-full text-left px-3 py-2 text-xs font-medium text-slate-500 hover:text-[#005D97] hover:bg-[#005D9708] transition-colors flex items-center gap-1.5"
+                      className="w-full text-left px-3 py-2 text-xs font-medium text-slate-500 hover:text-brand-600 hover:bg-brand-600/[0.031] transition-colors flex items-center gap-1.5"
                     >
                       <Settings className="w-3 h-3" />
                       Manage templates &rarr;
@@ -452,7 +452,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
 
       {/* Progress bar */}
       {totalCount > 0 && (
-        <div className="h-1.5 rounded-full bg-[#005D9712] mb-3">
+        <div className="h-1.5 rounded-full bg-brand-600/[0.071] mb-3">
           <div
             className="h-1.5 rounded-full bg-green-500 transition-all duration-300"
             style={{ width: `${progressPct}%` }}
@@ -468,7 +468,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
           return (
             <div
               key={subtask.id}
-              className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-[#005D9718] rounded-lg transition-colors ${
+              className={`group flex items-center gap-2 py-1.5 px-1 hover:bg-brand-600/[0.094] rounded-lg transition-colors ${
                 subtask.completed ? 'opacity-60' : ''
               } ${dragOverId === subtask.id ? 'bg-brand-50' : ''}`}
               draggable
@@ -557,7 +557,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
                   >
                     <button
                       onClick={() => updateAssignee(subtask.id, null)}
-                      className="w-full text-left px-3 py-1.5 text-sm text-slate-500 hover:bg-[#005D9718] transition-colors"
+                      className="w-full text-left px-3 py-1.5 text-sm text-slate-500 hover:bg-brand-600/[0.094] transition-colors"
                     >
                       None
                     </button>
@@ -565,7 +565,7 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
                       <button
                         key={m.id}
                         onClick={() => updateAssignee(subtask.id, m.id)}
-                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-[#005D9718] flex items-center gap-2 transition-colors"
+                        className="w-full text-left px-3 py-1.5 text-sm text-slate-700 hover:bg-brand-600/[0.094] flex items-center gap-2 transition-colors"
                       >
                         <Avatar src={m.avatar_url} name={m.full_name} size="xs" />
                         {m.full_name}
@@ -590,12 +590,12 @@ export function SubtasksSection({ contentItemId, userId, members, addToast, temp
                   }}
                   className={`inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md border bg-surface-card transition-colors ${
                     dueDateEditId === subtask.id
-                      ? 'border-[#005D97] ring-2 ring-[#005D9725]'
-                      : 'border-slate-300 hover:border-[#005D97]'
+                      ? 'border-brand-600 ring-2 ring-brand-600/[0.145]'
+                      : 'border-slate-300 hover:border-brand-600'
                   }`}
                   title={subtask.due_date ? formatDate(subtask.due_date) : 'Set due date'}
                 >
-                  <Calendar className="w-3 h-3 text-[#005D97] shrink-0" />
+                  <Calendar className="w-3 h-3 text-brand-600 shrink-0" />
                   {subtask.due_date ? (
                     <span className="text-slate-700 font-medium">{formatDate(subtask.due_date)}</span>
                   ) : (

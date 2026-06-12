@@ -105,7 +105,7 @@ export function CommentRow({ comment, currentUserId, isAdmin, members, onEdit, o
             disabled={saving}
             autoFocus
             className="w-full px-3 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400 resize-none"
-            style={{ border: '1px solid #00233930' }}
+            style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
             onKeyDown={(e) => {
               if (e.key === 'Escape') {
                 // Only cancel edit mode if dropdown isn't capturing Esc itself.
@@ -182,7 +182,7 @@ export function CommentRow({ comment, currentUserId, isAdmin, members, onEdit, o
                   <button
                     onClick={() => setConfirmDeleteOpen(true)}
                     disabled={deleting}
-                    className="p-1 rounded text-slate-400 hover:text-[#BA2C2C] hover:bg-[#BA2C2C0D] transition-colors disabled:opacity-50"
+                    className="p-1 rounded text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.051] transition-colors disabled:opacity-50"
                     title="Delete comment"
                     aria-label="Delete comment"
                   >
@@ -197,7 +197,7 @@ export function CommentRow({ comment, currentUserId, isAdmin, members, onEdit, o
               <span
                 key={`${m.uuid}-${m.start}`}
                 className="inline-flex items-baseline rounded-full px-1.5 py-0.5 text-xs font-medium"
-                style={{ backgroundColor: '#005D9712', color: '#005D97' }}
+                style={{ backgroundColor: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))' }}
                 title={`Mentioned: ${m.name}`}
               >
                 @{m.name}

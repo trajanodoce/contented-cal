@@ -90,8 +90,8 @@ function PlatformIcon({ meta, size = 'md' }: { meta: PlatformMeta; size?: 'sm' |
 function StatusBadge({ status }: { status: string | null }) {
   if (!status) return null;
   const map: Record<string, { icon: typeof CheckCircle2; label: string; cls: string }> = {
-    connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-[#2F8889] bg-[#92D1B218] border-[#92D1B240]' },
-    error: { icon: AlertCircle, label: 'Error', cls: 'text-accent-crimson bg-[#BA2C2C08] border-[#BA2C2C30]' },
+    connected: { icon: CheckCircle2, label: 'Connected', cls: 'text-accent-teal bg-[#92D1B218] border-[#92D1B240]' },
+    error: { icon: AlertCircle, label: 'Error', cls: 'text-accent-crimson bg-accent-crimson/[0.031] border-accent-crimson/[0.188]' },
     disconnected: { icon: Clock, label: 'Disconnected', cls: 'text-slate-600 bg-surface-nested border-slate-200' },
   };
   const { icon: Icon, label, cls } = map[status] ?? map.disconnected;
@@ -192,14 +192,14 @@ function SetupForm({ meta, existing, onSave, onDisconnect, onCancel, saving }: S
         </button>
         <button
           onClick={onCancel}
-          className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
+          className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-brand-600/[0.094] transition-colors"
         >
           Cancel
         </button>
         {existing && (
           <button
             onClick={onDisconnect}
-            className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C08] transition-colors"
+            className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-accent-crimson/[0.188] rounded-lg hover:bg-accent-crimson/[0.031] transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" /> Disconnect
           </button>
@@ -238,14 +238,14 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
   }
 
   return (
-    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <div className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <div className="p-5">
         <div className="flex items-start gap-4">
           <PlatformIcon meta={meta} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-semibold text-slate-900">{meta.name}</h3>
-              <span className="text-xs text-slate-400 bg-[#005D9712] px-2 py-0.5 rounded-full">{meta.category}</span>
+              <span className="text-xs text-slate-400 bg-brand-600/[0.071] px-2 py-0.5 rounded-full">{meta.category}</span>
               {integration && <StatusBadge status={integration.status} />}
             </div>
             <p className="text-xs text-slate-500 mt-1 leading-relaxed">{meta.description}</p>
@@ -266,7 +266,7 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               <button
                 onClick={onTest}
                 disabled={testing}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-xs text-slate-600 border border-slate-200 rounded-lg hover:bg-brand-600/[0.094] transition-colors"
                 title="Test connection"
               >
                 {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
@@ -277,11 +277,11 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               onClick={handleConnectClick}
               className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
                 ${connected
-                  ? 'text-slate-700 border border-slate-200 hover:bg-[#005D9718]'
+                  ? 'text-slate-700 border border-slate-200 hover:bg-brand-600/[0.094]'
                   : 'bg-brand-600 text-white hover:bg-brand-500'}`}
             >
               {connected ? (
-                <><Check className="w-3.5 h-3.5 text-[#2F8889]" /> Manage</>
+                <><Check className="w-3.5 h-3.5 text-accent-teal" /> Manage</>
               ) : (
                 <><Plug className="w-3.5 h-3.5" /> Connect</>
               )}
@@ -324,13 +324,13 @@ function IntegrationCard({ meta, integration, onConnect, onDisconnect, onOAuthCo
               </button>
               <button
                 onClick={() => setExpanded(false)}
-                className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
+                className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-brand-600/[0.094] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={async () => { await onDisconnect(); setExpanded(false); }}
-                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C08] transition-colors"
+                className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-accent-crimson/[0.188] rounded-lg hover:bg-accent-crimson/[0.031] transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" /> Disconnect
               </button>
@@ -782,7 +782,7 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
           const isExpanded = expandedPlatform === platform.id;
 
           return (
-            <div key={platform.id} className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid #00233930' }}>
+            <div key={platform.id} className="bg-surface-card rounded-xl overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <div className="p-5">
                 <div className="flex items-start gap-4">
                   <div
@@ -794,9 +794,9 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="text-sm font-semibold text-slate-900">{platform.name}</h3>
-                      <span className="text-xs text-slate-400 bg-[#005D9712] px-2 py-0.5 rounded-full">{platform.tag}</span>
+                      <span className="text-xs text-slate-400 bg-brand-600/[0.071] px-2 py-0.5 rounded-full">{platform.tag}</span>
                       {isConnected && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-[#2F8889] bg-[#92D1B218] border-[#92D1B240]">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border text-accent-teal bg-[#92D1B218] border-[#92D1B240]">
                           <CheckCircle2 className="w-3 h-3" />
                           Connected
                         </span>
@@ -819,11 +819,11 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       onClick={() => setExpandedPlatform(isExpanded ? null : platform.id)}
                       className={`flex items-center gap-1.5 px-4 py-1.5 text-sm rounded-lg transition-colors font-medium
                         ${isConnected
-                          ? 'text-slate-700 border border-slate-200 hover:bg-[#005D9718]'
+                          ? 'text-slate-700 border border-slate-200 hover:bg-brand-600/[0.094]'
                           : 'bg-brand-600 text-white hover:bg-brand-500'}`}
                     >
                       {isConnected ? (
-                        <><Check className="w-3.5 h-3.5 text-[#2F8889]" /> Manage</>
+                        <><Check className="w-3.5 h-3.5 text-accent-teal" /> Manage</>
                       ) : (
                         <><Plug className="w-3.5 h-3.5" /> Connect</>
                       )}
@@ -881,14 +881,14 @@ function PersonalIntegrationsSection({ addToast }: { addToast: (msg: string, typ
                       </button>
                       <button
                         onClick={() => setExpandedPlatform(null)}
-                        className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-[#005D9718] transition-colors"
+                        className="px-4 py-2 text-sm text-slate-600 border border-slate-200 rounded-lg hover:bg-brand-600/[0.094] transition-colors"
                       >
                         Cancel
                       </button>
                       {isConnected && (
                         <button
                           onClick={() => disconnectPersonal(platform.id)}
-                          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C08] transition-colors"
+                          className="ml-auto flex items-center gap-1.5 px-3 py-2 text-sm text-accent-crimson border border-accent-crimson/[0.188] rounded-lg hover:bg-accent-crimson/[0.031] transition-colors"
                         >
                           <Trash2 className="w-3.5 h-3.5" /> Disconnect
                         </button>
@@ -936,7 +936,7 @@ function IntegrationStatusList({ integrations }: { integrations: Integration[] }
         const meta = PLATFORMS.find(p => p.id === int.platform);
         if (!meta) return null;
         return (
-          <div key={int.id} className="flex items-center gap-3 p-3 bg-surface-card rounded-xl" style={{ border: '1px solid #00233930' }}>
+          <div key={int.id} className="flex items-center gap-3 p-3 bg-surface-card rounded-xl" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
             <PlatformIcon meta={meta} size="sm" />
             <span className="text-sm font-medium text-slate-700 flex-1">{meta.name}</span>
             <StatusBadge status={int.status} />

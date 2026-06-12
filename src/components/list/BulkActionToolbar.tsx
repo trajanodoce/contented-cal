@@ -17,7 +17,7 @@ import type { Profile, BoardColumn } from '../../lib/database.types';
  * Tailwind class to apply to selected rows in list-style consumers.
  * Pattern: <tr className={isSelected ? selectedRowClass : ''}> ...
  */
-export const selectedRowClass = 'bg-[#005D9710]';
+export const selectedRowClass = 'bg-brand-600/[0.063]';
 
 interface BulkActionToolbarProps {
   selectedCount: number;
@@ -288,7 +288,7 @@ export function BulkActionToolbar({
     transform: 'translateX(-50%)',
     zIndex: 40,
     backgroundColor: '#ffffff',
-    border: '1.5px solid #002339',
+    border: '1.5px solid rgb(var(--color-brand-900))',
     borderRadius: 14,
     boxShadow:
       '0 6px 10px rgba(0,35,57,.14), 0 20px 32px -8px rgba(0,35,57,.22)',
@@ -302,7 +302,7 @@ export function BulkActionToolbar({
   const dividerStyle: React.CSSProperties = {
     width: 1,
     height: 22,
-    background: '#00233918',
+    background: 'rgb(var(--color-brand-900) / 0.094)',
     flexShrink: 0,
   };
 
@@ -321,7 +321,7 @@ export function BulkActionToolbar({
     lineHeight: 1,
   };
 
-  const deleteBtnStyle: React.CSSProperties = { ...actionBtnBase, color: '#BA2C2C' };
+  const deleteBtnStyle: React.CSSProperties = { ...actionBtnBase, color: 'rgb(var(--color-accent-crimson))' };
 
   const clearBtnStyle: React.CSSProperties = { ...actionBtnBase, color: '#64748b' };
 
@@ -349,14 +349,14 @@ export function BulkActionToolbar({
         style={{
           ...actionBtnBase,
           ...style,
-          background: isActive ? '#005D9708' : 'transparent',
+          background: isActive ? 'rgb(var(--color-brand-600) / 0.031)' : 'transparent',
           opacity: isProcessing ? 0.5 : 1,
         }}
         onMouseEnter={(e) => {
-          if (!isProcessing) e.currentTarget.style.background = '#005D9708';
+          if (!isProcessing) e.currentTarget.style.background = 'rgb(var(--color-brand-600) / 0.031)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = isActive ? '#005D9708' : 'transparent';
+          e.currentTarget.style.background = isActive ? 'rgb(var(--color-brand-600) / 0.031)' : 'transparent';
         }}
       >
         {icon}
@@ -380,7 +380,7 @@ export function BulkActionToolbar({
               fontSize: 11,
               fontWeight: 700,
               color: '#ffffff',
-              background: '#005D97',
+              background: 'rgb(var(--color-brand-600))',
               borderRadius: 99,
               display: 'inline-flex',
               alignItems: 'center',
@@ -390,7 +390,7 @@ export function BulkActionToolbar({
           >
             {selectedCount}
           </span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#002339' }}>selected</span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--color-brand-900))' }}>selected</span>
         </div>
 
         <div style={dividerStyle} />
@@ -436,7 +436,7 @@ export function BulkActionToolbar({
           onClick={onClear}
           style={clearBtnStyle}
           onMouseEnter={(e) => {
-            if (!isProcessing) e.currentTarget.style.background = '#005D9708';
+            if (!isProcessing) e.currentTarget.style.background = 'rgb(var(--color-brand-600) / 0.031)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'transparent';
@@ -463,7 +463,7 @@ export function BulkActionToolbar({
                   minWidth: 220,
                   maxHeight: 320,
                   overflowY: 'auto',
-                  border: '1.5px solid #002339',
+                  border: '1.5px solid rgb(var(--color-brand-900))',
                   borderRadius: 12,
                   background: '#ffffff',
                   boxShadow: '0 4px 20px rgba(0,35,57,.12)',
@@ -479,7 +479,7 @@ export function BulkActionToolbar({
                   <button
                     key={column.id}
                     onClick={() => handleBulkStatusChange(column.id)}
-                    className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 rounded"
+                    className="w-full px-2 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 rounded"
                   >
                     <span
                       className="w-2 h-2 rounded-full shrink-0"
@@ -498,7 +498,7 @@ export function BulkActionToolbar({
                 <button
                   key={member.id}
                   onClick={() => handleBulkAssign(member.id)}
-                  className="w-full px-2 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 rounded"
+                  className="w-full px-2 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 rounded"
                 >
                   <Avatar src={member.avatar_url} name={member.full_name} size="md" />
                   <span className="text-slate-700">{member.full_name || member.email}</span>
@@ -523,7 +523,7 @@ export function BulkActionToolbar({
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleBulkDelete}
         variant="destructive"
-        icon={<AlertTriangle size={20} color="#BA2C2C" />}
+        icon={<AlertTriangle size={20} color="rgb(var(--color-accent-crimson))" />}
         title={`Delete ${selectedCount} item${selectedCount === 1 ? '' : 's'}?`}
         description="This action cannot be undone. The selected content items will be permanently deleted."
         confirmLabel="Delete"

@@ -76,13 +76,13 @@ function projectHealthColor(project: Project, ps?: ProjectMiniStats): string {
   if (project.status === 'archived') return '#64748B'; // slate
 
   // Active: derive timeline health from end_date + completion ratio
-  if (!project.end_date) return '#005D97'; // navy default — no due date
+  if (!project.end_date) return 'rgb(var(--color-brand-600))'; // navy default — no due date
   const endDate = parseLocalDate(project.end_date);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const daysToEnd = Math.ceil((endDate.getTime() - today.getTime()) / 86400000);
   const completion = ps && ps.total > 0 ? ps.completed / ps.total : 0;
-  if (daysToEnd < 0) return '#BA2C2C'; // overdue
+  if (daysToEnd < 0) return 'rgb(var(--color-accent-crimson))'; // overdue
   if (daysToEnd <= 7 && completion < 0.8) return '#C4504A'; // due soon, under-done
   return '#357254'; // on track
 }
@@ -112,7 +112,7 @@ function upcomingDueBadge(dueIso: string): { label: string; bg: string; text: st
     return { label: `🌤 ${formatDate(dueIso)}`, bg: '#D98A6B10', text: '#D98A6B' };
   }
   // 4-7 days out: scheduled, not urgent yet — keep neutral brand-navy
-  return { label: `🌊 ${formatDate(dueIso)}`, bg: '#005D9712', text: '#005D97' };
+  return { label: `🌊 ${formatDate(dueIso)}`, bg: 'rgb(var(--color-brand-600) / 0.071)', text: 'rgb(var(--color-brand-600))' };
 }
 
 function projectDueMeta(due: string | null): { label: string; color: string } | null {
@@ -123,7 +123,7 @@ function projectDueMeta(due: string | null): { label: string; color: string } | 
   const days = Math.ceil((dueDate.getTime() - today.getTime()) / 86400000);
   if (days < 0) {
     const overdueDays = Math.abs(days);
-    return { label: `Overdue ${overdueDays}d`, color: '#BA2C2C' };
+    return { label: `Overdue ${overdueDays}d`, color: 'rgb(var(--color-accent-crimson))' };
   }
   if (days === 0) return { label: 'Due today', color: '#C4504A' };
   if (days <= 3) return { label: `Due in ${days}d`, color: '#D98A6B' };
@@ -280,7 +280,7 @@ export function HomePage() {
           value={stats?.overdue_items ?? 0}
           icon={<AlertTriangle className="w-5 h-5" />}
           color="text-accent-crimson"
-          bg="bg-[#BA2C2C12]"
+          bg="bg-accent-crimson/[0.071]"
           alert={!!stats?.overdue_items}
           onClick={() => navigate('/list')}
         />
@@ -308,7 +308,7 @@ export function HomePage() {
         {/* Left Column: High Priority + Upcoming */}
         <div className="lg:col-span-2 space-y-6">
           {/* High Priority Items */}
-          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Flame className="w-4.5 h-4.5 text-orange-500" />
@@ -342,7 +342,7 @@ export function HomePage() {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors text-left group"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-brand-600/[0.094] transition-colors text-left group"
                     >
                       <div className={`w-2 h-2 rounded-full shrink-0 ${pStyle.dot}`} />
                       <div className="flex-1 min-w-0">
@@ -370,7 +370,7 @@ export function HomePage() {
           </section>
 
           {/* Upcoming Due */}
-          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4.5 h-4.5 text-brand-500" />
@@ -397,7 +397,7 @@ export function HomePage() {
                     <button
                       key={item.id}
                       onClick={() => setSelectedItemId(item.id)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors text-left group"
+                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-brand-600/[0.094] transition-colors text-left group"
                     >
                       <div
                         className="px-2 py-1 rounded text-xs font-semibold shrink-0"
@@ -426,7 +426,7 @@ export function HomePage() {
 
           {/* Projects Overview */}
           {projects.length > 0 && (
-            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <FolderOpen className="w-4.5 h-4.5 text-brand-500" />
@@ -440,7 +440,7 @@ export function HomePage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[#005D9712]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-brand-600/[0.071]">
                 {projects.map(project => {
                   const ps = projectStats.get(project.id);
                   const dueMeta = projectDueMeta(ps?.nearestUpcomingDue ?? project.end_date ?? null);
@@ -449,7 +449,7 @@ export function HomePage() {
                     <button
                       key={project.id}
                       onClick={() => navigate(`/projects/${project.id}`)}
-                      className="bg-surface-card p-4 hover:bg-[#005D9718] transition-colors text-left group"
+                      className="bg-surface-card p-4 hover:bg-brand-600/[0.094] transition-colors text-left group"
                     >
                       <h3 className="text-sm font-semibold text-slate-900 truncate group-hover:text-brand-600 transition-colors mb-1.5">
                         {project.title}
@@ -495,7 +495,7 @@ export function HomePage() {
         {/* Right Column: Status Breakdown + Activity */}
         <div className="space-y-6">
           {/* Status Breakdown */}
-          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4.5 h-4.5 text-slate-500" />
@@ -518,7 +518,7 @@ export function HomePage() {
                         <span className="font-medium text-slate-700">{s.status_name}</span>
                         <span className="text-slate-500">{s.count}</span>
                       </div>
-                      <div className="h-2 bg-[#005D9712] rounded-full overflow-hidden">
+                      <div className="h-2 bg-brand-600/[0.071] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
@@ -535,7 +535,7 @@ export function HomePage() {
           </section>
 
           {/* Priority Breakdown */}
-          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <AlertCircle className="w-4.5 h-4.5 text-slate-500" />
@@ -561,7 +561,7 @@ export function HomePage() {
           </section>
 
           {/* Recent Activity */}
-          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+          <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
             <div className="px-5 py-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Activity className="w-4.5 h-4.5 text-slate-500" />
@@ -616,7 +616,7 @@ function StatCard({
     <button
       onClick={onClick}
       className="bg-surface-card rounded-xl p-5 hover:shadow-md transition-all text-left group"
-      style={{ border: '1px solid #00233930' }}
+      style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
     >
       <div className="flex items-center justify-between mb-3">
         <div className={`w-10 h-10 rounded-lg ${bg} flex items-center justify-center ${color}`}>

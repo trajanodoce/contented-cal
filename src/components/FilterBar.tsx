@@ -119,7 +119,7 @@ export function FilterBar({
   }), [filters]);
 
   return (
-    <div className="rounded-xl p-3 mb-4" style={{ background: 'linear-gradient(135deg, #005D9722 0%, #005D970A 50%, transparent 70%), #ffffff', border: '1px solid #00233930' }}>
+    <div className="rounded-xl p-3 mb-4" style={{ background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.133) 0%, rgb(var(--color-brand-600) / 0.039) 50%, transparent 70%), #ffffff', border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <div className="flex flex-wrap items-center gap-2">
         {/* Search input */}
         <div className="relative flex-shrink-0 min-w-[260px] max-w-[360px]">
@@ -130,19 +130,19 @@ export function FilterBar({
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             className="w-full pl-10 pr-9 py-2 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-            style={{ border: '1px solid #00233920', background: 'white' }}
+            style={{ border: '1px solid rgb(var(--color-brand-900) / 0.125)', background: 'white' }}
           />
           {searchValue && (
             <button
               onClick={() => setSearchValue('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-[#005D9710] rounded"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-brand-600/[0.063] rounded"
             >
               <X className="w-3 h-3 text-slate-400" />
             </button>
           )}
         </div>
 
-        <div className="h-6 w-px" style={{ backgroundColor: '#00233920' }} />
+        <div className="h-6 w-px" style={{ backgroundColor: 'rgb(var(--color-brand-900) / 0.125)' }} />
 
         {/* Content Type filter */}
         <FilterDropdown
@@ -254,8 +254,8 @@ export function FilterBar({
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all hover:scale-105 active:scale-95 text-accent-crimson hover:bg-[#BA2C2C08]"
-            style={{ border: '1px solid #BA2C2C30' }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all hover:scale-105 active:scale-95 text-accent-crimson hover:bg-accent-crimson/[0.031]"
+            style={{ border: '1px solid rgb(var(--color-accent-crimson) / 0.188)' }}
             title="Clear all filters"
           >
             <X className="w-3.5 h-3.5" />
@@ -346,14 +346,14 @@ function FilterDropdown({
             ? 'text-brand-700 bg-brand-50 hover:bg-brand-100'
             : count === 1
               ? indicatorColor
-                ? 'hover:bg-[#005D9718]'
-                : 'text-slate-700 hover:bg-[#005D9710]'
-              : 'text-slate-600 hover:bg-[#005D9710]'
+                ? 'hover:bg-brand-600/[0.094]'
+                : 'text-slate-700 hover:bg-brand-600/[0.063]'
+              : 'text-slate-600 hover:bg-brand-600/[0.063]'
         }`}
         style={
           count === 1 && indicatorColor
             ? { fontSize: '13.5px', fontWeight: 600, backgroundColor: `${indicatorColor}15`, border: `1px solid ${indicatorColor}` }
-            : { fontSize: '13.5px', fontWeight: 600, border: '1px solid #00233925' }
+            : { fontSize: '13.5px', fontWeight: 600, border: '1px solid rgb(var(--color-brand-900) / 0.145)' }
         }
       >
         {count === 1 && indicatorColor && (
@@ -369,9 +369,9 @@ function FilterDropdown({
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 rounded-xl shadow-lg min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute top-full mt-1 rounded-xl shadow-lg min-w-[200px] max-h-[300px] overflow-y-auto z-50" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           <div className="p-2 space-y-1">
-            <p className="text-xs font-medium uppercase px-2 py-1" style={{ color: '#002339' }}>{label}</p>
+            <p className="text-xs font-medium uppercase px-2 py-1" style={{ color: 'rgb(var(--color-brand-900))' }}>{label}</p>
             {options.map((option) => {
               const isSelected = selectedIds.includes(option.id);
               return (
@@ -379,7 +379,7 @@ function FilterDropdown({
                   key={option.id}
                   onClick={() => onToggle(option.id)}
                   className={`w-full px-2 py-2 text-left text-sm flex items-center gap-2 rounded-lg transition-colors ${
-                    isSelected ? '' : 'hover:bg-[#005D9718]'
+                    isSelected ? '' : 'hover:bg-brand-600/[0.094]'
                   }`}
                   style={{
                     backgroundColor: isSelected

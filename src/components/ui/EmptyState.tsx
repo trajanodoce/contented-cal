@@ -27,11 +27,11 @@ export interface EmptyStateProps {
 const stateStyles = {
   success: {
     color: '#357254',
-    bg: 'linear-gradient(135deg, #92D1B228 0%, #FBE7F140 100%)',
+    bg: 'linear-gradient(135deg, #92D1B228 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
   },
   info: {
-    color: '#005D97',
-    bg: '#005D9712',
+    color: 'rgb(var(--color-brand-600))',
+    bg: 'rgb(var(--color-brand-600) / 0.071)',
   },
   neutral: {
     color: '#64748b',
@@ -116,7 +116,7 @@ export function EmptyState({
   const containerStyle: React.CSSProperties =
     level === 1
       ? {
-          border: '1.5px solid #002339',
+          border: '1.5px solid rgb(var(--color-brand-900))',
           borderRadius: 12,
           padding: 32,
           textAlign: 'center' as const,
@@ -124,7 +124,7 @@ export function EmptyState({
         }
       : level === 2
         ? {
-            border: '1px solid #00233930',
+            border: '1px solid rgb(var(--color-brand-900) / 0.188)',
             borderRadius: 10,
             padding: '22px 28px',
             textAlign: 'center' as const,
@@ -143,7 +143,7 @@ export function EmptyState({
           fontFamily: 'Faune-Text_Bold, sans-serif',
           fontSize: 14,
           fontWeight: 700,
-          color: '#002339',
+          color: 'rgb(var(--color-brand-900))',
           margin: 0,
         }
       : level === 2
@@ -176,7 +176,7 @@ export function EmptyState({
               onClick={action.onClick}
               style={{
                 marginTop: 12,
-                backgroundColor: '#005D97',
+                backgroundColor: 'rgb(var(--color-brand-600))',
                 color: '#fff',
                 fontSize: 12,
                 fontWeight: 600,

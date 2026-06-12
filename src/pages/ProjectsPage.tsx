@@ -38,13 +38,13 @@ interface ContentItemStub {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  active: 'bg-[#92D1B218] text-[#2F8889]',
+  active: 'bg-[#92D1B218] text-accent-teal',
   completed: 'bg-brand-100 text-brand-700',
-  archived: 'bg-[#005D9712] text-slate-500',
+  archived: 'bg-brand-600/[0.071] text-slate-500',
 };
 
 function getStatusStyle(status: string): string {
-  return STATUS_STYLES[status] ?? 'bg-[#005D9712] text-slate-500';
+  return STATUS_STYLES[status] ?? 'bg-brand-600/[0.071] text-slate-500';
 }
 
 interface BoardColumn {
@@ -133,19 +133,19 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* backdrop */}
-      <div className="absolute inset-0 bg-[#00233960]" onClick={onClose} />
+      <div className="absolute inset-0 bg-brand-900/[0.376]" onClick={onClose} />
 
       <form
         onSubmit={handleSubmit}
         className="relative bg-surface-card rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 space-y-4"
-        style={{ border: '1px solid #00233930' }}
+        style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
       >
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">Create Project</h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded hover:bg-[#005D9710] text-slate-400 hover:text-slate-600"
+            className="p-1 rounded hover:bg-brand-600/[0.063] text-slate-400 hover:text-slate-600"
           >
             <X className="w-5 h-5" />
           </button>
@@ -216,7 +216,7 @@ function CreateProjectModal({ members, workspaceId, onClose, onCreated }: Create
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-[#005D9718]"
+            className="px-4 py-2 text-sm font-medium text-slate-700 bg-surface-card border border-slate-200 rounded-lg hover:bg-brand-600/[0.094]"
           >
             Cancel
           </button>
@@ -394,7 +394,7 @@ export function ProjectsPage() {
                 key={project.id}
                 onClick={() => navigate(`/projects/${project.id}`)}
                 className="bg-surface-card rounded-xl p-5 text-left hover:shadow-md transition-all"
-                style={{ border: '1px solid #00233930' }}
+                style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
               >
                 {/* Header row */}
                 <div className="flex items-start justify-between gap-2 mb-3">
@@ -434,7 +434,7 @@ export function ProjectsPage() {
                       <span className="font-medium text-slate-700">{weightedPct}% complete</span>
                     )}
                   </div>
-                  <div className="w-full h-2 rounded-full overflow-hidden flex bg-[#005D9712]">
+                  <div className="w-full h-2 rounded-full overflow-hidden flex bg-brand-600/[0.071]">
                     {totalItems > 0 ? (
                       sortedColumns.map((col) => {
                         const count = colCounts.get(col.id) ?? 0;

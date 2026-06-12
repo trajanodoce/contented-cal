@@ -59,10 +59,10 @@ function CustomSelect({ options, value, onChange, placeholder }: {
         <ChevronDown className="w-4 h-4 text-slate-400" />
       </button>
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {options.map(opt => (
             <button key={opt.value} type="button" onClick={() => { onChange(opt.value); setIsOpen(false); }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${opt.value === value ? 'bg-purple-50 text-purple-900' : 'text-slate-700'}`}>
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 ${opt.value === value ? 'bg-purple-50 text-purple-900' : 'text-slate-700'}`}>
               {opt.color && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: opt.color }} />}
               {opt.label}
               {opt.value === value && <Check className="w-4 h-4 ml-auto" />}
@@ -111,12 +111,12 @@ function AssigneeMultiSelect({ members, value, onChange }: {
         <ChevronDown className="w-4 h-4 text-slate-400" />
       </button>
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 w-full mt-1 bg-surface-card rounded-xl shadow-lg max-h-60 overflow-auto" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {members.map(m => {
             const sel = value.includes(m.id);
             return (
               <button key={m.id} type="button" onClick={() => toggle(m.id)}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-3 ${sel ? 'bg-purple-50' : ''}`}>
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-3 ${sel ? 'bg-purple-50' : ''}`}>
                 <div className={`w-5 h-5 rounded border flex items-center justify-center ${sel ? 'bg-purple-600 border-purple-600' : 'border-slate-300'}`}>
                   {sel && <Check className="w-3 h-3 text-white" />}
                 </div>
@@ -326,14 +326,14 @@ export function DesignRequestPage() {
           <div
             className="mb-6 rounded-xl px-4 py-3 flex items-center gap-2.5"
             style={{
-              background: '#B8447A0A',
-              border: '1px solid #B8447A30',
+              background: 'rgb(var(--color-accent-berry) / 0.039)',
+              border: '1px solid rgb(var(--color-accent-berry) / 0.188)',
             }}
           >
-            <LinkIcon className="w-4 h-4 flex-shrink-0" style={{ color: '#B8447A' }} />
+            <LinkIcon className="w-4 h-4 flex-shrink-0" style={{ color: 'rgb(var(--color-accent-berry))' }} />
             <div className="text-sm leading-snug">
               <span className="text-slate-700">This design task will be linked to </span>
-              <span className="font-semibold" style={{ color: '#B8447A' }}>
+              <span className="font-semibold" style={{ color: 'rgb(var(--color-accent-berry))' }}>
                 {linkedParentTask?.title ?? 'the source task'}
               </span>
               <span className="text-slate-500"> · the source task&rsquo;s &ldquo;Request design&rdquo; subtask will be checked off automatically.</span>

@@ -119,7 +119,7 @@ export function ArchivePage() {
 
       {/* Empty state */}
       {items.length === 0 ? (
-        <div className="bg-surface-card rounded-xl p-12 text-center" style={{ border: '1px solid #00233918' }}>
+        <div className="bg-surface-card rounded-xl p-12 text-center" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.094)' }}>
           <ArchiveIcon className="w-10 h-10 mx-auto mb-3 text-slate-300" />
           <p className="text-sm font-medium text-slate-600">Archive is empty</p>
           <p className="text-xs text-slate-400 mt-1">
@@ -129,7 +129,7 @@ export function ArchivePage() {
       ) : (
         <div
           className="bg-surface-card rounded-xl overflow-hidden"
-          style={{ border: '1px solid #00233918' }}
+          style={{ border: '1px solid rgb(var(--color-brand-900) / 0.094)' }}
         >
           <div className="divide-y divide-slate-100">
             {items.map((item) => {
@@ -139,7 +139,7 @@ export function ArchivePage() {
               return (
                 <div
                   key={item.id}
-                  className="group flex items-center gap-3 px-4 py-3 hover:bg-[#005D9708] transition-colors"
+                  className="group flex items-center gap-3 px-4 py-3 hover:bg-brand-600/[0.031] transition-colors"
                 >
                   {/* Category icon */}
                   <TaskCategoryIcon category={item.category} />

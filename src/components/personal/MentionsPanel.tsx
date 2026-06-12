@@ -40,16 +40,16 @@ export function MentionsPanel({ onOpenItem, initialLimit = 8 }: Props) {
   return (
     <section
       className="bg-surface-card rounded-xl shadow-sm overflow-hidden"
-      style={{ border: '1px solid #00233930' }}
+      style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
     >
       <div className="cc-banner-section-header flex items-center gap-2 border-b border-slate-100">
-        <h2 className="text-base font-heading" style={{ color: '#002339' }}>
+        <h2 className="text-base font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>
           Heads Up
         </h2>
         {unreadCount > 0 && (
           <span
             className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
-            style={{ backgroundColor: '#BA2C2C' }}
+            style={{ backgroundColor: 'rgb(var(--color-accent-crimson))' }}
           >
             {unreadCount} unread
           </span>
@@ -113,7 +113,7 @@ function AlertRow({ alert, onOpen, onDismiss }: AlertRowProps) {
         return {
           actionLabel: 'mentioned you in',
           Icon: AtSign,
-          iconColor: '#005D97',
+          iconColor: 'rgb(var(--color-brand-600))',
         };
       case 'subtask_assigned':
         return {
@@ -132,7 +132,7 @@ function AlertRow({ alert, onOpen, onDismiss }: AlertRowProps) {
 
   return (
     <li
-      className="group flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-[#005D9708]"
+      className="group flex items-start gap-3 px-4 py-3 cursor-pointer transition-colors hover:bg-brand-600/[0.031]"
       onClick={onOpen}
       role="button"
       tabIndex={0}
@@ -142,12 +142,12 @@ function AlertRow({ alert, onOpen, onDismiss }: AlertRowProps) {
           onOpen();
         }
       }}
-      style={isUnread ? { backgroundColor: '#005D9706' } : undefined}
+      style={isUnread ? { backgroundColor: 'rgb(var(--color-brand-600) / 0.024)' } : undefined}
     >
       {/* Unread dot */}
       <span
         className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0"
-        style={{ backgroundColor: isUnread ? '#BA2C2C' : 'transparent' }}
+        style={{ backgroundColor: isUnread ? 'rgb(var(--color-accent-crimson))' : 'transparent' }}
         aria-hidden
       />
 

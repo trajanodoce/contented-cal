@@ -197,7 +197,7 @@ export function ChannelsTab({ workspaceId }: ChannelsTabProps) {
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group ${
                 dragOverIndex === index
                   ? 'bg-brand-50 border border-brand-200'
-                  : 'bg-surface-nested hover:bg-[#005D9718]'
+                  : 'bg-surface-nested hover:bg-brand-600/[0.094]'
               }`}
               style={
                 dragOverIndex !== index
@@ -255,13 +255,13 @@ export function ChannelsTab({ workspaceId }: ChannelsTabProps) {
                         setEditingIndex(index);
                         setEditValue(channel);
                       }}
-                      className="px-2 py-1 text-xs text-slate-500 hover:text-brand-600 hover:bg-[#005D9710] rounded transition-colors"
+                      className="px-2 py-1 text-xs text-slate-500 hover:text-brand-600 hover:bg-brand-600/[0.063] rounded transition-colors"
                     >
                       Rename
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(index)}
-                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-[#BA2C2C08] rounded transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -284,7 +284,7 @@ export function ChannelsTab({ workspaceId }: ChannelsTabProps) {
         onClose={() => setShowDeleteConfirm(null)}
         onConfirm={() => showDeleteConfirm !== null && handleDelete(showDeleteConfirm)}
         variant="destructive"
-        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        icon={<Trash2 className="w-5 h-5" style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
         title="Delete Channel?"
         description={
           showDeleteConfirm !== null

@@ -14,12 +14,12 @@ interface ConfirmModalProps {
 }
 
 const iconCircleBg: Record<string, string> = {
-  destructive: '#BA2C2C15',
+  destructive: 'rgb(var(--color-accent-crimson) / 0.082)',
   warning: '#FFC3B830',
 };
 
 const confirmBg: Record<string, string> = {
-  destructive: '#BA2C2C',
+  destructive: 'rgb(var(--color-accent-crimson))',
   warning: '#A05042',
 };
 
@@ -96,7 +96,7 @@ export function ConfirmModal({
           maxWidth: 420,
           width: '100%',
           backgroundColor: '#fff',
-          border: '1.5px solid #002339',
+          border: '1.5px solid rgb(var(--color-brand-900))',
           borderRadius: 14,
           boxShadow:
             '0 2px 4px rgba(186,44,44,.25), 0 20px 40px -8px rgba(0,35,57,.22)',
@@ -128,7 +128,7 @@ export function ConfirmModal({
               className="font-heading"
               style={{
                 fontSize: 15,
-                color: '#002339',
+                color: 'rgb(var(--color-brand-900))',
                 margin: 0,
               }}
             >
@@ -152,7 +152,7 @@ export function ConfirmModal({
           className="flex justify-end"
           style={{
             backgroundColor: '#F7F9FC',
-            borderTop: '1px solid #00233918',
+            borderTop: '1px solid rgb(var(--color-brand-900) / 0.094)',
             padding: '14px 22px',
             gap: 8,
           }}

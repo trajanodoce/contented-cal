@@ -135,8 +135,8 @@ export function StyledSelect({
             left: pos.left,
             width: pos.width,
             zIndex: 9999,
-            borderColor: '#00233930',
-            background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff',
+            borderColor: 'rgb(var(--color-brand-900) / 0.188)',
+            background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff',
           }}
         >
           <div className="p-1 space-y-0.5">
@@ -152,7 +152,7 @@ export function StyledSelect({
                     setIsOpen(false);
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                    isSelected ? '' : 'hover:bg-[#005D9718]'
+                    isSelected ? '' : 'hover:bg-brand-600/[0.094]'
                   }`}
                   style={{ backgroundColor: isSelected ? '#e8f0fe' : undefined }}
                 >

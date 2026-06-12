@@ -273,7 +273,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
           <button
             onClick={openCreate}
             className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90"
-            style={{ backgroundColor: '#005D97' }}
+            style={{ backgroundColor: 'rgb(var(--color-brand-600))' }}
           >
             <Plus className="w-4 h-4" />
             Create Template
@@ -300,13 +300,13 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
               onDrop={() => handleListDrop(index)}
               className={`group flex items-start gap-3 p-4 rounded-xl transition-colors ${
                 listDragOverIndex === index
-                  ? 'bg-[#005D9710]'
-                  : 'bg-surface-nested hover:bg-[#005D9708]'
+                  ? 'bg-brand-600/[0.063]'
+                  : 'bg-surface-nested hover:bg-brand-600/[0.031]'
               } ${listDragIndex === index ? 'opacity-50' : ''}`}
               style={{
                 border: listDragOverIndex === index
-                  ? '2px dashed #005D97'
-                  : '1px solid #00233918',
+                  ? '2px dashed rgb(var(--color-brand-600))'
+                  : '1px solid rgb(var(--color-brand-900) / 0.094)',
               }}
             >
               {/* Drag handle */}
@@ -343,21 +343,21 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
               <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => openEdit(index)}
-                  className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-[#005D9710] rounded transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-600/[0.063] rounded transition-colors"
                   title="Edit"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => openDuplicate(index)}
-                  className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-[#005D9710] rounded transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-600/[0.063] rounded transition-colors"
                   title="Duplicate"
                 >
                   <Copy className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => setDeleteIndex(index)}
-                  className="p-1.5 text-slate-400 hover:text-[#BA2C2C] hover:bg-[#BA2C2C08] rounded transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded transition-colors"
                   title="Delete"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -372,12 +372,12 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
       {modalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center"
-          style={{ backgroundColor: '#00233960' }}
+          style={{ backgroundColor: 'rgb(var(--color-brand-900) / 0.376)' }}
           onClick={handleBackdropClick}
         >
           <div
             className="bg-surface-card shadow-xl w-full max-w-[520px] mx-4"
-            style={{ border: '1.5px solid #002339', borderRadius: 14 }}
+            style={{ border: '1.5px solid rgb(var(--color-brand-900))', borderRadius: 14 }}
             onClick={e => e.stopPropagation()}
           >
             {/* Modal header */}
@@ -404,7 +404,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                   placeholder="e.g. Blog Post Checklist"
                   autoFocus
                   className="w-full px-3 py-2.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  style={{ border: '1px solid #00233930' }}
+                  style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
                 />
               </div>
 
@@ -420,7 +420,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                       onDragOver={e => { e.preventDefault(); setItemDragOverIndex(index); }}
                       onDrop={() => handleItemDrop(index)}
                       className={`flex items-center gap-2 ${
-                        itemDragOverIndex === index ? 'bg-[#005D9710] rounded' : ''
+                        itemDragOverIndex === index ? 'bg-brand-600/[0.063] rounded' : ''
                       } ${itemDragIndex === index ? 'opacity-50' : ''}`}
                     >
                       <span
@@ -441,12 +441,12 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                         onPaste={e => handlePaste(e, index)}
                         placeholder={`Item ${index + 1}`}
                         className="flex-1 px-2.5 py-1.5 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500"
-                        style={{ border: '1px solid #00233930' }}
+                        style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
                       />
                       <button
                         onClick={() => removeItem(index)}
                         disabled={modalItems.length <= 1}
-                        className="w-[26px] h-[26px] flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-[#005D9708] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                        className="w-[26px] h-[26px] flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-brand-600/[0.031] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -460,8 +460,8 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                   disabled={atMax}
                   className="w-full mt-2 py-2 text-sm font-medium rounded-lg transition-colors"
                   style={{
-                    border: atMax ? '1.5px dashed #cbd5e1' : '1.5px dashed #005D9730',
-                    color: atMax ? '#94a3b8' : '#005D97',
+                    border: atMax ? '1.5px dashed #cbd5e1' : '1.5px dashed rgb(var(--color-brand-600) / 0.188)',
+                    color: atMax ? '#94a3b8' : 'rgb(var(--color-brand-600))',
                     cursor: atMax ? 'not-allowed' : 'pointer',
                     backgroundColor: 'transparent',
                   }}
@@ -477,12 +477,12 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
               className="flex items-center justify-between px-6 py-3.5"
               style={{
                 backgroundColor: '#F7F9FC',
-                borderTop: '1px solid #00233918',
+                borderTop: '1px solid rgb(var(--color-brand-900) / 0.094)',
               }}
             >
               <span
                 className="text-xs font-medium"
-                style={{ color: atMax ? '#BA2C2C' : '#64748b' }}
+                style={{ color: atMax ? 'rgb(var(--color-accent-crimson))' : '#64748b' }}
               >
                 {atMax ? `${modalItems.length} / ${MAX_ITEMS} — max` : `${modalItems.length} / ${MAX_ITEMS} items`}
               </span>
@@ -490,7 +490,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                 <button
                   onClick={closeModal}
                   className="px-4 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
-                  style={{ border: '1px solid #00233930' }}
+                  style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}
                 >
                   Cancel
                 </button>
@@ -498,7 +498,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
                   onClick={handleModalSave}
                   disabled={!modalName.trim() || filledCount === 0 || isSaving}
                   className="px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
-                  style={{ backgroundColor: '#005D97' }}
+                  style={{ backgroundColor: 'rgb(var(--color-brand-600))' }}
                 >
                   {isSaving ? 'Saving...' : editIndex !== null ? 'Save Changes' : 'Create Template'}
                 </button>
@@ -514,7 +514,7 @@ export function SubtaskTemplatesTab({ workspaceId }: SubtaskTemplatesTabProps) {
         onClose={() => setDeleteIndex(null)}
         onConfirm={handleDelete}
         variant="destructive"
-        icon={<Trash2 className="w-5 h-5" style={{ color: '#BA2C2C' }} />}
+        icon={<Trash2 className="w-5 h-5" style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
         title="Delete Template?"
         description={
           deleteIndex !== null

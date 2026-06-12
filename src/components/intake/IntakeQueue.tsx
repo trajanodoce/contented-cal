@@ -263,8 +263,8 @@ function SlackTab({ addToast, onOpenItem, items, loading, channelMap, refresh }:
   return (
     <div className="flex flex-1 min-h-0">
       {/* List panel */}
-      <div className="w-80 shrink-0 border-r bg-surface-card flex flex-col" style={{ borderColor: '#00233930' }}>
-        <div className="px-4 py-3 border-b" style={{ borderColor: '#00233920' }}>
+      <div className="w-80 shrink-0 border-r bg-surface-card flex flex-col" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.188)' }}>
+        <div className="px-4 py-3 border-b" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.125)' }}>
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-slate-900">
               Slack Requests
@@ -285,14 +285,14 @@ function SlackTab({ addToast, onOpenItem, items, loading, channelMap, refresh }:
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="w-10 h-10 rounded-xl bg-[#005D9712] flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-brand-600/[0.071] flex items-center justify-center mb-3">
                 <MessageSquare className="w-5 h-5 text-slate-400" />
               </div>
               <p className="text-sm font-medium text-slate-600">No pending requests</p>
               <p className="text-xs text-slate-400 mt-1">Slack /content-request submissions will appear here for triage.</p>
             </div>
           ) : (
-            <div className="divide-y" style={{ borderColor: '#00233910' }}>
+            <div className="divide-y" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.063)' }}>
               {items.map(item => {
                 const isSelected = selected?.id === item.id;
                 const isChecked = selectedIds.has(item.id);
@@ -302,7 +302,7 @@ function SlackTab({ addToast, onOpenItem, items, loading, channelMap, refresh }:
                   <button
                     key={item.id}
                     onClick={(e) => handleRowClick(item, e)}
-                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9718] transition-colors
+                    className={`w-full text-left px-4 py-3 hover:bg-brand-600/[0.094] transition-colors
                       ${isSelected ? 'bg-mint border-l-2 border-brand-400' : ''}
                       ${isChecked ? 'bg-brand-50' : ''}`}
                   >
@@ -343,7 +343,7 @@ function SlackTab({ addToast, onOpenItem, items, loading, channelMap, refresh }:
       <div className="flex-1 overflow-y-auto bg-surface-nested">
         {!selected ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-14 h-14 rounded-2xl bg-surface-card flex items-center justify-center mb-4 shadow-sm" style={{ border: '1px solid #00233920' }}>
+            <div className="w-14 h-14 rounded-2xl bg-surface-card flex items-center justify-center mb-4 shadow-sm" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.125)' }}>
               <MessageSquare className="w-7 h-7 text-slate-400" />
             </div>
             <h3 className="text-base font-semibold text-slate-700 mb-1">Select a request</h3>
@@ -402,9 +402,9 @@ function SlackItemDetail({
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+      <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         {/* Header */}
-        <div className="px-6 py-5 border-b" style={{ borderColor: '#00233920' }}>
+        <div className="px-6 py-5 border-b" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.125)' }}>
           <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             {cf._slack_user_name && (
@@ -430,7 +430,7 @@ function SlackItemDetail({
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Tags</p>
               <div className="flex flex-wrap gap-1">
                 {item.tags.map(tag => (
-                  <span key={tag} className="text-xs bg-[#005D9712] text-slate-600 px-2 py-0.5 rounded-full">{tag}</span>
+                  <span key={tag} className="text-xs bg-brand-600/[0.071] text-slate-600 px-2 py-0.5 rounded-full">{tag}</span>
                 ))}
               </div>
             </div>
@@ -439,7 +439,7 @@ function SlackItemDetail({
 
         {/* Actions */}
         {canAct && (
-          <div className="px-6 py-4 bg-surface-nested border-t flex items-center gap-3" style={{ borderColor: '#00233920' }}>
+          <div className="px-6 py-4 bg-surface-nested border-t flex items-center gap-3" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.125)' }}>
             {isRejecting ? (
               <RejectReasonPicker
                 onSelect={onReject}
@@ -496,7 +496,7 @@ function RejectReasonPicker({ onSelect, onCancel, disabled }: {
           key={reason}
           onClick={() => onSelect(reason)}
           disabled={disabled}
-          className="px-3 py-1.5 text-sm font-medium text-accent-crimson bg-[#BA2C2C08] border border-[#BA2C2C30] rounded-lg hover:bg-[#BA2C2C15] disabled:opacity-60 transition-colors"
+          className="px-3 py-1.5 text-sm font-medium text-accent-crimson bg-accent-crimson/[0.031] border border-accent-crimson/[0.188] rounded-lg hover:bg-accent-crimson/[0.082] disabled:opacity-60 transition-colors"
         >
           {reason}
         </button>
@@ -525,7 +525,7 @@ function BulkTriageToolbar({ count, processing, showReject, onApprove, onStartRe
   onClear: () => void;
 }) {
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-surface-card shadow-xl rounded-xl px-4 py-3" style={{ border: '1px solid #00233930' }}>
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-surface-card shadow-xl rounded-xl px-4 py-3" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       <span className="text-sm font-medium text-slate-700">{count} selected</span>
       <div className="h-6 w-px bg-slate-200" />
 
@@ -548,7 +548,7 @@ function BulkTriageToolbar({ count, processing, showReject, onApprove, onStartRe
           <button
             onClick={onStartReject}
             disabled={processing}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-accent-crimson hover:bg-accent-crimson/[0.031] rounded-lg transition-colors disabled:opacity-50"
           >
             <X className="w-4 h-4" />
             Reject
@@ -560,7 +560,7 @@ function BulkTriageToolbar({ count, processing, showReject, onApprove, onStartRe
       <button
         onClick={onClear}
         disabled={processing}
-        className="px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-[#005D9710] rounded-lg transition-colors disabled:opacity-50"
+        className="px-3 py-1.5 text-sm font-medium text-slate-500 hover:text-slate-700 hover:bg-brand-600/[0.063] rounded-lg transition-colors disabled:opacity-50"
       >
         <X className="w-4 h-4" />
       </button>
@@ -671,8 +671,8 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
   return (
     <div className="flex flex-1 min-h-0">
       {/* List panel */}
-      <div className="w-80 shrink-0 border-r bg-surface-card flex flex-col" style={{ borderColor: '#00233930' }}>
-        <div className="px-4 py-3 border-b" style={{ borderColor: '#00233920' }}>
+      <div className="w-80 shrink-0 border-r bg-surface-card flex flex-col" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.188)' }}>
+        <div className="px-4 py-3 border-b" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.125)' }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-900">
               Submissions
@@ -690,7 +690,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
                 key={f}
                 onClick={() => setStatusFilter(f)}
                 className={`px-2 py-1 text-xs rounded-md capitalize transition-colors
-                  ${statusFilter === f ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-[#005D9710]'}`}
+                  ${statusFilter === f ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-brand-600/[0.063]'}`}
               >
                 {f}
               </button>
@@ -705,7 +705,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <div className="w-10 h-10 rounded-xl bg-[#005D9712] flex items-center justify-center mb-3">
+              <div className="w-10 h-10 rounded-xl bg-brand-600/[0.071] flex items-center justify-center mb-3">
                 <Inbox className="w-5 h-5 text-slate-400" />
               </div>
               <p className="text-sm font-medium text-slate-600">No submissions</p>
@@ -714,7 +714,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
               </p>
             </div>
           ) : (
-            <div className="divide-y" style={{ borderColor: '#00233910' }}>
+            <div className="divide-y" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.063)' }}>
               {filtered.map(sub => {
                 const data = (sub.data as Record<string, string>) ?? {};
                 const title = data.title || `Submission from ${sub.submitted_by_email ?? 'Unknown'}`;
@@ -722,7 +722,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
                   <button
                     key={sub.id}
                     onClick={() => setSelected(sub)}
-                    className={`w-full text-left px-4 py-3 hover:bg-[#005D9718] transition-colors
+                    className={`w-full text-left px-4 py-3 hover:bg-brand-600/[0.094] transition-colors
                       ${selected?.id === sub.id ? 'bg-mint border-l-2 border-brand-400' : ''}`}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -748,7 +748,7 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
       <div className="flex-1 overflow-y-auto bg-surface-nested">
         {!selected ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-14 h-14 rounded-2xl bg-surface-card flex items-center justify-center mb-4 shadow-sm" style={{ border: '1px solid #00233920' }}>
+            <div className="w-14 h-14 rounded-2xl bg-surface-card flex items-center justify-center mb-4 shadow-sm" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.125)' }}>
               <Inbox className="w-7 h-7 text-slate-400" />
             </div>
             <h3 className="text-base font-semibold text-slate-700 mb-1">Select a submission</h3>
@@ -772,11 +772,11 @@ function FormsTab({ addToast }: { addToast: Props['addToast'] }) {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-700',
-    converted: 'bg-[#92D1B218] text-[#2F8889]',
-    rejected: 'bg-[#BA2C2C12] text-accent-crimson',
+    converted: 'bg-[#92D1B218] text-accent-teal',
+    rejected: 'bg-accent-crimson/[0.071] text-accent-crimson',
   };
   return (
-    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${map[status] ?? 'bg-[#005D9712] text-slate-500'}`}>
+    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full capitalize ${map[status] ?? 'bg-brand-600/[0.071] text-slate-500'}`}>
       {status}
     </span>
   );
@@ -795,9 +795,9 @@ function SubmissionDetail({
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid #00233930' }}>
+      <div className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         {/* Header */}
-        <div className="px-6 py-5 border-b" style={{ borderColor: '#00233920' }}>
+        <div className="px-6 py-5 border-b" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.125)' }}>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
@@ -831,7 +831,7 @@ function SubmissionDetail({
 
         {/* Actions */}
         {isPending && (
-          <div className="px-6 py-4 bg-surface-nested border-t flex items-center gap-3" style={{ borderColor: '#00233920' }}>
+          <div className="px-6 py-4 bg-surface-nested border-t flex items-center gap-3" style={{ borderColor: 'rgb(var(--color-brand-900) / 0.125)' }}>
             <button
               onClick={onConvert}
               disabled={converting}
@@ -851,13 +851,13 @@ function SubmissionDetail({
           </div>
         )}
         {sub.status === 'converted' && (
-          <div className="px-6 py-4 bg-[#92D1B218] border-t border-[#92D1B230] flex items-center gap-2 text-sm text-[#2F8889]">
+          <div className="px-6 py-4 bg-[#92D1B218] border-t border-[#92D1B230] flex items-center gap-2 text-sm text-accent-teal">
             <Check className="w-4 h-4" />
             Converted to a content item
           </div>
         )}
         {sub.status === 'rejected' && (
-          <div className="px-6 py-4 bg-[#BA2C2C08] border-t border-[#BA2C2C15] flex items-center gap-2 text-sm text-accent-crimson">
+          <div className="px-6 py-4 bg-accent-crimson/[0.031] border-t border-accent-crimson/[0.082] flex items-center gap-2 text-sm text-accent-crimson">
             <X className="w-4 h-4" />
             Submission rejected
           </div>

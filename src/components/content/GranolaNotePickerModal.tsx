@@ -88,8 +88,8 @@ export function GranolaNotePickerModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#00233960] flex items-center justify-center z-50 p-4">
-      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden" style={{ border: '1px solid #00233930' }}>
+    <div className="fixed inset-0 bg-brand-900/[0.376] flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-card rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export function GranolaNotePickerModal({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-[#005D9710] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-brand-600/[0.063] transition-colors"
           >
             <X className="w-4 h-4 text-slate-500" />
           </button>
@@ -135,7 +135,7 @@ export function GranolaNotePickerModal({
         {/* Notes list */}
         <div className="flex-1 overflow-y-auto">
           {error && (
-            <div className="flex items-center gap-2 px-5 py-3 bg-[#BA2C2C08] text-accent-crimson text-sm">
+            <div className="flex items-center gap-2 px-5 py-3 bg-accent-crimson/[0.031] text-accent-crimson text-sm">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
@@ -155,7 +155,7 @@ export function GranolaNotePickerModal({
               {filtered.map((note) => (
                 <div
                   key={note.id}
-                  className="flex items-center gap-3 px-5 py-3 hover:bg-[#005D9718] transition-colors group"
+                  className="flex items-center gap-3 px-5 py-3 hover:bg-brand-600/[0.094] transition-colors group"
                 >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"

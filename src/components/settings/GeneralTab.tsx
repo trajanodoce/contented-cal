@@ -157,7 +157,7 @@ export function GeneralTab({ workspace }: GeneralTabProps) {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-surface-card border border-slate-300 rounded-lg hover:bg-[#005D9718] cursor-pointer transition-colors">
+            <label className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-slate-700 bg-surface-card border border-slate-300 rounded-lg hover:bg-brand-600/[0.094] cursor-pointer transition-colors">
               <Upload className="w-4 h-4" />
               {isUploading ? 'Uploading...' : logoUrl ? 'Change logo' : 'Upload logo'}
               <input
@@ -172,7 +172,7 @@ export function GeneralTab({ workspace }: GeneralTabProps) {
               <button
                 onClick={handleRemoveLogo}
                 disabled={isUploading}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-accent-crimson hover:bg-[#BA2C2C08] rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-accent-crimson hover:bg-accent-crimson/[0.031] rounded-lg transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
                 Remove

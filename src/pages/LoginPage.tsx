@@ -66,7 +66,7 @@ export function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-surface-card rounded-2xl shadow-sm p-8" style={{ border: '1.5px solid #002339' }}>
+        <div className="bg-surface-card rounded-2xl shadow-sm p-8" style={{ border: '1.5px solid rgb(var(--color-brand-900))' }}>
           {/* Mode Toggle */}
           <div className="flex rounded-lg bg-surface-nested p-1 mb-6">
             <button

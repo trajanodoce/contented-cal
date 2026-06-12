@@ -42,13 +42,13 @@ type IconStyle = {
 
 const ICON_STYLES: Record<ActivityType, IconStyle> = {
   status:     { background: '#92D1B220', color: '#357254', Icon: Check },
-  assignment: { background: '#005D9712', color: '#005D97', Icon: Users },
+  assignment: { background: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))', Icon: Users },
   comment:    { background: '#FFC3B830', color: '#A05042', Icon: MessageCircle },
-  subtask:    { background: '#005D9712', color: '#005D97', Icon: Plus },
+  subtask:    { background: 'rgb(var(--color-brand-600) / 0.071)', color: 'rgb(var(--color-brand-600))', Icon: Plus },
   move:       { background: '#94A3B820', color: '#64748b', Icon: ChevronRight },
-  delete:     { background: '#BA2C2C15', color: '#BA2C2C', Icon: Trash2 },
+  delete:     { background: 'rgb(var(--color-accent-crimson) / 0.082)', color: 'rgb(var(--color-accent-crimson))', Icon: Trash2 },
   create:     {
-    background: 'linear-gradient(135deg, #92D1B228 0%, #FBE7F140 100%)',
+    background: 'linear-gradient(135deg, #92D1B228 0%, rgb(var(--color-accent-pink) / 0.251) 100%)',
     color: '#357254',
     Icon: Sun,
   },
@@ -65,7 +65,7 @@ export function ActivityLog({ children }: ActivityLogProps) {
           top: 14,
           bottom: 14,
           width: 1,
-          background: '#00233910',
+          background: 'rgb(var(--color-brand-900) / 0.063)',
         }}
       />
       {children}
@@ -108,7 +108,7 @@ export function ActivityLogRow({ type, actor, timestamp, action, metadata, child
         <Icon size={11} color={color} strokeWidth={2.25} />
       </div>
       <div style={{ paddingTop: 2, flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, lineHeight: 1.45, color: '#002339' }}>
+        <div style={{ fontSize: 13, lineHeight: 1.45, color: 'rgb(var(--color-brand-900))' }}>
           <Actor name={actor.name} /> {content}
         </div>
         <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
@@ -141,7 +141,7 @@ function RenderedParts({ parts }: { parts: ActionPart[] }) {
           );
         }
         if (part.kind === 'bold') {
-          return <strong key={i} style={{ color: '#002339', fontWeight: 600 }}>{part.value}</strong>;
+          return <strong key={i} style={{ color: 'rgb(var(--color-brand-900))', fontWeight: 600 }}>{part.value}</strong>;
         }
         // pill
         return <StatusPill key={i} label={part.label} color={part.color} />;
@@ -152,9 +152,9 @@ function RenderedParts({ parts }: { parts: ActionPart[] }) {
 
 function StatusPill({ label, color }: { label: string; color?: string }) {
   // Default neutral palette
-  const bg = color ? `${color}12` : '#005D9712';
-  const fg = color || '#005D97';
-  const border = color ? `${color}30` : '#005D9730';
+  const bg = color ? `${color}12` : 'rgb(var(--color-brand-600) / 0.071)';
+  const fg = color || 'rgb(var(--color-brand-600))';
+  const border = color ? `${color}30` : 'rgb(var(--color-brand-600) / 0.188)';
   return (
     <span
       style={{
@@ -185,7 +185,7 @@ export function Actor({ name }: { name: string; avatarUrl?: string | null }) {
           width: 18,
           height: 18,
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #005D97, #002339)',
+          background: 'linear-gradient(135deg, rgb(var(--color-brand-600)), rgb(var(--color-brand-900)))',
           color: '#ffffff',
           fontSize: 9,
           fontWeight: 700,
@@ -197,7 +197,7 @@ export function Actor({ name }: { name: string; avatarUrl?: string | null }) {
       >
         {initial}
       </span>
-      <span style={{ fontSize: 13, fontWeight: 600, color: '#002339' }}>{name}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--color-brand-900))' }}>{name}</span>
     </span>
   );
 }

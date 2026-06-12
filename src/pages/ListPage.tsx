@@ -377,7 +377,7 @@ export function ListPage() {
       {/* Table */}
       <div
         className="bg-surface-card rounded-lg overflow-hidden focus:outline-none"
-        style={{ border: '1.5px solid #002339' }}
+        style={{ border: '1.5px solid rgb(var(--color-brand-900))' }}
         tabIndex={0}
         onKeyDown={handleTableKeyDown}
       >
@@ -385,13 +385,13 @@ export function ListPage() {
           <table className="w-full">
             <thead
               className="sticky top-0 z-10"
-              style={{ background: '#F7F9FC', borderBottom: '1.5px solid #00233980' }}
+              style={{ background: '#F7F9FC', borderBottom: '1.5px solid rgb(var(--color-brand-900) / 0.502)' }}
             >
               <tr>
                 <th className="px-4 py-3 w-12">
                   <button
                     onClick={handleSelectAll}
-                    className="p-1 hover:bg-[#005D9710] rounded transition-colors"
+                    className="p-1 hover:bg-brand-600/[0.063] rounded transition-colors"
                   >
                     {isAllSelected ? (
                       <CheckSquare className="w-5 h-5 text-brand-600" />
@@ -433,8 +433,8 @@ export function ListPage() {
                           linkedPlatforms: [],
                         });
                       }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg text-accent-crimson hover:bg-[#BA2C2C08] transition-colors"
-                      style={{ border: '1px solid #BA2C2C30' }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-lg text-accent-crimson hover:bg-accent-crimson/[0.031] transition-colors"
+                      style={{ border: '1px solid rgb(var(--color-accent-crimson) / 0.188)' }}
                     >
                       Clear filters
                     </button>
@@ -470,18 +470,18 @@ export function ListPage() {
                         : INTERNAL_COLOR;
                 const isBlocked = status?.name?.toLowerCase() === 'blocked';
                 const isUrgentRow = isBlocked || (dueDate.isOverdue && !isDone);
-                const leftBarColor = isUrgentRow ? '#BA2C2C' : sourceLeftBarColor;
+                const leftBarColor = isUrgentRow ? 'rgb(var(--color-accent-crimson))' : sourceLeftBarColor;
 
                 return (
                   <tr
                     key={item.id}
                     onClick={() => handleRowClick(item, idx)}
                     className={`group cursor-pointer transition-colors ${
-                      isSelected ? 'bg-[#005D9710]' : 'hover:bg-[#005D9718]'
+                      isSelected ? 'bg-brand-600/[0.063]' : 'hover:bg-brand-600/[0.094]'
                     } ${isDone ? 'opacity-60' : ''}`}
                     style={
                       isFocused
-                        ? { outline: '2px solid #005D97', outlineOffset: '-2px' }
+                        ? { outline: '2px solid rgb(var(--color-brand-600))', outlineOffset: '-2px' }
                         : undefined
                     }
                   >
@@ -492,7 +492,7 @@ export function ListPage() {
                     >
                       <button
                         onClick={() => handleSelectItem(item.id)}
-                        className="p-1 hover:bg-[#005D9710] rounded transition-colors"
+                        className="p-1 hover:bg-brand-600/[0.063] rounded transition-colors"
                       >
                         {isSelected ? (
                           <CheckSquare className="w-5 h-5 text-brand-600" />
@@ -512,7 +512,7 @@ export function ListPage() {
                         {isUrgentRow && (
                           <AlertTriangle
                             className="w-3.5 h-3.5 shrink-0"
-                            style={{ color: '#BA2C2C' }}
+                            style={{ color: 'rgb(var(--color-accent-crimson))' }}
                           />
                         )}
                         <span className={`${isUrgentRow ? 'font-bold' : 'font-medium'} ${isDone ? 'text-slate-500' : 'text-slate-900'} truncate max-w-[320px]`}>{item.title}</span>
@@ -702,7 +702,7 @@ function InlineStatusEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[150px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[150px]" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {[...boardColumns]
             .sort((a, b) => a.position - b.position)
             .map((column) => (
@@ -712,7 +712,7 @@ function InlineStatusEdit({
                   e.stopPropagation();
                   handleStatusChange(column.id);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 ${
                   column.id === statusId ? 'bg-brand-50' : ''
                 }`}
               >
@@ -799,7 +799,7 @@ function InlinePriorityEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[120px]" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[120px]" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {Object.entries(PRIORITY_STYLES).map(([key, ps]) => (
             <button
               key={key}
@@ -807,7 +807,7 @@ function InlinePriorityEdit({
                 e.stopPropagation();
                 handlePriorityChange(key);
               }}
-              className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-2 ${
+              className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-2 ${
                 key === priority ? 'bg-brand-50' : ''
               }`}
             >
@@ -907,7 +907,7 @@ function InlineAssigneeEdit({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[180px] p-2" style={{ border: '1px solid #00233930', background: 'linear-gradient(135deg, #005D9718 0%, transparent 50%), #ffffff' }}>
+        <div className="absolute z-50 mt-1 bg-surface-card rounded-xl shadow-lg min-w-[180px] p-2" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)', background: 'linear-gradient(135deg, rgb(var(--color-brand-600) / 0.094) 0%, transparent 50%), #ffffff' }}>
           {members.map((member) => {
             const isSelected = assigneeIds.includes(member.id);
             return (
@@ -917,7 +917,7 @@ function InlineAssigneeEdit({
                   e.stopPropagation();
                   toggleAssignee(member.id);
                 }}
-                className={`w-full px-3 py-2 text-left text-sm hover:bg-[#005D9718] flex items-center gap-3 rounded ${
+                className={`w-full px-3 py-2 text-left text-sm hover:bg-brand-600/[0.094] flex items-center gap-3 rounded ${
                   isSelected ? 'bg-brand-50' : ''
                 }`}
               >

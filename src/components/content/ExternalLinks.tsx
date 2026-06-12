@@ -71,7 +71,7 @@ function LinkCard({ link, onDelete, readOnly = false }: { link: ExternalLink; on
   const FileIcon = isFile ? getFileIcon(fileName) : Image;
 
   return (
-    <div className="group bg-surface-card rounded-xl overflow-hidden hover:shadow-md hover:border-[#005D9730] transition-all" style={{ border: '1px solid #00233930' }}>
+    <div className="group bg-surface-card rounded-xl overflow-hidden hover:shadow-md hover:border-brand-600/[0.188] transition-all" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
       {/* Thumbnail */}
       <div className="w-full h-16 bg-surface-nested flex items-center justify-center overflow-hidden relative">
         {isFile && isImage && !imgError ? (
@@ -372,8 +372,8 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
 
       <div className="flex items-center justify-between mb-3">
         <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-[0.06em] flex items-center gap-1.5">
-          <Paperclip className="w-3.5 h-3.5" style={{ color: '#005D97' }} />
-          <span style={{ color: '#005D97' }}>Assets {links.length > 0 && `(${links.length})`}</span>
+          <Paperclip className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-brand-600))' }} />
+          <span style={{ color: 'rgb(var(--color-brand-600))' }}>Assets {links.length > 0 && `(${links.length})`}</span>
         </label>
         {!readOnly && (
           <div className="flex items-center gap-2">
@@ -388,7 +388,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
               <button
                 onClick={() => setAdding(true)}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md transition-colors"
-                style={{ color: '#005D97', border: '1px solid #005D9740', backgroundColor: 'white' }}
+                style={{ color: 'rgb(var(--color-brand-600))', border: '1px solid rgb(var(--color-brand-600) / 0.251)', backgroundColor: 'white' }}
               >
                 <Link2 className="w-3 h-3" /> Add link
               </button>
@@ -455,7 +455,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
             </>
           ) : (
             <>
-              <div className="w-10 h-10 rounded-xl bg-[#005D9712] group-hover:bg-brand-100 flex items-center justify-center mb-2 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-brand-600/[0.071] group-hover:bg-brand-100 flex items-center justify-center mb-2 transition-colors">
                 <Upload className="w-5 h-5 text-slate-400 group-hover:text-brand-500 transition-colors" />
               </div>
               <p className="text-sm font-medium text-slate-600 group-hover:text-brand-600 transition-colors">
@@ -503,7 +503,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                           <button onClick={saveEditLink} className="px-2.5 py-1 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-500 flex items-center gap-1">
                             <Check className="w-3 h-3" /> Save
                           </button>
-                          <button onClick={() => setEditingLinkId(null)} className="px-2.5 py-1 text-slate-500 text-xs border border-slate-200 rounded-lg hover:bg-[#005D9710]">
+                          <button onClick={() => setEditingLinkId(null)} className="px-2.5 py-1 text-slate-500 text-xs border border-slate-200 rounded-lg hover:bg-brand-600/[0.063]">
                             Cancel
                           </button>
                         </div>
@@ -514,7 +514,7 @@ export function ExternalLinksSection({ contentItemId, addToast, readOnly = false
                   return (
                     <div
                       key={link.id}
-                      className="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#005D9718] transition-colors"
+                      className="group flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-brand-600/[0.094] transition-colors"
                     >
                       <PlatformIcon platform={link.platform} size={28} />
                       <a
