@@ -138,7 +138,7 @@ export function Avatar({
         aria-label="User avatar"
         style={{ ...base, background: 'rgb(var(--color-slate-200))' }}
       >
-        <User size={iconPx} color="rgb(var(--color-slate-400))" strokeWidth={2} />
+        <User size={iconPx} style={{ color: 'rgb(var(--color-slate-400))' }} strokeWidth={2} />
       </span>
     );
   }
@@ -229,11 +229,13 @@ export function Avatar({
             cy={px / 2}
             r={ringStrokeRadius}
             fill="none"
-            stroke="rgb(var(--color-brand-600))"
             strokeWidth={3}
             strokeLinecap="round"
             strokeDasharray="40 200"
             style={{
+              // var() resolves in CSS props (style), NOT in the raw `stroke`
+              // SVG attribute — so stroke must live here.
+              stroke: 'rgb(var(--color-brand-600))',
               // Override generic 240 default so the dash anim wraps fully on any size
               strokeDashoffset: ringCircumference,
             }}

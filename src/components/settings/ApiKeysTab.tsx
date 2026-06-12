@@ -461,21 +461,21 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                 <ScopeRadioCard
                   selected={newScope === 'read'}
                   onSelect={() => setNewScope('read')}
-                  icon={<Eye size={13} strokeWidth={2} color="rgb(var(--color-slate-500))" />}
+                  icon={<Eye size={13} strokeWidth={2} style={{ color: 'rgb(var(--color-slate-500))' }} />}
                   label="Read"
                   description="List items, fetch single items, list types and statuses. No writes."
                 />
                 <ScopeRadioCard
                   selected={newScope === 'read_write'}
                   onSelect={() => setNewScope('read_write')}
-                  icon={<PenLine size={13} strokeWidth={2} color="rgb(var(--color-brand-600))" />}
+                  icon={<PenLine size={13} strokeWidth={2} style={{ color: 'rgb(var(--color-brand-600))' }} />}
                   label="Read & Write"
                   description="Everything in Read, plus create, update, and delete items."
                 />
                 <ScopeRadioCard
                   selected={newScope === 'full'}
                   onSelect={() => setNewScope('full')}
-                  icon={<Circle size={13} strokeWidth={2} color="rgb(var(--color-accent-crimson))" />}
+                  icon={<Circle size={13} strokeWidth={2} style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
                   label="Full admin"
                   description="Everything above, plus workspace settings, members, and API key management."
                   sensitive
@@ -551,7 +551,7 @@ export function ApiKeysTab({ workspaceId }: ApiKeysTabProps) {
                   flexShrink: 0,
                 }}
               >
-                <Check size={18} strokeWidth={2.5} color="rgb(var(--color-state-success))" />
+                <Check size={18} strokeWidth={2.5} style={{ color: 'rgb(var(--color-state-success))' }} />
               </div>
               <div style={{ flex: 1 }}>
                 <div

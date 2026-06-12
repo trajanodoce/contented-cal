@@ -523,7 +523,7 @@ export function BulkActionToolbar({
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleBulkDelete}
         variant="destructive"
-        icon={<AlertTriangle size={20} color="rgb(var(--color-accent-crimson))" />}
+        icon={<AlertTriangle size={20} style={{ color: 'rgb(var(--color-accent-crimson))' }} />}
         title={`Delete ${selectedCount} item${selectedCount === 1 ? '' : 's'}?`}
         description="This action cannot be undone. The selected content items will be permanently deleted."
         confirmLabel="Delete"
