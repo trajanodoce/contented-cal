@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   PORTABLE DESIGN TOKENS  ·  CSS variables (RGB channel format)
+   ───────────────────────────────────────────────────────────────────────
+   Drop-in color foundation for a Tailwind app. Pairs with tailwind.tokens.js.
+   See README.md for setup.
+
+   WHY CHANNELS (space-separated "R G B", not hex):
+   Tailwind's `rgb(var(--x) / <alpha-value>)` pattern needs raw channels so
+   opacity modifiers compose natively — `bg-brand-600/12` → rgb(... / 0.12).
+   It also makes every color runtime-swappable (white-label) and theme-
+   flippable (dark mode) by overriding one variable instead of editing
+   hundreds of call sites.
+
+   HOW TO ADAPT TO A NEW APP:
+   1. Swap the BRAND ramp + ACCENTS for your brand. Everything else
+      (neutrals, text roles, borders, state) is a sensible universal default.
+   2. To white-label per tenant: override any --color-* on a wrapper element
+      (e.g. [data-theme="acme"] { --color-brand-600: 153 51 0; }).
+   3. For dark mode: fill in the .dark block at the bottom.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── BRAND ramp ───────────────────────  ← SWAP THESE FOR YOUR APP ────── */
+  /* A single-hue tint→shade ramp. 600 is the primary; 900 the darkest.    */
+  --color-brand-50: 244 248 251;
+  --color-brand-100: 224 239 248;
+  --color-brand-200: 183 206 236;
+  --color-brand-300: 123 192 232;
+  --color-brand-400: 59 157 212;
+  --color-brand-500: 0 112 181;
+  --color-brand-600: 0 93 151;     /* primary */
+  --color-brand-700: 0 61 102;
+  --color-brand-800: 0 51 80;
+  --color-brand-900: 0 35 57;      /* darkest — deep text, borders */
+  --color-brand-950: 0 26 43;
+
+  /* ── ACCENTS ──────────────────────────  ← brand-adjacent, swap to taste */
+  --color-accent-pink: 251 231 241;
+  --color-accent-coral: 255 195 184;
+  --color-accent-lavender: 211 205 236;
+  --color-accent-mint: 146 209 178;
+  --color-accent-crimson: 186 44 44;
+  --color-accent-teal: 47 136 137;
+  --color-accent-berry: 184 68 122;
+
+  /* ── SURFACES ─────────────────────────────────────────────────────────── */
+  --color-surface-page: 244 248 251;   /* app background */
+  --color-surface-card: 247 249 252;   /* raised cards/panels */
+  --color-surface-nested: 249 247 251; /* inset zones inside cards */
+
+  /* ── NEUTRAL ramp (mirrors Tailwind `slate`) ───────────────────────────── */
+  /* Override Tailwind's slate with these (see tailwind.tokens.js) so all
+     existing slate-* classes become theme-swappable. Universal — keep as-is. */
+  --color-slate-50: 248 250 252;
+  --color-slate-100: 241 245 249;
+  --color-slate-200: 226 232 240;
+  --color-slate-300: 203 213 225;
+  --color-slate-400: 148 163 184;
+  --color-slate-500: 100 116 139;
+  --color-slate-600: 71 85 105;
+  --color-slate-700: 51 65 85;
+  --color-slate-800: 30 41 59;
+  --color-slate-900: 15 23 42;
+  --color-slate-950: 2 6 23;
+
+  /* ── SEMANTIC TEXT roles (preferred for new code) ──────────────────────── */
+  /* Role-named so dark mode swaps MEANING, not just shade. Class form:
+     text-ink / text-ink-muted / text-ink-subtle (see tailwind.tokens.js). */
+  --color-text-primary: 15 23 42;    /* headings, primary copy */
+  --color-text-secondary: 51 65 85;  /* body */
+  --color-text-muted: 100 116 139;   /* secondary / meta */
+  --color-text-subtle: 148 163 184;  /* placeholders, faint */
+  --color-text-inverse: 255 255 255; /* on dark/brand fills */
+
+  /* ── SEMANTIC BORDERS ──────────────────────────────────────────────────── */
+  --color-border-subtle: 226 232 240;  /* hairlines, dividers */
+  --color-border-default: 0 35 57;     /* used at low alpha (e.g. /12) */
+  --color-border-strong: 100 116 139;
+
+  /* ── STATE ─────────────────────────────────────────────────────────────── */
+  --color-state-success: 53 114 84;
+  --color-state-success-tint: 146 209 178;
+  --color-state-error: 186 44 44;
+  --color-state-warning: 245 158 11;
+  --color-state-warning-tint: 255 195 184;
+  --color-state-info: 0 93 151;
+}
+
+/* ── DARK MODE ──────────────────────────────────────────────────────────────
+   Toggle by adding `class="dark"` to <html> (Tailwind darkMode: 'class').
+   Fill in the values that should differ; anything omitted inherits :root.
+   Starter inversions below — tune to taste, then uncomment. */
+.dark {
+  /* --color-surface-page: 15 20 25;
+     --color-surface-card: 22 28 34;
+     --color-surface-nested: 30 37 45;
+     --color-text-primary: 241 245 249;
+     --color-text-secondary: 203 213 225;
+     --color-text-muted: 148 163 184;
+     --color-text-subtle: 100 116 139;
+     --color-border-subtle: 51 65 85;
+     --color-border-default: 226 232 240; */
+}
