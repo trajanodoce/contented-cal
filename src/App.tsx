@@ -21,6 +21,7 @@ function AppWithFilters({ children }: { children: React.ReactNode }) {
 }
 import { LoginPage } from './pages/LoginPage';
 import { CreateWorkspacePage } from './pages/CreateWorkspacePage';
+import { WelcomePage } from './pages/WelcomePage';
 import { Loader2 } from 'lucide-react';
 
 // Layout (always loaded)
@@ -163,7 +164,37 @@ function CreateWorkspaceRoute() {
     return <Navigate to="/home" replace />;
   }
 
+  // New, membership-less users can't self-create a workspace — they go to the lobby
+  // and wait for an admin to approve them. (Owners reopen creation via Settings → Workspaces.)
+  if (workspaces.length === 0) {
+    return <Navigate to="/welcome" replace />;
+  }
+
   return <CreateWorkspacePage />;
+}
+
+function WelcomeRoute() {
+  const { user, loading: authLoading } = useAuth();
+  const { workspaces, loading: workspaceLoading } = useWorkspace();
+
+  if (authLoading || workspaceLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-surface-page">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Already approved onto a workspace → into the app.
+  if (workspaces.length > 0) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return <WelcomePage />;
 }
 
 function ProtectedLayout() {
@@ -191,7 +222,7 @@ function ProtectedLayout() {
   }
 
   if (workspaces.length === 0) {
-    return <Navigate to="/create-workspace" replace />;
+    return <Navigate to="/welcome" replace />;
   }
 
   return <AppLayout />;
@@ -217,6 +248,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
       <Route path="/create-workspace" element={<CreateWorkspaceRoute />} />
+      <Route path="/welcome" element={<WelcomeRoute />} />
       <Route path="/auth/callback" element={<LazyPage><AuthCallback /></LazyPage>} />
       <Route path="/intake/:slug" element={<LazyPage><IntakeFormPage /></LazyPage>} />
       <Route element={<ProtectedLayout />}>

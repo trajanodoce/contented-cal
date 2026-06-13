@@ -52,6 +52,8 @@ export function TeamTab() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
   const [cancellingInviteId, setCancellingInviteId] = useState<string | null>(null);
+  const [pendingLogins, setPendingLogins] = useState<Profile[]>([]);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const isAdmin = userRole === 'admin';
 
@@ -59,7 +61,7 @@ export function TeamTab() {
     if (!currentWorkspace) return;
     setLoading(true);
 
-    const [membersRes, invitesRes] = await Promise.all([
+    const [membersRes, invitesRes, profilesRes] = await Promise.all([
       supabase
         .from('workspace_members')
         .select('user_id, role, created_at, profiles:user_id(id, full_name, email, avatar_url)')
@@ -71,8 +73,13 @@ export function TeamTab() {
         .eq('workspace_id', currentWorkspace.id)
         .is('accepted_at', null)
         .order('created_at', { ascending: false }),
+      supabase
+        .from('profiles')
+        .select('*')
+        .order('email'),
     ]);
 
+    let memberIds = new Set<string>();
     if (membersRes.error) {
       toast.error('Failed to load team members');
     } else {
@@ -84,10 +91,20 @@ export function TeamTab() {
         profile: m.profiles as Profile,
       }));
       setMembers(mapped);
+      memberIds = new Set(mapped.map((m) => m.user_id));
     }
 
     if (!invitesRes.error) {
       setPendingInvites(invitesRes.data || []);
+    }
+
+    // "New logins" — anyone who has signed in (so a profile exists) but isn't a member yet.
+    // Exclude throwaway @test.local fixtures so the list stays real.
+    if (!profilesRes.error) {
+      const pending = (profilesRes.data || []).filter(
+        (p) => !memberIds.has(p.id) && !(p.email || '').toLowerCase().endsWith('@test.local')
+      );
+      setPendingLogins(pending);
     }
 
     setLoading(false);
@@ -152,6 +169,23 @@ export function TeamTab() {
     setRemovingId(null);
   };
 
+  const handleApprove = async (userId: string, role: Role) => {
+    if (!currentWorkspace) return;
+    setApprovingId(userId);
+    const { error } = await supabase
+      .from('workspace_members')
+      .insert({ workspace_id: currentWorkspace.id, user_id: userId, role });
+
+    if (error) {
+      toast.error('Failed to approve: ' + error.message);
+    } else {
+      toast.success('Approved — added to the workspace');
+      fetchMembers();
+      refreshWorkspaceData();
+    }
+    setApprovingId(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -186,6 +220,32 @@ export function TeamTab() {
           </div>
         )}
       </div>
+
+      {/* New logins - pending approval */}
+      {isAdmin && pendingLogins.length > 0 && (
+        <div
+          className="border rounded-lg p-4"
+          style={{ borderColor: 'rgb(var(--color-brand-600) / 0.3)', background: 'rgb(var(--color-brand-600) / 0.04)' }}
+        >
+          <h4 className="text-sm font-medium text-brand-800 flex items-center gap-2 mb-1">
+            <UserPlus className="w-4 h-4" />
+            New logins - pending approval ({pendingLogins.length})
+          </h4>
+          <p className="text-xs text-slate-500 mb-3">
+            Signed in but not on the workspace yet. Approve to grant access. Added as Viewer by default; change the role anytime below.
+          </p>
+          <div className="space-y-2">
+            {pendingLogins.map((p) => (
+              <PendingLoginRow
+                key={p.id}
+                profile={p}
+                approving={approvingId === p.id}
+                onApprove={(role) => handleApprove(p.id, role)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Pending Invites */}
       {pendingInvites.length > 0 && (
@@ -406,6 +466,53 @@ function RoleDropdown({ currentRole, loading, onChange }: { currentRole: Role; l
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+function PendingLoginRow({
+  profile,
+  approving,
+  onApprove,
+}: {
+  profile: Profile;
+  approving: boolean;
+  onApprove: (role: Role) => void;
+}) {
+  const [role, setRole] = useState<Role>('viewer');
+  return (
+    <div
+      className="flex items-center justify-between bg-surface-card rounded-lg px-3 py-2.5"
+      style={{ border: '1px solid rgb(var(--color-brand-900) / 0.12)' }}
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <Avatar src={profile.avatar_url} name={profile.full_name} size="lg" />
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-slate-900 truncate">{profile.full_name || 'Unnamed'}</p>
+          <p className="text-xs text-slate-500 truncate">{profile.email}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+        <div className="w-32">
+          <StyledSelect
+            value={role}
+            onChange={(v) => setRole(v as Role)}
+            options={[
+              { value: 'viewer', label: 'Viewer' },
+              { value: 'editor', label: 'Editor' },
+              { value: 'admin', label: 'Admin' },
+            ]}
+          />
+        </div>
+        <button
+          onClick={() => onApprove(role)}
+          disabled={approving}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-brand-600 hover:bg-brand-500 rounded-lg transition-colors disabled:opacity-50 flex-shrink-0"
+        >
+          {approving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+          Approve
+        </button>
+      </div>
     </div>
   );
 }
