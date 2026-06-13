@@ -383,7 +383,7 @@ export function ProjectsPage() {
                     const col = item.status ? columnMap.get(item.status) : null;
                     if (!col) return sum;
                     const colName = col.name.toLowerCase();
-                    const isDone = colName === 'published' || colName === 'completed';
+                    const isDone = colName === 'published/done' || colName === 'published' || colName === 'completed';
                     return sum + (isDone ? 1 : col.position / maxPosition);
                   }, 0) / totalItems * 100
                 )

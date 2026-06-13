@@ -11,7 +11,7 @@ import { isPast, isToday, isTomorrow } from 'date-fns';
 export function isDoneStatus(name: string | null | undefined): boolean {
   if (!name) return false;
   const n = name.toLowerCase();
-  return n === 'published' || n === 'completed';
+  return n === 'published/done' || n === 'published' || n === 'completed';
 }
 
 /**

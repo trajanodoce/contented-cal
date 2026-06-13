@@ -251,7 +251,7 @@ export function ProjectDetailPage() {
     const ids = new Set<string>();
     boardColumns.forEach(c => {
       const name = c.name.toLowerCase();
-      if (name === 'published' || name === 'completed') ids.add(c.id);
+      if (name === 'published/done' || name === 'published' || name === 'completed') ids.add(c.id);
     });
     return ids;
   }, [boardColumns]);
@@ -267,7 +267,7 @@ export function ProjectDetailPage() {
         if (!i.due_date) return false;
         const statusCol = boardColumns.find(c => c.id === i.status);
         const statusName = statusCol?.name?.toLowerCase();
-        if (statusName === 'published' || statusName === 'completed') return false;
+        if (statusName === 'published/done' || statusName === 'published' || statusName === 'completed') return false;
         const d = parseLocalDate(i.due_date);
         return d < new Date() && !isToday(d);
       }).length,
@@ -1180,7 +1180,7 @@ function ListTab({
                   : isLinear ? LINEAR_COLOR
                   : INTERNAL_COLOR;
                 const colName = col?.name?.toLowerCase();
-                const isDone = colName === 'published' || colName === 'completed';
+                const isDone = colName === 'published/done' || colName === 'published' || colName === 'completed';
                 const isBlocked = colName === 'blocked';
                 const isOverdue = item.due_date && !isDone && new Date(item.due_date + 'T00:00:00') < new Date(new Date().toDateString());
                 const isUrgentRow = isBlocked || isOverdue;
@@ -1473,7 +1473,7 @@ function ProjectBoardColumn({
   });
 
   const colColor = column.color ?? 'rgb(var(--color-slate-400))';
-  const isDoneCol = column.name.toLowerCase() === 'published' || column.name.toLowerCase() === 'completed';
+  const isDoneCol = column.name.toLowerCase() === 'published/done' || column.name.toLowerCase() === 'published' || column.name.toLowerCase() === 'completed';
 
   return (
     <div
@@ -1598,7 +1598,7 @@ function BoardTab({
 
     // Sync completed boolean when moving to/from done columns
     const targetName = targetColumn.name.toLowerCase();
-    const isDoneColumn = targetName === 'published' || targetName === 'completed';
+    const isDoneColumn = targetName === 'published/done' || targetName === 'published' || targetName === 'completed';
     const updatePayload: Record<string, unknown> = { status: targetColumnId };
     if (isDoneColumn) {
       updatePayload.completed = true;
@@ -1606,7 +1606,7 @@ function BoardTab({
     } else {
       const prevCol = boardColumns.find(c => c.id === item.status);
       const prevName = prevCol?.name?.toLowerCase();
-      if (prevName === 'published' || prevName === 'completed') {
+      if (prevName === 'published/done' || prevName === 'published' || prevName === 'completed') {
         updatePayload.completed = false;
         updatePayload.completed_at = null;
       }
