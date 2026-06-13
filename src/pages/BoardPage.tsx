@@ -3,6 +3,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useFilters } from '../contexts/FiltersContext';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { useApp } from '../contexts/AppContext';
+import { FilteredEmptyState } from '../components/FilteredEmptyState';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import type { ContentItem, ContentType, BoardColumn, Profile } from '../lib/database.types';
@@ -324,7 +325,7 @@ function BoardColumnContainer({ column, items, contentTypes, boardColumns, membe
 export function BoardPage() {
   const { currentWorkspace, userRole } = useWorkspace();
   const canDrag = userRole === 'admin' || userRole === 'editor';
-  const { filters, setFilters, isLoaded } = useFilters();
+  const { filters, setFilters, isLoaded, resetFilters, hasActiveFilters } = useFilters();
   const { contentItems, contentItemsLoading, patchContentItem, memberProfiles: members } = useApp();
   const [columns, setColumns] = useState<BoardColumn[]>([]);
   const [contentTypes, setContentTypes] = useState<ContentType[]>([]);
@@ -524,6 +525,11 @@ export function BoardPage() {
         </div>
       </div>
 
+      {hasActiveFilters && filteredItems.length === 0 ? (
+        <div className="flex-1 p-6">
+          <FilteredEmptyState hiddenCount={contentItems.length} onClear={resetFilters} />
+        </div>
+      ) : (
       <div className="cc-board-scrollbar flex-1 min-h-0" style={{ overflowX: 'scroll', overflowY: 'hidden' }}>
         <DndContext
           sensors={sensors}
@@ -563,6 +569,7 @@ export function BoardPage() {
           </DragOverlay>
         </DndContext>
       </div>
+      )}
 
     </div>
   );

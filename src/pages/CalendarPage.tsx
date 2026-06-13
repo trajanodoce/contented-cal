@@ -14,6 +14,7 @@ import { useTaskLinkCounts } from '../hooks/useTaskLinkCounts';
 import { useGranolaItemIds } from '../hooks/useGranolaNotes';
 import { useFilters } from '../contexts/FiltersContext';
 import { FilterBar, applyFilters } from '../components/FilterBar';
+import { FilteredEmptyState } from '../components/FilteredEmptyState';
 import { useSelectedItem } from '../contexts/SelectedItemContext';
 import { CreateItemModal, MeetingPrefill } from '../components/content/CreateItemModal';
 import { GranolaNotePickerModal } from '../components/content/GranolaNotePickerModal';
@@ -901,7 +902,7 @@ export function CalendarPage() {
     setCalendarViewType(newView);
   }, [setCalendarViewType]);
 
-  const { filters, setFilters, isLoaded } = useFilters();
+  const { filters, setFilters, isLoaded, resetFilters, hasActiveFilters } = useFilters();
   const channels = useMemo(() => {
     const configured = getWorkspaceChannels(currentWorkspace?.settings);
     const fromItems = contentItems.map((i) => i.channel).filter(Boolean) as string[];
@@ -1224,6 +1225,9 @@ export function CalendarPage() {
         </div>
 
         <div className="flex-1 overflow-auto p-6">
+          {hasActiveFilters && filteredItems.length === 0 ? (
+            <FilteredEmptyState hiddenCount={contentItems.length} onClear={resetFilters} />
+          ) : (<>
           {view === 'month' && (
             <MonthView
               currentDate={currentDate}
@@ -1284,6 +1288,7 @@ export function CalendarPage() {
               onDateClick={handleDateClick}
             />
           )}
+          </>)}
         </div>
 
         <CreateItemModal

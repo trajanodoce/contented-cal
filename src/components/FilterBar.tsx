@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, X, ChevronDown, Check } from 'lucide-react';
+import { Search, X, ChevronDown, Check, Filter } from 'lucide-react';
 import { Avatar } from './ui/Avatar';
 import type { ContentType, BoardColumn, Profile } from '../lib/database.types';
 
@@ -264,11 +264,26 @@ export function FilterBar({
         )}
       </div>
 
-      {/* Results count */}
-      <div className="mt-2 text-xs text-slate-500">
-        Showing {filteredCount} of {totalCount} items
-        {hasActiveFilters && <span className="ml-1 text-brand-600">(filtered)</span>}
-      </div>
+      {/* Results count — a prominent bar when filters are active so a low (or
+          zero) count is never silently overlooked; quiet line otherwise. */}
+      {hasActiveFilters ? (
+        <div
+          className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm"
+          style={{
+            backgroundColor: 'rgb(var(--color-brand-600) / 0.08)',
+            border: '1px solid rgb(var(--color-brand-600) / 0.22)',
+            color: 'rgb(var(--color-brand-700))',
+          }}
+        >
+          <Filter className="w-4 h-4 flex-shrink-0" />
+          <span className="font-semibold">Filters active</span>
+          <span style={{ opacity: 0.85 }}>&mdash; showing {filteredCount} of {totalCount} items</span>
+        </div>
+      ) : (
+        <div className="mt-2 text-xs text-slate-500">
+          Showing {filteredCount} of {totalCount} items
+        </div>
+      )}
     </div>
   );
 }
