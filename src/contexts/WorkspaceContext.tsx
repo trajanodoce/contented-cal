@@ -10,6 +10,7 @@ interface WorkspaceContextValue {
   currentWorkspace: Workspace | null;
   workspaces: Workspace[];
   userRole: UserRole | null;
+  isOwner: boolean;
   loading: boolean;
   switchWorkspace: (workspace: Workspace) => void;
   refreshWorkspaces: () => Promise<void>;
@@ -23,6 +24,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Fetch user's workspaces and determine which to show
@@ -87,6 +89,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         .from('workspaces')
         .select('*')
         .in('id', workspaceIds)
+        .eq('archived', false)
         .order('name');
 
       if (workspaceError) throw workspaceError;
@@ -133,6 +136,27 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refreshWorkspaces();
   }, [refreshWorkspaces]);
+
+  // Global owner flag — separate from per-workspace role. Drives owner-only
+  // UI gating (General/Customizations/Workspaces tabs, owner-management).
+  useEffect(() => {
+    if (!user) {
+      setIsOwner(false);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from('profiles')
+      .select('is_owner')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled) setIsOwner(Boolean(data?.is_owner));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const switchWorkspace = useCallback((workspace: Workspace) => {
     setCurrentWorkspace(workspace);
@@ -190,6 +214,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       currentWorkspace,
       workspaces,
       userRole,
+      isOwner,
       loading,
       switchWorkspace,
       refreshWorkspaces,

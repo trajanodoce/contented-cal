@@ -8,8 +8,9 @@ import { CustomizationsTab } from '../components/settings/CustomizationsTab';
 import { IntakeFormsList } from '../components/settings/IntakeFormBuilder';
 import { IntegrationsPage } from '../components/settings/IntegrationsPage';
 import { ApiKeysTab } from '../components/settings/ApiKeysTab';
+import { WorkspacesTab } from '../components/settings/WorkspacesTab';
 import {
-  Settings, Users, Inbox, Zap, Key, AlertTriangle, Palette,
+  Settings, Users, Inbox, Zap, Key, AlertTriangle, Palette, Building2,
 } from 'lucide-react';
 import SettingsTabs from '../components/ui/SettingsTabs';
 
@@ -19,7 +20,7 @@ const CUSTOMIZATION_SLUGS = [
 
 const DEFAULT_CUSTOMIZATION_SLUG = 'content-types';
 
-type TopTab = 'general' | 'team' | 'customizations' | 'intake-forms' | 'integrations' | 'api';
+type TopTab = 'general' | 'team' | 'customizations' | 'intake-forms' | 'integrations' | 'api' | 'workspaces';
 
 /**
  * Single source of truth for /settings routing. Resolves the active top tab
@@ -45,40 +46,62 @@ function resolveTab(pathname: string): { topTab: TopTab; redirect?: string } {
     return { topTab: 'customizations' };
   }
 
-  const valid: TopTab[] = ['general', 'team', 'intake-forms', 'integrations', 'api'];
+  const valid: TopTab[] = ['general', 'team', 'intake-forms', 'integrations', 'api', 'workspaces'];
   if (valid.includes(first as TopTab)) return { topTab: first as TopTab };
 
   return { topTab: 'general', redirect: '/settings/general' };
 }
 
 export function SettingsPage() {
-  const { currentWorkspace, userRole } = useWorkspace();
+  const { currentWorkspace, userRole, isOwner } = useWorkspace();
   const location = useLocation();
   const navigate = useNavigate();
 
   const { topTab, redirect } = resolveTab(location.pathname);
 
+  const canAccessSettings = isOwner || userRole === 'admin' || userRole === 'editor';
+
+  // Per-role tab visibility. Owner = everything; admin = Team/Intake/Integrations/API;
+  // editor = Integrations only. General + Customizations are owner-only.
+  const TAB_DEFS = [
+    { id: 'general', label: 'General', icon: <Settings className="w-3.5 h-3.5" />, show: isOwner },
+    { id: 'team', label: 'Team', icon: <Users className="w-3.5 h-3.5" />, show: isOwner || userRole === 'admin' },
+    { id: 'customizations', label: 'Customizations', icon: <Palette className="w-3.5 h-3.5" />, show: isOwner },
+    { id: 'intake-forms', label: 'Intake Forms', icon: <Inbox className="w-3.5 h-3.5" />, show: isOwner || userRole === 'admin' },
+    { id: 'integrations', label: 'Integrations', icon: <Zap className="w-3.5 h-3.5" />, show: isOwner || userRole === 'admin' || userRole === 'editor' },
+    { id: 'api', label: 'API', icon: <Key className="w-3.5 h-3.5" />, show: isOwner || userRole === 'admin' },
+    { id: 'workspaces', label: 'Workspaces', icon: <Building2 className="w-3.5 h-3.5" />, show: isOwner },
+  ];
+  const visibleTabs = TAB_DEFS.filter((t) => t.show);
+  const firstVisibleId = visibleTabs[0]?.id;
+  const topTabVisible = visibleTabs.some((t) => t.id === topTab);
+
   useEffect(() => {
     if (redirect) {
       navigate(redirect, { replace: true });
+    } else if (canAccessSettings && !topTabVisible && firstVisibleId) {
+      // Land non-owner roles on a tab they can actually see (e.g. editor → Integrations)
+      navigate(`/settings/${firstVisibleId}`, { replace: true });
     }
-  }, [redirect, navigate]);
+  }, [redirect, canAccessSettings, topTabVisible, firstVisibleId, navigate]);
 
   if (redirect) return null;
 
-  if (userRole !== 'admin') {
+  if (!canAccessSettings) {
     return (
       <div className="p-8">
         <div className="flex items-center justify-center h-[60vh]">
           <div className="text-center max-w-md">
             <AlertTriangle className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-slate-900 mb-2">Access Denied</h2>
-            <p className="text-slate-500">Only workspace admins can access settings.</p>
+            <p className="text-slate-500">You do not have access to workspace settings.</p>
           </div>
         </div>
       </div>
     );
   }
+
+  if (!topTabVisible) return null;
 
   const handleTabChange = (id: string) => {
     // /settings/customizations is handled by resolveTab which auto-redirects
@@ -95,14 +118,7 @@ export function SettingsPage() {
 
       <div className="mb-6">
         <SettingsTabs
-          tabs={[
-            { id: 'general', label: 'General', icon: <Settings className="w-3.5 h-3.5" /> },
-            { id: 'team', label: 'Team', icon: <Users className="w-3.5 h-3.5" /> },
-            { id: 'customizations', label: 'Customizations', icon: <Palette className="w-3.5 h-3.5" /> },
-            { id: 'intake-forms', label: 'Intake Forms', icon: <Inbox className="w-3.5 h-3.5" /> },
-            { id: 'integrations', label: 'Integrations', icon: <Zap className="w-3.5 h-3.5" /> },
-            { id: 'api', label: 'API', icon: <Key className="w-3.5 h-3.5" /> },
-          ]}
+          tabs={visibleTabs.map(({ id, label, icon }) => ({ id, label, icon }))}
           activeTab={topTab}
           onTabChange={handleTabChange}
         />
@@ -125,6 +141,7 @@ export function SettingsPage() {
           {topTab === 'intake-forms' && <IntakeFormsList addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}
           {topTab === 'integrations' && <IntegrationsPage addToast={(msg, type = 'success') => { if (type === 'error') toast.error(msg); else toast.success(msg); }} />}
           {topTab === 'api' && <ApiKeysTab workspaceId={currentWorkspace?.id || null} />}
+          {topTab === 'workspaces' && <WorkspacesTab />}
         </div>
       )}
     </div>

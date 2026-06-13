@@ -75,7 +75,7 @@ export function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { currentWorkspace, switchWorkspace, workspaces, userRole } = useWorkspace();
+  const { currentWorkspace, switchWorkspace, workspaces, userRole, isOwner } = useWorkspace();
   const { setLastUsedView } = useViewPersistence();
   const [showWorkspacePicker, setShowWorkspacePicker] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,8 +86,11 @@ export function AppLayout() {
   const fabMenuRef = useRef<HTMLDivElement>(null);
   const { selectedItemId, setSelectedItemId } = useSelectedItem();
   const { unreadCount: unreadAlertCount } = useUserAlerts();
-  const canCreate = userRole === 'admin' || userRole === 'editor';
-  const canAccessSettings = userRole === 'admin';
+  const canCreate = isOwner || userRole === 'admin' || userRole === 'editor';
+  // Editors reach Settings for Integrations; owners always. Viewers: no settings.
+  const canAccessSettings = isOwner || userRole === 'admin' || userRole === 'editor';
+  // Intake Queue is admin+/owner only (matches the route guard + RLS).
+  const canSeeIntakeQueue = isOwner || userRole === 'admin';
   const urlSyncRef = useRef(false);
 
   // Track view changes and save to persistence
@@ -278,7 +281,7 @@ export function AppLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1">
-          {navItems.map((item) => {
+          {navItems.filter((item) => item.path !== '/intake-queue' || canSeeIntakeQueue).map((item) => {
             const showAlertDot = item.path === '/my-work' && unreadAlertCount > 0;
             return (
               <NavLink

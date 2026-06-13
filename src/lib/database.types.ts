@@ -1043,6 +1043,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_owner: boolean
           updated_at: string
         }
         Insert: {
@@ -1051,6 +1052,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          is_owner?: boolean
           updated_at?: string
         }
         Update: {
@@ -1059,6 +1061,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_owner?: boolean
           updated_at?: string
         }
         Relationships: []
@@ -1662,6 +1665,7 @@ export type Database = {
       }
       workspaces: {
         Row: {
+          archived: boolean
           created_at: string
           id: string
           logo_url: string | null
@@ -1670,6 +1674,7 @@ export type Database = {
           slug: string
         }
         Insert: {
+          archived?: boolean
           created_at?: string
           id?: string
           logo_url?: string | null
@@ -1678,6 +1683,7 @@ export type Database = {
           slug: string
         }
         Update: {
+          archived?: boolean
           created_at?: string
           id?: string
           logo_url?: string | null
@@ -2048,4 +2054,5 @@ export interface Profile {
   email: string | null;
   full_name: string | null;
   avatar_url: string | null;
+  is_owner?: boolean;
 }

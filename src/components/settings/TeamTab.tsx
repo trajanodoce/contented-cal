@@ -21,6 +21,7 @@ import {
   X,
   Clock,
   Search,
+  Crown,
 } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { format } from 'date-fns';
@@ -41,7 +42,7 @@ const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon
 };
 
 export function TeamTab() {
-  const { currentWorkspace, userRole } = useWorkspace();
+  const { currentWorkspace, userRole, isOwner } = useWorkspace();
   const { user } = useAuth();
   const { refreshWorkspaceData } = useApp();
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -54,8 +55,10 @@ export function TeamTab() {
   const [cancellingInviteId, setCancellingInviteId] = useState<string | null>(null);
   const [pendingLogins, setPendingLogins] = useState<Profile[]>([]);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [togglingOwnerId, setTogglingOwnerId] = useState<string | null>(null);
 
   const isAdmin = userRole === 'admin';
+  const ownerCount = members.filter((m) => m.profile?.is_owner).length;
 
   const fetchMembers = useCallback(async () => {
     if (!currentWorkspace) return;
@@ -64,7 +67,7 @@ export function TeamTab() {
     const [membersRes, invitesRes, profilesRes] = await Promise.all([
       supabase
         .from('workspace_members')
-        .select('user_id, role, created_at, profiles:user_id(id, full_name, email, avatar_url)')
+        .select('user_id, role, created_at, profiles:user_id(id, full_name, email, avatar_url, is_owner)')
         .eq('workspace_id', currentWorkspace.id)
         .order('created_at'),
       supabase
@@ -186,6 +189,27 @@ export function TeamTab() {
     setApprovingId(null);
   };
 
+  // Owner-management: grant/revoke the GLOBAL owner flag (owner-only UI; the DB
+  // guard trigger blocks self-escalation and last-owner removal as a backstop).
+  const handleToggleOwner = async (userId: string, makeOwner: boolean) => {
+    setTogglingOwnerId(userId);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_owner: makeOwner })
+      .eq('id', userId);
+    if (error) {
+      toast.error(
+        error.message.includes('last remaining owner')
+          ? 'Cannot remove the last remaining owner.'
+          : 'Failed to update owner: ' + error.message
+      );
+    } else {
+      toast.success(makeOwner ? 'Owner granted' : 'Owner removed');
+      fetchMembers();
+    }
+    setTogglingOwnerId(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -300,7 +324,7 @@ export function TeamTab() {
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Member</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Role</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Joined</th>
-              {isAdmin && (
+              {(isAdmin || isOwner) && (
                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Actions</th>
               )}
             </tr>
@@ -323,6 +347,11 @@ export function TeamTab() {
                           {member.profile.full_name || 'Unnamed'}
                           {isCurrentUser && (
                             <span className="ml-2 text-xs text-brand-600 font-normal">(you)</span>
+                          )}
+                          {member.profile.is_owner && (
+                            <span className="ml-2 inline-flex items-center gap-1 text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full align-middle">
+                              <Crown className="w-2.5 h-2.5" /> Owner
+                            </span>
                           )}
                         </p>
                         <p className="text-xs text-slate-500">{member.profile.email}</p>
@@ -348,17 +377,29 @@ export function TeamTab() {
                       {format(new Date(member.created_at), 'MMM d, yyyy')}
                     </span>
                   </td>
-                  {isAdmin && (
+                  {(isAdmin || isOwner) && (
                     <td className="px-4 py-3 text-right">
-                      {!isCurrentUser && (
-                        <button
-                          onClick={() => setRemovingId(member.user_id)}
-                          className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded-lg transition-colors"
-                          title="Remove member"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        {isOwner && !isCurrentUser && (
+                          <button
+                            onClick={() => handleToggleOwner(member.user_id, !member.profile.is_owner)}
+                            disabled={togglingOwnerId === member.user_id || (member.profile.is_owner && ownerCount <= 1)}
+                            className={`p-1.5 rounded-lg transition-colors disabled:opacity-40 ${member.profile.is_owner ? 'text-amber-500 hover:bg-amber-50' : 'text-slate-300 hover:text-amber-500 hover:bg-amber-50'}`}
+                            title={member.profile.is_owner ? (ownerCount <= 1 ? 'Cannot remove the last owner' : 'Remove owner') : 'Make owner'}
+                          >
+                            {togglingOwnerId === member.user_id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crown className="w-4 h-4" />}
+                          </button>
+                        )}
+                        {isAdmin && !isCurrentUser && (
+                          <button
+                            onClick={() => setRemovingId(member.user_id)}
+                            className="p-1.5 text-slate-400 hover:text-accent-crimson hover:bg-accent-crimson/[0.031] rounded-lg transition-colors"
+                            title="Remove member"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   )}
                 </tr>

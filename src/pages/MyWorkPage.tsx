@@ -63,6 +63,7 @@ export function MyWorkPage() {
   const { setSelectedItemId } = useSelectedItem();
 
   const [subtasks, setSubtasks] = useState<SubtaskWithParent[]>([]);
+  const [myProjectIds, setMyProjectIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const myItems = useMemo(
     () => (user ? contentItems.filter((i) => i.assignee_ids?.includes(user.id)) : []),
@@ -98,6 +99,13 @@ export function MyWorkPage() {
         content_items: undefined,
       }));
       setSubtasks(mapped);
+
+      // Projects the user is a member of — their tasks surface under "From your projects"
+      const { data: pm } = await supabase
+        .from('project_members')
+        .select('project_id')
+        .eq('user_id', user.id);
+      setMyProjectIds(new Set((pm || []).map((r: { project_id: string }) => r.project_id)));
     } catch (err) {
       console.error('Error fetching my work:', err);
     } finally {
@@ -194,6 +202,27 @@ export function MyWorkPage() {
     return [...active, ...done];
   }, [filteredItems, isItemDone, sortField, compareItems]);
 
+  // Tasks from projects the user is a member of (relevance), minus ones already
+  // assigned to them (those are in "My Tasks"). Same filter/sort treatment.
+  const sortedProjectItems = useMemo(() => {
+    if (myProjectIds.size === 0) return [];
+    const assignedIds = new Set(myItems.map((i) => i.id));
+    let result = contentItems.filter(
+      (i) => i.project_id && myProjectIds.has(i.project_id) && !assignedIds.has(i.id),
+    );
+    if (isLoaded) result = applyFilters(result, filters);
+    if (!showCompleted) {
+      result = result.filter((i) => !(i.completed || (i.status != null && doneColumnIds.has(i.status))));
+    }
+    const active = result.filter((i) => !isItemDone(i));
+    const done = result.filter((i) => isItemDone(i));
+    if (sortField) {
+      active.sort(compareItems);
+      done.sort(compareItems);
+    }
+    return [...active, ...done];
+  }, [contentItems, myProjectIds, myItems, filters, isLoaded, showCompleted, doneColumnIds, isItemDone, sortField, compareItems]);
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       if (sortDirection === 'asc') {
@@ -265,6 +294,156 @@ export function MyWorkPage() {
     );
   }
 
+  const renderTaskSection = (title: string, items: ContentItem[]) => (
+    <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
+      <div className="cc-banner-section-header flex items-center gap-2 border-b border-slate-100">
+        <h2 className="text-base font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>{title}</h2>
+        <span
+          className="text-xs font-semibold px-2 py-0.5 rounded-full"
+          style={{ backgroundColor: 'rgba(0,35,57,.12)', color: 'rgb(var(--color-brand-900))' }}
+        >
+          {items.length}
+        </span>
+      </div>
+
+      <div className="overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-brand-600/[0.071] border-b border-slate-200">
+            <tr>
+              <th
+                className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
+                onClick={() => handleSort('title')}
+              >
+                <span className="inline-flex items-center gap-1">Title <SortIcon field="title" /></span>
+              </th>
+              <th
+                className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
+                onClick={() => handleSort('type')}
+              >
+                <span className="inline-flex items-center gap-1">Type <SortIcon field="type" /></span>
+              </th>
+              <th
+                className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
+                onClick={() => handleSort('status')}
+              >
+                <span className="inline-flex items-center gap-1">Status <SortIcon field="status" /></span>
+              </th>
+              <th
+                className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
+                onClick={() => handleSort('due_date')}
+              >
+                <span className="inline-flex items-center gap-1">Due Date <SortIcon field="due_date" /></span>
+              </th>
+              <th
+                className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
+                onClick={() => handleSort('priority')}
+              >
+                <span className="inline-flex items-center gap-1">Priority <SortIcon field="priority" /></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {items.map((item) => {
+              const ct = getContentType(item.content_type_id);
+              const status = getStatusName(item.status);
+              const done = isItemDone(item);
+              const isOverdue =
+                !done &&
+                item.due_date &&
+                isPast(parseLocalDate(item.due_date)) &&
+                !isToday(parseLocalDate(item.due_date));
+
+              const isOrdinal = isOrdinalItem(item);
+              const isLinear = isLinearItem(item);
+
+              const rowBg = done
+                ? DONE_BG
+                : isOrdinal
+                  ? `${ORDINAL_COLOR}0A`
+                  : isLinear
+                    ? `${LINEAR_COLOR}0A`
+                    : undefined;
+
+              return (
+                <tr
+                  key={item.id}
+                  onClick={() => setSelectedItemId(item.id)}
+                  className={`cursor-pointer transition-colors ${done ? 'opacity-60 hover:bg-brand-600/[0.039]' : 'hover:bg-brand-600/[0.094]'}`}
+                  style={rowBg ? { backgroundColor: rowBg } : {}}
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <TaskCategoryIcon category={item.category} />
+                      {done && (
+                        <span title="Completed" className="inline-flex flex-shrink-0">
+                          <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-completed))' }} />
+                        </span>
+                      )}
+                      <span className={`text-sm font-medium ${done ? 'text-slate-500' : 'text-slate-900'}`}>
+                        {item.title}
+                      </span>
+                      {granolaItemIds.has(item.id) && (
+                        <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
+                          <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    {ct && (
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: ct.color ?? undefined }}
+                        />
+                        <span className={`text-sm ${done ? 'text-slate-400' : 'text-slate-600'}`}>{ct.name}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {status && (
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                        style={{
+                          backgroundColor: `${status.color ?? 'rgb(var(--color-slate-400))'}55`,
+                          color: pillTextColor(status.color ?? 'rgb(var(--color-slate-400))'),
+                          border: `0.5px solid ${pillTextColor(status.color ?? 'rgb(var(--color-slate-400))')}`,
+                        }}
+                      >
+                        {status.name}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {item.due_date ? (
+                      <span
+                        className={`flex items-center gap-1 text-sm ${
+                          isOverdue ? 'text-accent-crimson font-medium' : done ? 'text-slate-400' : 'text-slate-600'
+                        }`}
+                      >
+                        {isOverdue && <AlertCircle className="w-3.5 h-3.5" />}
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        {formatDate(item.due_date)}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-slate-400">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full ${PRIORITY_STYLES[item.priority ?? 'medium']?.dot}`} />
+                      <span className={`text-sm ${done ? 'text-slate-400' : 'text-slate-600'}`}>{priorityLabels[item.priority ?? 'medium']}</span>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
       {/* FilterBar */}
@@ -311,157 +490,9 @@ export function MyWorkPage() {
       {/* Personal Tasks — always visible */}
       <PersonalTasksSection workspaceId={currentWorkspace.id} />
 
-      {/* My Tasks */}
-      {sortedItems.length > 0 && (
-            <section className="bg-surface-card rounded-xl shadow-sm overflow-hidden" style={{ border: '1px solid rgb(var(--color-brand-900) / 0.188)' }}>
-              <div className="cc-banner-section-header flex items-center gap-2 border-b border-slate-100">
-                <h2 className="text-base font-heading" style={{ color: 'rgb(var(--color-brand-900))' }}>My Tasks</h2>
-                <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(0,35,57,.12)', color: 'rgb(var(--color-brand-900))' }}
-                >
-                  {sortedItems.length}
-                </span>
-              </div>
-
-              <div className="overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-brand-600/[0.071] border-b border-slate-200">
-                    <tr>
-                      <th
-                        className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
-                        onClick={() => handleSort('title')}
-                      >
-                        <span className="inline-flex items-center gap-1">Title <SortIcon field="title" /></span>
-                      </th>
-                      <th
-                        className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
-                        onClick={() => handleSort('type')}
-                      >
-                        <span className="inline-flex items-center gap-1">Type <SortIcon field="type" /></span>
-                      </th>
-                      <th
-                        className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
-                        onClick={() => handleSort('status')}
-                      >
-                        <span className="inline-flex items-center gap-1">Status <SortIcon field="status" /></span>
-                      </th>
-                      <th
-                        className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
-                        onClick={() => handleSort('due_date')}
-                      >
-                        <span className="inline-flex items-center gap-1">Due Date <SortIcon field="due_date" /></span>
-                      </th>
-                      <th
-                        className="px-4 py-2.5 text-left text-xs font-medium text-slate-500 uppercase cursor-pointer select-none hover:text-slate-700 transition-colors"
-                        onClick={() => handleSort('priority')}
-                      >
-                        <span className="inline-flex items-center gap-1">Priority <SortIcon field="priority" /></span>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {sortedItems.map((item) => {
-                      const ct = getContentType(item.content_type_id);
-                      const status = getStatusName(item.status);
-                      const done = isItemDone(item);
-                      const isOverdue =
-                        !done &&
-                        item.due_date &&
-                        isPast(parseLocalDate(item.due_date)) &&
-                        !isToday(parseLocalDate(item.due_date));
-
-                      const isOrdinal = isOrdinalItem(item);
-                      const isLinear = isLinearItem(item);
-
-                      // Determine row background: done → blue, ordinal/linear → tint, default → none
-                      const rowBg = done
-                        ? DONE_BG
-                        : isOrdinal
-                          ? `${ORDINAL_COLOR}0A`
-                          : isLinear
-                            ? `${LINEAR_COLOR}0A`
-                            : undefined;
-
-                      return (
-                        <tr
-                          key={item.id}
-                          onClick={() => setSelectedItemId(item.id)}
-                          className={`cursor-pointer transition-colors ${done ? 'opacity-60 hover:bg-brand-600/[0.039]' : 'hover:bg-brand-600/[0.094]'}`}
-                          style={rowBg ? { backgroundColor: rowBg } : {}}
-                        >
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1.5">
-                              <TaskCategoryIcon category={item.category} />
-                              {done && (
-                                <span title="Completed" className="inline-flex flex-shrink-0">
-                                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-completed))' }} />
-                                </span>
-                              )}
-                              <span className={`text-sm font-medium ${done ? 'text-slate-500' : 'text-slate-900'}`}>
-                                {item.title}
-                              </span>
-                              {granolaItemIds.has(item.id) && (
-                                <span title="Has meeting notes" className="flex-shrink-0 inline-flex">
-                                  <Mic className="w-3.5 h-3.5" style={{ color: GRANOLA_TEXT }} />
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">
-                            {ct && (
-                              <div className="flex items-center gap-1.5">
-                                <span
-                                  className="w-2 h-2 rounded-full"
-                                  style={{ backgroundColor: ct.color ?? undefined }}
-                                />
-                                <span className={`text-sm ${done ? 'text-slate-400' : 'text-slate-600'}`}>{ct.name}</span>
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            {status && (
-                              <span
-                                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
-                                style={{
-                                  backgroundColor: `${status.color ?? 'rgb(var(--color-slate-400))'}55`,
-                                  color: pillTextColor(status.color ?? 'rgb(var(--color-slate-400))'),
-                                  border: `0.5px solid ${pillTextColor(status.color ?? 'rgb(var(--color-slate-400))')}`,
-                                }}
-                              >
-                                {status.name}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            {item.due_date ? (
-                              <span
-                                className={`flex items-center gap-1 text-sm ${
-                                  isOverdue ? 'text-accent-crimson font-medium' : done ? 'text-slate-400' : 'text-slate-600'
-                                }`}
-                              >
-                                {isOverdue && <AlertCircle className="w-3.5 h-3.5" />}
-                                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                                {formatDate(item.due_date)}
-                              </span>
-                            ) : (
-                              <span className="text-sm text-slate-400">—</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-1.5">
-                              <span className={`w-2 h-2 rounded-full ${PRIORITY_STYLES[item.priority ?? 'medium']?.dot}`} />
-                              <span className={`text-sm ${done ? 'text-slate-400' : 'text-slate-600'}`}>{priorityLabels[item.priority ?? 'medium']}</span>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+      {/* My Tasks + tasks from projects you're a member of */}
+      {sortedItems.length > 0 && renderTaskSection('My Tasks', sortedItems)}
+      {sortedProjectItems.length > 0 && renderTaskSection('From your projects', sortedProjectItems)}
 
           {/* My Subtasks */}
           {subtasks.length > 0 && (
