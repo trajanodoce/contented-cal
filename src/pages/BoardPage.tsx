@@ -121,7 +121,7 @@ function BoardCard({ item, contentTypes, boardColumns, members, subtaskCount, li
         </span>
         {isDone && (
           <span title="Completed" className="inline-flex flex-shrink-0 mt-0.5">
-            <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-success))' }} />
+            <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-completed))' }} />
           </span>
         )}
         <h4

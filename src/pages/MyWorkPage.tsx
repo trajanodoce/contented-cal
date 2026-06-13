@@ -395,7 +395,7 @@ export function MyWorkPage() {
                               <TaskCategoryIcon category={item.category} />
                               {done && (
                                 <span title="Completed" className="inline-flex flex-shrink-0">
-                                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
+                                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-completed))' }} />
                                 </span>
                               )}
                               <span className={`text-sm font-medium ${done ? 'text-slate-500' : 'text-slate-900'}`}>

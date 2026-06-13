@@ -477,7 +477,7 @@ export function ListPage() {
                         <TaskCategoryIcon category={item.category} />
                         {isDone && (
                           <span title="Completed" className="inline-flex flex-shrink-0">
-                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-completed))' }} />
                           </span>
                         )}
                         {isUrgentRow && (

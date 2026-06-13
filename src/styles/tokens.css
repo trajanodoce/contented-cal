@@ -83,6 +83,8 @@
   --color-state-warning: 245 158 11;       /* #F59E0B (amber-500) */
   --color-state-warning-tint: 255 195 184; /* #FFC3B8 (coral/peach) */
   --color-state-info: 0 93 151;            /* #005D97 (= brand-600) */
+  --color-state-completed: 74 111 160;        /* #4A6FA0 — done/completed (distinct from success-green) */
+  --color-state-completed-tint: 183 206 236;  /* #B7CEEC */
 }
 
 /* Reserved for the dark-mode color pass (follow-up project). Empty body is

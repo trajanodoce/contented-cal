@@ -1223,7 +1223,7 @@ function ListTab({
                         <TaskCategoryIcon category={item.category} />
                         {isDone && (
                           <span title="Completed" className="inline-flex flex-shrink-0">
-                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
+                            <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-completed))' }} />
                           </span>
                         )}
                         {isUrgentRow && (
@@ -1408,7 +1408,7 @@ function ProjectBoardCard({
         </span>
         {isDone && (
           <span title="Completed" className="inline-flex flex-shrink-0 mt-0.5">
-            <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-success))' }} />
+            <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-completed))' }} />
           </span>
         )}
         <p className={`text-xs font-medium ${isDone ? 'text-slate-500' : 'text-slate-900'} line-clamp-2 flex-1`} title={item.title}>

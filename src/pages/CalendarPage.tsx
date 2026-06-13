@@ -156,8 +156,13 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
   const borderColor = isOverdue ? '#ef4444' : contentType?.color || 'rgb(var(--color-slate-200))';
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
+  // Ordinal posts are view-only reference; "Published" is their normal state,
+  // not a "done" to grey out — keep their identity regardless of status.
+  const showDone = isDone && !isOrdinal;
 
-  const itemBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : 'white';
+  const itemBg = isOrdinal ? `${ORDINAL_COLOR}20` : isLinear ? `${LINEAR_COLOR}0A` : 'white';
+  const accentColor = isLinear ? LINEAR_COLOR : isOrdinal ? ORDINAL_TEXT : borderColor;
+  const outlineColor = isLinear ? `${LINEAR_COLOR}30` : isOrdinal ? `${ORDINAL_COLOR}66` : `${borderColor}30`;
 
   return (
     <div
@@ -165,15 +170,15 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
       {...listeners}
       {...attributes}
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-2 py-1 rounded-[3px] text-[14px] cursor-pointer hover:opacity-80 transition-opacity mb-[6px] overflow-hidden min-w-0 leading-tight ${isDone ? 'opacity-60' : ''}`}
+      className={`flex items-center gap-1.5 px-2 py-1 rounded-[3px] text-[14px] cursor-pointer hover:opacity-80 transition-opacity mb-[6px] overflow-hidden min-w-0 leading-tight ${showDone ? 'opacity-60' : ''}`}
       style={{
         transform: isDragging
           ? `${CSS.Translate.toString(transform) ?? ''} rotate(-1.5deg)`
           : CSS.Translate.toString(transform),
-        opacity: isDragging ? 0.9 : isDone ? 0.6 : 1,
+        opacity: isDragging ? 0.9 : showDone ? 0.6 : 1,
         // Slim 1px tinted outline + 2px solid left border for emphasis.
-        border: `1px solid ${isLinear ? LINEAR_COLOR : borderColor}30`,
-        borderLeft: `2px solid ${isLinear ? LINEAR_COLOR : borderColor}`,
+        border: `1px solid ${outlineColor}`,
+        borderLeft: `2px solid ${accentColor}`,
         backgroundColor: itemBg,
         boxShadow: isDragging
           ? '0 4px 6px rgba(0,35,57,.11), 0 10px 16px rgba(0,35,57,.16)'
@@ -189,13 +194,16 @@ function CalendarItemPill({ item, contentTypes, boardColumns, members, dateMode,
           L
         </span>
       )}
-      {!isLinear && <TaskCategoryIcon category={item.category} />}
-      {isDone && (
+      {isOrdinal && (
+        <span title="Ordinal post" className="flex-shrink-0 text-[11px] font-bold leading-none" style={{ color: ORDINAL_TEXT }}>⬡</span>
+      )}
+      {!isLinear && !isOrdinal && <TaskCategoryIcon category={item.category} />}
+      {showDone && (
         <span title="Completed" className="inline-flex flex-shrink-0">
-          <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-success))' }} />
+          <CheckCircle2 className="w-3 h-3" style={{ color: 'rgb(var(--color-state-completed))' }} />
         </span>
       )}
-      <span className={`truncate flex-1 font-medium ${isDone ? 'text-slate-500' : 'text-slate-700'}`}>{item.title}</span>
+      <span className="truncate flex-1 font-medium" style={{ color: showDone ? 'rgb(var(--color-slate-500))' : isOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-700))' }}>{item.title}</span>
       <SubtaskIndicator count={subtaskCount} size="xs" />
       <AssetIndicator info={linkInfo} size="xs" />
       <LinkedTaskIndicator count={taskLinkCount} size="xs" />
@@ -238,15 +246,16 @@ function ProjectMarker({ project, type }: { project: Project; type: 'start' | 'e
 function SubtaskPill({ subtask }: { subtask: SubtaskWithParent }) {
   return (
     <div
-      className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] truncate border-[0.5px] ${
+      className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium truncate border-[0.5px]"
+      style={
         subtask.completed
-          ? 'bg-green-50 text-green-600 border-green-300 opacity-70'
-          : 'bg-slate-100 text-slate-500 border-slate-300'
-      }`}
+          ? { backgroundColor: 'rgb(var(--color-state-completed-tint) / 0.30)', color: 'rgb(var(--color-state-completed))', borderColor: 'rgb(var(--color-state-completed))' }
+          : { backgroundColor: 'rgb(var(--color-slate-100))', color: 'rgb(var(--color-slate-600))', borderColor: 'rgb(var(--color-slate-300))' }
+      }
       title={`Subtask: ${subtask.title}${subtask.parentTitle ? ` (${subtask.parentTitle})` : ''}`}
     >
       <CheckSquare className="w-2.5 h-2.5 flex-shrink-0" />
-      <span className="truncate">{subtask.title}</span>
+      <span className={`truncate ${subtask.completed ? 'line-through' : ''}`}>{subtask.title}</span>
     </div>
   );
 }
@@ -737,14 +746,15 @@ function DayView({ currentDate, items, contentTypes, boardColumns, members, date
                 {daySubtasks.map((st) => (
                   <div
                     key={`sub-${st.id}`}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm"
+                    style={
                       st.completed
-                        ? 'bg-green-50 text-green-600 opacity-70'
-                        : 'bg-slate-50 text-slate-600'
-                    }`}
+                        ? { backgroundColor: 'rgb(var(--color-state-completed-tint) / 0.30)', color: 'rgb(var(--color-state-completed))' }
+                        : { backgroundColor: 'rgb(var(--color-slate-50))', color: 'rgb(var(--color-slate-600))' }
+                    }
                   >
                     <CheckSquare className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span className="truncate">{st.title}</span>
+                    <span className={`truncate ${st.completed ? 'line-through' : ''}`}>{st.title}</span>
                     {st.parentTitle && (
                       <span className="text-xs text-slate-400 ml-auto flex-shrink-0">from {st.parentTitle}</span>
                     )}
@@ -778,13 +788,14 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
   const isOrdinal = isOrdinalItem(item);
   const isLinear = isLinearItem(item);
   const isExternal = isOrdinal || isLinear;
+  const showDone = isDone && !isOrdinal;
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: item.id,
     data: { item },
   });
 
-  const externalBg = isOrdinal ? `${ORDINAL_COLOR}0A` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
+  const externalBg = isOrdinal ? `${ORDINAL_COLOR}20` : isLinear ? `${LINEAR_COLOR}0A` : undefined;
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -800,7 +811,7 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
       onClick={onClick}
       className={`rounded-lg border p-4 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing ${
         isExternal ? '' : 'bg-slate-50'
-      } ${isOverdue ? 'border-red-300' : 'border-slate-300'} ${isDone ? 'opacity-60' : ''}`}
+      } ${isOverdue ? 'border-red-300' : 'border-slate-300'} ${showDone ? 'opacity-60' : ''}`}
     >
       <div className="flex items-start gap-3">
         <div
@@ -810,13 +821,16 @@ function DayViewCardFull({ item, contentTypes, boardColumns, members, hasGranola
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-1">
-            <TaskCategoryIcon category={item.category} />
-            {isDone && (
+            {isOrdinal && (
+              <span title="Ordinal post" className="flex-shrink-0 text-xs font-bold leading-none" style={{ color: ORDINAL_TEXT }}>⬡</span>
+            )}
+            {!isOrdinal && <TaskCategoryIcon category={item.category} />}
+            {showDone && (
               <span title="Completed" className="inline-flex flex-shrink-0">
-                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-success))' }} />
+                <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'rgb(var(--color-state-completed))' }} />
               </span>
             )}
-            <h4 className={`font-medium truncate ${isDone ? 'text-slate-500' : 'text-slate-900'}`}>{item.title}</h4>
+            <h4 className="font-medium truncate" style={{ color: showDone ? 'rgb(var(--color-slate-500))' : isOrdinal ? ORDINAL_TEXT : 'rgb(var(--color-slate-900))' }}>{item.title}</h4>
             {hasGranolaNotes && <GranolaIndicator size="sm" />}
           </div>
 
