@@ -18,19 +18,22 @@ export const SURFACE = {
 // Tailwind classes alongside hex, so they stay there as the single source.
 // Need raw hex? Use PRIORITY_STYLES[level].hex.
 
-// ── Board column palette (canonical Draft 5.2) ──────────────────────────────
-// Predefined 10-color set. No color picker — auto-assigns left to right on
-// column creation; user can swap within the set. Use the hex with an alpha
-// suffix for tinting (e.g., `${color}06` for column bg, `${color}12` for header).
+// ── Board status spectrum (canonical 2026-06-13) ────────────────────────────
+// 8 semantic colors forming a warm→cool workflow arc (Backlog → Done), with
+// Blocked as semantic red outside the flow. This is the swatch set the
+// Settings → Board Columns picker offers. These colors are hard-wired into
+// pills, dots, calendar chips, etc. via `board_columns.color`, so changes here
+// ripple app-wide. Use the hex with an alpha suffix for tinting (e.g.
+// `${color}06` column bg, `${color}12` header).
+// NOTE (white-label): other orgs may need more columns; expand this curated
+// set per-org — a free color picker is unsafe given how widely colors are used.
 export const BOARD_COLUMN_PALETTE = [
-  { name: 'Navy',     hex: '#005D97' },
-  { name: 'Cerulean', hex: '#2E8BC0' },
-  { name: 'Iris',     hex: '#6366F1' },
-  { name: 'Amethyst', hex: '#7C3AED' },
-  { name: 'Berry',    hex: '#B8447A' },
-  { name: 'Coral',    hex: '#C4504A' },
-  { name: 'Peach',    hex: '#D98A6B' },
-  { name: 'Sage',     hex: '#4D9B6E' },
-  { name: 'Teal',     hex: '#0F8B8D' },
-  { name: 'Slate',    hex: '#64748B' },
+  { name: 'Slate',    hex: '#94A3B8' }, // Backlog — neutral / not started
+  { name: 'Apricot',  hex: '#FFB07C' }, // Research/Outline
+  { name: 'Orchid',   hex: '#D279D2' }, // Draft
+  { name: 'Wisteria', hex: '#6E7BC0' }, // In Review — bluer nudge, off Ordinal's lavender
+  { name: 'Mint',     hex: '#92D1B2' }, // Approved
+  { name: 'Teal',     hex: '#18767A' }, // Scheduled
+  { name: 'Cobalt',   hex: '#0061C2' }, // Published/Done
+  { name: 'Crimson',  hex: '#BA2C2C' }, // Blocked (semantic, = accent-crimson)
 ] as const;

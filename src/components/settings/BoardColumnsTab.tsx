@@ -9,8 +9,7 @@ import {
 } from 'lucide-react';
 import { BOARD_COLUMN_PALETTE } from '../../lib/colors';
 
-// Canonical 10-color board column palette (Draft 5.2).
-// Use this array of hex values; the named-color metadata lives in colors.ts.
+// Canonical 8-color board status spectrum (see colors.ts). Swatch set for the picker.
 const COLOR_PALETTE = BOARD_COLUMN_PALETTE.map((c) => c.hex);
 
 interface BoardColumnsTabProps {

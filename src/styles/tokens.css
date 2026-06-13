@@ -85,6 +85,20 @@
   --color-state-info: 0 93 151;            /* #005D97 (= brand-600) */
   --color-state-completed: 74 111 160;        /* #4A6FA0 — done/completed (distinct from success-green) */
   --color-state-completed-tint: 183 206 236;  /* #B7CEEC */
+
+  /* ── Status spectrum (board workflow arc) ───────────────────────────── */
+  /* Default warm→cool spectrum for board statuses. The app renders actual
+     columns from `board_columns.color` at runtime; these tokens are the
+     canonical default + a stable by-name reference (e.g. done/blocked) for
+     components that need a status color independent of DB state. */
+  --color-status-backlog:   148 163 184;  /* #94A3B8 — Slate */
+  --color-status-research:  255 176 124;  /* #FFB07C — Apricot */
+  --color-status-draft:     210 121 210;  /* #D279D2 — Orchid */
+  --color-status-review:    110 123 192;  /* #6E7BC0 — Wisteria (bluer, off Ordinal lavender) */
+  --color-status-approved:  146 209 178;  /* #92D1B2 — Mint (= accent-mint) */
+  --color-status-scheduled:  24 118 122;  /* #18767A — Teal */
+  --color-status-done:        0  97 194;  /* #0061C2 — Cobalt (board "Published/Done" status). INTENTIONALLY distinct from --color-state-completed (#4A6FA0) above, which stays steel for completion checkmarks + subtask-done — do not merge. */
+  --color-status-blocked:   186  44  44;  /* #BA2C2C — Crimson (= accent-crimson) */
 }
 
 /* Reserved for the dark-mode color pass (follow-up project). Empty body is
