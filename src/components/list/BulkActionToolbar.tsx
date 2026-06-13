@@ -10,7 +10,6 @@ import {
   datePickerPopoverClass,
   datePickerPopoverStyle,
 } from '../ui/DatePicker';
-import { isDoneStatus } from '../../lib/itemHelpers';
 import type { Profile, BoardColumn } from '../../lib/database.types';
 
 /**
@@ -170,16 +169,9 @@ export function BulkActionToolbar({
       const { data: { user } } = await supabase.auth.getUser();
       const status = boardColumns.find((bc) => bc.id === statusId);
 
-      const isDone = isDoneStatus(status?.name);
+      // completed / completed_at are derived from status by the DB trigger
+      // (trg_sync_completed_from_status), per-row — payload carries status only.
       const payload: Record<string, unknown> = { status: statusId };
-      if (isDone) {
-        payload.completed = true;
-        payload.completed_at = new Date().toISOString();
-      } else {
-        // Moving OUT of a done column → reset completed flags so view stays consistent
-        payload.completed = false;
-        payload.completed_at = null;
-      }
 
       const updates = selectedIds.map(async (id) => {
         await supabase.from('content_items').update(payload).eq('id', id);

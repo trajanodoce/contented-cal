@@ -1596,21 +1596,9 @@ function BoardTab({
     if (!item || !targetColumn) return;
     if (item.status === targetColumnId) return;
 
-    // Sync completed boolean when moving to/from done columns
-    const targetName = targetColumn.name.toLowerCase();
-    const isDoneColumn = targetName === 'published/done' || targetName === 'published' || targetName === 'completed';
+    // completed / completed_at are derived from status by the DB trigger
+    // (trg_sync_completed_from_status) — the client payload carries status only.
     const updatePayload: Record<string, unknown> = { status: targetColumnId };
-    if (isDoneColumn) {
-      updatePayload.completed = true;
-      updatePayload.completed_at = new Date().toISOString();
-    } else {
-      const prevCol = boardColumns.find(c => c.id === item.status);
-      const prevName = prevCol?.name?.toLowerCase();
-      if (prevName === 'published/done' || prevName === 'published' || prevName === 'completed') {
-        updatePayload.completed = false;
-        updatePayload.completed_at = null;
-      }
-    }
 
     const { error } = await supabase
       .from('content_items')

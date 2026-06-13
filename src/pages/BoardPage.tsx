@@ -422,20 +422,9 @@ export function BoardPage() {
     if (!item || !targetColumn) return;
     if (item.status === targetColumnId) return;
 
-    // Sync completed boolean when moving to/from done columns
-    const isDoneCol = isDoneStatus(targetColumn.name);
+    // completed / completed_at are derived from status by the DB trigger
+    // (trg_sync_completed_from_status) — the client payload carries status only.
     const updatePayload: Record<string, unknown> = { status: targetColumnId };
-    if (isDoneCol) {
-      updatePayload.completed = true;
-      updatePayload.completed_at = new Date().toISOString();
-    } else {
-      // Moving out of a done column — mark incomplete
-      const prevCol = columns.find(c => c.id === item.status);
-      if (isDoneStatus(prevCol?.name)) {
-        updatePayload.completed = false;
-        updatePayload.completed_at = null;
-      }
-    }
 
     const { error } = await supabase
       .from('content_items')
